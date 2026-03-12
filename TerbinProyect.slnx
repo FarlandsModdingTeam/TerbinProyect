@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="TerbinLibrary/TerbinLibrary.csproj" />
+  <Project Path="TerbinService/TerbinService.csproj" />
+</Solution>
