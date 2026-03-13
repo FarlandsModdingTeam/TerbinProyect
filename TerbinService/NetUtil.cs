@@ -38,82 +38,92 @@ public static class NetUtil
     }
 
 
-    public static async Task<bool> DownloadWithProgress(string eUrl, string eDestination)
+    public static async Task<bool> DownloadWithProgress(
+                                            string pUrl,
+                                            string pDestination,
+                                            IProgress<double>? pProgress = null,
+                                            CancellationToken pCancellationToken = default)
     {
-        using var response = await _httpClient.GetAsync(eUrl, HttpCompletionOption.ResponseHeadersRead);
+        using var response = await GetResponseAsync(pUrl, pCancellationToken);
 
-        if (response.StatusCode != HttpStatusCode.OK)
-        {
+        if (!IsResponseOk(response))
             return false;
-        }
 
-        var total = response.Content.Headers.ContentLength ?? -1L;
-        using var stream = await response.Content.ReadAsStreamAsync();
-        using var fs = new FileStream(eDestination, FileMode.Create, FileAccess.Write, FileShare.None);
+        var total = GetContentLength(response);
 
+        await using var networkStream = await GetNetworkStreamAsync(response, pCancellationToken);
+        await using var fileStream = CreateFileStream(pDestination);
 
-        var buffer = new byte[81920];
-        long totalRead = 0;
-        int read;
-        while ((read = await stream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-        {
-            await fs.WriteAsync(buffer.AsMemory(0, read));
-            totalRead += read;
-            if (total > 0)
-            {
-                // ESTO LEE.
-            }
-        }
+        await CopyStreamWithProgressAsync(
+            networkStream,
+            fileStream,
+            total,
+            pProgress,
+            pCancellationToken);
 
         return true;
     }
 
-    public static async Task<bool> DownloadWithProgress(
-        HttpClient httpClient,
-        string url,
-        string destination,
-        IProgress<double>? progress = null,
-        CancellationToken cancellationToken = default)
+    public static bool IsResponseOk(HttpResponseMessage pResponse)
     {
-        using var response = await httpClient.GetAsync(
-            url,
+        return pResponse.IsSuccessStatusCode;
+    }
+    public static Task<HttpResponseMessage> GetResponseAsync(string pUrl, CancellationToken pCancellationToken)
+    {
+        return _httpClient.GetAsync(
+            pUrl,
             HttpCompletionOption.ResponseHeadersRead,
-            cancellationToken);
-
-        if (!response.IsSuccessStatusCode)
-            return false;
-
-        var total = response.Content.Headers.ContentLength;
-
-        await using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-
-        await using var fs = new FileStream(
-            destination,
+            pCancellationToken);
+    }
+    public static long? GetContentLength(HttpResponseMessage pResponse)
+    {
+        return pResponse.Content.Headers.ContentLength;
+    }
+    public static Task<Stream> GetNetworkStreamAsync(HttpResponseMessage pResponse, CancellationToken pCancellationToken)
+    {
+        return pResponse.Content.ReadAsStreamAsync(pCancellationToken);
+    }
+    public static FileStream CreateFileStream(string pDestination)
+    {
+        return new FileStream(
+            pDestination,
             FileMode.Create,
             FileAccess.Write,
             FileShare.None,
             bufferSize: 81920,
             useAsync: true);
-
+    }
+    public static async Task CopyStreamWithProgressAsync(Stream pSource, Stream pDestination, long? pTotal, IProgress<double>? pProgress, CancellationToken pCancellationToken)
+    {
         var buffer = new byte[81920];
         long totalRead = 0;
         int read;
 
-        while ((read = await stream.ReadAsync(buffer.AsMemory(0, buffer.Length), cancellationToken)) > 0)
+        while ((read = await pSource.ReadAsync(
+                   buffer.AsMemory(0, buffer.Length),
+                   pCancellationToken)) > 0)
         {
-            await fs.WriteAsync(buffer.AsMemory(0, read), cancellationToken);
+            await pDestination.WriteAsync(
+                buffer.AsMemory(0, read),
+                pCancellationToken);
 
             totalRead += read;
 
-            if (total.HasValue && progress != null)
-            {
-                double percent = (double)totalRead / total.Value * 100;
-                progress.Report(percent);
-            }
+            ReportProgress(totalRead, pTotal, pProgress);
         }
-
-        return true;
     }
+    public static void ReportProgress(long pTotalRead, long? pTotal, IProgress<double>? pProgress)
+    {
+        if (!pTotal.HasValue || pProgress == null)
+            return;
+
+        double percent = (double)pTotalRead / pTotal.Value * 100;
+        pProgress.Report(percent);
+    }
+
+
+
+
 
     public static string DownloadString(string eUrl)
     {
