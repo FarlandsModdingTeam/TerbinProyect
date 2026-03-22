@@ -17,11 +17,11 @@ public partial class HandleInstances
     /// 
     /// </summary>
     /// <returns></returns>
-    public static bool InstallBepInEx(string eDest) // enterDestination
+    public static bool InstallBepInEx(string eDest)
     {
-        // TODO: Instalar Bepinex en la instancia.
         string url = LibraryInstances.URL_BepInEx;
-
+        // return NetUtil.InstallZip(url, eDest); // devuelve Task<>
+    
         throw new NotImplementedException();
     }
 

@@ -21,7 +21,7 @@ public static class NetUtil
 {
     private static readonly HttpClient _httpClient = new();
 
-    public static async Task<bool> InstallZip(string pUrl, string pDestination, string pNameArchive)
+    public static async Task<bool> InstallZip(string pUrl, string pDestination)
     {
         bool result = true;
         string tmp = "";
@@ -43,7 +43,7 @@ public static class NetUtil
         }
         catch (Exception e)
         {
-            // TODO: guardar error -> DebugLogger.
+            // TODO: DebugLogger.
             result = false;
         }
         finally
@@ -55,7 +55,7 @@ public static class NetUtil
             }
             catch
             {
-                // TODO: guardar error -> DebugLogger.
+                // TODO: DebugLogger.
             }
         }
 
