@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TerbinLibrary.Communication
+namespace TerbinLibrary.Communication;
+public enum Action : byte
 {
-    public enum Action : byte
-    {
-        None = 0,
-        PlaceHolder = 1,
-    }
+    None = 0,
+    PlaceHolder = 1,
+}
 
 
-    public struct Header
-    {
-        private Guid _id; // pruebas y esas cosas.
-        private Action _action;
-
-
-    }
+public struct Header
+{
+    public Guid Id;
+    public Action ActionHeader;
 }
