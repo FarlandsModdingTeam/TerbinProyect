@@ -20,20 +20,29 @@ public class CommunicationThreads
     public static void Init()
     {
         using var server = new NamedPipeServerStream("TerbinPipe");
-        server.WaitForConnection();
-
-        using var reader = new StreamReader(server);
-        using var writer = new StreamWriter(server);
-        writer.AutoFlush = true;
-
         while (true)
         {
-            //var msg = reader.ReadLine();
+            server.WaitForConnection();
+
+            _ = read(server);
+            _ = send(server);
         }
     }
 
-    internal async void send(StreamWriter pWriter)
+    private static async Task read(NamedPipeServerStream pServer)
     {
+        using var reader = new StreamReader(pServer);
+
+        char[] a = [];
+        var r = await reader.ReadBlockAsync(a, 1, 1);
+
+
+    }
+
+    private static async Task send(NamedPipeServerStream pServer)
+    {
+        //using var writer = new StreamWriter(pServer);
+        //writer.AutoFlush = true;
         // pWriter.WriteAsync();
     }
 }

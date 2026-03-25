@@ -1,17 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Runtime.InteropServices;
 
 namespace TerbinLibrary.Communication;
-public enum Action : byte
+public enum CodeAction : byte
 {
-    None = 0,
+    Stop = 0,
     PlaceHolder = 1,
 }
-
-
-public struct Header
+public enum CodeStatus : short
 {
-    public Guid Id;
-    public Action ActionHeader;
+    NotAsign = -1,
+
+    Succes = 200,
+
+    NotFound = 404,
+    //etc...
+}
+
+[StructLayout(LayoutKind.Sequential)]
+public struct Capsule
+{
+    public Guid IdClient;
+    public CodeAction Action;
+    public CodeStatus Status;
 }
