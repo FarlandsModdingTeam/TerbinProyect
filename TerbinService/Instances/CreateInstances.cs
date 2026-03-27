@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
-using TerbinLibrary.Instances;
+using TerbinLibrary;
 
 namespace TerbinService.Instances;
 
@@ -19,7 +19,7 @@ public partial class HandleInstances
     /// <returns></returns>
     public static bool InstallBepInEx(string eDest)
     {
-        string url = LibraryInstances.URL_BepInEx;
+        string url = TerbinURLs.BepInEx;
         // return NetUtil.InstallZip(url, eDest); // devuelve Task<>
     
         throw new NotImplementedException();
