@@ -13,8 +13,8 @@ namespace TerbinService;
   empieza: "p"en minuscula = parametro entrante local.
   empieza: mayuscula = publica.
  -- Funciones:
-  empieza: mayuscula = publica.
-  empieza: minuscula = privada.
+  empieza: mayorculas = publica.
+  empieza: menorculas = privada.
  */
 
 public static class NetUtil
