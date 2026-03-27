@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
-using System.Text;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using TerbinLibrary.Communication;
 
 namespace TerbinService.Communication;
@@ -19,24 +20,45 @@ public class CommunicationThreads
 {
     public static void Init()
     {
-        using var server = new NamedPipeServerStream("TerbinPipe");
+        _ = createPipe();
+    }
+
+    private static async Task createPipe()
+    {
         while (true)
         {
-            server.WaitForConnection();
+            using var pipe = new NamedPipeServerStream(
+                    "TerbinPipe",
+                    PipeDirection.In | PipeDirection.Out,
+                    NamedPipeServerStream.MaxAllowedServerInstances,
+                    PipeTransmissionMode.Byte,
+                    PipeOptions.Asynchronous);
 
-            _ = read(server);
-            _ = send(server);
+            await pipe.WaitForConnectionAsync();
+
+            _ = Task.Run(() => createPipe());
+            _ = Task.Run(() => handleClient(pipe));
         }
+    }
+
+    private static async Task handleClient(NamedPipeServerStream pPipe)
+    {
+        //_ = read(pPipe);
+        //_ = send(pPipe);
+
+
     }
 
     private static async Task read(NamedPipeServerStream pServer)
     {
-        using var reader = new StreamReader(pServer);
+        /*
+         using var reader = new StreamReader(pServer);
 
-        char[] a = [];
-        var r = await reader.ReadBlockAsync(a, 1, 1);
+        while (true)
+        {
 
-
+        }
+         */
     }
 
     private static async Task send(NamedPipeServerStream pServer)
