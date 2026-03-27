@@ -7,7 +7,6 @@ using System.Text;
 namespace TerbinLibrary.Communication;
 
 
-// TODO: (Mangincian): ver si hace falta MarshalByRefObject;
 public class StreamReadBytes : StreamBytes
 {
     public StreamReadBytes(Stream pPipeStream) : base(pPipeStream)
@@ -20,10 +19,21 @@ public class StreamReadBytes : StreamBytes
     {
         byte[] buffer = new byte[Marshal.SizeOf<T>()];
 
-        await PipeStream.ReadAsync(buffer.AsMemory(0, buffer.Length));
+        int totalRead = 0;
+        while (totalRead < buffer.Length)
+        {
+            int read = await PipeStream.ReadAsync(
+                buffer.AsMemory(totalRead, buffer.Length - totalRead)
+            );
+
+            if (read == 0)
+                throw new EndOfStreamException("Stream cerrado antes de leer todos los bytes");
+
+            totalRead += read;
+        }
+
         T data = BytesToStruct<T>(buffer);
-
-
+        return data;
     }
 }
 public class StreamWritesBytes : StreamBytes
@@ -35,6 +45,7 @@ public class StreamWritesBytes : StreamBytes
 }
 
 
+// TODO: (Mangincian): ver si hace falta MarshalByRefObject;
 public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
 {
     private Stream _pipeStream;
