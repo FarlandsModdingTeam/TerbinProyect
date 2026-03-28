@@ -11,12 +11,12 @@ namespace TerbinService.Communication;
 // ├─Usar Reflexión para a las clases y metodos sin tener un swich enorme.
 // └─Intentar instalar BepiEx.
 
-public interface IServer
+public interface ITerbinExecutable
 {
-    void Init();
+    static abstract void Init();
 }
 
-public class CommunicationThreads
+public class CommunicationThreads : ITerbinExecutable
 {
     public static void Init()
     {

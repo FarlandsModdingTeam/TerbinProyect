@@ -7,9 +7,9 @@ using System.Text;
 namespace TerbinLibrary.Communication;
 
 
-public class StreamReadBytes : StreamBytes
+public class StreamReadStruct : StreamBytes
 {
-    public StreamReadBytes(Stream pPipeStream) : base(pPipeStream)
+    public StreamReadStruct(Stream pPipeStream) : base(pPipeStream)
     {
     }
 
@@ -17,31 +17,21 @@ public class StreamReadBytes : StreamBytes
 
     public async Task<T> ReadAsycn<T>() where T : struct
     {
-        byte[] buffer = new byte[Marshal.SizeOf<T>()];
-
-        int totalRead = 0;
-        while (totalRead < buffer.Length)
-        {
-            int read = await PipeStream.ReadAsync(
-                buffer.AsMemory(totalRead, buffer.Length - totalRead)
-            );
-
-            if (read == 0)
-                throw new EndOfStreamException("Stream cerrado antes de leer todos los bytes");
-
-            totalRead += read;
-        }
-
-        T data = BytesToStruct<T>(buffer);
-        return data;
+        byte[] buffer = await base.ReadAsycn(Marshal.SizeOf<T>());
+        return BytesToStruct<T>(buffer);
     }
 }
-public class StreamWritesBytes : StreamBytes
+public class StreamWritesStruct : StreamBytes
 {
-    public StreamWritesBytes(Stream pPipeStream) : base(pPipeStream)
+    public StreamWritesStruct(Stream pPipeStream) : base(pPipeStream)
     {
     }
 
+    public async Task WriteAsycn<T>(T pStruct) where T : struct
+    {
+        byte[] buffer = StructToBytes<T>(pStruct);
+        await base.WriteAsync(buffer);
+    }
 }
 
 
@@ -60,6 +50,35 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
     {
         this._pipeStream = pPipeStream;
 
+    }
+
+    public virtual async Task<byte[]> ReadAsycn(int pSize)
+    {
+        byte[] buffer = new byte[pSize];
+
+        int totalRead = 0;
+        while (totalRead < buffer.Length)
+        {
+            int read = await PipeStream.ReadAsync(
+                buffer.AsMemory(totalRead, buffer.Length - totalRead)
+            );
+
+            if (read == 0)
+                throw new EndOfStreamException("(StreamBytes>ReadAsycn): Stream closed before reading all bytes");
+
+            totalRead += read;
+        }
+
+        return buffer;
+    }
+
+    public virtual async Task WriteAsync(byte[] buffer)
+    {
+        if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+        if (PipeStream == null) throw new InvalidOperationException("(StreamBytes>ReadAsycn): PipeStream is Null.");
+
+        await PipeStream.WriteAsync(buffer.AsMemory(0, buffer.Length));
+        await PipeStream.FlushAsync();
     }
 
 
