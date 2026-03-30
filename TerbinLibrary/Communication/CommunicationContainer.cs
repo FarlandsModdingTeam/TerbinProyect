@@ -70,5 +70,5 @@ public struct Capsule
     // ¿Si no pasas Guid sigue pasando bytes?
 }
 
-// TODO: Todo el tema del TerbinCommandAttribute deberia estar en TerbinProyect no en TerbinLibrary.
+// TODO: Todo el tema del TerbinCommandAttribute deberia estar en TerbinService no en TerbinLibrary.
 // TODO: Como mucho aqui deberia estar el tema de serializar y deserializar los parametros.

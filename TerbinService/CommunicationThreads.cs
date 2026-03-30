@@ -46,7 +46,10 @@ public class CommunicationThreads : ITerbinExecutable
         //_ = read(pPipe);
         //_ = send(pPipe);
 
-
+        while (true)
+        {
+            // TODO: Alguna forma esperar a que mande un mensaje.
+        }
     }
 
     private static async Task read(NamedPipeServerStream pServer)

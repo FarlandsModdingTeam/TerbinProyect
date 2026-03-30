@@ -6,12 +6,26 @@ using System.Text;
 using TerbinLibrary.Communication;
 
 namespace TerbinService;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayorculas = publica.
+  empieza: menorculas = privada.
+ */
 
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 public sealed class TerbinExecutableAttribute : Attribute
 {
     public CodeAction Action { get; }
+
+    // TODO: guardar la lista de types de la funcion.
+    // TODO: funcion estatica que serialice/deserialice a los tipos y cantidades guardadas.
+
     public TerbinExecutableAttribute(CodeAction pAction) => Action = pAction;
     public TerbinExecutableAttribute(byte pAction) => Action = (CodeAction)pAction;
 }
@@ -34,7 +48,7 @@ public sealed class ExecutableDispatcher
     public bool Unregister(CodeAction pAction) => _handlers.TryRemove(pAction, out _);
 
 
-    public async Task<Capsule> DispatchAsync(Capsule capsule)
+    public async Task<Capsule> DispatchAsync(Capsule capsule) // Aqui es donde se ejecuta, manda cojones.
     {
         if (!_handlers.TryGetValue(capsule.ActionMethod, out var handler))
         {
@@ -82,13 +96,5 @@ public sealed class ExecutableDispatcher
                 Register(attr.Action, (h, b) => del(h, b));
             }
         }
-    }
-
-
-    // En proceso, no se si esto es posible, no se como hacerlo.
-    public void /*TODO: que pueda devolver algo*/ Invoke(byte[] pParameters)
-    {
-        // TODO: que puedas invocar un metodo que que tenga cualquier tipo de parametros.
-        // TODO: serializar pParameters en los parametros del metodo.
     }
 }

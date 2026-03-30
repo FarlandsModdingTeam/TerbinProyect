@@ -3,13 +3,24 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using TerbinLibrary;
+using TerbinLibrary.Communication;
 
 namespace TerbinService.Instances;
 
 public partial class HandleInstances
 {
+    [TerbinExecutable(CodeAction.CreateInstance)]
+    public static async Task<Capsule> Create(Header pHead, byte[] pParameters)
+    {
 
 
+        return new Capsule
+        {
+            Head = pHead,
+            ActionMethod = CodeAction.CreateInstance,
+            Parameters = Array.Empty<byte>() // pruebas
+        };
+    }
 
 
 
