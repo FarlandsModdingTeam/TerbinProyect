@@ -13,8 +13,6 @@ public class StreamReadStruct : StreamBytes
     {
     }
 
-
-
     public async Task<T> ReadAsycn<T>() where T : struct
     {
         byte[] buffer = await base.ReadAsycn(Marshal.SizeOf<T>());
