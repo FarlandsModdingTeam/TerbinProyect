@@ -20,11 +20,11 @@ namespace TerbinService.Communication;
 // TODO: Movelo a TerbinLibrary.
 public class CommunicationThreads
 {
-    public NamedPipeServerStream NewTerbinPipe
+    public static NamedPipeServerStream NewTerbinPipe
     {
         get => CreateServerPipe();
     }
-    public NamedPipeClientStream NewClientTerbinPipe
+    public static NamedPipeClientStream NewClientTerbinPipe
     {
         get => CreateClientPipe();
     }
