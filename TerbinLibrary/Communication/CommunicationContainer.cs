@@ -63,6 +63,19 @@ public struct Header
     public Guid IdRequest; // ¿Realmente es necesario?
     public ushort OrderRequest;
     public CodeStatus Status;
+
+    public static Header CreateRegural(
+        Guid? pIdRequest = null,
+        ushort? pOrderRequest = null,
+        CodeStatus? pStatus = null)
+    {
+        return new Header
+        {
+            IdRequest = pIdRequest ?? Guid.NewGuid(),
+            OrderRequest = pOrderRequest ?? 0,
+            Status = pStatus ?? CodeStatus.NotAsign,
+        };
+    }
 }
 
 [StructLayout(LayoutKind.Sequential)]
@@ -77,6 +90,22 @@ public struct Capsule
     public byte Payload;
     // TODO: Pasar Guid de tuberia para parametros;
     // ¿Si no pasas Guid sigue pasando bytes?
+
+    public static Capsule CreateRegural(
+        Header? pHead = null,
+        CodeAction? pActionMethod = null,
+        byte? pIdMemory = null,
+        byte? pPayload = null
+        )
+    {
+        return new Capsule
+        {
+            Head = pHead ?? Header.CreateRegural(),
+            ActionMethod = pActionMethod ?? CodeAction.Load,
+            IdMemory = pIdMemory ?? 0, // TODO: pedir al servidor un hueco vacio.
+            Payload = pPayload ?? 0,
+        };
+    }
 }
 
 // 16 bytes es el guid y los restantes 7 es el resto de mensaje XD.
