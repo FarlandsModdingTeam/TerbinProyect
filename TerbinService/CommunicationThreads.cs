@@ -47,18 +47,18 @@ public class CommunicationThreads
                 PipeOptions.Asynchronous);
     }
 
-    public static void CreateServerThread()
-    {
-        throw new NotImplementedException();
-    }
+    //public static async Task CreateServerThread()
+    //{
+    //}
 
 
-
+    [Obsolete]
     public static void Init()
     {
         _ = createPipe();
     }
 
+    [Obsolete]
     private static async Task createPipe()
     {
         //while (!Worker.Cts.Token.IsCancellationRequested)
@@ -80,6 +80,7 @@ public class CommunicationThreads
         _ = handleClient(pipe);
     }
 
+    [Obsolete]
     private static async Task handleClient(NamedPipeServerStream pPipe)
     {
         //_ = handleRead(pPipe);

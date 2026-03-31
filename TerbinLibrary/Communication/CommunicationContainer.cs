@@ -58,6 +58,7 @@ public enum CodeStatus : short
     GenericWorkerError = 500,
 }
 
+// TODO: Hacerles getter y setters + valor predeterminado, con eso nos olvidamos del constructor.
 [StructLayout(LayoutKind.Sequential)]
 public struct Header
 {
@@ -76,6 +77,7 @@ public struct Header
     }
 }
 
+// TODO: Hacerles getter y setters + valor predeterminado, con eso nos olvidamos del constructor.
 [StructLayout(LayoutKind.Sequential)]
 public struct Capsule
 {

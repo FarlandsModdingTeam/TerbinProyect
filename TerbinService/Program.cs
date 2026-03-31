@@ -17,7 +17,7 @@ async Task simulateClient()
 {
     await Task.Delay(1000);
 
-    Console.WriteLine("[Cliente] Creando Encapsulamiento...");
+    Console.WriteLine("[Client] Creando Encapsulamiento...");
     var id = Guid.NewGuid();
     var header = new Header(id);
     var cap = new Capsule(pHead: header, pActionMethod: CodeAction.CreateInstance);
@@ -40,6 +40,7 @@ async Task simulateClient()
     await writer.WriteAsycn<Capsule>(capClose);
 }
 
+// TODO: Adaptar y meter en Library.
 async Task manejerSends(NamedPipeClientStream pPipe)
 {
     var reader = new StreamReadStruct(pPipe);
@@ -47,5 +48,10 @@ async Task manejerSends(NamedPipeClientStream pPipe)
     {
         var r = await reader.ReadAsycn<Capsule>();
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
+        if (r.ActionMethod == CodeAction.Stop && // Nunca llega esta respuesta.
+            r.Head.Status == CodeStatus.Succes)
+        {
+            break;
+        }
     }
 }

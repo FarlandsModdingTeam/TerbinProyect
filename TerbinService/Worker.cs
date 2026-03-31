@@ -1,3 +1,4 @@
+using System.IO.Pipes;
 using System.Reflection;
 using TerbinLibrary.Communication;
 using TerbinService.Communication;
@@ -5,7 +6,7 @@ using TerbinService.Instances;
 
 namespace TerbinService;
 
-// Loco ¿Porque una clase tiene parametros de entrada?
+
 public class Worker(ILogger<Worker> logger) : BackgroundService
 {
     public static CancellationTokenSource? Cts;
@@ -16,20 +17,47 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
 
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
 
-        CommunicationThreads.Init();
+        //CommunicationThreads.Init();
+        _ = autoCreatePipe();
     }
+
+    private async Task autoCreatePipe()
+    {
+        var pipe = CommunicationThreads.NewTerbinPipe;
+        await pipe.WaitForConnectionAsync(Cts.Token);
+
+        _ = Task.Run(() => autoCreatePipe(), Cts.Token);
+        _ = handleClient(pipe, Cts.Token);
+    }
+
+    private async Task handleClient(NamedPipeServerStream pPipe, CancellationToken pTokenCancellation)
+    {
+        StreamReadStruct reader = new(pPipe);
+        StreamWritesStruct writer = new(pPipe);
+
+        while (!pTokenCancellation.IsCancellationRequested)
+        {
+            Capsule cap = await reader.ReadAsycn<Capsule>(pTokenCancellation);
+            //Console.WriteLine($"[Worker] Client {cap.Head.IdRequest:N}");
+
+            var capR = await ExecutableDispatcher.DispatchAsync(cap);
+
+            _ = writer.WriteAsycn<Capsule>(capR);
+        }
+    }
+
 
     [TerbinExecutable(CodeAction.Stop)]
     public static async Task<Capsule> Stop(Header pHead, MemoryStream pPaarameters)
     {
-        Console.WriteLine("(Worker): Stopping execution...");
-        Cts?.Cancel();
-
-        pHead.Status = CodeStatus.Succes;
-        return new Capsule
+        _ = Task.Run(async () =>
         {
-            Head = pHead,
-            ActionMethod = CodeAction.Stop,
-        };
+            await Task.Delay(2000);
+            Console.WriteLine("(Worker): Execution stoped");
+            Cts?.Cancel();
+        });
+        Console.WriteLine("(Worker): Stopping execution...");
+        pHead.Status = CodeStatus.Succes;
+        return new Capsule(pHead, CodeAction.Stop, 1);
     }
 }

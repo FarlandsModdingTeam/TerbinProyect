@@ -13,9 +13,9 @@ public class StreamReadStruct : StreamBytes
     {
     }
 
-    public async Task<T> ReadAsycn<T>() where T : struct
+    public async Task<T> ReadAsycn<T>(CancellationToken pToken = default) where T : struct
     {
-        byte[] buffer = await base.ReadAsycn(Marshal.SizeOf<T>());
+        byte[] buffer = await base.ReadAsycn(Marshal.SizeOf<T>(), pToken);
         return BytesToStruct<T>(buffer);
     }
 }
@@ -25,10 +25,10 @@ public class StreamWritesStruct : StreamBytes
     {
     }
 
-    public async Task WriteAsycn<T>(T pStruct) where T : struct
+    public async Task WriteAsycn<T>(T pStruct, CancellationToken pToken = default) where T : struct
     {
         byte[] buffer = StructToBytes<T>(pStruct);
-        await base.WriteAsync(buffer);
+        await base.WriteAsync(buffer, pToken);
     }
 }
 
@@ -49,7 +49,7 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
         this._pipeStream = pPipeStream;
     }
 
-    public virtual async Task<byte[]> ReadAsycn(int pSize)
+    public virtual async Task<byte[]> ReadAsycn(int pSize, CancellationToken pToken = default)
     {
         byte[] buffer = new byte[pSize];
 
@@ -57,7 +57,8 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
         while (totalRead < buffer.Length)
         {
             int read = await PipeStream.ReadAsync(
-                buffer.AsMemory(totalRead, buffer.Length - totalRead)
+                buffer.AsMemory(totalRead, buffer.Length - totalRead),
+                pToken
             );
 
             if (read == 0)
@@ -69,13 +70,12 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
         return buffer;
     }
 
-    public virtual async Task WriteAsync(byte[] buffer)
+    public virtual async Task WriteAsync(byte[] buffer, CancellationToken pToken = default)
     {
         if (buffer == null) throw new ArgumentNullException(nameof(buffer));
-        if (PipeStream == null) throw new InvalidOperationException("(StreamBytes>ReadAsycn): PipeStream is Null.");
 
-        await PipeStream.WriteAsync(buffer.AsMemory(0, buffer.Length));
-        await PipeStream.FlushAsync();
+        await PipeStream.WriteAsync(buffer.AsMemory(0, buffer.Length), pToken);
+        await PipeStream.FlushAsync(pToken);
     }
 
 

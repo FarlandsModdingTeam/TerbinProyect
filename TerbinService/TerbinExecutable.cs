@@ -58,7 +58,7 @@ public sealed class ExecutableDispatcher
 
         try
         {
-            return await handler(capsule.Head, new()) // Convert.FromBase64String(capsule.Parameters)
+            return await handler(capsule.Head, new())
                 .ConfigureAwait(false); // ¿?
         }
         catch
