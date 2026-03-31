@@ -19,15 +19,8 @@ async Task simulateClient()
 
     Console.WriteLine("[Cliente] Creando Encapsulamiento...");
     var id = Guid.NewGuid();
-    var cap = new Capsule
-    {
-        Head = new Header
-        {
-            IdRequest = id,
-            Status = CodeStatus.NotAsign
-        },
-        ActionMethod = CodeAction.CreateInstance,
-    };
+    var header = new Header(id);
+    var cap = new Capsule(pHead: header, pActionMethod: CodeAction.CreateInstance);
 
 
     using var pipe = new NamedPipeClientStream(".", "TerbinPipe", PipeDirection.InOut, PipeOptions.Asynchronous);
@@ -40,21 +33,11 @@ async Task simulateClient()
 
 
     await writer.WriteAsycn<Capsule>(cap);
-    //Console.WriteLine("[Cliente] Peticion Ejecutada...");
 
     await Task.Delay(1000);
-    var capClose = new Capsule
-    {
-        Head = new Header
-        {
-            IdRequest = id,
-            Status = CodeStatus.NotAsign
-        },
-        ActionMethod = CodeAction.Stop,
-        //Parameters = "" // Convert.ToBase64String(Convert.FromBase64String("f"))
-    };
+
+    var capClose = new Capsule(pHead: header, pActionMethod: CodeAction.Stop);
     await writer.WriteAsycn<Capsule>(capClose);
-    //Console.WriteLine("[Cliente] Deteniendo ejecucion...");
 }
 
 async Task manejerSends(NamedPipeClientStream pPipe)

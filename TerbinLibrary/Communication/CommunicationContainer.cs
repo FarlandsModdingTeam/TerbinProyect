@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
@@ -61,20 +62,17 @@ public enum CodeStatus : short
 public struct Header
 {
     public Guid IdRequest; // ¿Realmente es necesario?
-    public ushort OrderRequest;
+    public ushort OrderRequest; // Me imagino que tambien hay que reservar.
     public CodeStatus Status;
 
-    public static Header CreateRegural(
+    public Header(
         Guid? pIdRequest = null,
-        ushort? pOrderRequest = null,
-        CodeStatus? pStatus = null)
+        ushort pOrderRequest = 0,
+        CodeStatus pStatus = CodeStatus.NotAsign)
     {
-        return new Header
-        {
-            IdRequest = pIdRequest ?? Guid.NewGuid(),
-            OrderRequest = pOrderRequest ?? 0,
-            Status = pStatus ?? CodeStatus.NotAsign,
-        };
+        IdRequest = pIdRequest ?? Guid.NewGuid();
+        OrderRequest = pOrderRequest;
+        Status = pStatus;
     }
 }
 
@@ -86,25 +84,20 @@ public struct Capsule
     // Deberia hacer que IdMemory sea un byte y tener una RAM (almacen de memorias xd) o tener un almacen por funcion /
     // y que IdMemory sea un CodeAction y guardar los datos en la memoria especifica de la funcion y ya no tengo /
     // que especificarlo pero IdMemory se quedaria vacio pero si es byte el cliente tiene que medio gestionar la memoria.
-    public byte IdMemory;
+    public byte IdMemory; // Reservarse los 10 primeros
     public byte Payload;
-    // TODO: Pasar Guid de tuberia para parametros;
-    // ¿Si no pasas Guid sigue pasando bytes?
 
-    public static Capsule CreateRegural(
-        Header? pHead = null,
-        CodeAction? pActionMethod = null,
-        byte? pIdMemory = null,
-        byte? pPayload = null
-        )
+    public Capsule(
+        Header pHead = new(),
+        CodeAction pActionMethod = CodeAction.Load,
+        byte pIdMemory = 0,
+        byte pPayload = 0)
     {
-        return new Capsule
-        {
-            Head = pHead ?? Header.CreateRegural(),
-            ActionMethod = pActionMethod ?? CodeAction.Load,
-            IdMemory = pIdMemory ?? 0, // TODO: pedir al servidor un hueco vacio.
-            Payload = pPayload ?? 0,
-        };
+        Head = pHead;
+        ActionMethod = pActionMethod;
+        // TODO: gestionar espacio automatico.
+        IdMemory = (pIdMemory < 10) ? (byte)10 : pIdMemory;
+        Payload = pPayload;
     }
 }
 
