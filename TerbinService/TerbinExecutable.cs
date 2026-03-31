@@ -31,7 +31,7 @@ public sealed class TerbinExecutableAttribute : Attribute
 }
 
 // NOTA: ¿Para que sirve esto?.
-public delegate Task<Capsule> ExecutableHandler(Header Action, MemoryStream parameters);
+public delegate Task<Capsule> ExecutableHandler(Header pHead, MemoryStream pParameters);
 
 
 public sealed class ExecutableDispatcher
@@ -63,7 +63,7 @@ public sealed class ExecutableDispatcher
         }
         catch
         {
-            capsule.Head.Status = CodeStatus.NotAsign;
+            capsule.Head.Status = CodeStatus.GenericWorkerError;
             return capsule;
         }
     }
@@ -83,7 +83,7 @@ public sealed class ExecutableDispatcher
                 var parameters = method.GetParameters();
                 if (parameters.Length != 2 ||
                     parameters[0].ParameterType != typeof(Header) ||
-                    parameters[1].ParameterType != typeof(byte[]))
+                    parameters[1].ParameterType != typeof(MemoryStream))
                     continue;
 
                 if (method.ReturnType != typeof(Task<Capsule>))

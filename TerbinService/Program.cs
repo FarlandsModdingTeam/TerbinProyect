@@ -1,5 +1,5 @@
 using System.IO.Pipes;
-using System.Reflection;
+using System.Runtime.InteropServices;
 using TerbinLibrary.Communication;
 using TerbinService;
 using TerbinService.Communication;
@@ -17,46 +17,52 @@ async Task simulateClient()
 {
     await Task.Delay(1000);
 
-    Console.WriteLine("Creando Encapsulamiento...");
+    Console.WriteLine("[Cliente] Creando Encapsulamiento...");
     var id = Guid.NewGuid();
     var cap = new Capsule
     {
         Head = new Header
         {
-            IdClient = id,
+            IdRequest = id,
             Status = CodeStatus.NotAsign
         },
         ActionMethod = CodeAction.CreateInstance,
-        //Parameters = "" // Convert.ToBase64String(Convert.FromBase64String("f"))
     };
 
-    await Task.Delay(1000);
 
     using var pipe = new NamedPipeClientStream(".", "TerbinPipe", PipeDirection.InOut, PipeOptions.Asynchronous);
     await pipe.ConnectAsync();
+
+    _ = manejerSends(pipe);
+
+    await Task.Delay(1000);
     var writer = new StreamWritesStruct(pipe);
 
-    Console.WriteLine("Enviando Peticion...");
-    await writer.WriteAsycn<Capsule>(cap).ContinueWith(r =>
-    {
 
-    });
+    await writer.WriteAsycn<Capsule>(cap);
+    //Console.WriteLine("[Cliente] Peticion Ejecutada...");
 
-    // Esto es mentira no esperan.
-
+    await Task.Delay(1000);
     var capClose = new Capsule
     {
         Head = new Header
         {
-            IdClient = id,
+            IdRequest = id,
             Status = CodeStatus.NotAsign
         },
         ActionMethod = CodeAction.Stop,
         //Parameters = "" // Convert.ToBase64String(Convert.FromBase64String("f"))
     };
-    await writer.WriteAsycn<Capsule>(capClose).ContinueWith(rr =>
-    {
-        Console.WriteLine("(Deteniendo ejecucion...)");
-    });
+    await writer.WriteAsycn<Capsule>(capClose);
+    //Console.WriteLine("[Cliente] Deteniendo ejecucion...");
 }
 
+async Task manejerSends(NamedPipeClientStream pPipe)
+{
+    var reader = new StreamReadStruct(pPipe);
+    while (true)
+    {
+        var r = await reader.ReadAsycn<Capsule>();
+        Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
+    }
+}

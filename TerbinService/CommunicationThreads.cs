@@ -16,8 +16,44 @@ namespace TerbinService.Communication;
 //    static abstract void Init();
 //}
 
+// TODO: Hacerlo como libreria.
+// TODO: Movelo a TerbinLibrary.
 public class CommunicationThreads
 {
+    public NamedPipeServerStream NewTerbinPipe
+    {
+        get => CreateServerPipe();
+    }
+    public NamedPipeClientStream NewClientTerbinPipe
+    {
+        get => CreateClientPipe();
+    }
+
+    public static NamedPipeServerStream CreateServerPipe()
+    {
+        return new NamedPipeServerStream(
+                "TerbinPipe",
+                PipeDirection.In | PipeDirection.Out,
+                NamedPipeServerStream.MaxAllowedServerInstances,
+                PipeTransmissionMode.Byte,
+                PipeOptions.Asynchronous);
+    }
+    public static NamedPipeClientStream CreateClientPipe()
+    {
+        return new NamedPipeClientStream(
+                ".",
+                "TerbinPipe",
+                PipeDirection.InOut,
+                PipeOptions.Asynchronous);
+    }
+
+    public static void CreateServerThread()
+    {
+        throw new NotImplementedException();
+    }
+
+
+
     public static void Init()
     {
         _ = createPipe();
@@ -25,26 +61,29 @@ public class CommunicationThreads
 
     private static async Task createPipe()
     {
-        while (!Worker.Cts.Token.IsCancellationRequested)
-        {
-            using var pipe = new NamedPipeServerStream(
-                    "TerbinPipe",
-                    PipeDirection.In | PipeDirection.Out,
-                    NamedPipeServerStream.MaxAllowedServerInstances,
-                    PipeTransmissionMode.Byte,
-                    PipeOptions.Asynchronous);
+        //while (!Worker.Cts.Token.IsCancellationRequested)
+        //{ }
 
-            await pipe.WaitForConnectionAsync();
+        var pipe = new NamedPipeServerStream(
+                "TerbinPipe",
+                PipeDirection.In | PipeDirection.Out,
+                NamedPipeServerStream.MaxAllowedServerInstances,
+                PipeTransmissionMode.Byte,
+                PipeOptions.Asynchronous);
 
-            _ = Task.Run(() => createPipe());
-            _ = Task.Run(() => handleClient(pipe));
-        }
+        Console.WriteLine("[Worker] Waiting Client...");
+        await pipe.WaitForConnectionAsync();
+
+        _ = Task.Run(() => createPipe());
+        //_ = Task.Run(() => handleClient(pipe));
+
+        _ = handleClient(pipe);
     }
 
     private static async Task handleClient(NamedPipeServerStream pPipe)
     {
-        //_ = read(pPipe);
-        //_ = send(pPipe);
+        //_ = handleRead(pPipe);
+        //_ = handleSend(pPipe);
 
         while (!Worker.Cts.Token.IsCancellationRequested)
         {
@@ -54,6 +93,8 @@ public class CommunicationThreads
             StreamWritesStruct writer = new(pPipe);
 
             Capsule cap = await reader.ReadAsycn<Capsule>();
+            Console.WriteLine($"[Worker] Client {cap.Head.IdRequest:N}");
+
 
             var capR = await ExecutableDispatcher.DispatchAsync(cap);
 
@@ -61,7 +102,7 @@ public class CommunicationThreads
         }
     }
 
-    private static async Task read(NamedPipeServerStream pServer)
+    private static async Task handleRead(NamedPipeServerStream pServer)
     {
         /*
          using var reader = new StreamReader(pServer);
@@ -73,7 +114,7 @@ public class CommunicationThreads
          */
     }
 
-    private static async Task send(NamedPipeServerStream pServer)
+    private static async Task handleSend(NamedPipeServerStream pServer)
     {
         //using var writer = new StreamWriter(pServer);
         //writer.AutoFlush = true;

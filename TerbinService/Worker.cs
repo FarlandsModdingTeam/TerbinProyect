@@ -15,22 +15,21 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
         Cts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
 
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
-        //ExecutableDispatcher.RegisterFromAssembly(typeof(HandleInstances).Assembly);
 
         CommunicationThreads.Init();
-
-        // Tu lógica aquí, usando _cts.Token en lugar de stoppingToken
-        while (!Cts.Token.IsCancellationRequested)
-        {
-            // Trabajo del worker...
-            await Task.Delay(1000, Cts.Token);
-        }
     }
 
     [TerbinExecutable(CodeAction.Stop)]
-    public static async Task Stop(Header pHead, MemoryStream pPaarameters)
+    public static async Task<Capsule> Stop(Header pHead, MemoryStream pPaarameters)
     {
-        Console.WriteLine("(Stopping execution...)");
+        Console.WriteLine("(Worker): Stopping execution...");
         Cts?.Cancel();
+
+        pHead.Status = CodeStatus.Succes;
+        return new Capsule
+        {
+            Head = pHead,
+            ActionMethod = CodeAction.Stop,
+        };
     }
 }

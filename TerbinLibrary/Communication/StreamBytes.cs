@@ -47,7 +47,6 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
     public StreamBytes(Stream pPipeStream)
     {
         this._pipeStream = pPipeStream;
-
     }
 
     public virtual async Task<byte[]> ReadAsycn(int pSize)

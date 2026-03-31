@@ -27,7 +27,8 @@ public enum CodeAction : byte
 {
     Stop = 0,
     None = 1,
-    PlaceHolder = 2,
+    Load = 2,
+    PlaceHolder = 3,
     // etc...
 
     // methods:
@@ -59,7 +60,8 @@ public enum CodeStatus : short
 [StructLayout(LayoutKind.Sequential)]
 public struct Header
 {
-    public Guid IdClient;
+    public Guid IdRequest; // ¿Realmente es necesario?
+    public ushort OrderRequest;
     public CodeStatus Status;
 }
 
@@ -68,15 +70,20 @@ public struct Capsule
 {
     public Header Head;
     public CodeAction ActionMethod;
-    // TODO: DesSerializar los parametros en los tipos de parametros requeridos.
-    // public string Parameters; // temporal, Ayuda!.
+    // Deberia hacer que IdMemory sea un byte y tener una RAM (almacen de memorias xd) o tener un almacen por funcion /
+    // y que IdMemory sea un CodeAction y guardar los datos en la memoria especifica de la funcion y ya no tengo /
+    // que especificarlo pero IdMemory se quedaria vacio pero si es byte el cliente tiene que medio gestionar la memoria.
+    public byte IdMemory;
+    public byte Payload;
     // TODO: Pasar Guid de tuberia para parametros;
     // ¿Si no pasas Guid sigue pasando bytes?
 }
 
+// 16 bytes es el guid y los restantes 7 es el resto de mensaje XD.
+
 /*
  No Byte[], MemoryStream, string, BinaryFormatter, Span<byte>, creo que solo me queda unsafe y no se como funciona.
- */
+*/
 
 // TODO: Todo el tema del TerbinCommandAttribute deberia estar en TerbinService no en TerbinLibrary.
 // TODO: Como mucho aqui deberia estar el tema de serializar y deserializar los parametros.

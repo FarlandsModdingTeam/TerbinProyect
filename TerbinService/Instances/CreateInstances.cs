@@ -12,10 +12,10 @@ public partial class HandleInstances
     [TerbinExecutable(CodeAction.CreateInstance)]
     public static async Task<Capsule> Create(Header pHead, MemoryStream pParameters)
     {
-        Console.WriteLine("Pruebas...");
-        Console.WriteLine("Pruebas...");
-        Console.WriteLine("Pruebas...");
+        Console.WriteLine("[Worker] Pruebas...");
+        Console.WriteLine($"[Worker] Cliente: {pHead.IdRequest:N}");
 
+        pHead.Status = CodeStatus.Succes;
         return new Capsule
         {
             Head = pHead,
