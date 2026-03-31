@@ -10,15 +10,17 @@ namespace TerbinService.Instances;
 public partial class HandleInstances
 {
     [TerbinExecutable(CodeAction.CreateInstance)]
-    public static async Task<Capsule> Create(Header pHead, byte[] pParameters)
+    public static async Task<Capsule> Create(Header pHead, MemoryStream pParameters)
     {
-
+        Console.WriteLine("Pruebas...");
+        Console.WriteLine("Pruebas...");
+        Console.WriteLine("Pruebas...");
 
         return new Capsule
         {
             Head = pHead,
             ActionMethod = CodeAction.CreateInstance,
-            Parameters = Array.Empty<byte>() // pruebas
+            //Parameters = ""// Convert.ToBase64String(Convert.FromBase64String("f")) // pruebas
         };
     }
 

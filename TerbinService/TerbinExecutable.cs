@@ -31,34 +31,34 @@ public sealed class TerbinExecutableAttribute : Attribute
 }
 
 // NOTA: ¿Para que sirve esto?.
-public delegate Task<Capsule> ExecutableHandler(Header Action, byte[] parameters);
+public delegate Task<Capsule> ExecutableHandler(Header Action, MemoryStream parameters);
 
 
 public sealed class ExecutableDispatcher
 {
-    private readonly ConcurrentDictionary<CodeAction, ExecutableHandler> _handlers = new();
+    private static readonly ConcurrentDictionary<CodeAction, ExecutableHandler> _handlers = new();
 
 
-    public void Register(CodeAction pAction, ExecutableHandler pHandler)
+    public static void Register(CodeAction pAction, ExecutableHandler pHandler)
     {
         if (pHandler == null) throw new ArgumentNullException(nameof(pHandler));
         _handlers[pAction] = pHandler;
     }
 
-    public bool Unregister(CodeAction pAction) => _handlers.TryRemove(pAction, out _);
+    public static bool Unregister(CodeAction pAction) => _handlers.TryRemove(pAction, out _);
 
 
-    public async Task<Capsule> DispatchAsync(Capsule capsule) // Aqui es donde se ejecuta, manda cojones.
+    public static async Task<Capsule> DispatchAsync(Capsule capsule) // Aqui es donde se ejecuta, manda cojones.
     {
         if (!_handlers.TryGetValue(capsule.ActionMethod, out var handler))
         {
-            capsule.Head.Status = CodeStatus.NotFound;
+            capsule.Head.Status = CodeStatus.ActionNotFound;
             return capsule;
         }
 
         try
         {
-            return await handler(capsule.Head, capsule.Parameters ?? Array.Empty<byte>())
+            return await handler(capsule.Head, new()) // Convert.FromBase64String(capsule.Parameters)
                 .ConfigureAwait(false); // ¿?
         }
         catch
@@ -70,7 +70,7 @@ public sealed class ExecutableDispatcher
 
 
     // Escanea métodos estáticos con [TerbinCommand(1)] y firma Task<Capsule>(Header, byte[])
-    public void RegisterFromAssembly(Assembly pAssembly)
+    public static void RegisterFromAssembly(Assembly pAssembly)
     {
         foreach (var type in pAssembly.GetTypes())
         {
@@ -90,8 +90,8 @@ public sealed class ExecutableDispatcher
                     continue;
 
                 // Crea delegate fuertemente tipado (evita reflexión por llamada)
-                var del = (Func<Header, byte[], Task<Capsule>>)Delegate.CreateDelegate(
-                    typeof(Func<Header, byte[], Task<Capsule>>), method);
+                var del = (Func<Header, MemoryStream, Task<Capsule>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, MemoryStream, Task<Capsule>>), method);
 
                 Register(attr.Action, (h, b) => del(h, b));
             }

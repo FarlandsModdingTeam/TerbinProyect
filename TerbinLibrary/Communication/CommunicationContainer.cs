@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 
 namespace TerbinLibrary.Communication;
@@ -35,9 +36,9 @@ public enum CodeAction : byte
 }
 /* -- Parecida a HTTP pero no la voy a seguir a raja tabla.
     1xx → Informativos
-    2xx → Éxito (ej. 200 OK) ✅
-    3xx → Redirecciones 🔁
-    4xx → Error del cliente (ej. 404 Not Found) ❌
+    2xx → Éxito (ej. 200 OK)
+    3xx → Redirecciones
+    4xx → Error del cliente (ej. 404 Not Found)
     5xx → Error del worker (ej. 500 Internal Server Error)
  */
 public enum CodeStatus : short
@@ -48,6 +49,9 @@ public enum CodeStatus : short
 
     BadRequest = 400,
     NotFound = 404,
+
+    ActionNotFound = 440,
+
 
     GenericWorkerError = 500,
 }
@@ -65,10 +69,14 @@ public struct Capsule
     public Header Head;
     public CodeAction ActionMethod;
     // TODO: DesSerializar los parametros en los tipos de parametros requeridos.
-    public byte[] Parameters;
+    // public string Parameters; // temporal, Ayuda!.
     // TODO: Pasar Guid de tuberia para parametros;
     // ¿Si no pasas Guid sigue pasando bytes?
 }
+
+/*
+ No Byte[], MemoryStream, string, BinaryFormatter, Span<byte>, creo que solo me queda unsafe y no se como funciona.
+ */
 
 // TODO: Todo el tema del TerbinCommandAttribute deberia estar en TerbinService no en TerbinLibrary.
 // TODO: Como mucho aqui deberia estar el tema de serializar y deserializar los parametros.

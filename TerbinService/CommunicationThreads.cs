@@ -11,12 +11,12 @@ namespace TerbinService.Communication;
 // ├─Usar Reflexión para a las clases y metodos sin tener un swich enorme.
 // └─Intentar instalar BepiEx.
 
-public interface ITerbinExecutable
-{
-    static abstract void Init();
-}
+//public interface ITerbinExecutable
+//{
+//    static abstract void Init();
+//}
 
-public class CommunicationThreads : ITerbinExecutable
+public class CommunicationThreads
 {
     public static void Init()
     {
@@ -25,7 +25,7 @@ public class CommunicationThreads : ITerbinExecutable
 
     private static async Task createPipe()
     {
-        while (true)
+        while (!Worker.Cts.Token.IsCancellationRequested)
         {
             using var pipe = new NamedPipeServerStream(
                     "TerbinPipe",
@@ -46,9 +46,18 @@ public class CommunicationThreads : ITerbinExecutable
         //_ = read(pPipe);
         //_ = send(pPipe);
 
-        while (true)
+        while (!Worker.Cts.Token.IsCancellationRequested)
         {
             // TODO: Alguna forma esperar a que mande un mensaje.
+
+            StreamReadStruct reader = new(pPipe);
+            StreamWritesStruct writer = new(pPipe);
+
+            Capsule cap = await reader.ReadAsycn<Capsule>();
+
+            var capR = await ExecutableDispatcher.DispatchAsync(cap);
+
+            _ = writer.WriteAsycn<Capsule>(capR);
         }
     }
 
