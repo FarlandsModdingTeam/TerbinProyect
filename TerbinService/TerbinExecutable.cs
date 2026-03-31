@@ -31,7 +31,7 @@ public sealed class TerbinExecutableAttribute : Attribute
 }
 
 // NOTA: ¿Para que sirve esto?.
-public delegate Task<Capsule> ExecutableHandler(Header pHead, MemoryStream pParameters);
+public delegate Task<PacketRequest> ExecutableHandler(Header pHead, MemoryStream pParameters);
 
 
 public sealed class ExecutableDispatcher
@@ -48,7 +48,7 @@ public sealed class ExecutableDispatcher
     public static bool Unregister(CodeAction pAction) => _handlers.TryRemove(pAction, out _);
 
 
-    public static async Task<Capsule> DispatchAsync(Capsule capsule) // Aqui es donde se ejecuta, manda cojones.
+    public static async Task<PacketRequest> DispatchAsync(PacketRequest capsule) // Aqui es donde se ejecuta, manda cojones.
     {
         if (!_handlers.TryGetValue(capsule.ActionMethod, out var handler))
         {
@@ -86,12 +86,12 @@ public sealed class ExecutableDispatcher
                     parameters[1].ParameterType != typeof(MemoryStream))
                     continue;
 
-                if (method.ReturnType != typeof(Task<Capsule>))
+                if (method.ReturnType != typeof(Task<PacketRequest>))
                     continue;
 
                 // Crea delegate fuertemente tipado (evita reflexión por llamada)
-                var del = (Func<Header, MemoryStream, Task<Capsule>>)Delegate.CreateDelegate(
-                    typeof(Func<Header, MemoryStream, Task<Capsule>>), method);
+                var del = (Func<Header, MemoryStream, Task<PacketRequest>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, MemoryStream, Task<PacketRequest>>), method);
 
                 Register(attr.Action, (h, b) => del(h, b));
             }

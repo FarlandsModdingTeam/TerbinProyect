@@ -37,18 +37,18 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
 
         while (!pTokenCancellation.IsCancellationRequested)
         {
-            Capsule cap = await reader.ReadAsycn<Capsule>(pTokenCancellation);
+            PacketRequest cap = await reader.ReadAsycn<PacketRequest>(pTokenCancellation);
             //Console.WriteLine($"[Worker] Client {cap.Head.IdRequest:N}");
 
             var capR = await ExecutableDispatcher.DispatchAsync(cap);
 
-            _ = writer.WriteAsycn<Capsule>(capR);
+            _ = writer.WriteAsycn<PacketRequest>(capR);
         }
     }
 
 
     [TerbinExecutable(CodeAction.Stop)]
-    public static async Task<Capsule> Stop(Header pHead, MemoryStream pPaarameters)
+    public static async Task<PacketRequest> Stop(Header pHead, MemoryStream pParameters)
     {
         _ = Task.Run(async () =>
         {
@@ -58,6 +58,6 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
         });
         Console.WriteLine("(Worker): Stopping execution...");
         pHead.Status = CodeStatus.Succes;
-        return new Capsule(pHead, CodeAction.Stop, 1);
+        return new PacketRequest(pHead, CodeAction.Stop, 1);
     }
 }

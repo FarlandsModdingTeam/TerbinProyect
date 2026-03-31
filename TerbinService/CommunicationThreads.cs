@@ -93,13 +93,13 @@ public class CommunicationThreads
             StreamReadStruct reader = new(pPipe);
             StreamWritesStruct writer = new(pPipe);
 
-            Capsule cap = await reader.ReadAsycn<Capsule>();
+            PacketRequest cap = await reader.ReadAsycn<PacketRequest>();
             Console.WriteLine($"[Worker] Client {cap.Head.IdRequest:N}");
 
 
             var capR = await ExecutableDispatcher.DispatchAsync(cap);
 
-            _ = writer.WriteAsycn<Capsule>(capR);
+            _ = writer.WriteAsycn<PacketRequest>(capR);
         }
     }
 

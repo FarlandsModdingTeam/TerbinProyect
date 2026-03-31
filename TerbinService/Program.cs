@@ -20,7 +20,7 @@ async Task simulateClient()
     Console.WriteLine("[Client] Creando Encapsulamiento...");
     var id = Guid.NewGuid();
     var header = new Header(id);
-    var cap = new Capsule(pHead: header, pActionMethod: CodeAction.CreateInstance);
+    var cap = new PacketRequest(pHead: header, pActionMethod: CodeAction.CreateInstance);
 
 
     using var pipe = new NamedPipeClientStream(".", "TerbinPipe", PipeDirection.InOut, PipeOptions.Asynchronous);
@@ -32,12 +32,12 @@ async Task simulateClient()
     var writer = new StreamWritesStruct(pipe);
 
 
-    await writer.WriteAsycn<Capsule>(cap);
+    await writer.WriteAsycn<PacketRequest>(cap);
 
     await Task.Delay(1000);
 
-    var capClose = new Capsule(pHead: header, pActionMethod: CodeAction.Stop);
-    await writer.WriteAsycn<Capsule>(capClose);
+    var capClose = new PacketRequest(pHead: header, pActionMethod: CodeAction.Stop);
+    await writer.WriteAsycn<PacketRequest>(capClose);
 }
 
 // TODO: Adaptar y meter en Library.
@@ -46,7 +46,7 @@ async Task manejerSends(NamedPipeClientStream pPipe)
     var reader = new StreamReadStruct(pPipe);
     while (true)
     {
-        var r = await reader.ReadAsycn<Capsule>();
+        var r = await reader.ReadAsycn<PacketRequest>();
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
         if (r.ActionMethod == CodeAction.Stop && // Nunca llega esta respuesta.
             r.Head.Status == CodeStatus.Succes)

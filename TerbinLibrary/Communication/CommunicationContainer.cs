@@ -79,7 +79,7 @@ public struct Header
 
 // TODO: Hacerles getter y setters + valor predeterminado, con eso nos olvidamos del constructor.
 [StructLayout(LayoutKind.Sequential)]
-public struct Capsule
+public struct PacketRequest
 {
     public Header Head;
     public CodeAction ActionMethod;
@@ -89,7 +89,7 @@ public struct Capsule
     public byte IdMemory; // Reservarse los 10 primeros
     public byte Payload;
 
-    public Capsule(
+    public PacketRequest(
         Header pHead = new(),
         CodeAction pActionMethod = CodeAction.Load,
         byte pIdMemory = 0,
