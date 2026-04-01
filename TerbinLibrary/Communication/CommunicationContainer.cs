@@ -62,7 +62,7 @@ public enum CodeStatus : short
 }
 
 // TODO: Hacerles getter y setters + valor predeterminado, con eso nos olvidamos del constructor.
-[StructLayout(LayoutKind.Sequential)]
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct Header // la memoria es constante es unmanaged.
 {
     public ushort IdClient;
@@ -109,26 +109,24 @@ public struct PacketRequest : IStructSerializable
     {
         int offset = 0;
 
-        byte[] binHead = StructSerialineitor.SerializeConst(Head);
-        binHead.CopyTo(pBuffer[offset..]);
-        offset += binHead.Length;
-
-        pBuffer[offset++] = ActionMethod;
-        pBuffer[offset++] = IdMemory;
-
-        if (Payload.Length > ushort.MaxValue)
-            throw new InvalidOperationException("Payload demasiado grande para ushort");
-
-        BitConverter.TryWriteBytes(pBuffer[offset..], (ushort)Payload.Length);
-        offset += 2;
-
-        Payload.CopyTo(pBuffer[offset..]);
+        BinWriter.Add<Header>(pBuffer, ref offset, Head);
+        BinWriter.Add<byte>(pBuffer, ref offset, ActionMethod);
+        BinWriter.Add<byte>(pBuffer, ref offset, IdMemory);
+        BinWriter.AddArray<byte>(pBuffer, ref offset, Payload);
     }
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
     {
+        int offset = 0;
+        Head = StructSerialineitor.DeserializeConst<Header>(pBuffer[offset..6].ToArray());
+        offset += 6;
 
+        ActionMethod = pBuffer[offset++];
+        IdMemory = pBuffer[offset++];
 
-        throw new NotImplementedException();
+        ushort payloadLength = BitConverter.ToUInt16(pBuffer[offset..]);
+        offset += 2;
+
+        Payload = pBuffer.Slice(offset, payloadLength).ToArray();
     }
 
 }

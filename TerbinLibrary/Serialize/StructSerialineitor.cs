@@ -57,22 +57,4 @@ public class StructSerialineitor
         newStruct.ReadFrom(pBuffer);
         return newStruct;
     }
-
-    public static void AddArray<T>(Span<byte> pBuffer, int pOffset, T[] pArray) where T : unmanaged
-    {
-        if (pArray.Length > ushort.MaxValue)
-            throw new InvalidOperationException("Array surpasses ushort max");
-
-        BitConverter.TryWriteBytes(pBuffer[pOffset..], (ushort)pArray.Length);
-        pOffset += 2;
-
-        Span<byte> bytes = MemoryMarshal.AsBytes(pArray.AsSpan());
-        bytes.CopyTo(pBuffer[pOffset..]);
-        pOffset += bytes.Length;
-    }
-
-    public static void AddUnmaged<T>(Span<byte> pBuffer, int pOffset, T pData) where T : unmanaged
-    {
-
-    }
 }
