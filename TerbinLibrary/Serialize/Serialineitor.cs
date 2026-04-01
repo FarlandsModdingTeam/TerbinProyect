@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Communication;
@@ -15,7 +16,7 @@ public interface IStructSerializable
 }
 
 
-public class StructSerialineitor
+public class Serialineitor
 {
     public static byte[] SerializeConst<T>(T pStruct) where T : struct
     {
@@ -43,18 +44,32 @@ public class StructSerialineitor
     }
 
     
-
     public static byte[] Serialize<T>(T pStruct) where T : struct, IStructSerializable
     {
         byte[] buffer = new byte[pStruct.GetSize()]; // sizeof(T) // unsafe
         pStruct.WriteTo(buffer);
         return buffer;
     }
-
     public static T Deserialize<T>(byte[] pBuffer) where T : struct, IStructSerializable
     {
         T newStruct = new();
         newStruct.ReadFrom(pBuffer);
         return newStruct;
+    }
+
+
+    public static byte[] SerializeArray<T>(T[] pArray)
+        where T : unmanaged
+    {
+        int offset = 0;
+        Span<byte> newArray = new Span<byte>();//new byte[pArray.Length * Unsafe.SizeOf<T>()];
+        BinWriter.AddArray<T>(newArray, ref offset, pArray);
+        return newArray.ToArray();
+    }
+    public static T[] DeserializeArray<T>(byte[] pArray)
+        where T : unmanaged
+    {
+        int offset = 0;
+        return BinReader.ReadArray<T>(pArray, ref offset);
     }
 }

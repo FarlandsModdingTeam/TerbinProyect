@@ -47,23 +47,23 @@ public sealed class ExecutableDispatcher
     public static bool Unregister(byte pAction) => _handlers.TryRemove(pAction, out _);
 
 
-    public static async Task<PacketRequest> DispatchAsync(PacketRequest capsule) // Aqui es donde se ejecuta, manda cojones.
+    public static async Task<PacketRequest> DispatchAsync(PacketRequest pCapsule) // Aqui es donde se ejecuta, manda cojones.
     {
-        if (!_handlers.TryGetValue(capsule.ActionMethod, out var handler))
+        if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handler))
         {
-            capsule.Head.Status = CodeStatus.ActionNotFound;
-            return capsule;
+            pCapsule.Head.Status = CodeStatus.ActionNotFound;
+            return pCapsule;
         }
 
         try
         {
-            return await handler(capsule.Head, new())
+            return await handler(pCapsule.Head, new MemoryStream(pCapsule.Payload))
                 .ConfigureAwait(false); // ¿?
         }
         catch
         {
-            capsule.Head.Status = CodeStatus.GenericWorkerError;
-            return capsule;
+            pCapsule.Head.Status = CodeStatus.GenericWorkerError;
+            return pCapsule;
         }
     }
 

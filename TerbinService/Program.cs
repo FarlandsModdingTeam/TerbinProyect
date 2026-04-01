@@ -2,6 +2,7 @@ using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Id;
+using TerbinLibrary.Serialize;
 using TerbinService;
 using TerbinService.Communication;
 
@@ -40,8 +41,11 @@ async Task simulateClient()
         Console.Write($"[Client] ({input}), {(CodeAction)input}\n"+
             $"-------(  End  )---------\n");
 
+
+        //byte[] menssaje = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
+
         var header = new Header(id);
-        var cap = new PacketRequest(pHead: header, pActionMethod: input);
+        var cap = new PacketRequest(pHead: header, pActionMethod: input/*, pPayload: menssaje*/);
 
         await writer.WriteAsycn<PacketRequest>(cap);
 

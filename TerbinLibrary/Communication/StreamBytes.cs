@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Text;
+using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Communication;
 
@@ -13,10 +14,11 @@ public class StreamReadStruct : StreamBytes
     {
     }
 
-    public async Task<T> ReadAsycn<T>(CancellationToken pToken = default) where T : struct
+    public async Task<T> ReadAsycn<T>(CancellationToken pToken = default)
+        where T : struct, IStructSerializable
     {
         byte[] buffer = await base.ReadAsycn(Marshal.SizeOf<T>(), pToken);
-        return BytesToStruct<T>(buffer);
+        return Serialineitor.Deserialize<T>(buffer);
     }
 }
 public class StreamWritesStruct : StreamBytes
@@ -25,9 +27,10 @@ public class StreamWritesStruct : StreamBytes
     {
     }
 
-    public async Task WriteAsycn<T>(T pStruct, CancellationToken pToken = default) where T : struct
+    public async Task WriteAsycn<T>(T pStruct, CancellationToken pToken = default)
+        where T : struct, IStructSerializable
     {
-        byte[] buffer = StructToBytes<T>(pStruct);
+        byte[] buffer = Serialineitor.Serialize<T>(pStruct);
         await base.WriteAsync(buffer, pToken);
     }
 }

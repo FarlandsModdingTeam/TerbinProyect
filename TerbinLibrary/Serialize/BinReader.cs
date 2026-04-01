@@ -31,7 +31,7 @@ public class BinReader
         where T : struct, IStructSerializable
     {
         var lenth = pStruct.GetSize();
-        T newStruct = StructSerialineitor.Deserialize<T>(pBuffer[pOffset..(pOffset+lenth)].ToArray());
+        T newStruct = Serialineitor.Deserialize<T>(pBuffer[pOffset..(pOffset+lenth)].ToArray());
         pOffset += lenth;
         return newStruct;
     }

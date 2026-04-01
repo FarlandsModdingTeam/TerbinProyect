@@ -104,11 +104,12 @@ public struct PacketRequest : IStructSerializable
         Payload = pPayload ?? [];
     }
 
-    public int GetSize() => 8 + Payload.Length;
+    // Header + bye + byte + ushort + byte[]
+    // 6 + 1 + 1 + 2 + Length
+    public int GetSize() => 10 + Payload.Length;
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
-
         BinWriter.Add<Header>(pBuffer, ref offset, Head);
         BinWriter.Add<byte>(pBuffer, ref offset, ActionMethod);
         BinWriter.Add<byte>(pBuffer, ref offset, IdMemory);
@@ -117,16 +118,10 @@ public struct PacketRequest : IStructSerializable
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
     {
         int offset = 0;
-        Head = StructSerialineitor.DeserializeConst<Header>(pBuffer[offset..6].ToArray());
-        offset += 6;
-
-        ActionMethod = pBuffer[offset++];
-        IdMemory = pBuffer[offset++];
-
-        ushort payloadLength = BitConverter.ToUInt16(pBuffer[offset..]);
-        offset += 2;
-
-        Payload = pBuffer.Slice(offset, payloadLength).ToArray();
+        Head =          BinReader.Read<Header>(pBuffer, ref offset);
+        ActionMethod =  BinReader.Read<byte>(pBuffer, ref offset);
+        IdMemory =      BinReader.Read<byte>(pBuffer, ref offset);
+        Payload =       BinReader.ReadArray<byte>(pBuffer, ref offset);
     }
 
 }
