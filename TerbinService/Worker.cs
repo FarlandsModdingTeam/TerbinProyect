@@ -38,12 +38,13 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
         while (!pTokenCancellation.IsCancellationRequested)
         {
             PacketRequest cap = await reader.ReadAsycn<PacketRequest>(pTokenCancellation);
-            //Console.WriteLine($"[Worker] Client {cap.Head.IdRequest:N}");
+            //Console.WriteLine($"[Worker] Client {cap.Head.OrderRequest}");
 
             var capR = await ExecutableDispatcher.DispatchAsync(cap);
 
             _ = writer.WriteAsycn<PacketRequest>(capR);
         }
+        pPipe.Disconnect(); // porque nunca pasa aqui.
     }
 
 

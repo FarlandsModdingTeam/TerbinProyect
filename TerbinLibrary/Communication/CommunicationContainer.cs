@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
+using TerbinLibrary.Id;
 
 namespace TerbinLibrary.Communication;
 
@@ -62,16 +63,16 @@ public enum CodeStatus : short
 [StructLayout(LayoutKind.Sequential)]
 public struct Header
 {
-    public Guid IdRequest; // ¿Realmente es necesario?
+    public ushort IdClient; // ¿Realmente es necesario?
     public ushort OrderRequest; // Me imagino que tambien hay que reservar.
     public CodeStatus Status;
 
     public Header(
-        Guid? pIdRequest = null,
+        ushort pIdClient = 0,
         ushort pOrderRequest = 0,
         CodeStatus pStatus = CodeStatus.NotAsign)
     {
-        IdRequest = pIdRequest ?? Guid.NewGuid();
+        IdClient = (pIdClient == 0) ? ShortId.NewShortId() : pIdClient;
         OrderRequest = pOrderRequest;
         Status = pStatus;
     }

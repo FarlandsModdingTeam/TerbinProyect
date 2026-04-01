@@ -1,6 +1,7 @@
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using TerbinLibrary.Communication;
+using TerbinLibrary.Id;
 using TerbinService;
 using TerbinService.Communication;
 
@@ -17,27 +18,32 @@ async Task simulateClient()
 {
     await Task.Delay(1000);
 
-    Console.WriteLine("[Client] Creando Encapsulamiento...");
-    var id = Guid.NewGuid();
-    var header = new Header(id);
-    var cap = new PacketRequest(pHead: header, pActionMethod: CodeAction.CreateInstance);
+    var id = ShortId.New;
+    Console.WriteLine($"[Client] Id: {id}");
 
 
     using var pipe = new NamedPipeClientStream(".", "TerbinPipe", PipeDirection.InOut, PipeOptions.Asynchronous);
     await pipe.ConnectAsync();
-
     _ = manejerSends(pipe);
+    Console.WriteLine($"[Client] ¡Conectado!");
 
-    await Task.Delay(1000);
     var writer = new StreamWritesStruct(pipe);
 
+    while (true)
+    {
+        Console.WriteLine($"--------------------");
+        Console.WriteLine($"[Client] (byte de accion: 0 = Stop, 10 = CreateInstance, )");
+        byte input = (byte)/*Console.ReadLine()*/"0".ToArray()[0]; // alacguabar!
 
-    await writer.WriteAsycn<PacketRequest>(cap);
 
-    await Task.Delay(1000);
+        var header = new Header(id);
+        var cap = new PacketRequest(pHead: header, pActionMethod: (CodeAction)input);
 
-    var capClose = new PacketRequest(pHead: header, pActionMethod: CodeAction.Stop);
-    await writer.WriteAsycn<PacketRequest>(capClose);
+        await writer.WriteAsycn<PacketRequest>(cap);
+
+        if (input == 0)
+            break;
+    }
 }
 
 // TODO: Adaptar y meter en Library.

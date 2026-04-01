@@ -13,7 +13,7 @@ public partial class HandleInstances
     public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
     {
         Console.WriteLine("[Worker] Pruebas...");
-        Console.WriteLine($"[Worker] Cliente: {pHead.IdRequest:N}");
+        Console.WriteLine($"[Worker] Cliente: {pHead.IdClient}");
 
         pHead.Status = CodeStatus.Succes;
         return new PacketRequest

@@ -94,7 +94,7 @@ public class CommunicationThreads
             StreamWritesStruct writer = new(pPipe);
 
             PacketRequest cap = await reader.ReadAsycn<PacketRequest>();
-            Console.WriteLine($"[Worker] Client {cap.Head.IdRequest:N}");
+            Console.WriteLine($"[Worker] Client {cap.Head.OrderRequest}");
 
 
             var capR = await ExecutableDispatcher.DispatchAsync(cap);
