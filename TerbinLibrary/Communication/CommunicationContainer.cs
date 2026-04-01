@@ -106,7 +106,7 @@ public struct PacketRequest : IStructSerializable
 
     // Header + bye + byte + ushort + byte[]
     // 6 + 1 + 1 + 2 + Length
-    public int GetSize() => 10 + Payload.Length;
+    public int GetSize() => 10 + Payload.Length; // 
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;

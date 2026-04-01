@@ -14,8 +14,15 @@ public partial class HandleInstances
     public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
     {
         Console.WriteLine($"[Worker] Cliente: {pHead.IdClient}");
-        char[] falseString = Serialineitor.DeserializeArray<char>(pParameters.ToArray());
-        Console.WriteLine($"[Worker] Mensaje: {falseString}");
+        if (pParameters.Length > 0)
+        {
+            char[] falseString = Serialineitor.DeserializeArray<char>(pParameters.ToArray());
+            Console.WriteLine($"[Worker] Mensaje: {new string(falseString)}");
+        }
+        else
+        {
+            Console.WriteLine("[Worker] Mensaje: (Sin payload)");
+        }
 
         // Me acuerdo que con MemoryStream podias elegir que cosa leer o algo así.
         // no me acuerdo porque elegi MemoryStream para leer datos.

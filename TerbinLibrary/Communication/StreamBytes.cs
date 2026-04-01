@@ -8,30 +8,39 @@ using TerbinLibrary.Serialize;
 namespace TerbinLibrary.Communication;
 
 
-public class StreamReadStruct : StreamBytes
-{
-    public StreamReadStruct(Stream pPipeStream) : base(pPipeStream)
-    {
-    }
-
-    public async Task<T> ReadAsycn<T>(CancellationToken pToken = default)
-        where T : struct, IStructSerializable
-    {
-        byte[] buffer = await base.ReadAsycn(Marshal.SizeOf<T>(), pToken);
-        return Serialineitor.Deserialize<T>(buffer);
-    }
-}
 public class StreamWritesStruct : StreamBytes
 {
-    public StreamWritesStruct(Stream pPipeStream) : base(pPipeStream)
-    {
-    }
+    public StreamWritesStruct(Stream pPipeStream) : base(pPipeStream) { }
 
     public async Task WriteAsycn<T>(T pStruct, CancellationToken pToken = default)
         where T : struct, IStructSerializable
     {
         byte[] buffer = Serialineitor.Serialize<T>(pStruct);
+
+        // 1. Escribimos la longitud real del paquete primero (4 bytes)
+        byte[] lengthPrefix = BitConverter.GetBytes(buffer.Length);
+        await PipeStream.WriteAsync(lengthPrefix, pToken);
+
+        // 2. Escribimos el paquete
         await base.WriteAsync(buffer, pToken);
+    }
+}
+
+public class StreamReadStruct : StreamBytes
+{
+    public StreamReadStruct(Stream pPipeStream) : base(pPipeStream) { }
+
+    public async Task<T> ReadAsycn<T>(CancellationToken pToken = default)
+        where T : struct, IStructSerializable
+    {
+        // 1. Leemos los 4 bytes que nos dicen cuánto mide el mensaje
+        byte[] lengthBuffer = await base.ReadAsycn(4, pToken);
+        int packetLength = BitConverter.ToInt32(lengthBuffer);
+
+        // 2. Leemos EXACTAMENTE la longitud dinámica del paquete
+        byte[] buffer = await base.ReadAsycn(packetLength, pToken);
+
+        return Serialineitor.Deserialize<T>(buffer);
     }
 }
 

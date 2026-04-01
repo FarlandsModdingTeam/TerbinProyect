@@ -40,8 +40,15 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
             PacketRequest cap = await reader.ReadAsycn<PacketRequest>(pTokenCancellation);
             //Console.WriteLine($"[Worker] Client {cap.Head.OrderRequest}");
 
-            var capR = await ExecutableDispatcher.DispatchAsync(cap);
-
+            PacketRequest capR = default;
+            try
+            {
+                capR = await ExecutableDispatcher.DispatchAsync(cap);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception: {e.Message}");
+            }
             _ = writer.WriteAsycn<PacketRequest>(capR);
         }
         pPipe.Disconnect(); // porque nunca pasa aqui.
