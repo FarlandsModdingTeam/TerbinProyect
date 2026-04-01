@@ -9,7 +9,7 @@ namespace TerbinService.Instances;
 
 public partial class HandleInstances
 {
-    [TerbinExecutable(CodeAction.CreateInstance)]
+    [TerbinExecutable((byte)CodeAction.CreateInstance)]
     public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
     {
         Console.WriteLine("[Worker] Pruebas...");
@@ -19,7 +19,7 @@ public partial class HandleInstances
         return new PacketRequest
         {
             Head = pHead,
-            ActionMethod = CodeAction.CreateInstance,
+            ActionMethod = (byte)CodeAction.CreateInstance,
             //Parameters = ""// Convert.ToBase64String(Convert.FromBase64String("f")) // pruebas
         };
     }

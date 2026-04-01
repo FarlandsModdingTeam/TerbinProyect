@@ -21,13 +21,12 @@ namespace TerbinService;
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 public sealed class TerbinExecutableAttribute : Attribute
 {
-    public CodeAction Action { get; }
+    public byte Action { get; } // CodeAction
 
     // TODO: guardar la lista de types de la funcion.
     // TODO: funcion estatica que serialice/deserialice a los tipos y cantidades guardadas.
 
-    public TerbinExecutableAttribute(CodeAction pAction) => Action = pAction;
-    public TerbinExecutableAttribute(byte pAction) => Action = (CodeAction)pAction;
+    public TerbinExecutableAttribute(byte pAction) => Action = pAction;
 }
 
 // NOTA: ¿Para que sirve esto?.
@@ -36,16 +35,16 @@ public delegate Task<PacketRequest> ExecutableHandler(Header pHead, MemoryStream
 
 public sealed class ExecutableDispatcher
 {
-    private static readonly ConcurrentDictionary<CodeAction, ExecutableHandler> _handlers = new();
+    private static readonly ConcurrentDictionary<byte, ExecutableHandler> _handlers = new();
 
 
-    public static void Register(CodeAction pAction, ExecutableHandler pHandler)
+    public static void Register(byte pAction, ExecutableHandler pHandler)
     {
         if (pHandler == null) throw new ArgumentNullException(nameof(pHandler));
         _handlers[pAction] = pHandler;
     }
 
-    public static bool Unregister(CodeAction pAction) => _handlers.TryRemove(pAction, out _);
+    public static bool Unregister(byte pAction) => _handlers.TryRemove(pAction, out _);
 
 
     public static async Task<PacketRequest> DispatchAsync(PacketRequest capsule) // Aqui es donde se ejecuta, manda cojones.

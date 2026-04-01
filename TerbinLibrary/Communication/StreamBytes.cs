@@ -80,6 +80,7 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
 
 
     // ****************************( Helpers )**************************** //
+    [Obsolete(message: "Use: StructSerialineitor.SerializeConst()")]
     public static byte[] StructToBytes<T>(T pStruct) where T : struct
     {
         int size = Marshal.SizeOf(pStruct);
@@ -93,6 +94,7 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
         return arr;
     }
 
+    [Obsolete(message: "Use: StructSerialineitor.DeserializeConst()")]
     public static T BytesToStruct<T>(byte[] pBytes) where T : struct
     {
         T newStruct = default;

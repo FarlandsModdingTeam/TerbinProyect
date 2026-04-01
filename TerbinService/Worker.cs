@@ -48,7 +48,7 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
     }
 
 
-    [TerbinExecutable(CodeAction.Stop)]
+    [TerbinExecutable((byte)CodeAction.Stop)]
     public static async Task<PacketRequest> Stop(Header pHead, MemoryStream pParameters)
     {
         _ = Task.Run(async () =>
@@ -59,6 +59,6 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
         });
         Console.WriteLine("(Worker): Stopping execution...");
         pHead.Status = CodeStatus.Succes;
-        return new PacketRequest(pHead, CodeAction.Stop, 1);
+        return new PacketRequest(pHead, (byte)CodeAction.Stop, 1);
     }
 }

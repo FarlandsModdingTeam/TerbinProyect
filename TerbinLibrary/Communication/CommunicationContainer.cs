@@ -7,6 +7,8 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using TerbinLibrary.Id;
+using TerbinLibrary.Serialize;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TerbinLibrary.Communication;
 
@@ -61,54 +63,76 @@ public enum CodeStatus : short
 
 // TODO: Hacerles getter y setters + valor predeterminado, con eso nos olvidamos del constructor.
 [StructLayout(LayoutKind.Sequential)]
-public struct Header
+public struct Header // la memoria es constante es unmanaged.
 {
-    public ushort IdClient; // ¿Realmente es necesario?
-    public ushort OrderRequest; // Me imagino que tambien hay que reservar.
+    public ushort IdClient;
+    public ushort OrderRequest;
     public CodeStatus Status;
 
     public Header(
         ushort pIdClient = 0,
-        ushort pOrderRequest = 0,
+        ushort? pOrderRequest = null,
         CodeStatus pStatus = CodeStatus.NotAsign)
     {
         IdClient = (pIdClient == 0) ? ShortId.NewShortId() : pIdClient;
-        OrderRequest = pOrderRequest;
+        OrderRequest = pOrderRequest ?? 0;
         Status = pStatus;
     }
 }
 
 // TODO: Hacerles getter y setters + valor predeterminado, con eso nos olvidamos del constructor.
 [StructLayout(LayoutKind.Sequential)]
-public struct PacketRequest
+public struct PacketRequest : IStructSerializable
 {
     public Header Head;
-    public CodeAction ActionMethod;
+    public byte ActionMethod;
     // Deberia hacer que IdMemory sea un byte y tener una RAM (almacen de memorias xd) o tener un almacen por funcion /
     // y que IdMemory sea un CodeAction y guardar los datos en la memoria especifica de la funcion y ya no tengo /
     // que especificarlo pero IdMemory se quedaria vacio pero si es byte el cliente tiene que medio gestionar la memoria.
     public byte IdMemory; // Reservarse los 10 primeros
-    public byte Payload;
+    public byte[] Payload;
 
     public PacketRequest(
         Header pHead = new(),
-        CodeAction pActionMethod = CodeAction.Load,
+        byte pActionMethod = 2,
         byte pIdMemory = 0,
-        byte pPayload = 0)
+        byte[]? pPayload = null)
     {
         Head = pHead;
         ActionMethod = pActionMethod;
-        // TODO: gestionar espacio automatico.
         IdMemory = (pIdMemory < 10) ? (byte)10 : pIdMemory;
-        Payload = pPayload;
+        Payload = pPayload ?? [];
     }
-}
 
-// 16 bytes es el guid y los restantes 7 es el resto de mensaje XD.
+    public int GetSize() => 8 + Payload.Length;
+    public void WriteTo(Span<byte> pBuffer)
+    {
+        int offset = 0;
+
+        byte[] binHead = StructSerialineitor.SerializeConst(Head);
+        binHead.CopyTo(pBuffer[offset..]);
+        offset += binHead.Length;
+
+        pBuffer[offset++] = ActionMethod;
+        pBuffer[offset++] = IdMemory;
+
+        if (Payload.Length > ushort.MaxValue)
+            throw new InvalidOperationException("Payload demasiado grande para ushort");
+
+        BitConverter.TryWriteBytes(pBuffer[offset..], (ushort)Payload.Length);
+        offset += 2;
+
+        Payload.CopyTo(pBuffer[offset..]);
+    }
+    public void ReadFrom(ReadOnlySpan<byte> pBuffer)
+    {
+
+
+        throw new NotImplementedException();
+    }
+
+}
 
 /*
  No Byte[], MemoryStream, string, BinaryFormatter, Span<byte>, creo que solo me queda unsafe y no se como funciona.
 */
-
-// TODO: Todo el tema del TerbinCommandAttribute deberia estar en TerbinService no en TerbinLibrary.
-// TODO: Como mucho aqui deberia estar el tema de serializar y deserializar los parametros.
