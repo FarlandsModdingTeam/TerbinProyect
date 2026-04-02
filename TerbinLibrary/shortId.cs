@@ -4,8 +4,16 @@ using System.Text;
 
 namespace TerbinLibrary.Id;
 
+
+public enum ShortIdReserved : ushort
+{
+    Solicited = 0,
+    DoNotAssign = 1,
+    Server = 2,
+}
+
 /// <summary>
-/// 0 = solicitar, 1 = no asignado, 
+/// 0 = solicitar, 1 = no asignar, 2 = server,  
 /// </summary>
 public static class ShortId
 {

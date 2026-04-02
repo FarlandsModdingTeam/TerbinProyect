@@ -4,7 +4,10 @@ using TerbinLibrary.Communication;
 using TerbinLibrary.Id;
 using TerbinLibrary.Serialize;
 using TerbinService;
-using TerbinService.Communication;
+// TODO: Instalar BepiEx.
+// ├─Crear Tuberia y Encabezado.
+// ├─Usar Reflexión para a las clases y metodos sin tener un swich enorme.
+// └─Intentar instalar BepiEx.
 
 _ = Task.Run(() => simulateClient());
 
@@ -24,12 +27,12 @@ async Task simulateClient()
     var id = ShortId.New;
     Console.WriteLine($"[Client] Id: {id}");
 
-    using var pipe = CommunicationThreads.CreateClientPipe();
+    using var pipe = Communicator.CreateClientPipe();
     await pipe.ConnectAsync();
     _ = manejerSends(pipe);
     Console.WriteLine($"[Client] ¡Conectado!");
 
-    var writer = new StreamWritesStruct(pipe);
+    var writer = new StreamWriteStruct(pipe);
 
     while (true)
     {

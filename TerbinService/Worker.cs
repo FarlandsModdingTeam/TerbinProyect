@@ -1,7 +1,6 @@
 using System.IO.Pipes;
 using System.Reflection;
 using TerbinLibrary.Communication;
-using TerbinService.Communication;
 using TerbinLibrary.Executables;
 
 namespace TerbinService;
@@ -40,7 +39,7 @@ public class Worker : BackgroundService
 
     private async Task autoCreatePipe()
     {
-        var pipe = CommunicationThreads.NewTerbinPipe;
+        var pipe = Communicator.NewTerbinPipe;
         await pipe.WaitForConnectionAsync(Cts.Token);
 
         _ = Task.Run(() => autoCreatePipe(), Cts.Token);
@@ -50,7 +49,7 @@ public class Worker : BackgroundService
     private async Task handleClient(NamedPipeServerStream pPipe, CancellationToken pTokenCancellation)
     {
         StreamReadStruct reader = new(pPipe);
-        StreamWritesStruct writer = new(pPipe);
+        StreamWriteStruct writer = new(pPipe);
 
         while (!pTokenCancellation.IsCancellationRequested)
         {

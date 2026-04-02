@@ -18,9 +18,9 @@ namespace TerbinLibrary.Communication;
  */
 
 
-public class StreamWritesStruct : StreamBytes
+public class StreamWriteStruct : StreamBytes
 {
-    public StreamWritesStruct(Stream pPipeStream) : base(pPipeStream) { }
+    public StreamWriteStruct(Stream pPipeStream) : base(pPipeStream) { }
 
     public async Task WriteAsycn<T>(T pStruct, CancellationToken pToken = default)
         where T : struct, IStructSerializable
@@ -32,7 +32,7 @@ public class StreamWritesStruct : StreamBytes
         await PipeStream.WriteAsync(lengthPrefix, pToken);
 
         // 2. Escribimos el paquete
-        await base.WriteAsync(buffer, pToken);
+        await base.WriteBytesAsync(buffer, pToken);
     }
 }
 
@@ -44,11 +44,11 @@ public class StreamReadStruct : StreamBytes
         where T : struct, IStructSerializable
     {
         // 1. Leemos los 4 bytes que nos dicen cuánto mide el mensaje
-        byte[] lengthBuffer = await base.ReadAsycn(4, pToken);
+        byte[] lengthBuffer = await base.ReadBytesAsycn(4, pToken);
         int packetLength = BitConverter.ToInt32(lengthBuffer);
 
         // 2. Leemos EXACTAMENTE la longitud dinámica del paquete
-        byte[] buffer = await base.ReadAsycn(packetLength, pToken);
+        byte[] buffer = await base.ReadBytesAsycn(packetLength, pToken);
 
         return Serialineitor.DeserializeStruct<T>(buffer);
     }
@@ -71,7 +71,7 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
         this._pipeStream = pPipeStream;
     }
 
-    public virtual async Task<byte[]> ReadAsycn(int pSize, CancellationToken pToken = default)
+    public virtual async Task<byte[]> ReadBytesAsycn(int pSize, CancellationToken pToken = default)
     {
         byte[] buffer = new byte[pSize];
 
@@ -92,42 +92,12 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
         return buffer;
     }
 
-    public virtual async Task WriteAsync(byte[] buffer, CancellationToken pToken = default)
+    public virtual async Task WriteBytesAsync(byte[] buffer, CancellationToken pToken = default)
     {
         if (buffer == null) throw new ArgumentNullException(nameof(buffer));
 
         await PipeStream.WriteAsync(buffer.AsMemory(0, buffer.Length), pToken);
         await PipeStream.FlushAsync(pToken);
-    }
-
-
-    // ****************************( Helpers )**************************** //
-    [Obsolete(message: "Use: StructSerialineitor.SerializeConst()")]
-    public static byte[] StructToBytes<T>(T pStruct) where T : struct
-    {
-        int size = Marshal.SizeOf(pStruct);
-        byte[] arr = new byte[size];
-
-        IntPtr ptr = Marshal.AllocHGlobal(size);
-        Marshal.StructureToPtr(pStruct, ptr, true);
-        Marshal.Copy(ptr, arr, 0, size);
-        Marshal.FreeHGlobal(ptr);
-
-        return arr;
-    }
-
-    [Obsolete(message: "Use: StructSerialineitor.DeserializeConst()")]
-    public static T BytesToStruct<T>(byte[] pBytes) where T : struct
-    {
-        T newStruct = default;
-
-        IntPtr ptr = Marshal.AllocHGlobal(pBytes.Length);
-        Marshal.Copy(pBytes, 0, ptr, pBytes.Length);
-
-        newStruct = Marshal.PtrToStructure<T>(ptr);
-        Marshal.FreeHGlobal(ptr);
-
-        return newStruct;
     }
 
 

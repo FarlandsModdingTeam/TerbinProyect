@@ -23,6 +23,18 @@ namespace TerbinLibrary.Communication;
  */
 
 
+[Flags]
+public enum CodeTypeData : byte
+{
+    Single = 0 << 0, // 0000
+    Array  = 1 << 0, // 0001
+
+    Int   = 0 << 1,  // 0000
+    Float = 1 << 1,  // 0010
+    Char  = 2 << 1,  // 0100
+    Byte  = 3 << 1,  // 0110
+}
+
 /// <summary>
 /// 
 /// Reserved the first 10.
@@ -32,7 +44,8 @@ public enum CodeAction : byte
     Stop = 0,
     None = 1,
     Load = 2,
-    PlaceHolder = 3,
+    Solicit = 3,
+    Cancel = 4,
     // etc...
 
     // methods:
@@ -52,6 +65,8 @@ public enum CodeStatus : short
 
     Succes = 200,
 
+    Execute = 300,
+
     BadRequest = 400,
     NotFound = 404,
 
@@ -66,7 +81,7 @@ public enum CodeStatus : short
 public struct Header // la memoria es constante es unmanaged.
 {
     public ushort IdClient;
-    public ushort OrderRequest;
+    public ushort OrderRequest; // 0 = solo uno, 1 = es el primero, ushort.MaxValue = es el ultimo.
     public CodeStatus Status;
 
     public Header()
