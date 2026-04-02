@@ -62,7 +62,7 @@ public class Serialineitor
         where T : unmanaged
     {
         int offset = 0;
-        Span<byte> newArray = new Span<byte>();//new byte[pArray.Length * Unsafe.SizeOf<T>()];
+        byte[] newArray = new byte[pArray.Length * Unsafe.SizeOf<T>() + 2];
         BinWriter.AddArray<T>(newArray, ref offset, pArray);
         return newArray.ToArray();
     }

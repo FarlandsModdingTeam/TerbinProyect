@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
 
-namespace TerbinService;
+namespace TerbinLibrary.Executables;
 /*
  -- Variables:
   empieza: _ = es privada NO local.
@@ -57,7 +57,7 @@ public sealed class ExecutableDispatcher
 
         try
         {
-            return await handler(pCapsule.Head, new MemoryStream(pCapsule.Payload))
+            return await handler(pCapsule.Head, new MemoryStream(pCapsule.Payload ?? []))
                 .ConfigureAwait(false); // ¿?
         }
         catch

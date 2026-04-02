@@ -4,6 +4,9 @@ using System.Text;
 
 namespace TerbinLibrary.Id;
 
+/// <summary>
+/// 0 = solicitar, 1 = no asignado, 
+/// </summary>
 public static class ShortId
 {
     private static ushort _incremental = 10;

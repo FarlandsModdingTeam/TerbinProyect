@@ -14,12 +14,11 @@ builder.Services.AddHostedService<Worker>();
 var host = builder.Build();
 host.Run();
 
-
 async Task simulateClient()
 {
     await Task.Delay(1000);
 
-    Console.WriteLine($"[Client] Tamaño bytes ({Marshal.SizeOf<PacketRequest>()})");
+    // Console.WriteLine($"[Client] Tamaño bytes ({Marshal.SizeOf<PacketRequest>()})");
     // StreamBytes.StructToBytes(cap).ToArray().Length
 
     var id = ShortId.New;
@@ -34,6 +33,11 @@ async Task simulateClient()
 
     while (true)
     {
+        while (!SimulateClient.Write)
+        {
+            await Task.Delay(500);
+        }
+
         Console.Write($"-------( Start )---------\n"+
             $"[Client] (byte de accion: 0 = Stop, 10 = CreateInstance, )\n"+
             $"[Client] Action -> ");
@@ -41,19 +45,35 @@ async Task simulateClient()
         Console.Write($"[Client] ({input}), {(CodeAction)input}\n"+
             $"-------(  End  )---------\n");
 
-
-        //byte[] menssaje = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
+        byte[] menssaje = new byte["matenme".ToCharArray().Length * 2];
+        try
+        {
+            menssaje = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"[Cliente] Excption => {e.Message}");
+        }
 
         var header = new Header(id);
-        var cap = new PacketRequest(pHead: header, pActionMethod: input/*, pPayload: menssaje*/);
+        var cap = new PacketRequest(pHead: header, pActionMethod: input, pPayload: menssaje/**/);
 
         await writer.WriteAsycn<PacketRequest>(cap);
 
         if (input == 0)
         {
-            Console.WriteLine($"[Client] Desconexion elegida.");
-            break;
+            Console.WriteLine($"[Client] Desconexion elegida, esperando confirmación del servidor...");
+
+            // Esperamos a que manejerSends reciba el paquete
+            while (!SimulateClient.Disconnect)
+            {
+                await Task.Delay(100);
+            }
+
+            Console.WriteLine($"[Client] Confirmación recibida, cerrando pipe de forma segura.");
+            break; // <-- Ahora sí nos vamos.
         }
+        SimulateClient.Write = false;
     }
 }
 
@@ -65,11 +85,20 @@ async Task manejerSends(NamedPipeClientStream pPipe)
     {
         var r = await reader.ReadAsycn<PacketRequest>();
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
-        if (r.ActionMethod == (byte)CodeAction.Stop && // Nunca llega esta respuesta.
+
+        if (r.ActionMethod == (byte)CodeAction.Stop &&
             r.Head.Status == CodeStatus.Succes)
         {
             Console.WriteLine($"[Client] Desconexion recibida.");
+            SimulateClient.Disconnect = true; // <-- Avisamos al hilo principal
             break;
         }
+        SimulateClient.Write = true;
     }
+}
+
+class SimulateClient
+{
+    public static bool Write = true;
+    public static bool Disconnect = false;
 }

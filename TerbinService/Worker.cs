@@ -2,7 +2,7 @@ using System.IO.Pipes;
 using System.Reflection;
 using TerbinLibrary.Communication;
 using TerbinService.Communication;
-using TerbinService.Instances;
+using TerbinLibrary.Executables;
 
 namespace TerbinService;
 
@@ -44,12 +44,12 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
             try
             {
                 capR = await ExecutableDispatcher.DispatchAsync(cap);
+                await writer.WriteAsycn<PacketRequest>(capR);
             }
             catch (Exception e)
             {
                 Console.WriteLine($"Exception: {e.Message}");
             }
-            _ = writer.WriteAsycn<PacketRequest>(capR);
         }
         pPipe.Disconnect(); // porque nunca pasa aqui.
     }

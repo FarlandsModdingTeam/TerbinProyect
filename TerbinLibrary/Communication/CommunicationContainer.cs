@@ -69,12 +69,19 @@ public struct Header // la memoria es constante es unmanaged.
     public ushort OrderRequest;
     public CodeStatus Status;
 
+    public Header()
+    {
+        IdClient = 1;
+        OrderRequest = 0;
+        Status = CodeStatus.NotAsign;
+    }
+
     public Header(
         ushort pIdClient = 0,
         ushort? pOrderRequest = null,
         CodeStatus pStatus = CodeStatus.NotAsign)
     {
-        IdClient = (pIdClient == 0) ? ShortId.NewShortId() : pIdClient;
+        IdClient = (pIdClient == 0) ? (ushort)1 : pIdClient;
         OrderRequest = pOrderRequest ?? 0;
         Status = pStatus;
     }
@@ -92,13 +99,21 @@ public struct PacketRequest : IStructSerializable
     public byte IdMemory; // Reservarse los 10 primeros
     public byte[] Payload;
 
+    public PacketRequest()
+    {
+        Head = new Header();
+        ActionMethod = (byte)CodeAction.None;
+        IdMemory = 0;
+        Payload = [];
+    }
+
     public PacketRequest(
-        Header pHead = new(),
+        Header? pHead = null,
         byte pActionMethod = 2,
         byte pIdMemory = 0,
         byte[]? pPayload = null)
     {
-        Head = pHead;
+        Head = pHead ?? new Header();
         ActionMethod = pActionMethod;
         IdMemory = (pIdMemory < 10) ? (byte)10 : pIdMemory;
         Payload = pPayload ?? [];
@@ -106,7 +121,7 @@ public struct PacketRequest : IStructSerializable
 
     // Header + bye + byte + ushort + byte[]
     // 6 + 1 + 1 + 2 + Length
-    public int GetSize() => 10 + Payload.Length; // 
+    public int GetSize() => 10 + (Payload?.Length ?? 0);
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
