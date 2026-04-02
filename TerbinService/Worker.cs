@@ -5,19 +5,36 @@ using TerbinService.Communication;
 using TerbinLibrary.Executables;
 
 namespace TerbinService;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayusculas = publica.
+  empieza: minusculas = privada.
+ */
 
 
-public class Worker(ILogger<Worker> logger) : BackgroundService
+public class Worker : BackgroundService
 {
     public static CancellationTokenSource? Cts;
+    private static IHostApplicationLifetime? _appLifetime;
 
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public Worker(ILogger<Worker> pLogger, IHostApplicationLifetime pAppLifetime)
     {
-        Cts = CancellationTokenSource.CreateLinkedTokenSource(stoppingToken);
+        Worker._appLifetime = pAppLifetime;
+    }
+
+
+
+    protected override async Task ExecuteAsync(CancellationToken pStoppingToken)
+    {
+        Cts = CancellationTokenSource.CreateLinkedTokenSource(pStoppingToken);
 
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
 
-        //CommunicationThreads.Init();
         _ = autoCreatePipe();
     }
 
@@ -60,8 +77,9 @@ public class Worker(ILogger<Worker> logger) : BackgroundService
     {
         _ = Task.Run(async () =>
         {
-            await Task.Delay(2000);
+            await Task.Delay(1000);
             Console.WriteLine("(Worker): Execution stoped");
+            _appLifetime?.StopApplication();
             Cts?.Cancel();
         });
         Console.WriteLine("(Worker): Stopping execution...");

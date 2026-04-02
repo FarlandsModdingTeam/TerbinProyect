@@ -58,7 +58,7 @@ public sealed class ExecutableDispatcher
         try
         {
             return await handler(pCapsule.Head, new MemoryStream(pCapsule.Payload ?? []))
-                .ConfigureAwait(false); // ¿?
+                .ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
         }
         catch
         {
@@ -66,7 +66,6 @@ public sealed class ExecutableDispatcher
             return pCapsule;
         }
     }
-
 
     // Escanea métodos estáticos con [TerbinCommand(1)] y firma Task<Capsule>(Header, byte[])
     public static void RegisterFromAssembly(Assembly pAssembly)

@@ -6,6 +6,16 @@ using System.Text;
 using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Communication;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayorculas = publica.
+  empieza: menorculas = privada.
+ */
 
 
 public class StreamWritesStruct : StreamBytes
@@ -15,7 +25,7 @@ public class StreamWritesStruct : StreamBytes
     public async Task WriteAsycn<T>(T pStruct, CancellationToken pToken = default)
         where T : struct, IStructSerializable
     {
-        byte[] buffer = Serialineitor.Serialize<T>(pStruct);
+        byte[] buffer = Serialineitor.SerializeStruct<T>(pStruct);
 
         // 1. Escribimos la longitud real del paquete primero (4 bytes)
         byte[] lengthPrefix = BitConverter.GetBytes(buffer.Length);
@@ -40,7 +50,7 @@ public class StreamReadStruct : StreamBytes
         // 2. Leemos EXACTAMENTE la longitud dinámica del paquete
         byte[] buffer = await base.ReadAsycn(packetLength, pToken);
 
-        return Serialineitor.Deserialize<T>(buffer);
+        return Serialineitor.DeserializeStruct<T>(buffer);
     }
 }
 

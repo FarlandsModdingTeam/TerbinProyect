@@ -11,7 +11,6 @@ using TerbinLibrary.Serialize;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TerbinLibrary.Communication;
-
 /*
  -- Variables:
   empieza: _ = es privada NO local.
@@ -19,9 +18,10 @@ namespace TerbinLibrary.Communication;
   empieza: "p"en minuscula = parametro entrante local.
   empieza: mayuscula = publica.
  -- Funciones:
-  empieza: mayorculas = publica.
-  empieza: menorculas = privada.
+  empieza: mayusculas = publica.
+  empieza: minusculas = privada.
  */
+
 
 /// <summary>
 /// 
@@ -125,18 +125,18 @@ public struct PacketRequest : IStructSerializable
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
-        BinWriter.Add<Header>(pBuffer, ref offset, Head);
-        BinWriter.Add<byte>(pBuffer, ref offset, ActionMethod);
-        BinWriter.Add<byte>(pBuffer, ref offset, IdMemory);
-        BinWriter.AddArray<byte>(pBuffer, ref offset, Payload);
+        pBuffer.Write<Header>(ref offset, Head);
+        pBuffer.Write<byte>(ref offset, ActionMethod);
+        pBuffer.Write<byte>(ref offset, IdMemory);
+        pBuffer.WriteArray<byte>(ref offset, Payload);
     }
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
     {
         int offset = 0;
-        Head =          BinReader.Read<Header>(pBuffer, ref offset);
-        ActionMethod =  BinReader.Read<byte>(pBuffer, ref offset);
-        IdMemory =      BinReader.Read<byte>(pBuffer, ref offset);
-        Payload =       BinReader.ReadArray<byte>(pBuffer, ref offset);
+        Head =          pBuffer.Read<Header>(ref offset);
+        ActionMethod =  pBuffer.Read<byte>(ref offset);
+        IdMemory =      pBuffer.Read<byte>(ref offset);
+        Payload =       pBuffer.ReadArray<byte>(ref offset);
     }
 
 }
