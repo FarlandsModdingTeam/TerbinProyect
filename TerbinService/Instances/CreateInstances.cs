@@ -10,10 +10,10 @@ namespace TerbinService.Instances;
 
 public partial class HandleInstances
 {
-    [TerbinExecutable((byte)CodeAction.CreateInstance)]
+    [TerbinExecutable((byte)CodeMethodsTerbinService.CreateInstance)]
     public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
     {
-        Console.WriteLine($"[Worker] Cliente: {pHead.IdClient}");
+        Console.WriteLine($"[Worker] Cliente: {pHead.IdRequest}");
         if (pParameters.Length > 0)
         {
             char[] falseString = Serialineitor.DeserializeArray<char>(pParameters.ToArray());
@@ -32,7 +32,7 @@ public partial class HandleInstances
         return new PacketRequest
         {
             Head = pHead,
-            ActionMethod = (byte)CodeAction.CreateInstance,
+            ActionMethod = (byte)CodeMethodsTerbinService.CreateInstance,
         };
     }
 

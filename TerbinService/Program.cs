@@ -45,7 +45,7 @@ async Task simulateClient()
             $"[Client] (byte de accion: 0 = Stop, 10 = CreateInstance, )\n"+
             $"[Client] Action -> ");
         byte input = byte.Parse(Console.ReadLine()); // alacguabar!
-        Console.Write($"[Client] ({input}), {(CodeAction)input}\n"+
+        Console.Write($"[Client] ({input}), {(CodeMethodsTerbinService)input}\n"+
             $"-------(  End  )---------\n");
 
         byte[] menssaje = new byte["matenme".ToCharArray().Length * 2];
@@ -89,7 +89,7 @@ async Task manejerSends(NamedPipeClientStream pPipe)
         var r = await reader.ReadAsycn<PacketRequest>();
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
 
-        if (r.ActionMethod == (byte)CodeAction.Stop &&
+        if (r.ActionMethod == (byte)CodeMethodsTerbinService.Stop &&
             r.Head.Status == CodeStatus.Succes)
         {
             Console.WriteLine($"[Client] Desconexion recibida.");

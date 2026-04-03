@@ -39,7 +39,8 @@ public static class ShortId
     public static ushort NewShortId()
     {
         var now = DateTime.Now;
-        int total = nextId() + (now.Second + now.Minute + now.Hour);
+        var timeId = now.Second + now.Minute;
+        int total = nextId() + (timeId < 0 ? 0 : timeId);
         return (byte)total;
     }
 

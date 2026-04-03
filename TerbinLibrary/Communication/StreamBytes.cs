@@ -13,8 +13,8 @@ namespace TerbinLibrary.Communication;
   empieza: "p"en minuscula = parametro entrante local.
   empieza: mayuscula = publica.
  -- Funciones:
-  empieza: mayorculas = publica.
-  empieza: menorculas = privada.
+  empieza: mayusculas = publica.
+  empieza: minusculas = privada.
  */
 
 
@@ -27,8 +27,9 @@ public class StreamWriteStruct : StreamBytes
     {
         byte[] buffer = Serialineitor.SerializeStruct<T>(pStruct);
 
-        // 1. Escribimos la longitud real del paquete primero (4 bytes)
-        byte[] lengthPrefix = BitConverter.GetBytes(buffer.Length);
+        // 1. Escribimos la longitud real del paquete primero (2 bytes)
+        //byte[] lengthPrefix = [(byte)buffer.Length];
+        byte[] lengthPrefix = BitConverter.GetBytes((ushort)buffer.Length);
         await PipeStream.WriteAsync(lengthPrefix, pToken);
 
         // 2. Escribimos el paquete
@@ -43,9 +44,10 @@ public class StreamReadStruct : StreamBytes
     public async Task<T> ReadAsycn<T>(CancellationToken pToken = default)
         where T : struct, IStructSerializable
     {
-        // 1. Leemos los 4 bytes que nos dicen cuánto mide el mensaje
-        byte[] lengthBuffer = await base.ReadBytesAsycn(4, pToken);
-        int packetLength = BitConverter.ToInt32(lengthBuffer);
+        // 1. Leemos los 1 bytes que nos dicen cuánto mide el mensaje
+        byte[] lengthBuffer = await base.ReadBytesAsycn(2, pToken);
+        ushort packetLength = BitConverter.ToUInt16(lengthBuffer);
+        //int packetLength = lengthBuffer[0];
 
         // 2. Leemos EXACTAMENTE la longitud dinámica del paquete
         byte[] buffer = await base.ReadBytesAsycn(packetLength, pToken);

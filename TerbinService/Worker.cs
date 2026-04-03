@@ -34,7 +34,15 @@ public class Worker : BackgroundService
 
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
 
-        _ = autoCreatePipe();
+        //_ = autoCreatePipe();
+
+        var communicator = new Communicator(true, Cts.Token);
+        communicator.OnRecive += onRecive;
+    }
+
+    private async Task onRecive(PacketRequest pRequest)
+    {
+        // TODO: todo.
     }
 
     private async Task autoCreatePipe()
@@ -71,7 +79,7 @@ public class Worker : BackgroundService
     }
 
 
-    [TerbinExecutable((byte)CodeAction.Stop)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]
     public static async Task<PacketRequest> Stop(Header pHead, MemoryStream pParameters)
     {
         _ = Task.Run(async () =>
@@ -83,6 +91,6 @@ public class Worker : BackgroundService
         });
         Console.WriteLine("(Worker): Stopping execution...");
         pHead.Status = CodeStatus.Succes;
-        return new PacketRequest(pHead, (byte)CodeAction.Stop, 1);
+        return new PacketRequest(pHead, (byte)CodeTerbinProtocol.Stop, 1);
     }
 }

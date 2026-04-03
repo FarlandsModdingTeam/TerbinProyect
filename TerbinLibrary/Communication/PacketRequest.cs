@@ -8,7 +8,6 @@ using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using TerbinLibrary.Id;
 using TerbinLibrary.Serialize;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -36,22 +35,39 @@ public enum CodeTypeData : byte
 }
 
 /// <summary>
-/// 
+/// 0 -> 9 | 
 /// Reserved the first 10.
 /// </summary>
-public enum CodeAction : byte
+public enum CodeTerbinProtocol : byte
 {
     Stop = 0,
     None = 1,
     Load = 2,
-    Solicit = 3,
-    Cancel = 4,
-    // etc...
+    Cancel = 3,
+     // "CRUD":
+    Solicit = 4,
+    Create = 5,
+    Update = 6,
 
-    // methods:
-    CreateInstance = 10,
-    DeleteInstance = 11,
+    Undefined7 = 7,
+    Undefined8 = 8,
+    Undefined9 = 9,
 }
+
+public enum CodeTerbinMemory : byte
+{
+    New = 0,
+    NotAsign = 1,
+    Undefined2 = 2,
+    Undefined3 = 3,
+    Undefined4 = 4,
+    Undefined5 = 5,
+    Undefined6 = 6,
+    Undefined7 = 7,
+    Undefined8 = 8,
+    Undefined9 = 9,
+}
+
 /* -- Parecida a HTTP pero no la voy a seguir a raja tabla.
     1xx → Informativos
     2xx → Éxito (ej. 200 OK)
@@ -65,7 +81,7 @@ public enum CodeStatus : short
 
     Succes = 200,
 
-    Execute = 300,
+    Execute = 300, // Hace 0 falta.
 
     BadRequest = 400,
     NotFound = 404,
@@ -80,13 +96,13 @@ public enum CodeStatus : short
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct Header // la memoria es constante es unmanaged.
 {
-    public ushort IdClient;
+    public ushort IdRequest;
     public ushort OrderRequest; // 0 = solo uno, 1 = es el primero, ushort.MaxValue = es el ultimo.
     public CodeStatus Status;
 
     public Header()
     {
-        IdClient = 1;
+        IdRequest = 1;
         OrderRequest = 0;
         Status = CodeStatus.NotAsign;
     }
@@ -96,7 +112,7 @@ public struct Header // la memoria es constante es unmanaged.
         ushort? pOrderRequest = null,
         CodeStatus pStatus = CodeStatus.NotAsign)
     {
-        IdClient = (pIdClient == 0) ? (ushort)1 : pIdClient;
+        IdRequest = (pIdClient == 0) ? (ushort)1 : pIdClient;
         OrderRequest = pOrderRequest ?? 0;
         Status = pStatus;
     }
@@ -117,7 +133,7 @@ public struct PacketRequest : IStructSerializable
     public PacketRequest()
     {
         Head = new Header();
-        ActionMethod = (byte)CodeAction.None;
+        ActionMethod = (byte)CodeTerbinProtocol.None;
         IdMemory = 0;
         Payload = [];
     }
