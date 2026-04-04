@@ -52,13 +52,6 @@ public class Communicator : IDisposable
         private set => field = value;
     } = false;
 
-    [Obsolete]
-    public ushort Id
-    {
-        get => field;
-        private set => field = value;
-    } = 0;
-
     public ushort MaximumResponseTime
     {
         get => field;
@@ -95,12 +88,10 @@ public class Communicator : IDisposable
 
         if (IsServer)
         {
-            //Id = (ushort)MiniID.Server;
             _thePipe = CreateServerPipe(pName);
         }
         else
         {
-            //Id = MiniID.NewS;
             _thePipe = CreateClientPipe(pName);
         }
         _writer = new StreamWriteStruct(_thePipe);
@@ -296,14 +287,6 @@ public class Communicator : IDisposable
 
 
     // ****************************( Helps )**************************** //
-    [Obsolete]
-    private Header createHead(ushort pOrderRequest, CodeStatus pStatus)
-    {
-        return new Header(pIdRequest: Id,
-                          pOrderRequest: pOrderRequest,
-                          pStatus: pStatus);
-    }
-
     public static NamedPipeServerStream CreateServerPipe(string pName = "TerbinPipe")
     {
         return new NamedPipeServerStream(
