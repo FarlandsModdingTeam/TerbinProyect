@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TerbinLibrary.Id;
 
-
+[Obsolete] 
 public enum ShortIdReserved : ushort
 {
     Solicited = 0,
@@ -13,19 +13,24 @@ public enum ShortIdReserved : ushort
 }
 
 /// <summary>
-/// 0 = solicitar, 1 = no asignar, 2 = server,  
+/// 
 /// </summary>
 public static class ShortId
 {
     private static ushort _incremental = 10;
+
+    public const ushort MAX = 0xFFF0;
+    public const ushort MIN = 10;
 
     public static ushort Incremental
     {
         get => _incremental;
         private set
         {
-            if (value < 10)
-                value = 10;
+            if (value < MIN)
+                value = MIN;
+            if (value > MAX)
+                value = MAX;
 
             _incremental = value;
         }
@@ -46,6 +51,11 @@ public static class ShortId
 
     private static ushort nextId()
     {
+        if (Incremental >= MAX)
+        {
+            Incremental = MIN;
+            return Incremental;
+        }
         return Incremental++;
     }
 }
