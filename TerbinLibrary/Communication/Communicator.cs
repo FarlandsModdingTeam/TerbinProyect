@@ -2,10 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO.Pipes;
-using System.Net.NetworkInformation;
 using TerbinLibrary.Executables;
 using TerbinLibrary.Id;
-using TerbinLibrary.Serialize;
+using TerbinLibrary;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -42,6 +41,7 @@ public class Communicator : IDisposable
 
     private readonly ConcurrentQueue<PacketRequest> _queue = new();
     private readonly SemaphoreSlim _signal = new(0);
+    private readonly ConcurrentDictionary<ushort, TaskCompletionSource<PacketRequest>> _pendingRequests = new();
 
     private event Func<PacketRequest, Task>? _onRecive;
     private event Func<PacketRequest, Task>? _onNewClientConnect;
@@ -52,17 +52,18 @@ public class Communicator : IDisposable
         private set => field = value;
     } = false;
 
+    [Obsolete]
     public ushort Id
     {
-        get
-        {
-            return field;
-        }
-        private set
-        {
-            field = value;
-        }
+        get => field;
+        private set => field = value;
     } = 0;
+
+    public ushort MaximumResponseTime
+    {
+        get => field;
+        set => field = value;
+    } = 180;
 
     // ****************************( Getters, Setters e Indexadores )**************************** //
     public bool IsConnect => _thePipe?.IsConnected ?? false;
@@ -94,12 +95,12 @@ public class Communicator : IDisposable
 
         if (IsServer)
         {
-            Id = (ushort)ShortIdReserved.Server;
+            //Id = (ushort)MiniID.Server;
             _thePipe = CreateServerPipe(pName);
         }
         else
         {
-            Id = ShortId.New;
+            //Id = MiniID.NewS;
             _thePipe = CreateClientPipe(pName);
         }
         _writer = new StreamWriteStruct(_thePipe);
@@ -142,25 +143,46 @@ public class Communicator : IDisposable
         throw new NotImplementedException("Ñe");
     }
 
-    public async Task Execute(byte pActionMethod, MemoryStream pPayload)
+    public async Task<ushort> Execute(byte pActionMethod, MemoryStream pPayload)
     {
-        await Execute(pActionMethod, pPayload.ToArray());
+        return await Execute(pActionMethod, pPayload.ToArray());
     }
-    public async Task Execute(byte pActionMethod, byte[] pPayload)
+    public async Task<ushort> Execute(byte pActionMethod, byte[] pPayload)
     {
-        if (pPayload.Length <= TerbinProtocol.MAXPLD)
+        ushort id = MiniID.NewS;
+        if (pPayload.Length <= TerbinProtocol.MAX_PLD)
+            _ = handleExecuteSigle(pActionMethod, pPayload, id);
+        else
+            _ = handleExecuteFragment(pActionMethod, pPayload, id);
+        return id;
+    }
+
+    private async Task<PacketRequest?> handleExecuteSigle(byte pActionMethod, byte[] pPayload, ushort pId, bool pRecuperate = true)
+    {
+        await AddQueue(0, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.NotAsign, pPayload, pId);
+
+        if (!pRecuperate)
+            return null;
+        return await recuperateReply(pId);
+    }
+
+    private async Task<PacketRequest?> handleExecuteFragment(byte pActionMethod, byte[] pPayload, ushort pId, bool pRecuperate = true)
+    {
+        // TODO: solicitamos memoria.
+
+        for (ushort i = 1; i < 10; i++)
         {
-            AddQueue(0, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.NotAsign, pPayload);
+            byte[] fragmentPayload = pPayload[..TerbinProtocol.FRAGMENT_IN];
+            pPayload = pPayload[TerbinProtocol.FRAGMENT_IN..];
+            if (pPayload.Length <= TerbinProtocol.MAX_PLD)
+                await AddQueue(TerbinProtocol.FINAL_PACKET, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.New, fragmentPayload, pId);
+            else
+                await AddQueue(i, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.New, fragmentPayload, pId);
         }
 
-
-
-        // TODO: Craer protocolo estandar.
-    }
-
-    private async Task handleExecuteFragment(byte pActionMethod, byte[] pPayload)
-    {
-        AddQueue(0, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.New, pPayload);
+        if (!pRecuperate)
+            return null;
+        return await recuperateReply(pId);
     }
 
     private async Task<PacketRequest> handleGetMemory()
@@ -175,27 +197,62 @@ public class Communicator : IDisposable
         throw new NotImplementedException("Ñe");
     }
 
+    private async Task<PacketRequest> recuperateReply(ushort pId)
+    {
+        var tcs = new TaskCompletionSource<PacketRequest>(TaskCreationOptions.RunContinuationsAsynchronously);
+
+        if (!_pendingRequests.TryAdd(pId, tcs))
+            throw new InvalidOperationException($"Ya se está esperando el IdRequest: {pId}");
+
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(MaximumResponseTime));
+
+        cts.Token.Register(() =>
+        {
+            // Intentamos sacar la petición del diccionario
+            if (_pendingRequests.TryRemove(pId, out TaskCompletionSource<PacketRequest>? removedTcs))
+            {
+                var timeoutHeader = new Header(pIdRequest: pId, pOrderRequest: 0, pStatus: CodeStatus.OverMaximumTime);
+                var timeoutPacket = new PacketRequest(pHead: timeoutHeader);
+                removedTcs.TrySetResult(timeoutPacket);
+            }
+        });
+
+        return await tcs.Task;
+    }
+
+    private async Task handleReceive(PacketRequest pCapsule)
+    {
+        if (_pendingRequests.TryRemove(pCapsule.Head.IdRequest, out var tcs))
+            tcs.TrySetResult(pCapsule);
+    }
 
     // --- Reply --- //
-    public async Task ReplySucces(byte pActionMethod)
+    public async Task ReplySucces(byte pActionMethod, ushort pId)
     {
-        AddQueue(0, CodeStatus.Succes, pActionMethod, (byte)CodeTerbinMemory.NotAsign, []);
+        await AddQueue(0, CodeStatus.Succes, pActionMethod, (byte)CodeTerbinMemory.NotAsign, [], pId);
     }
-    public async Task ReplyError(CodeStatus pStatus, byte pActionMethod)
+    public async Task ReplyError(CodeStatus pStatus, byte pActionMethod, ushort pId)
     {
-        AddQueue(0, pStatus, pActionMethod, (byte)CodeTerbinMemory.NotAsign, []);
+
+        await AddQueue(0, pStatus, pActionMethod, (byte)CodeTerbinMemory.NotAsign, [], pId);
     }
 
 
     // --- Queue --- //
-    public void AddQueue(ushort pOrderRequest,
-                            CodeStatus pStatus,
-                            byte pActionMethod,
-                            byte pIdMemory,
-                            byte[] pSectionPayload)
+    public async Task AddQueue(
+                ushort pOrderRequest,
+                CodeStatus pStatus,
+                byte pActionMethod,
+                byte pIdMemory,
+                byte[] pSectionPayload,
+                ushort pIdRequest)
     {
+        Header head = new Header(
+            pIdRequest: pIdRequest,
+            pOrderRequest: pOrderRequest,
+            pStatus: pStatus);
         PacketRequest capsule = new PacketRequest(
-            pHead: createHead(pOrderRequest, pStatus),
+            pHead: head,
             pActionMethod: pActionMethod,
             pIdMemory: pIdMemory,
             pPayload: pSectionPayload);
@@ -209,6 +266,7 @@ public class Communicator : IDisposable
         while (!_stopToken.IsCancellationRequested)
         {
             PacketRequest r = await _reader.ReadAsycn<PacketRequest>(_stopToken);
+            _ = handleReceive(r);
             _ = _onRecive?.Invoke(r);
         }
     }
@@ -238,9 +296,10 @@ public class Communicator : IDisposable
 
 
     // ****************************( Helps )**************************** //
+    [Obsolete]
     private Header createHead(ushort pOrderRequest, CodeStatus pStatus)
     {
-        return new Header(pIdClient: Id,
+        return new Header(pIdRequest: Id,
                           pOrderRequest: pOrderRequest,
                           pStatus: pStatus);
     }

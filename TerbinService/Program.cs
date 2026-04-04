@@ -1,5 +1,6 @@
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
+using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Id;
 using TerbinLibrary.Serialize;
@@ -24,7 +25,7 @@ async Task simulateClient()
     // Console.WriteLine($"[Client] Tamaño bytes ({Marshal.SizeOf<PacketRequest>()})");
     // StreamBytes.StructToBytes(cap).ToArray().Length
 
-    var id = ShortId.New;
+    var id = MiniID.NewS;
     Console.WriteLine($"[Client] Id: {id}");
 
     using var pipe = Communicator.CreateClientPipe();
@@ -89,7 +90,7 @@ async Task manejerSends(NamedPipeClientStream pPipe)
         var r = await reader.ReadAsycn<PacketRequest>();
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
 
-        if (r.ActionMethod == (byte)CodeMethodsTerbinService.Stop &&
+        if (r.ActionMethod == (byte)CodeTerbinProtocol.Stop &&
             r.Head.Status == CodeStatus.Succes)
         {
             Console.WriteLine($"[Client] Desconexion recibida.");
