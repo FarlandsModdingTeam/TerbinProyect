@@ -29,24 +29,30 @@ public struct Header // la memoria es constante es unmanaged.
     public ushort IdRequest;
     public ushort OrderRequest; // 0 = solo uno, 1 = es el primero, ushort.MaxValue = es el ultimo.
     public CodeStatus Status;
+    public ushort MaximusTime; // ¿Aqui realmente se necesita?
 
     public Header()
     {
-        IdRequest = 1;
+        IdRequest = 0;
         OrderRequest = 0;
         Status = CodeStatus.NotAsign;
+        MaximusTime = TerbinProtocol.MAXIMUS_RESPONSE_TIME;
     }
 
     public Header(
         ushort pIdRequest = 0,
         ushort? pOrderRequest = null,
-        CodeStatus pStatus = CodeStatus.NotAsign)
+        CodeStatus pStatus = CodeStatus.NotAsign,
+        ushort pMaximusTime = TerbinProtocol.MAXIMUS_RESPONSE_TIME)
     {
         IdRequest = (pIdRequest == 0) ? (ushort)1 : pIdRequest;
         OrderRequest = pOrderRequest ?? 0;
         Status = pStatus;
+        MaximusTime = pMaximusTime;
     }
 }
+
+
 
 // TODO: Hacerles getter y setters + valor predeterminado, con eso nos olvidamos del constructor.
 [StructLayout(LayoutKind.Sequential)]
@@ -57,21 +63,21 @@ public struct PacketRequest : IStructSerializable
     // Deberia hacer que IdMemory sea un byte y tener una RAM (almacen de memorias xd) o tener un almacen por funcion /
     // y que IdMemory sea un CodeAction y guardar los datos en la memoria especifica de la funcion y ya no tengo /
     // que especificarlo pero IdMemory se quedaria vacio pero si es byte el cliente tiene que medio gestionar la memoria.
-    public byte IdMemory; // Reservarse los 10 primeros
+    public byte IdMemory;
     public byte[] Payload;
 
     public PacketRequest()
     {
         Head = new Header();
         ActionMethod = (byte)CodeTerbinProtocol.None;
-        IdMemory = 0;
+        IdMemory = (byte)CodeTerbinMemory.Undefined;
         Payload = [];
     }
 
     public PacketRequest(
         Header? pHead = null,
-        byte pActionMethod = 2,
-        byte pIdMemory = 0,
+        byte pActionMethod = (byte)CodeTerbinProtocol.None,
+        byte pIdMemory = (byte)CodeTerbinMemory.Undefined,
         byte[]? pPayload = null)
     {
         Head = pHead ?? new Header();
@@ -81,8 +87,8 @@ public struct PacketRequest : IStructSerializable
     }
 
     // Header + bye + byte + ushort + byte[]
-    // 6 + 1 + 1 + 2 + Length
-    public int GetSize() => 10 + (Payload?.Length ?? 0);
+    // 8 + 1 + 1 + 2 + Length
+    public int GetSize() => 12 + (Payload?.Length ?? 0);
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
@@ -100,6 +106,13 @@ public struct PacketRequest : IStructSerializable
         Payload =       pBuffer.ReadArray<byte>(ref offset);
     }
 
+    public static explicit operator PacketRequest(Task<PacketRequest?> v)
+    {
+        if (v != null)
+            return (PacketRequest)v;
+        else
+            return new PacketRequest();
+    }
 }
 
 /*

@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO.Pipes;
-using TerbinLibrary.Executables;
+using TerbinLibrary.Memory;
 using TerbinLibrary.Id;
 using TerbinLibrary;
 
@@ -56,7 +56,7 @@ public class Communicator : IDisposable
     {
         get => field;
         set => field = value;
-    } = 180;
+    } = TerbinProtocol.MAXIMUS_RESPONSE_TIME;
 
     // ****************************( Getters, Setters e Indexadores )**************************** //
     public bool IsConnect => _thePipe?.IsConnected ?? false;
@@ -130,8 +130,13 @@ public class Communicator : IDisposable
     }
     public async Task<PacketRequest> Communicate(byte pActionMethod, byte[] pPayload)
     {
-
-        throw new NotImplementedException("Ñe");
+        ushort id = MiniID.NewS;
+        PacketRequest reply;
+        if (pPayload.Length <= TerbinProtocol.MAX_PLD)
+            reply = (PacketRequest) await HandleSendSigle(pActionMethod, pPayload, id, true);
+        else
+            reply = (PacketRequest) await HandleSendFragment(pActionMethod, pPayload, id, true);
+        return reply;
     }
 
     public async Task<ushort> Execute(byte pActionMethod, MemoryStream pPayload)
@@ -142,13 +147,23 @@ public class Communicator : IDisposable
     {
         ushort id = MiniID.NewS;
         if (pPayload.Length <= TerbinProtocol.MAX_PLD)
-            _ = handleExecuteSigle(pActionMethod, pPayload, id);
+            _ = HandleSendSigle(pActionMethod, pPayload, id, false);
         else
-            _ = handleExecuteFragment(pActionMethod, pPayload, id);
+            _ = HandleSendFragment(pActionMethod, pPayload, id, false);
         return id;
     }
 
-    private async Task<PacketRequest?> handleExecuteSigle(byte pActionMethod, byte[] pPayload, ushort pId, bool pRecuperate = true)
+    //private ushort handleSendSize(byte pActionMethod, byte[] pPayload)
+    //{
+    //    ushort id = MiniID.NewS;
+    //    if (pPayload.Length <= TerbinProtocol.MAX_PLD)
+    //        _ = handleExecuteSigle(pActionMethod, pPayload, id, false);
+    //    else
+    //        _ = handleExecuteFragment(pActionMethod, pPayload, id, false);
+    //    return id;
+    //}
+
+    public async Task<PacketRequest?> HandleSendSigle(byte pActionMethod, byte[] pPayload, ushort pId, bool pRecuperate = true)
     {
         await AddQueue(0, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.NotAsign, pPayload, pId);
 
@@ -157,11 +172,12 @@ public class Communicator : IDisposable
         return await recuperateReply(pId);
     }
 
-    private async Task<PacketRequest?> handleExecuteFragment(byte pActionMethod, byte[] pPayload, ushort pId, bool pRecuperate = true)
+    public async Task<PacketRequest?> HandleSendFragment(byte pActionMethod, byte[] pPayload, ushort pId, bool pRecuperate = true)
     {
         // TODO: solicitamos memoria.
 
-        for (ushort i = 1; i < 10; i++)
+        int totalPackets = (int)Math.Ceiling(pPayload.Length * TerbinProtocol.FRAGMENT_IN_MULTIPLICATE_INVERSE);
+        for (ushort i = 1; i < totalPackets; i++)
         {
             byte[] fragmentPayload = pPayload[..TerbinProtocol.FRAGMENT_IN];
             pPayload = pPayload[TerbinProtocol.FRAGMENT_IN..];
@@ -224,7 +240,6 @@ public class Communicator : IDisposable
     }
     public async Task ReplyError(CodeStatus pStatus, byte pActionMethod, ushort pId)
     {
-
         await AddQueue(0, pStatus, pActionMethod, (byte)CodeTerbinMemory.NotAsign, [], pId);
     }
 
@@ -257,8 +272,17 @@ public class Communicator : IDisposable
         while (!_stopToken.IsCancellationRequested)
         {
             PacketRequest r = await _reader.ReadAsycn<PacketRequest>(_stopToken);
-            _ = handleReceive(r);
-            _ = _onRecive?.Invoke(r);
+
+            // 1. Guardar en memoria siempre
+            bool isFinal = r.Head.OrderRequest == TerbinProtocol.FINAL_PACKET || r.Head.OrderRequest == 0;
+            TerbinMemory.Store(r.Head.IdRequest, r.Head.OrderRequest, r.Payload, isFinal);
+
+            // 2. Si está completo, avisar al usuario
+            if (isFinal)
+            {
+                _ = handleReceive(r);
+                _ = _onRecive?.Invoke(r);
+            }
         }
     }
     private async Task manageSend()
@@ -267,20 +291,20 @@ public class Communicator : IDisposable
         {
             await _signal.WaitAsync(_stopToken);
 
-            if (_queue.TryDequeue(out PacketRequest data))
-            {
-                try
-                {
-                    await _writer.WriteAsycn<PacketRequest>(data, _stopToken);
-                }
-                catch(Exception e)
-                {
+            if (!_queue.TryDequeue(out PacketRequest data))
+                continue;
 
-                }
-                finally
-                {
-                    //_signal.Release();
-                }
+            try
+            {
+                await _writer.WriteAsycn<PacketRequest>(data, _stopToken);
+            }
+            catch(Exception e)
+            {
+                // TODO: Logger.
+            }
+            finally
+            {
+                //_signal.Release();
             }
         }
     }

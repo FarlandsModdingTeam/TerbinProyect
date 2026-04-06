@@ -8,32 +8,35 @@ public class TerbinProtocol
 {
     public const ushort MAX_PLD = 0xFFF; // ¡Vamos Miura!
     public const ushort FRAGMENT_IN = 0xFFF;
+    public const double FRAGMENT_IN_MULTIPLICATE_INVERSE = 1.0D / FRAGMENT_IN;
 
     public const ushort ORDER_SINGLE = ushort.MinValue;
 
     public const ushort FIRST_PACKET = 1;
     public const ushort FINAL_PACKET = ushort.MaxValue;
+
+    public const ushort MAXIMUS_RESPONSE_TIME = 180; // ¿Se necesita un short?
 }
 
 [Flags]
 public enum CodeTypeData : byte
 {
-    Single = 0 << 0, // 0000
-    Array = 1 << 0, // 0001
+    //Single = 0 << 0, // 0000
+    //Array = 1 << 0, // 0001
 
-    Int = 0 << 1,  // 0000
-    Float = 1 << 1,  // 0010
-    Char = 2 << 1,  // 0100
-    Byte = 3 << 1,  // 0110
+    //Int = 0 << 1,  // 0000
+    //Float = 1 << 1,  // 0010
+    //Char = 2 << 1,  // 0100
+    //Byte = 3 << 1,  // 0110
 
 
-    // Singles  = 0b0000,
-    // Array    = 0b0001,
-    // 
-    // Int      = 0b0000,
-    // Float    = 0b0010,
-    // Char     = 0b0100,
-    // Byte     = 0b0110,
+    Singles = 0b000_0,
+    Array   = 0b000_1,
+
+    Int     = 0b000_0,
+    Float   = 0b001_0,
+    Char    = 0b010_0,
+    Byte    = 0b011_0,
 }
 
 /// <summary>
@@ -46,22 +49,23 @@ public enum CodeTerbinProtocol : byte
     None = 1,
     Load = 2,
     Cancel = 3,
-    // Si puede ayudar a ahorrarte bytes.
-    // "CRUD": 
     Solicit = 4,
-    Create = 5,
-    Update = 6,
-    Deleted = 7,
+    Undefine5 = 5,
 
-    Undefined8 = 8,
-    Undefined9 = 9,
+    // Si puede ayudar a ahorrarte fuciones.
+    // C.R.U.D for you: 
+    Create = 6,
+    Read = 7,
+    Update = 8,
+    Deleted = 9,
 }
 
 public enum CodeTerbinMemory : byte
 {
     New = 0,
     NotAsign = 1,
-    Undefined2 = 2,
+    Undefined = 2, // Literaly
+
     Undefined3 = 3,
     Undefined4 = 4,
     Undefined5 = 5,
