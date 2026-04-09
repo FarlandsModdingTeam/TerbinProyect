@@ -62,11 +62,11 @@ public enum CodeTerbinProtocol : byte
 
 public enum CodeTerbinMemory : byte
 {
-    New = 0,
+    None = 0,
     NotAsign = 1,
-    Undefined = 2, // Literaly
+    New = 2,
+    Undefined = 3, // Literaly
 
-    Undefined3 = 3,
     Undefined4 = 4,
     Undefined5 = 5,
     Undefined6 = 6,

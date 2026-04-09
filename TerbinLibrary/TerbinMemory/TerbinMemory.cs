@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary.Id;
 
 namespace TerbinLibrary.Memory;
 /*
@@ -25,20 +26,41 @@ namespace TerbinLibrary.Memory;
 // TODO: Limpia (pero desde Containers).
 public static class TerbinMemory
 {
-    // Diccionario concurrente para que sea Thread-Safe
-    private static readonly ConcurrentDictionary<ushort, TerbinContainer2> _containers = new();
 
-    // El Communicator llama a esto al recibir cualquier fragmento
-    public static void Store(ushort pIdRequest, ushort pOrder, byte[] pData, bool pIsFinal)
+    private static readonly ConcurrentDictionary<byte, TerbinRAM> _containers = new();
+
+    public static byte getStore()
     {
-        var container = _containers.GetOrAdd(pIdRequest, id => new TerbinContainer2 { IdRequest = id });
+        byte? idContainer = null;
+        foreach (var item in _containers)
+        {
+            if (!item.Value.IsOcupated)
+            {
+                idContainer = item.Key;
+                break;
+            }
+        }
+        if (idContainer != null)
+            return idContainer.Value;
+        return createStore().id;
+    }
+
+    static (bool succes, byte id) createStore()
+    {
+        byte id = MiniID.NewB;
+        return (_containers.TryAdd(id, new TerbinRAM { Id = id }), id);
+    }
+
+    public static void Store(byte pIdMemory, ushort pOrder, byte[] pData, bool pIsFinal)
+    {
+        var container = _containers.GetOrAdd(pIdMemory, id => new TerbinRAM { IdRequest = id });
         container.AddFragment(pOrder, pData, pIsFinal);
     }
 
-    // El Usuario o el Communicator llaman a esto para obtener el resultado
-    public static bool TryGetResult(ushort pIdRequest, out byte[]? pData)
+
+    public static bool TryGetResult(byte pIdMemory, out byte[]? pData)
     {
-        if (_containers.TryGetValue(pIdRequest, out var container) && container.IsComplete)
+        if (_containers.TryGetValue(pIdMemory, out var container) && container.IsComplete)
         {
             pData = container.GetFullData();
             return true;
@@ -47,9 +69,19 @@ public static class TerbinMemory
         return false;
     }
 
-    // Importante: El usuario debe liberar la memoria cuando ya no la necesite
-    public static void Release(ushort pIdRequest)
+
+    public static bool Release(byte pIdMemory)
     {
-        _containers.TryRemove(pIdRequest, out _);
+        if (_containers.TryGetValue(pIdMemory, out var value))
+        {
+            value.Release();
+            return true;
+        }
+        return false;
+    }
+
+    public static bool Remove(byte pIdMemory)
+    {
+        return _containers.TryRemove(pIdMemory, out _);
     }
 }
