@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
 
-namespace TerbinLibrary.Executables;
+namespace TerbinLibrary.Execution;
 /*
  -- Variables:
   empieza: _ = es privada NO local.

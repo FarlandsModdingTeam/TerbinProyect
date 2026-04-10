@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
-using TerbinLibrary.Executables;
 
-namespace TerbinLibrary;
+namespace TerbinLibrary.Execution;
 
 public class TerbinExecutor
 {
