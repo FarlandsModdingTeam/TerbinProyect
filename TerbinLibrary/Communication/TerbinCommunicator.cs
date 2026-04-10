@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO.Pipes;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using TerbinLibrary;
 using TerbinLibrary.Executables;
 using TerbinLibrary.Id;
@@ -30,8 +31,8 @@ namespace TerbinLibrary.Communication;
 
 - Execute es para mandar y olvidarte (ya lo recibiras en OnRecive);
 - Communicate es para mandar sabiendo que quieres recibir una respuesta;
-
  */
+
 
 public class TerbinCommunicator : IDisposable
 {
@@ -101,8 +102,6 @@ public class TerbinCommunicator : IDisposable
 
         _ = Task.Run(manageReceive, _stopToken);
         _ = Task.Run(manageSend, _stopToken);
-
-        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
 
 
@@ -143,11 +142,11 @@ public class TerbinCommunicator : IDisposable
         return reply;
     }
 
-    public async Task<ushort> Execute(byte pActionMethod, MemoryStream pPayload)
+    public async Task<ushort> Send(byte pActionMethod, MemoryStream pPayload)
     {
-        return await Execute(pActionMethod, pPayload.ToArray());
+        return await Send(pActionMethod, pPayload.ToArray());
     }
-    public async Task<ushort> Execute(byte pActionMethod, byte[] pPayload)
+    public async Task<ushort> Send(byte pActionMethod, byte[] pPayload)
     {
         ushort id = MiniID.NewS;
         if (pPayload.Length <= TerbinProtocol.MAX_PLD)
@@ -243,6 +242,7 @@ public class TerbinCommunicator : IDisposable
     }
 
     // --- Reply --- //
+    // Soy estupido.
     public async Task ReplySucces(byte pActionMethod, ushort pId)
     {
         await AddQueue(0, CodeStatus.Succes, pActionMethod, (byte)CodeTerbinMemory.NotAsign, [], pId);
@@ -252,6 +252,10 @@ public class TerbinCommunicator : IDisposable
         await AddQueue(0, pStatus, pActionMethod, (byte)CodeTerbinMemory.NotAsign, [], pId);
     }
 
+    public async Task Reply(PacketRequest pRequest)
+    {
+        await AddQueue(pRequest);
+    }
 
     // --- Queue --- //
     public async Task AddQueue(
@@ -271,7 +275,11 @@ public class TerbinCommunicator : IDisposable
             pActionMethod: pActionMethod,
             pIdMemory: pIdMemory,
             pPayload: pSectionPayload);
-        _queue.Enqueue(capsule);
+        await AddQueue(capsule);
+    }
+    public async Task AddQueue(PacketRequest pCapsule)
+    {
+        _queue.Enqueue(pCapsule);
         _signal.Release();
     }
 
