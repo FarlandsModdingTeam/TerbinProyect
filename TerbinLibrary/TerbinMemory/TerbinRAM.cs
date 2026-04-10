@@ -35,7 +35,10 @@ public class TerbinRAM
     private readonly Dictionary<ushort, byte[]> _fragments = new();
     private int _totalSize = 0;
 
-    public void AddFragment(ushort pOrder, byte[] pData/*, bool pIsFinal*/)
+    public event Action? OnAdd;
+    public event Action? OnRelease;
+
+    public void AddFragment(ushort pOrder, byte[] pData)
     {
         lock (_fragments)
         {
@@ -44,11 +47,13 @@ public class TerbinRAM
                 _fragments.Add(pOrder, pData);
                 _totalSize += pData.Length;
             }
-            //if (pIsFinal) _isComplete = true;
         }
+        OnAdd?.Invoke();
     }
 
     // TODO: Comprobar si falta alguna parte intermedia.
+    // TODO: Fragmentar/Encapsular.
+    [Obsolete]
     public byte[] GetFullData()
     {
         KeyValuePair<ushort, byte[]>[] fragmentsCopy;
@@ -71,9 +76,18 @@ public class TerbinRAM
         return result;
     }
 
+    public (bool succes, byte error) TryGetFullData(out byte[] pData)
+    {
+
+        throw new NotImplementedException("Ñe");
+    }
+
     public void Release()
     {
         IdRequest = (byte)CodeTerbinMemory.NotAsign;
+
+        OnAdd = null;
+        OnRelease?.Invoke();
 
         lock (_fragments)
         {
