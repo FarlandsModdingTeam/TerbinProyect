@@ -45,7 +45,7 @@ public static class TerbinMemory
         return createStore().id;
     }
 
-    static (bool succes, byte id) createStore()
+    private static (bool succes, byte id) createStore()
     {
         byte id = MiniID.NewB;
         return (_containers.TryAdd(id, new TerbinRAM { Id = id }), id);
