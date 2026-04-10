@@ -2,9 +2,11 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO.Pipes;
-using TerbinLibrary.Memory;
-using TerbinLibrary.Id;
+using System.Reflection;
 using TerbinLibrary;
+using TerbinLibrary.Executables;
+using TerbinLibrary.Id;
+using TerbinLibrary.Memory;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -31,7 +33,7 @@ namespace TerbinLibrary.Communication;
 
  */
 
-public class Communicator : IDisposable
+public class TerbinCommunicator : IDisposable
 {
     // ****************************( Variables )**************************** //
     private PipeStream _thePipe;
@@ -81,7 +83,7 @@ public class Communicator : IDisposable
     }
 
     // ****************************( Construct )**************************** //
-    public Communicator(bool pIsServer = false, CancellationToken pTokenCancellation = default, string pName = "TerbinPipe")
+    public TerbinCommunicator(bool pIsServer = false, CancellationToken pTokenCancellation = default, string pName = "TerbinPipe")
     {
         IsServer = pIsServer;
         _stopToken = pTokenCancellation;
@@ -99,6 +101,8 @@ public class Communicator : IDisposable
 
         _ = Task.Run(manageReceive, _stopToken);
         _ = Task.Run(manageSend, _stopToken);
+
+        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
 
 
@@ -231,6 +235,11 @@ public class Communicator : IDisposable
     {
         if (_pendingRequests.TryRemove(pCapsule.Head.IdRequest, out var tcs))
             tcs.TrySetResult(pCapsule);
+
+        if (pCapsule.ActionMethod > 9)
+        {
+            ExecutableDispatcher.DispatchAsync(pCapsule);
+        }
     }
 
     // --- Reply --- //
@@ -273,16 +282,15 @@ public class Communicator : IDisposable
         {
             PacketRequest r = await _reader.ReadAsycn<PacketRequest>(_stopToken);
 
-            // 1. Guardar en memoria siempre
-            bool isFinal = r.Head.OrderRequest == TerbinProtocol.FINAL_PACKET || r.Head.OrderRequest == 0;
-            TerbinMemory.Store(r.Head.IdRequest, r.Head.OrderRequest, r.Payload, isFinal);
 
-            // 2. Si está completo, avisar al usuario
-            if (isFinal)
-            {
-                _ = handleReceive(r);
-                _ = _onRecive?.Invoke(r);
-            }
+            //bool isFinal = r.Head.OrderRequest == TerbinProtocol.FINAL_PACKET || r.Head.OrderRequest == 0;
+            //TerbinMemory.Store(r.Head.IdRequest, r.Head.OrderRequest, r.Payload, isFinal);
+
+            //if (isFinal)
+            //{
+            //    _ = handleReceive(r);
+            //    _ = _onRecive?.Invoke(r);
+            //}
         }
     }
     private async Task manageSend()
@@ -365,7 +373,7 @@ public class Communicator : IDisposable
 
     }
 
-    ~Communicator()
+    ~TerbinCommunicator()
     {
         Dispose(false);
     }

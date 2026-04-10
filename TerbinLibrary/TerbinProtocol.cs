@@ -50,7 +50,7 @@ public enum CodeTerbinProtocol : byte
     Load = 2,
     Cancel = 3,
     Solicit = 4,
-    Undefine5 = 5,
+    Info = 5,
 
     // Si puede ayudar a ahorrarte fuciones.
     // C.R.U.D for you: 

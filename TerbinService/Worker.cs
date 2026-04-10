@@ -37,7 +37,7 @@ public class Worker : BackgroundService
 
         //_ = autoCreatePipe();
 
-        var communicator = new Communicator(true, Cts.Token);
+        var communicator = new TerbinCommunicator(true, Cts.Token);
         communicator.OnRecive += onRecive;
     }
 
@@ -48,7 +48,7 @@ public class Worker : BackgroundService
 
     private async Task autoCreatePipe()
     {
-        var pipe = Communicator.NewTerbinPipe;
+        var pipe = TerbinCommunicator.NewTerbinPipe;
         await pipe.WaitForConnectionAsync(Cts.Token);
 
         _ = Task.Run(() => autoCreatePipe(), Cts.Token);

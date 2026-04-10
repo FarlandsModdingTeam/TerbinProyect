@@ -28,7 +28,7 @@ async Task simulateClient()
     var id = MiniID.NewS;
     Console.WriteLine($"[Client] Id: {id}");
 
-    using var pipe = Communicator.CreateClientPipe();
+    using var pipe = TerbinCommunicator.CreateClientPipe();
     await pipe.ConnectAsync();
     _ = manejerSends(pipe);
     Console.WriteLine($"[Client] ¡Conectado!");
