@@ -234,11 +234,6 @@ public class TerbinCommunicator : IDisposable
     {
         if (_pendingRequests.TryRemove(pCapsule.Head.IdRequest, out var tcs))
             tcs.TrySetResult(pCapsule);
-
-        if (pCapsule.ActionMethod > 9)
-        {
-            ExecutableDispatcher.DispatchAsync(pCapsule);
-        }
     }
 
     // --- Reply --- //

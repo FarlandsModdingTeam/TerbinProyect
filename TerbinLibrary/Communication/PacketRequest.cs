@@ -7,6 +7,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.RegularExpressions;
 using TerbinLibrary.Id;
+using TerbinLibrary.Memory;
 using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Communication;
@@ -29,26 +30,30 @@ public struct Header // la memoria es constante es unmanaged.
     public ushort IdRequest;
     public ushort OrderRequest; // 0 = solo uno, 1 = es el primero, ushort.MaxValue = es el ultimo.
     public CodeStatus Status;
-    public ushort MaximusTime; // ¿Aqui realmente se necesita?
+    //public ushort MaximusTime; // ¿Aqui realmente se necesita?
+    public byte IdMemory;
 
     public Header()
     {
         IdRequest = 0;
         OrderRequest = 0;
         Status = CodeStatus.NotAsign;
-        MaximusTime = TerbinProtocol.MAXIMUS_RESPONSE_TIME;
+        //MaximusTime = TerbinProtocol.MAXIMUS_RESPONSE_TIME;
+        IdMemory = (byte)CodeTerbinMemory.Undefined;
     }
 
     public Header(
         ushort pIdRequest = 0,
         ushort? pOrderRequest = null,
         CodeStatus pStatus = CodeStatus.NotAsign,
-        ushort pMaximusTime = TerbinProtocol.MAXIMUS_RESPONSE_TIME)
+        /*ushort pMaximusTime = TerbinProtocol.MAXIMUS_RESPONSE_TIME,*/
+        byte pIdMemory = (byte)CodeTerbinMemory.Undefined)
     {
         IdRequest = (pIdRequest == 0) ? (ushort)1 : pIdRequest;
         OrderRequest = pOrderRequest ?? 0;
         Status = pStatus;
-        MaximusTime = pMaximusTime;
+        //MaximusTime = pMaximusTime;
+        IdMemory = pIdMemory;
     }
 }
 
@@ -63,14 +68,14 @@ public struct PacketRequest : IStructSerializable
     // Deberia hacer que IdMemory sea un byte y tener una RAM (almacen de memorias xd) o tener un almacen por funcion /
     // y que IdMemory sea un CodeAction y guardar los datos en la memoria especifica de la funcion y ya no tengo /
     // que especificarlo pero IdMemory se quedaria vacio pero si es byte el cliente tiene que medio gestionar la memoria.
-    public byte IdMemory;
+    //public byte IdMemory;
     public byte[] Payload;
 
     public PacketRequest()
     {
         Head = new Header();
         ActionMethod = (byte)CodeTerbinProtocol.None;
-        IdMemory = (byte)CodeTerbinMemory.Undefined;
+        //IdMemory = (byte)CodeTerbinMemory.Undefined;
         Payload = [];
     }
 
@@ -82,19 +87,19 @@ public struct PacketRequest : IStructSerializable
     {
         Head = pHead ?? new Header();
         ActionMethod = pActionMethod;
-        IdMemory = (pIdMemory < 10) ? (byte)10 : pIdMemory;
+        //IdMemory = (pIdMemory < 10) ? (byte)10 : pIdMemory;
         Payload = pPayload ?? [];
     }
 
     // Header + bye + byte + ushort + byte[]
-    // 8 + 1 + 1 + 2 + Length
-    public int GetSize() => 12 + (Payload?.Length ?? 0);
+    // 7 + 1 + 0 + 2 + Length
+    public int GetSize() => 10 + (Payload?.Length ?? 0);
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
         pBuffer.Write<Header>(ref offset, Head);
         pBuffer.Write<byte>(ref offset, ActionMethod);
-        pBuffer.Write<byte>(ref offset, IdMemory);
+        //pBuffer.Write<byte>(ref offset, IdMemory);
         pBuffer.WriteArray<byte>(ref offset, Payload);
     }
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
@@ -102,7 +107,7 @@ public struct PacketRequest : IStructSerializable
         int offset = 0;
         Head =          pBuffer.Read<Header>(ref offset);
         ActionMethod =  pBuffer.Read<byte>(ref offset);
-        IdMemory =      pBuffer.Read<byte>(ref offset);
+        //IdMemory =      pBuffer.Read<byte>(ref offset);
         Payload =       pBuffer.ReadArray<byte>(ref offset);
     }
 
