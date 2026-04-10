@@ -32,13 +32,6 @@ public class TerbinRAM
 
     public bool IsOcupated => IdRequest != (ushort)CodeTerbinMemory.NotAsign;
 
-    private volatile bool _isComplete; // Puta IA de mierda que no sabe hacer una puta mierda.
-    public bool IsComplete
-    {
-        get => _isComplete;
-        internal set => _isComplete = value;
-    }
-
     private readonly Dictionary<ushort, byte[]> _fragments = new();
     private int _totalSize = 0;
 
@@ -87,7 +80,5 @@ public class TerbinRAM
             _fragments.Clear();
             _totalSize = 0;
         }
-
-        IsComplete = false;
     }
 }
