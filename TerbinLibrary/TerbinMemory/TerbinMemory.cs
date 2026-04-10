@@ -51,10 +51,10 @@ public static class TerbinMemory
         return (_containers.TryAdd(id, new TerbinRAM { Id = id }), id);
     }
 
-    public static void Store(byte pIdMemory, ushort pOrder, byte[] pData, bool pIsFinal)
+    public static void Store(byte pIdMemory, ushort pOrder, byte[] pData/*, bool pIsFinal*/)
     {
         var container = _containers.GetOrAdd(pIdMemory, id => new TerbinRAM { IdRequest = id });
-        container.AddFragment(pOrder, pData, pIsFinal);
+        container.AddFragment(pOrder, pData/*, pIsFinal*/);
     }
 
 

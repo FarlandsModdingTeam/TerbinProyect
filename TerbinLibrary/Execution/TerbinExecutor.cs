@@ -15,8 +15,7 @@ public class TerbinExecutor
     {
         this._communicator = pCommunicator;
 
-
-        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+        ExecutableDispatcher.RegisterAll();
     }
 
 
@@ -39,7 +38,7 @@ public class TerbinExecutor
     {
         if (pHead.IdRequest > 0)
         {
-            TerbinMemory.Store();
+            TerbinMemory.Store(pHead.IdMemory, pHead.OrderRequest, pParameters.ToArray());
         }
 
 

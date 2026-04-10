@@ -8,6 +8,7 @@ using TerbinLibrary;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Id;
 using TerbinLibrary.Memory;
+using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -166,33 +167,43 @@ public class TerbinCommunicator : IDisposable
     //    return id;
     //}
 
-    public async Task<PacketRequest?> HandleSendSigle(byte pActionMethod, byte[] pPayload, ushort pId, bool pRecuperate = true)
+    public async Task<PacketRequest?> HandleSendSigle(byte pActionMethod, byte[] pPayload, ushort pIdRequest, bool pRecuperate = true)
     {
-        await AddQueue(0, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.NotAsign, pPayload, pId);
+        await AddQueue(0, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.NotAsign, pPayload, pIdRequest);
 
         if (!pRecuperate)
             return null;
-        return await recuperateReply(pId);
+        return await recuperateReply(pIdRequest);
     }
 
-    public async Task<PacketRequest?> HandleSendFragment(byte pActionMethod, byte[] pPayload, ushort pId, bool pRecuperate = true)
+    public async Task<PacketRequest?> HandleSendFragment(byte pActionMethod, byte[] pPayload, ushort pIdRequest, bool pRecuperate = true)
     {
-        // TODO: solicitamos memoria.
+        byte idMemory = await soliciteMemory();
 
-        int totalPackets = (int)Math.Ceiling(pPayload.Length * TerbinProtocol.FRAGMENT_IN_MULTIPLICATE_INVERSE);
+        int totalPackets = (int)Math.Ceiling(pPayload.Length * TerbinProtocol.FRAGMENT_IN__MULTIPLICATE_INVERSE);
         for (ushort i = 1; i < totalPackets; i++)
         {
             byte[] fragmentPayload = pPayload[..TerbinProtocol.FRAGMENT_IN];
             pPayload = pPayload[TerbinProtocol.FRAGMENT_IN..];
             if (pPayload.Length <= TerbinProtocol.MAX_PLD)
-                await AddQueue(TerbinProtocol.FINAL_PACKET, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.New, fragmentPayload, pId);
+                await AddQueue(TerbinProtocol.FINAL_PACKET, CodeStatus.Execute, pActionMethod, idMemory, fragmentPayload, pIdRequest);
             else
-                await AddQueue(i, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.New, fragmentPayload, pId);
+                await AddQueue(i, CodeStatus.Execute, pActionMethod, idMemory, fragmentPayload, pIdRequest);
         }
 
         if (!pRecuperate)
             return null;
-        return await recuperateReply(pId);
+        return await recuperateReply(pIdRequest);
+    }
+
+    private async Task<byte> soliciteMemory()
+    {
+        ushort idR = MiniID.NewS;
+        await AddQueue(0, CodeStatus.Execute, (byte)CodeTerbinProtocol.Solicit, (byte)CodeTerbinMemory.New, [], idR);
+        PacketRequest r = await recuperateReply(idR);
+        return (r.Payload.Length > 0 && r.Head.Status == CodeStatus.Succes)
+            ? r.Payload[0]
+            : (byte)CodeTerbinMemory.None;
     }
 
     private async Task<PacketRequest> handleGetMemory()
@@ -257,18 +268,18 @@ public class TerbinCommunicator : IDisposable
                 ushort pOrderRequest,
                 CodeStatus pStatus,
                 byte pActionMethod,
-                byte pIdMemory,
+                ushort pIdMemory,
                 byte[] pSectionPayload,
                 ushort pIdRequest)
     {
         Header head = new Header(
             pIdRequest: pIdRequest,
             pOrderRequest: pOrderRequest,
+            pIdMemory: pIdMemory,
             pStatus: pStatus);
         PacketRequest capsule = new PacketRequest(
             pHead: head,
             pActionMethod: pActionMethod,
-            pIdMemory: pIdMemory,
             pPayload: pSectionPayload);
         await AddQueue(capsule);
     }

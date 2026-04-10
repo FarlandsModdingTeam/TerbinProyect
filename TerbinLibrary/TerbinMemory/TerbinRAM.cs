@@ -30,7 +30,7 @@ public class TerbinRAM
 
     public bool IsOcupated => IdRequest != (ushort)CodeTerbinMemory.NotAsign;
 
-    private volatile bool _isComplete;
+    private volatile bool _isComplete; // Puta IA de mierda que no sabe hacer una puta mierda.
     public bool IsComplete
     {
         get => _isComplete;
@@ -40,7 +40,7 @@ public class TerbinRAM
     private readonly Dictionary<ushort, byte[]> _fragments = new();
     private int _totalSize = 0;
 
-    public void AddFragment(ushort pOrder, byte[] pData, bool pIsFinal)
+    public void AddFragment(ushort pOrder, byte[] pData/*, bool pIsFinal*/)
     {
         lock (_fragments)
         {
@@ -49,7 +49,7 @@ public class TerbinRAM
                 _fragments.Add(pOrder, pData);
                 _totalSize += pData.Length;
             }
-            if (pIsFinal) _isComplete = true;
+            //if (pIsFinal) _isComplete = true;
         }
     }
 

@@ -111,6 +111,7 @@ public struct PacketRequest : IStructSerializable
         Payload =       pBuffer.ReadArray<byte>(ref offset);
     }
 
+    // ¿?
     public static explicit operator PacketRequest(Task<PacketRequest?> v)
     {
         if (v != null)

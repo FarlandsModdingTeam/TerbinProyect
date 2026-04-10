@@ -8,7 +8,7 @@ public class TerbinProtocol
 {
     public const ushort MAX_PLD = 0xFFF; // ¡Vamos Miura!
     public const ushort FRAGMENT_IN = 0xFFF;
-    public const double FRAGMENT_IN_MULTIPLICATE_INVERSE = 1.0D / FRAGMENT_IN;
+    public const double FRAGMENT_IN__MULTIPLICATE_INVERSE = 1.0D / FRAGMENT_IN;
 
     public const ushort ORDER_SINGLE = ushort.MinValue;
 
@@ -21,22 +21,23 @@ public class TerbinProtocol
 [Flags]
 public enum CodeTypeData : byte
 {
-    //Single = 0 << 0, // 0000
-    //Array = 1 << 0, // 0001
+    Singles = 0b0000000_0,
+    Array   = 0b0000000_1,
 
-    //Int = 0 << 1,  // 0000
-    //Float = 1 << 1,  // 0010
-    //Char = 2 << 1,  // 0100
-    //Byte = 3 << 1,  // 0110
+    Byte    = 0b0000000_0,
+    sByte   = 0b0000001_0,
+    Short   = 0b0000010_0,
+    uShort  = 0b0000011_0,
+    Int     = 0b0000100_0,
+    uInt    = 0b0000101_0,
+    Long    = 0b0000110_0,
+    uLong   = 0b0000111_0,
 
+    Float   = 0b0001000_0,
+    Doueble = 0b0001001_0,
+    Decimal = 0b0001010_0,
 
-    Singles = 0b000_0,
-    Array   = 0b000_1,
-
-    Int     = 0b000_0,
-    Float   = 0b001_0,
-    Char    = 0b010_0,
-    Byte    = 0b011_0,
+    Char    = 0b0001011_0,
 }
 
 /// <summary>

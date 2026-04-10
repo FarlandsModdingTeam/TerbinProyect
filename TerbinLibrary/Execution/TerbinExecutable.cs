@@ -67,6 +67,11 @@ public sealed class ExecutableDispatcher
         }
     }
 
+    public static void RegisterAll()
+    {
+        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+    }
+
     // Escanea métodos estáticos con [TerbinCommand(1)] y firma Task<Capsule>(Header, byte[])
     public static void RegisterFromAssembly(Assembly pAssembly)
     {
@@ -95,4 +100,5 @@ public sealed class ExecutableDispatcher
             }
         }
     }
+
 }
