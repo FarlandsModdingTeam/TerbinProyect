@@ -15,9 +15,9 @@ public class TerbinExecutor
     {
         this._communicator = pCommunicator;
 
-        ExecutableDispatcher.RegisterAll();
+        // ExecutableDispatcher.RegisterAll();
     }
-
+    // TODO: perdirle a Luis que sea mi tutor.
 
     public async Task<PacketRequest> Execution(PacketRequest pRequest)
     {
@@ -32,6 +32,10 @@ public class TerbinExecutor
     }
 
 
+    //public void Prueba(byte[]? b = null, char[]? c = null)
+    //{
+    //    Prueba(c:['1', '2', '3']);
+    //}
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Load)]
     public static async Task<PacketRequest> Load(Header pHead, MemoryStream pParameters)
@@ -42,15 +46,23 @@ public class TerbinExecutor
         }
 
 
-        throw new NotImplementedException("Ñe"); 
+        pHead.Status = CodeStatus.NotFound;
+        return new PacketRequest(pHead: pHead, pActionMethod: (byte)CodeTerbinProtocol.Info);
     }
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Solicit)]
     public static async Task<PacketRequest> Solicit(Header pHead, MemoryStream pParameters)
     {
+        if (pHead.IdMemory == (byte)CodeTerbinMemory.New)
+        {
+            byte id = TerbinMemory.GetStore();
+            pHead.Status = CodeStatus.Succes;
+            return new PacketRequest(pHead: pHead, pIdMemory: id);
+        }
 
-        throw new NotImplementedException("Ñe");
+        pHead.Status = CodeStatus.NotFound;
+        return new PacketRequest(pHead: pHead, pActionMethod: (byte)CodeTerbinProtocol.Info);
     }
 
 

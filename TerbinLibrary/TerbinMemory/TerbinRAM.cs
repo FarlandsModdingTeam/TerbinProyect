@@ -20,13 +20,15 @@ public class TerbinRAM
     {
         get => field;
         set => field = value;
-    } = (byte)CodeTerbinMemory.NotAsign;
+    }
+    = (byte)CodeTerbinMemory.NotAsign;
 
     public ushort IdRequest
     {
         get => field;
         set => field = value;
-    } = (ushort)CodeTerbinMemory.NotAsign;
+    }
+    = (ushort)CodeTerbinMemory.NotAsign;
 
     public bool IsOcupated => IdRequest != (ushort)CodeTerbinMemory.NotAsign;
 
@@ -53,6 +55,7 @@ public class TerbinRAM
         }
     }
 
+    // TODO: Comprobar si falta alguna parte intermedia.
     public byte[] GetFullData()
     {
         KeyValuePair<ushort, byte[]>[] fragmentsCopy;

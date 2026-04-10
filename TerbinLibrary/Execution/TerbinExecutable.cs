@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
+using TerbinLibrary.Memory;
 
 namespace TerbinLibrary.Execution;
 /*
@@ -17,7 +18,7 @@ namespace TerbinLibrary.Execution;
   empieza: menorculas = privada.
  */
 
-
+// TODO: AllowMultiple in true.
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 public sealed class TerbinExecutableAttribute : Attribute
 {
@@ -29,7 +30,7 @@ public sealed class TerbinExecutableAttribute : Attribute
     public TerbinExecutableAttribute(byte pAction) => Action = pAction;
 }
 
-// NOTA: ¿Para que sirve esto?.
+
 public delegate Task<PacketRequest> ExecutableHandler(Header pHead, MemoryStream pParameters);
 
 
@@ -52,21 +53,54 @@ public sealed class ExecutableDispatcher
         if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handler))
         {
             pCapsule.Head.Status = CodeStatus.ActionNotFound;
+            if (pCapsule.Head.IdMemory > TerbinProtocol.RESERVE_MEMORY)
+                TerbinMemory.Release(pCapsule.Head.IdMemory);
             return pCapsule;
         }
 
+        if (!tryGetMemoryStream(pCapsule, out var memo))
+        {
+            // TODO: Controlar.
+        }
         try
         {
-            return await handler(pCapsule.Head, new MemoryStream(pCapsule.Payload ?? []))
+            return await handler(pCapsule.Head, memo)
                 .ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
         }
         catch
         {
-            pCapsule.Head.Status = CodeStatus.GenericWorkerError;
+            pCapsule.Head.Status = CodeStatus.ExecutionError;
             return pCapsule;
         }
     }
 
+    private static bool tryGetMemoryStream(PacketRequest pCapsule, out MemoryStream pMemory)
+    {
+        pMemory = getMemoryStream(pCapsule);
+        return TerbinMemory.Release(pCapsule.Head.IdMemory);
+    }
+
+    private static MemoryStream getMemoryStream(PacketRequest pCapsule)
+    {
+        if (pCapsule.Head.OrderRequest != TerbinProtocol.FINAL_PACKET)
+            return new MemoryStream(pCapsule.Payload ?? []);
+
+        if (!TerbinMemory.TryGetResult(pCapsule.Head.IdMemory, out var bytes))
+            return new MemoryStream();
+
+        return addToMemoryStream(pCapsule, bytes);
+    }
+
+    public static MemoryStream addToMemoryStream(PacketRequest pCapsule, byte[] pBytes)
+    {
+        byte[] result = new byte[pCapsule.Payload.Length + pBytes.Length];
+        Buffer.BlockCopy(pCapsule.Payload, 0, result, 0, pCapsule.Payload.Length);
+        Buffer.BlockCopy(pBytes, 0, result, pCapsule.Payload.Length, pBytes.Length);
+        return new MemoryStream(result); // [.. pBytes, .. pCapsule.Payload]
+    }
+
+    // Esto no funcionara porque registrara TerbinLibrary XD
+    [Obsolete]
     public static void RegisterAll()
     {
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());

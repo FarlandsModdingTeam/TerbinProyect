@@ -16,6 +16,9 @@ public class TerbinProtocol
     public const ushort FINAL_PACKET = ushort.MaxValue;
 
     public const ushort MAXIMUS_RESPONSE_TIME = 180; // ¿Se necesita un short?
+
+    public const byte RESERVE_PROTOCOL = 9;
+    public const byte RESERVE_MEMORY = 9;
 }
 
 [Flags]
@@ -90,6 +93,7 @@ public enum CodeStatus : short
     Succes = 200,
 
     Execute = 300, // Hace 0 falta.
+    Info = 301,
 
     BadRequest = 400,
     NotFound = 404,
@@ -98,5 +102,6 @@ public enum CodeStatus : short
 
 
     GenericWorkerError = 500,
+    ExecutionError = 501,
     OverMaximumTime = 550,
 }

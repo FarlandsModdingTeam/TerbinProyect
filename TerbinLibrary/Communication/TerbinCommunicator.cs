@@ -181,6 +181,12 @@ public class TerbinCommunicator : IDisposable
         byte idMemory = await soliciteMemory();
 
         int totalPackets = (int)Math.Ceiling(pPayload.Length * TerbinProtocol.FRAGMENT_IN__MULTIPLICATE_INVERSE);
+        if (totalPackets >= TerbinProtocol.FINAL_PACKET - 1)
+        {
+            // TODO: mandar respuesta en vez de excepcion.
+            throw new Exception("¡QUE COJÓNES!");
+        }
+
         for (ushort i = 1; i < totalPackets; i++)
         {
             byte[] fragmentPayload = pPayload[..TerbinProtocol.FRAGMENT_IN];
@@ -201,9 +207,9 @@ public class TerbinCommunicator : IDisposable
         ushort idR = MiniID.NewS;
         await AddQueue(0, CodeStatus.Execute, (byte)CodeTerbinProtocol.Solicit, (byte)CodeTerbinMemory.New, [], idR);
         PacketRequest r = await recuperateReply(idR);
-        return (r.Payload.Length > 0 && r.Head.Status == CodeStatus.Succes)
-            ? r.Payload[0]
-            : (byte)CodeTerbinMemory.None;
+        return (r.Head.Status == CodeStatus.Succes)
+                ? r.Head.IdMemory
+                : (byte)CodeTerbinMemory.None;
     }
 
     private async Task<PacketRequest> handleGetMemory()
@@ -268,7 +274,7 @@ public class TerbinCommunicator : IDisposable
                 ushort pOrderRequest,
                 CodeStatus pStatus,
                 byte pActionMethod,
-                ushort pIdMemory,
+                byte pIdMemory,
                 byte[] pSectionPayload,
                 ushort pIdRequest)
     {

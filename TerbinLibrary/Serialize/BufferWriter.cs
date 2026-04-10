@@ -61,6 +61,7 @@ public static class BufferWriterExtension
 {
     // TODO: darles una vuelta a los sin offset para que:
     // crean un nuevo Span donde pongan lo nuevo y luego sobreEscriban el antiguo Span con el nuevo.
+    // Usar: Buffer.BlockCopy
     public static void Write<T>(this ref Span<byte> pBuffer, T pValue)
         where T : unmanaged
     {

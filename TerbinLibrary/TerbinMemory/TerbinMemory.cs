@@ -26,10 +26,10 @@ namespace TerbinLibrary.Memory;
 // TODO: Limpia (pero desde Containers).
 public static class TerbinMemory
 {
-
     private static readonly ConcurrentDictionary<byte, TerbinRAM> _containers = new();
 
-    public static byte getStore()
+
+    public static byte GetStore()
     {
         byte? idContainer = null;
         foreach (var item in _containers)
@@ -58,14 +58,14 @@ public static class TerbinMemory
     }
 
 
-    public static bool TryGetResult(byte pIdMemory, out byte[]? pData)
+    public static bool TryGetResult(byte pIdMemory, out byte[] pData)
     {
-        if (_containers.TryGetValue(pIdMemory, out var container) && container.IsComplete)
+        if (_containers.TryGetValue(pIdMemory, out var container))
         {
             pData = container.GetFullData();
             return true;
         }
-        pData = null;
+        pData = [];
         return false;
     }
 
@@ -80,8 +80,5 @@ public static class TerbinMemory
         return false;
     }
 
-    public static bool Remove(byte pIdMemory)
-    {
-        return _containers.TryRemove(pIdMemory, out _);
-    }
+    public static bool Remove(byte pIdMemory) => _containers.TryRemove(pIdMemory, out _);
 }
