@@ -51,22 +51,25 @@ public static class TerbinMemory
         return (_containers.TryAdd(id, new TerbinRAM { Id = id }), id);
     }
 
-    public static void Store(byte pIdMemory, ushort pOrder, byte[] pData/*, bool pIsFinal*/)
+    public static void Store(byte pIdMemory, ushort pOrder, byte[] pData)
     {
         var container = _containers.GetOrAdd(pIdMemory, id => new TerbinRAM { IdRequest = id });
-        container.AddFragment(pOrder, pData/*, pIsFinal*/);
+        container.AddFragment(pOrder, pData);
     }
 
 
-    public static bool TryGetResult(byte pIdMemory, out byte[] pData)
+    public static (bool succes, ErrorFlags typeError) TryGetResult(byte pIdMemory, out byte[] pData)
     {
         if (_containers.TryGetValue(pIdMemory, out var container))
         {
-            pData = container.GetFullData();
-            return true;
+            if (container.TryGetFullData(out pData) is var r && r.succes)
+                return (true, 0);
+            else
+                return (false, r.typeError);
         }
         pData = [];
-        return false;
+        // no habia una excepcion de intentar hacceder a null?
+        return (false, ErrorFlags.NullParameter);
     }
 
 

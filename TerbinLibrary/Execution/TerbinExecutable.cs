@@ -85,10 +85,16 @@ public sealed class ExecutableDispatcher
         if (pCapsule.Head.OrderRequest != TerbinProtocol.FINAL_PACKET)
             return new MemoryStream(pCapsule.Payload ?? []);
 
-        if (!TerbinMemory.TryGetResult(pCapsule.Head.IdMemory, out var bytes))
-            return new MemoryStream();
+        if (TerbinMemory.TryGetResult(pCapsule.Head.IdMemory, out var bytes) is var r && r.succes)
+        {
+            return addToMemoryStream(pCapsule, bytes);
+        }
+        else
+        {
+            // TODO: Logger.
+        }
 
-        return addToMemoryStream(pCapsule, bytes);
+        return new MemoryStream();
     }
 
     public static MemoryStream addToMemoryStream(PacketRequest pCapsule, byte[] pBytes)

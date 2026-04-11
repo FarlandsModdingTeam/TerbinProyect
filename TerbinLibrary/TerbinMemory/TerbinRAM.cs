@@ -38,6 +38,7 @@ public class TerbinRAM
     public event Action? OnAdd;
     public event Action? OnRelease;
 
+    // TODO: comprobar nulos, vacios, etc.
     public void AddFragment(ushort pOrder, byte[] pData)
     {
         lock (_fragments)
@@ -76,10 +77,46 @@ public class TerbinRAM
         return result;
     }
 
-    public (bool succes, byte error) TryGetFullData(out byte[] pData)
+    public (bool succes, ErrorFlags typeError) TryGetFullData(out byte[] pData)
     {
+        pData = [];
 
-        throw new NotImplementedException("Ñe");
+        KeyValuePair<ushort, byte[]>[] fragmentsCopy;
+        int totalSizeCopy;
+        lock (_fragments)
+        {
+            fragmentsCopy = _fragments.ToArray();
+            totalSizeCopy = _totalSize;
+        }
+
+        if (fragmentsCopy.Length == 0)
+            return (false, ErrorFlags.EmptyString);
+
+        Array.Sort(fragmentsCopy, (a, b) => a.Key.CompareTo(b.Key));
+
+        // Comprobamos si falta alguna parte de informacio intermedia.
+        if (!chechMissing(fragmentsCopy))
+            return (false, ErrorFlags.ValueOutOfRange);
+
+        pData = new byte[totalSizeCopy];
+        int offset = 0;
+        foreach (var f in fragmentsCopy)
+        {
+            Buffer.BlockCopy(f.Value, 0, pData, offset, f.Value.Length);
+            offset += f.Value.Length;
+        }
+
+        return (true, ErrorFlags.None);
+    }
+
+    private bool chechMissing(KeyValuePair<ushort, byte[]>[] pFragments)
+    {
+        for (ushort i = 0; i < pFragments.Length; i++)
+        {
+            if (pFragments[i].Key != (i + 1))
+                return false;
+        }
+        return true;
     }
 
     public void Release()
