@@ -18,7 +18,7 @@ public class TerbinProtocol
     public const ushort FIRST_PACKET = 1;
     public const ushort FINAL_PACKET = ushort.MaxValue;
 
-    public const ushort MAXIMUS_RESPONSE_TIME = 180; // ¿Se necesita un short?
+    public const ushort MAXIMUS_RESPONSE_TIME = 4; // ¿Se necesita un short? // 180
 
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
@@ -32,13 +32,20 @@ public class TerbinProtocol
 
     private static async Task autoCreatePipe(CancellationToken pTokenCancellation)
     {
-        var communicator = new TerbinCommunicator(true, pTokenCancellation);
-        communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
-        communicator.OnNewClientConnect += async () =>
+        try
         {
-            _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);
-        };
-        var executor = new TerbinExecutor();
+            var communicator = new TerbinCommunicator(true, pTokenCancellation);
+            communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
+            communicator.OnNewClientConnect += async () =>
+            {
+                _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);
+            };
+            var executor = new TerbinExecutor();
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine($"[Worker] Error-> {e.Message}");
+        }
     }
 }
 

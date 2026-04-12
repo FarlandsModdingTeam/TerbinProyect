@@ -30,12 +30,37 @@ public class Worker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken pStoppingToken)
     {
         Cts = CancellationTokenSource.CreateLinkedTokenSource(pStoppingToken);
-        await TerbinProtocol.InitProtocol(Cts.Token);
+        //await TerbinProtocol.InitProtocol(Cts.Token);
+        await autoCreatePipe(Cts.Token);
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
 
 
+    // Pruebas
+    public async Task InitProtocol(CancellationToken pTokenCancellation)
+    {
+        await autoCreatePipe(pTokenCancellation);
+        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+    }
 
+    // Pruebas
+    private async Task autoCreatePipe(CancellationToken pTokenCancellation)
+    {
+        try
+        {
+            var communicator = new TerbinCommunicator(true, pTokenCancellation);
+            communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
+            communicator.OnNewClientConnect += async () =>
+            {
+                _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);
+            };
+            var executor = new TerbinExecutor();
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"[Worker] Error-> {e.Message}");
+        }
+    }
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]
@@ -44,11 +69,11 @@ public class Worker : BackgroundService
         _ = Task.Run(async () =>
         {
             await Task.Delay(1000);
-            Console.WriteLine("(Worker): Execution stoped");
+            Console.WriteLine("[Worker] Execution stoped");
             _appLifetime?.StopApplication();
             Cts?.Cancel();
         });
-        Console.WriteLine("(Worker): Stopping execution...");
+        Console.WriteLine("[Worker] Stopping execution...");
         pHead.Status = CodeStatus.Succes;
         return new PacketRequest(pHead, (byte)CodeTerbinProtocol.Stop, 1);
     }

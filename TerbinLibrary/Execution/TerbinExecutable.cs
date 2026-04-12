@@ -50,6 +50,7 @@ public sealed class ExecutableDispatcher
 
     public static async Task<PacketRequest> DispatchAsync(PacketRequest pCapsule) // Aqui es donde se ejecuta, manda cojones.
     {
+        Console.WriteLine($"[Worker] Llegamos al despacahdor");
         if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handler))
         {
             pCapsule.Head.Status = CodeStatus.ActionNotFound;
