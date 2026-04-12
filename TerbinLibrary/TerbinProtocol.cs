@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
+using TerbinLibrary.Communication;
+using TerbinLibrary.Execution;
 
 namespace TerbinLibrary;
 
@@ -19,6 +22,24 @@ public class TerbinProtocol
 
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
+
+
+    public static async Task InitProtocol(CancellationToken pTokenCancellation)
+    {
+        await autoCreatePipe(pTokenCancellation);
+        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+    }
+
+    private static async Task autoCreatePipe(CancellationToken pTokenCancellation)
+    {
+        var communicator = new TerbinCommunicator(true, pTokenCancellation);
+        communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
+        communicator.OnNewClientConnect += async () =>
+        {
+            _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);
+        };
+        var executor = new TerbinExecutor();
+    }
 }
 
 [Flags]

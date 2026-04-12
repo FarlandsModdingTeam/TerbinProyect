@@ -30,51 +30,12 @@ public class Worker : BackgroundService
     protected override async Task ExecuteAsync(CancellationToken pStoppingToken)
     {
         Cts = CancellationTokenSource.CreateLinkedTokenSource(pStoppingToken);
-
-        var communicator = new TerbinCommunicator(true, Cts.Token);
-        communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
-        var executor = new TerbinExecutor();
-
+        await TerbinProtocol.InitProtocol(Cts.Token);
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
 
-    private async Task onRecive(PacketRequest pRequest)
-    {
-        // TODO: todo.
-    }
 
-    private async Task autoCreatePipe()
-    {
-        var pipe = TerbinCommunicator.NewTerbinPipe;
-        await pipe.WaitForConnectionAsync(Cts.Token);
 
-        _ = Task.Run(() => autoCreatePipe(), Cts.Token);
-        _ = handleClient(pipe, Cts.Token);
-    }
-
-    private async Task handleClient(NamedPipeServerStream pPipe, CancellationToken pTokenCancellation)
-    {
-        StreamReadStruct reader = new(pPipe);
-        StreamWriteStruct writer = new(pPipe);
-
-        while (!pTokenCancellation.IsCancellationRequested)
-        {
-            PacketRequest cap = await reader.ReadAsycn<PacketRequest>(pTokenCancellation);
-            //Console.WriteLine($"[Worker] Client {cap.Head.OrderRequest}");
-
-            PacketRequest capR = default;
-            try
-            {
-                capR = await ExecutableDispatcher.DispatchAsync(cap);
-                await writer.WriteAsycn<PacketRequest>(capR);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine($"Exception: {e.Message}");
-            }
-        }
-        pPipe.Disconnect(); // porque nunca pasa aqui.
-    }
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]

@@ -358,6 +358,7 @@ public class TerbinCommunicator : IDisposable
         if (_thePipe is NamedPipeServerStream pipe)
         {
             await pipe.WaitForConnectionAsync(_stopToken);
+            //_ = Task.Run(_onNewClientConnect?.Invoke(), _stopToken);
             _onNewClientConnect?.Invoke();
         }
     }
