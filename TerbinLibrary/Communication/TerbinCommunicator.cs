@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+// using System.IO.Pipelines;
 using System.IO.Pipes;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -48,8 +49,8 @@ public class TerbinCommunicator : IDisposable
     private readonly SemaphoreSlim _signal = new(0);
     private readonly ConcurrentDictionary<ushort, TaskCompletionSource<PacketRequest>> _pendingRequests = new();
 
-    private event Func<PacketRequest, Task>? _onRecive;
-    private event Func<PacketRequest, Task>? _onNewClientConnect;
+    private event Func<PacketRequest, Task<PacketRequest>>? _onRecive;
+    private event Func<Task>? _onNewClientConnect;
 
     public bool IsServer
     {
@@ -66,13 +67,22 @@ public class TerbinCommunicator : IDisposable
     // ****************************( Getters, Setters e Indexadores )**************************** //
     public bool IsConnect => _thePipe?.IsConnected ?? false;
 
-    public event Func<PacketRequest, Task>? OnRecive
+    public event Func<PacketRequest, Task<PacketRequest>>? OnRecive
     {
         add => _onRecive += value;
         remove
         {
             if (value != null)
                 _onRecive -= value;
+        }
+    }
+    public event Func<Task>? OnNewClientConnect
+    {
+        add => _onNewClientConnect += value;
+        remove
+        {
+            if (value != null)
+                _onNewClientConnect -= value;
         }
     }
 
@@ -104,6 +114,9 @@ public class TerbinCommunicator : IDisposable
 
         _ = Task.Run(manageReceive, _stopToken);
         _ = Task.Run(manageSend, _stopToken);
+
+        if (pIsServer)
+            _ = manageConnectClient();
     }
 
 
@@ -181,6 +194,11 @@ public class TerbinCommunicator : IDisposable
     public async Task<PacketRequest?> HandleSendFragment(byte pActionMethod, byte[] pPayload, ushort pIdRequest, bool pRecuperate = true)
     {
         byte idMemory = await soliciteMemory();
+        if (idMemory == (byte)CodeTerbinMemory.None)
+        {
+            // TODO: Controlar y logger.
+            throw new Exception("¡idMemory es None!");
+        }
 
         int totalPackets = (int)Math.Ceiling(pPayload.Length * TerbinProtocol.FRAGMENT_IN__MULTIPLICATE_INVERSE);
         if (totalPackets >= TerbinProtocol.FINAL_PACKET - 1)
@@ -224,18 +242,6 @@ public class TerbinCommunicator : IDisposable
         }
     }
 
-    private async Task<PacketRequest> handleGetMemory()
-    {
-
-        throw new NotImplementedException("Ñe");
-    }
-
-    private async Task<PacketRequest> administreMemory()
-    {
-
-        throw new NotImplementedException("Ñe");
-    }
-
     private async Task<(PacketRequest packet, TerbinErrorCode typeError)> recuperateReply(ushort pId)
     {
         var tcs = new TaskCompletionSource<PacketRequest>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -263,6 +269,12 @@ public class TerbinCommunicator : IDisposable
     {
         if (_pendingRequests.TryRemove(pCapsule.Head.IdRequest, out var tcs))
             tcs.TrySetResult(pCapsule);
+        if (pCapsule.Head.Status == CodeStatus.Execute &&
+            _onRecive != null)
+        {
+            var rCap = await _onRecive.Invoke(pCapsule);
+            await Reply(rCap);
+        }
     }
 
     // --- Reply --- //
@@ -314,15 +326,7 @@ public class TerbinCommunicator : IDisposable
         {
             PacketRequest r = await _reader.ReadAsycn<PacketRequest>(_stopToken);
 
-
-            //bool isFinal = r.Head.OrderRequest == TerbinProtocol.FINAL_PACKET || r.Head.OrderRequest == 0;
-            //TerbinMemory.Store(r.Head.IdRequest, r.Head.OrderRequest, r.Payload, isFinal);
-
-            //if (isFinal)
-            //{
-            //    _ = handleReceive(r);
-            //    _ = _onRecive?.Invoke(r);
-            //}
+            _ = handleReceive(r);
         }
     }
     private async Task manageSend()
@@ -346,6 +350,15 @@ public class TerbinCommunicator : IDisposable
             {
                 //_signal.Release();
             }
+        }
+    }
+
+    private async Task manageConnectClient()
+    {
+        if (_thePipe is NamedPipeServerStream pipe)
+        {
+            await pipe.WaitForConnectionAsync(_stopToken);
+            _onNewClientConnect?.Invoke();
         }
     }
 

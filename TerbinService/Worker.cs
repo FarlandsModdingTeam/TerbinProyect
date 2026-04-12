@@ -27,18 +27,15 @@ public class Worker : BackgroundService
         Worker._appLifetime = pAppLifetime;
     }
 
-
-
     protected override async Task ExecuteAsync(CancellationToken pStoppingToken)
     {
         Cts = CancellationTokenSource.CreateLinkedTokenSource(pStoppingToken);
 
-        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
-
-        //_ = autoCreatePipe();
-
         var communicator = new TerbinCommunicator(true, Cts.Token);
-        communicator.OnRecive += onRecive;
+        communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
+        var executor = new TerbinExecutor();
+
+        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
 
     private async Task onRecive(PacketRequest pRequest)

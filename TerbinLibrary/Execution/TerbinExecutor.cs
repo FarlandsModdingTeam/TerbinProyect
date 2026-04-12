@@ -9,11 +9,11 @@ namespace TerbinLibrary.Execution;
 
 public class TerbinExecutor
 {
-    TerbinCommunicator _communicator;
+    //TerbinCommunicator _communicator;
 
-    public TerbinExecutor(TerbinCommunicator pCommunicator)
+    public TerbinExecutor(/*TerbinCommunicator pCommunicator*/)
     {
-        this._communicator = pCommunicator;
+        //this._communicator = pCommunicator;
 
         // ExecutableDispatcher.RegisterAll();
     }
@@ -22,14 +22,14 @@ public class TerbinExecutor
     public async Task<PacketRequest> Execution(PacketRequest pRequest)
     {
         var capR = await ExecutableDispatcher.DispatchAsync(pRequest);
-        _ = Reply(capR);
+        //_ = Reply(capR);
         return capR;
     }
 
-    public async Task Reply(PacketRequest pRequest)
-    {
-        await this._communicator.Reply(pRequest);
-    }
+    //public async Task Reply(PacketRequest pRequest)
+    //{
+    //    await this._communicator.Reply(pRequest);
+    //}
 
 
     //public void Prueba(byte[]? b = null, char[]? c = null)

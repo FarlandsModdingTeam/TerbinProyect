@@ -92,7 +92,7 @@ public enum CodeStatus : short
 
     Succes = 200,
 
-    Execute = 300, // Hace 0 falta.
+    Execute = 300, // Hace mucha falta.
     Info = 301,
 
     BadRequest = 400,
