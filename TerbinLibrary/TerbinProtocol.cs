@@ -334,6 +334,7 @@ public enum TerbinErrorCode : ushort
     FinalPacketMissing = 2006,
     ChecksumInvalid = 2007,
     ProtocolVersionUnknown = 2008,
+    AlreadyExists = 2009,
 
     // ==========================================
     // 3000 - 3999: MEMORIA Y STREAMS (TerbinMemory)

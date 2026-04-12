@@ -77,7 +77,7 @@ public class TerbinRAM
         return result;
     }
 
-    public (bool succes, ErrorFlags typeError) TryGetFullData(out byte[] pData)
+    public (bool succes, TerbinErrorCode typeError) TryGetFullData(out byte[] pData)
     {
         pData = [];
 
@@ -90,13 +90,13 @@ public class TerbinRAM
         }
 
         if (fragmentsCopy.Length == 0)
-            return (false, ErrorFlags.EmptyString);
+            return (false, TerbinErrorCode.InvalidLength);
 
         Array.Sort(fragmentsCopy, (a, b) => a.Key.CompareTo(b.Key));
 
         // Comprobamos si falta alguna parte de informacio intermedia.
         if (!chechMissing(fragmentsCopy))
-            return (false, ErrorFlags.ValueOutOfRange);
+            return (false, TerbinErrorCode.OrderMismatch);
 
         pData = new byte[totalSizeCopy];
         int offset = 0;
@@ -106,7 +106,7 @@ public class TerbinRAM
             offset += f.Value.Length;
         }
  
-        return (true, ErrorFlags.None);
+        return (true, TerbinErrorCode.None);
     }
 
     private bool chechMissing(KeyValuePair<ushort, byte[]>[] pFragments)

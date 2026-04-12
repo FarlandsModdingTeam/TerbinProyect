@@ -58,18 +58,18 @@ public static class TerbinMemory
     }
 
 
-    public static (bool succes, ErrorFlags typeError) TryGetResult(byte pIdMemory, out byte[] pData)
+    public static (bool succes, TerbinErrorCode typeError) TryGetResult(byte pIdMemory, out byte[] pData)
     {
         if (_containers.TryGetValue(pIdMemory, out var container))
         {
             if (container.TryGetFullData(out pData) is var r && r.succes)
-                return (true, 0);
+                return (true, TerbinErrorCode.None);
             else
                 return (false, r.typeError);
         }
         pData = [];
         // no habia una excepcion de intentar hacceder a null?
-        return (false, ErrorFlags.NullParameter);
+        return (false, TerbinErrorCode.ValueOutOfRange);
     }
 
 

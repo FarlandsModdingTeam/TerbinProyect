@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO.Pipes;
 using System.Reflection;
+using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 using TerbinLibrary;
 using TerbinLibrary.Execution;
@@ -173,7 +174,8 @@ public class TerbinCommunicator : IDisposable
 
         if (!pRecuperate)
             return null;
-        return await recuperateReply(pIdRequest);
+        // TODO: gestionar error.
+        return (await recuperateReply(pIdRequest)).packet;
     }
 
     public async Task<PacketRequest?> HandleSendFragment(byte pActionMethod, byte[] pPayload, ushort pIdRequest, bool pRecuperate = true)
@@ -199,17 +201,27 @@ public class TerbinCommunicator : IDisposable
 
         if (!pRecuperate)
             return null;
-        return await recuperateReply(pIdRequest);
+        // TODO: gestionar error.
+        return (await recuperateReply(pIdRequest)).packet;
     }
 
     private async Task<byte> soliciteMemory()
     {
         ushort idR = MiniID.NewS;
         await AddQueue(0, CodeStatus.Execute, (byte)CodeTerbinProtocol.Solicit, (byte)CodeTerbinMemory.New, [], idR);
-        PacketRequest r = await recuperateReply(idR);
-        return (r.Head.Status == CodeStatus.Succes)
-                ? r.Head.IdMemory
-                : (byte)CodeTerbinMemory.None;
+
+        var r = await recuperateReply(idR);
+        if (r.typeError != TerbinErrorCode.None)
+        {
+            return (r.packet.Head.Status == CodeStatus.Succes)
+                    ? r.packet.Head.IdMemory
+                    : (byte)CodeTerbinMemory.None;
+        }
+        else
+        {
+            // TODO: Logger y gestionar.
+            return (byte)CodeTerbinMemory.None;
+        }
     }
 
     private async Task<PacketRequest> handleGetMemory()
@@ -224,12 +236,12 @@ public class TerbinCommunicator : IDisposable
         throw new NotImplementedException("Ñe");
     }
 
-    private async Task<PacketRequest> recuperateReply(ushort pId)
+    private async Task<(PacketRequest packet, TerbinErrorCode typeError)> recuperateReply(ushort pId)
     {
         var tcs = new TaskCompletionSource<PacketRequest>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         if (!_pendingRequests.TryAdd(pId, tcs))
-            throw new InvalidOperationException($"Ya se está esperando el IdRequest: {pId}");
+            return (new PacketRequest(), TerbinErrorCode.AlreadyExists);
 
         using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(MaximumResponseTime));
 
@@ -244,7 +256,7 @@ public class TerbinCommunicator : IDisposable
             }
         });
 
-        return await tcs.Task;
+        return (await tcs.Task, TerbinErrorCode.None);
     }
 
     private async Task handleReceive(PacketRequest pCapsule)
