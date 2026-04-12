@@ -107,7 +107,19 @@ public enum CodeStatus : short
 }
 
 
-// Pruebas
+
+
+
+
+
+
+
+
+
+
+// ==========================================
+// PRUEBAS: Para intentar hacer un enum que sustituya a las Excepciones
+// ==========================================
 [Flags]
 public enum ExceptionFlags : ulong
 {
@@ -290,4 +302,145 @@ public enum ErrorFlags : ulong
 
     // El bit más alto (63) como error fatal insalvable
     FatalError = 1ul << 63
+}
+
+// Usamos ushort (0 a 65,535) para que ocupe solo 2 bytes si lo mandas por red.
+public enum TerbinErrorCode : ushort
+{
+    None = 0, // Todo correcto (Success)
+
+    // ==========================================
+    // 1000 - 1999: VALIDACIONES BÁSICAS Y DATOS
+    // ==========================================
+    ParameterNull = 1001,
+    ParameterEmpty = 1002,
+    FormatInvalid = 1003,
+    ValueOutOfRange = 1004,
+    LengthExceeded = 1005,
+    MissingRequiredData = 1006,
+    InvalidCast = 1007,
+    DataTypeMismatch = 1008, // No coincide con CodeTypeData
+    InvalidLength = 1009,
+
+
+    // ==========================================
+    // 2000 - 2999: PROTOCOLO (TerbinProtocol)
+    // ==========================================
+    PacketMalformed = 2001,
+    HeaderInvalid = 2002,
+    PayloadTooLarge = 2003, // Supera MAX_PLD
+    FragmentationError = 2004, // Error al procesar FRAGMENT_IN
+    PacketOrderMismatch = 2005, // Ej: llegó FIRST_PACKET donde no tocaba
+    FinalPacketMissing = 2006,
+    ChecksumInvalid = 2007,
+    ProtocolVersionUnknown = 2008,
+
+    // ==========================================
+    // 3000 - 3999: MEMORIA Y STREAMS (TerbinMemory)
+    // ==========================================
+    MemoryIdNotFound = 3001, // TryGetResult falló
+    MemoryReleaseFailed = 3002,
+    MemoryStoreFailed = 3003,
+    MemoryAlreadyAllocated = 3004,
+    BufferOverflow = 3005,
+    StreamReadError = 3006,
+    StreamWriteError = 3007,
+    ReservedMemoryAccess = 3008, // Intento de usar RESERVE_MEMORY
+    OrderMismatch = 3009,
+
+    // ==========================================
+    // 4000 - 4999: EJECUCIÓN (ExecutableDispatcher)
+    // ==========================================
+    ActionNotFound = 4001, // Handler no existe
+    ActionAlreadyRegistered = 4002,
+    ActionRegistrationFailed = 4003,
+    HandlerExecutionFailed = 4004, // Excepción atrapada en DispatchAsync
+    InvalidSignature = 4005, // Firma de método incorrecta para el Delegate
+
+    // ==========================================
+    // 5000 - 5999: ESTADO Y LÓGICA DE NEGOCIO
+    // ==========================================
+    ResourceNotFound = 5001,
+    ResourceAlreadyExists = 5002,
+    InvalidStateTransition = 5003,
+    OperationCancelled = 5004,
+    LimitExceeded = 5005,
+
+    // ==========================================
+    // 6000 - 6999: SEGURIDAD Y PERMISOS
+    // ==========================================
+    Unauthorized = 6001,
+    ForbiddenAccess = 6002,
+    SignatureInvalid = 6003,
+
+    // ==========================================
+    // 7000 - 7999: CONECTIVIDAD Y TIMEOUTS
+    // ==========================================
+    TimeoutExceeded = 7001, // Supera MAXIMUS_RESPONSE_TIME
+    ConnectionLost = 7002,
+    EndpointUnreachable = 7003,
+
+    // ==========================================
+    // 9000 - 9999: ERRORES FATALES DE WORKER
+    // ==========================================
+    InternalSystemError = 9000,
+    OutOfMemory = 9001,
+    NotImplementedYet = 9999
+}
+
+public enum AppError : int
+{
+    None = 0, // Operación exitosa
+
+    // ==========================================
+    // 100 - 199: VALIDACIÓN DE PARÁMETROS Y DATOS
+    // ==========================================
+    NullValue = 100, // Pasaste un null donde no debías
+    EmptyValue = 101, // String vacío o colección sin elementos
+    WhitespaceOnly = 102, // String con solo espacios
+    ValueTooLow = 103, // Ej: Pasaste un negativo cuando se pedía positivo
+    ValueTooHigh = 104, // Ej: Supera el máximo permitido
+    LengthTooShort = 105, // Ej: Contraseña de 2 caracteres
+    LengthTooLong = 106,
+    InvalidFormat = 107, // Ej: Un email mal escrito o un regex que no cuadra
+    InvalidType = 108, // El tipo de dato no es el esperado
+
+    // ==========================================
+    // 200 - 299: COLECCIONES Y BÚSQUEDAS
+    // ==========================================
+    ItemNotFound = 200, // No se encuentra en el diccionario/lista
+    ItemAlreadyExists = 201, // Intentas añadir un ID que ya existe
+    CollectionEmpty = 202, // Intentas procesar una lista que no tiene nada
+    IndexOutOfRange = 203, // Índice de array incorrecto
+
+    // ==========================================
+    // 300 - 399: ESTADO Y LÓGICA DE NEGOCIO
+    // ==========================================
+    InvalidState = 300, // Ej: Intentas "Pausar" algo que ya está "Pausado"
+    NotAllowed = 301, // Operación no permitida en este contexto
+    DependencyMissing = 302, // Falta algo necesario para continuar
+    LimitExceeded = 303, // Se superó una cuota o límite lógico
+    Expired = 304, // Un token, sesión o dato ha caducado
+
+    // ==========================================
+    // 400 - 499: PERMISOS Y SEGURIDAD
+    // ==========================================
+    Unauthorized = 400, // No has iniciado sesión / No te conozco
+    Forbidden = 401, // Te conozco, pero no tienes permisos para esto
+    InvalidCredentials = 402, // Usuario o contraseña incorrectos
+
+    // ==========================================
+    // 500 - 599: INFRAESTRUCTURA Y EXTERNOS (Red, IO)
+    // ==========================================
+    Timeout = 500, // La operación tardó demasiado
+    ConnectionFailed = 501, // Fallo de NamedPipes, Sockets, etc.
+    ResourceLocked = 502, // Un archivo o memoria está en uso por otro hilo
+    ReadError = 503, // Error al leer del disco o stream
+    WriteError = 504, // Error al escribir en disco o stream
+
+    // ==========================================
+    // 900 - 999: ERRORES NO CONTROLADOS / CRÍTICOS
+    // ==========================================
+    NotImplemented = 900, // La función aún no está programada
+    InternalError = 999  // Error genérico inesperado ("Ha pasado algo raro")
 }
