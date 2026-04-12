@@ -62,10 +62,15 @@ async Task simulateClient()
         MemoryStream memo = new MemoryStream();
         StreamWriter writer = new StreamWriter(memo);
         writer.Write("matenme".ToCharArray());
-
-        var r = await communicator.Communicate(input, memo);
-
-        Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
+        try
+        {
+            var r = await communicator.Communicate(input, memo);
+            Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
+        }
+        catch(Exception e)
+        {
+            Console.WriteLine($"[Client] Error-> {e.Message}");
+        }
 
         if (input == 0)
         {
@@ -74,9 +79,4 @@ async Task simulateClient()
             break; // <-- Ahora sí nos vamos.
         }
     }
-}
-
-async Task recibe()
-{
-
 }
