@@ -35,17 +35,25 @@ while (true)
     byte[] menssaje = new byte["matenme".ToCharArray().Length * 2];
     menssaje = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
 
-    //MemoryStream memo = new MemoryStream();
-    //StreamWriter writer = new StreamWriter(memo);
+    //char[] m = "matenme".ToCharArray();
 
-    //writer.Write("matenme".ToCharArray());
-    //writer.Flush();
+    // TODO: (Solucionar error):  Este solo manda 12 bytes.
+    Span<byte> spanMenssaje = new byte["matenme".ToCharArray().Length * 2];
+    spanMenssaje.WriteArray<char>("matenme".ToCharArray());
 
+    // TODO: (Solucionar error): Este solo manda 7 bytes.
+    MemoryStream memo = new MemoryStream();
+    StreamWriter writer = new StreamWriter(memo);
 
-    //Console.WriteLine($"[Client] Mensaje: {memo.ToString}");
+    writer.Write("matenme".ToCharArray());
+    writer.Flush();
+
+    var a = spanMenssaje.ToArray();
+
+    Console.WriteLine($"[Client] Mensaje: {spanMenssaje.ToArray().ToString()}");
     try
     {
-        var r = await communicator.Communicate(input, menssaje);
+        var r = await communicator.Communicate(input, );
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
     }
     catch (Exception e)
