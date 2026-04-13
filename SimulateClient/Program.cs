@@ -53,7 +53,7 @@ while (true)
     Console.WriteLine($"[Client] Mensaje: {spanMenssaje.ToArray().ToString()}");
     try
     {
-        var r = await communicator.Communicate(input, );
+        var r = await communicator.Communicate(input, menssaje);
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
     }
     catch (Exception e)
