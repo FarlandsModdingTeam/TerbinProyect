@@ -32,6 +32,7 @@ while (true)
     Console.Write($"[Client] ({input}), {(CodeMethodsTerbinService)input}\n" +
         $"-------(  End  )---------\n");
 
+    // Esto fufa :)
     byte[] menssaje = new byte["matenme".ToCharArray().Length * 2];
     menssaje = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
 
