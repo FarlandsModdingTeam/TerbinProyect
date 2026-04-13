@@ -13,7 +13,8 @@ public partial class HandleInstances
     [TerbinExecutable((byte)CodeMethodsTerbinService.CreateInstance)]
     public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
     {
-        Console.WriteLine($"[Worker] Cliente: {pHead.IdRequest}");
+        Console.WriteLine($"[Worker] IdRequest: {pHead.IdRequest}");
+        Console.WriteLine($"[Worker] Largo: {pParameters.Length}");
         if (pParameters.Length > 0)
         {
             char[] falseString = Serialineitor.DeserializeArray<char>(pParameters.ToArray());

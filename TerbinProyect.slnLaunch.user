@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "Simulaciones",
+    "Projects": [
+      {
+        "Path": "TerbinService\\TerbinService.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "SimulateClient\\SimulateClient.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

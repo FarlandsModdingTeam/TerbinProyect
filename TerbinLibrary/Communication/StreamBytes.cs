@@ -29,19 +29,16 @@ public class StreamWriteStruct : StreamBytes
 
         // 1. Escribimos la longitud real del paquete primero (2 bytes)
         //byte[] lengthPrefix = [(byte)buffer.Length];
-        Console.WriteLine($"[X] Largo: {(ushort)buffer.Length}");
         byte[] lengthPrefix = BitConverter.GetBytes((ushort)buffer.Length);
-        Console.WriteLine($"[X] Largo2: {lengthPrefix}");
         try
         {
-            await PipeStream.WriteAsync(lengthPrefix, pToken); // No pasa de aqui
+            await PipeStream.WriteAsync(lengthPrefix.AsMemory(), pToken); // No pasa de aqui
         }
         catch (Exception e)
         {
-            Console.WriteLine($"[X] Exception-> {e.Message}");
+            Console.WriteLine($"[StreamWriteStruct>WriteAsycn] ExceptionError-> {e.Message}");
         }
 
-        Console.WriteLine($"[X] mandando mensaje...");
         // 2. Escribimos el paquete
         await base.WriteBytesAsync(buffer, pToken);
     }
@@ -57,12 +54,10 @@ public class StreamReadStruct : StreamBytes
         // 1. Leemos los 1 bytes que nos dicen cuánto mide el mensaje
         byte[] lengthBuffer = await base.ReadBytesAsycn(2, pToken);
         ushort packetLength = BitConverter.ToUInt16(lengthBuffer); // ToUInt16
-        Console.WriteLine($"[X] Recivido lingitud {packetLength}");
         //int packetLength = lengthBuffer[0];
 
         // 2. Leemos EXACTAMENTE la longitud dinámica del paquete
         byte[] buffer = await base.ReadBytesAsycn(packetLength, pToken);
-        Console.WriteLine($"[X] Recivido mensaje");
 
         return Serialineitor.DeserializeStruct<T>(buffer);
     }

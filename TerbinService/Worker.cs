@@ -68,13 +68,13 @@ public class Worker : BackgroundService
     {
         _ = Task.Run(async () =>
         {
-            await Task.Delay(1000);
+            await Task.Delay(100);
             Console.WriteLine("[Worker] Execution stoped");
             _appLifetime?.StopApplication();
             Cts?.Cancel();
         });
         Console.WriteLine("[Worker] Stopping execution...");
         pHead.Status = CodeStatus.Succes;
-        return new PacketRequest(pHead, (byte)CodeTerbinProtocol.Stop, 1);
+        return new PacketRequest(pHead, (byte)CodeTerbinProtocol.None, 1);
     }
 }

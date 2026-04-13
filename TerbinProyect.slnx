@@ -1,4 +1,5 @@
 <Solution>
+  <Project Path="SimulateClient/SimulateClient.csproj" Id="e67aefe0-a8df-49d3-b225-62f413bc15ab" />
   <Project Path="TerbinLibrary/TerbinLibrary.csproj" />
   <Project Path="TerbinService/TerbinService.csproj" />
 </Solution>

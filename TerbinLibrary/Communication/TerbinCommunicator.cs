@@ -112,9 +112,6 @@ public class TerbinCommunicator : IDisposable
         _writer = new StreamWriteStruct(_thePipe);
         _reader = new StreamReadStruct(_thePipe);
 
-        _ = Task.Run(manageReceive, _stopToken);
-        _ = Task.Run(manageSend, _stopToken);
-
         if (pIsServer)
             _ = manageConnectClient();
     }
@@ -137,9 +134,16 @@ public class TerbinCommunicator : IDisposable
         if (_thePipe is NamedPipeClientStream pipe)
         {
             await pipe.ConnectAsync();
+            StartBackgroundTasks();
             return true;
         }
         return false;
+    }
+
+    private void StartBackgroundTasks()
+    {
+        _ = Task.Run(manageReceive, _stopToken);
+        _ = Task.Run(manageSend, _stopToken);
     }
 
     public async Task<PacketRequest> Communicate(byte pActionMethod, MemoryStream pPayload)
@@ -183,17 +187,13 @@ public class TerbinCommunicator : IDisposable
 
     public async Task<PacketRequest?> HandleSendSigle(byte pActionMethod, byte[] pPayload, ushort pIdRequest, bool pRecuperate = true)
     {
-        Console.WriteLine($"[X] ¡HandleSendSigle!");
         await AddQueue(0, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.NotAsign, pPayload, pIdRequest);
-
-        Console.WriteLine($"[X] ¡HandleSendSigle! 2");
 
         if (!pRecuperate)
             return null;
-        Console.WriteLine($"[X] ¡HandleSendSigle! 3");
         // TODO: gestionar error.
         var r = await recuperateReply(pIdRequest);
-        Console.WriteLine($"[X] r: {r.typeError}");
+        Console.WriteLine($"[TerbinCommunicator] recuperate: {r.typeError}");
         return r.packet;
     }
 
@@ -318,12 +318,10 @@ public class TerbinCommunicator : IDisposable
             pHead: head,
             pActionMethod: pActionMethod,
             pPayload: pSectionPayload);
-        Console.WriteLine($"[X] AddQueue 1");
         await AddQueue(capsule);
     }
     public async Task AddQueue(PacketRequest pCapsule)
     {
-        Console.WriteLine($"[X] AddQueue 2");
         _queue.Enqueue(pCapsule);
         _signal.Release();
     }
@@ -333,35 +331,45 @@ public class TerbinCommunicator : IDisposable
     {
         while (!_stopToken.IsCancellationRequested)
         {
-            PacketRequest r = await _reader.ReadAsycn<PacketRequest>(_stopToken);
-
-            Console.WriteLine($"[X] ¡Nuevo Paquete recivido!");
-
-            _ = handleReceive(r);
+            try
+            {
+                PacketRequest r = await _reader.ReadAsycn<PacketRequest>(_stopToken);
+                _ = handleReceive(r);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"[TerbinCommunicator>manageReceive] ExceptionError-> {e.Message}");
+                break;
+            }
         }
     }
     private async Task manageSend()
     {
         while (!_stopToken.IsCancellationRequested)
         {
-            Console.WriteLine($"[X] Esperando enviar:");
-            await _signal.WaitAsync(_stopToken);
-            Console.WriteLine($"[X] Enviado...");
-
-            if (!_queue.TryDequeue(out PacketRequest data))
-                continue;
-
-            Console.WriteLine($"[X] Quitado y obtenido...");
-
             try
             {
+                await _signal.WaitAsync(_stopToken);
+
+                if (!_queue.TryDequeue(out PacketRequest data))
+                    continue;
+
                 await _writer.WriteAsycn<PacketRequest>(data, _stopToken);
-                Console.WriteLine($"[X] Enviado");
             }
-            catch(Exception e)
+            catch (EndOfStreamException)
+            {
+                Console.WriteLine($"[Communicator] El cliente se ha desconectado limpiamente.");
+                break;
+            }
+            catch (Exception e)
             {
                 // TODO: Logger.
-                Console.WriteLine($"[X] Error-> {e.Message}");
+                Console.WriteLine($"[TerbinCommunicator>manageSend] ExceptionError-> {e.Message}");
+                break;
             }
             finally
             {
@@ -375,8 +383,8 @@ public class TerbinCommunicator : IDisposable
         if (_thePipe is NamedPipeServerStream pipe)
         {
             await pipe.WaitForConnectionAsync(_stopToken);
-            Console.WriteLine($"[Worker] ¡Nuevo Cliente conectado! ");
             //_ = Task.Run(_onNewClientConnect?.Invoke(), _stopToken);
+            StartBackgroundTasks();
             _onNewClientConnect?.Invoke();
         }
     }
