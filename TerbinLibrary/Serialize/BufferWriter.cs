@@ -76,6 +76,7 @@ public class BufferWriter
 
 public static class BufferWriterExtension
 {
+    // NOTA: Mi todo es fisicamente implosible, XD
     // TODO: darles una vuelta a los sin offset para que:
     // crean un nuevo Span donde pongan lo nuevo y luego sobreEscriban el antiguo Span con el nuevo.
     // Usar: Buffer.BlockCopy
