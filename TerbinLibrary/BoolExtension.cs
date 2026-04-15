@@ -28,6 +28,6 @@ public static class BoolExtension
     }
     public static bool? ToBoolUk(this sbyte pSByte)
     {
-        return (pSByte == -1) ? null : ToBool(pSByte);
+        return (pSByte > 0) ? null : ToBool(pSByte);
     }
 }
