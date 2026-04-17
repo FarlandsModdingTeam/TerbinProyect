@@ -7,6 +7,18 @@ using System.Resources;
 
 namespace TerbinLibrary.Data;
 
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayorculas = publica.
+  empieza: menorculas = privada.
+ */
+
+
 public class AcessJSon
 {
     private static Dictionary<string, string> _places = new Dictionary<string, string>();
