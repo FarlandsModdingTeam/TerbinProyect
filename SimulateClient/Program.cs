@@ -35,7 +35,7 @@ while (true)
     if (input >= (byte)CodeTerbinProtocol.Create &&
         input <= (byte)CodeTerbinProtocol.Deleted)
     {
-        Console.Write($"\n[Client] Action2 ->");
+        Console.Write($"[Client] Action2 ->");
         input2 = byte.Parse(Console.ReadLine()); // alacguabar!
     }
     Console.Write($"[Client] ({input}), {(CodeMethodsTerbinService)input}\n" +
@@ -45,11 +45,11 @@ while (true)
     byte[] menssaje;
     if (input2 != byte.MaxValue)
     {
-        // Incluye input2 al final del mensaje
+        // Incluye input2 al inicio del mensaje
         var baseMsg = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
         menssaje = new byte[baseMsg.Length + 1];
-        Array.Copy(baseMsg, menssaje, baseMsg.Length);
-        menssaje[menssaje.Length - 1] = input2;
+        menssaje[0] = input2;
+        Array.Copy(baseMsg, 0, menssaje, 1, baseMsg.Length);
     }
     else
     {
@@ -79,9 +79,8 @@ while (true)
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
         if (r.Payload.Length > 0)
         {
-            string? rute = Serialineitor.DeserializeArray<char>(r.Payload.ToArray()).ToString();
-            rute ??= "null";
-            Console.WriteLine($"[Client] R (m: {rute})");
+            string rute = new(Serialineitor.DeserializeArray<char>(r.Payload));
+            Console.WriteLine($"[Client] R (l: {rute.Length}, m: {rute})");
         }
     }
     catch (Exception e)

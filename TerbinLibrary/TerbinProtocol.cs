@@ -141,6 +141,7 @@ public enum CodeStatus : short
     ExecutionError = 501,
     ErrorNotPayload = 502,
     SerializeError = 503,
+    AccesNullOrNotExist = 504,
 
     OverMaximumTime = 555,
 }

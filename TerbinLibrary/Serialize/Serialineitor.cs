@@ -24,7 +24,7 @@ public interface IStructSerializable
     void ReadFrom(ReadOnlySpan<byte> pBuffer);
 }
 
-
+// TODO: CreateArray: Le puedas pasar todo lo que quieras en orden y lo serializara y añadira a un array que te devolvera.
 public class Serialineitor
 {
     public static byte[] SerializeStructConst<T>(T pStruct) where T : struct

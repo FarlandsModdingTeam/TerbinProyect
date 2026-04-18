@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TerbinLibrary;
 using TerbinLibrary.Data;
+using TerbinLibrary.Extension;
 
 namespace TerbinService.Configuration;
 
@@ -14,6 +14,9 @@ internal class ManagerConfiguration
 
     public static string? GetConfg(string pKey)
     {
+        if (AcessJSon.Get(KEY) == null)
+            AcessJSon.Set(KEY, FOLDER);
+
         if (AcessJSon.Acess<Dictionary<string, string>>(KEY, JSON) is var r && r == null)
             return null;
 

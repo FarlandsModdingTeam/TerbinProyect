@@ -32,7 +32,7 @@ public class Worker : BackgroundService
         Cts = CancellationTokenSource.CreateLinkedTokenSource(pStoppingToken);
         //await TerbinProtocol.InitProtocol(Cts.Token);
         await autoCreatePipe(Cts.Token);
-        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+        TerbinExecutor.RegisterAll(Assembly.GetExecutingAssembly());
     }
 
 
@@ -40,14 +40,17 @@ public class Worker : BackgroundService
     public async Task InitProtocol(CancellationToken pTokenCancellation)
     {
         await autoCreatePipe(pTokenCancellation);
-        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+        TerbinExecutor.RegisterAll(Assembly.GetExecutingAssembly());
     }
 
     // Pruebas
     private async Task autoCreatePipe(CancellationToken pTokenCancellation)
     {
+        // No habria que registrar tambien al crear uno nuevo?????
         try
         {
+            TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+
             var communicator = new TerbinCommunicator(true, pTokenCancellation);
             communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
             communicator.OnNewClientConnect += async () =>

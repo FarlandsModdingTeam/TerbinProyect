@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TerbinLibrary;
+namespace TerbinLibrary.Extension;
 public static class BoolExtension
 {
     public static sbyte ToSByte(this bool pBool)

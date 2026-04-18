@@ -13,11 +13,7 @@ public class TerbinExecutor
 
     public TerbinExecutor(Assembly pAssembly)
     {
-        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly()); // Terbin Library
-        ExecutableDispatcher.RegisterFromAssembly(pAssembly); // Externo
-
-        // TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly()); // no hay internos
-        TerbinExecutableCRUDManager.RegisterFromAssembly(pAssembly);
+        RegisterAll(pAssembly);
     }
     public TerbinExecutor()
     {
@@ -25,6 +21,15 @@ public class TerbinExecutor
     }
 
     // TODO: perdirle a Luis que sea mi tutor.
+
+    public static void RegisterAll(Assembly pAssembly)
+    {
+        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly()); // Terbin Library
+        ExecutableDispatcher.RegisterFromAssembly(pAssembly); // Externo
+
+        // TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly()); // no hay internos
+        TerbinExecutableCRUDManager.RegisterFromAssembly(pAssembly);
+    }
 
     public async Task<PacketRequest> Execution(PacketRequest pRequest)
     {

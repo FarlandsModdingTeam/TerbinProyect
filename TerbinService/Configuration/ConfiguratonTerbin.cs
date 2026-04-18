@@ -20,7 +20,7 @@ namespace TerbinService.Configuration;
  */
 
 
-public class ConfiguratonFarlands
+public class ConfiguratonTerbin
 {
     private const string RUTE_FARLANDS = "rute_farlands";
     private const string RUTE_INSTANCES = "rute_instances";
@@ -37,8 +37,8 @@ public class ConfiguratonFarlands
                 (byte)CodeTerbinMemory.None,
                 pParameters.ToArray());
         }
-
-        string? newRute = Serialineitor.DeserializeArray<char>(pParameters.ToArray()).ToString();
+        
+        string newRute = new(Serialineitor.DeserializeArray<char>(pParameters.ToArray()));
         if (newRute == null)
         {
             pHead.Status = CodeStatus.ErrorNotPayload;
@@ -71,7 +71,7 @@ public class ConfiguratonFarlands
         else
         {
             pld = [];
-            pHead.Status = CodeStatus.SerializeError;
+            pHead.Status = CodeStatus.AccesNullOrNotExist;
         }
         return new PacketRequest(pHead,
             (byte)CodeTerbinProtocol.Update,

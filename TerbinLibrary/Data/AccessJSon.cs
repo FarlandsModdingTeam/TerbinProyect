@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Resources;
+using TerbinLibrary.Extension;
 
 namespace TerbinLibrary.Data;
 
@@ -92,6 +93,8 @@ public class AcessJSon
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(dir, fileName);
+        if (!File.Exists(routeComplete))
+            Directory.CreateDirectory(dir);
 
         string json = JsonConvert.SerializeObject(pContent); // Formatting.Indented
         if (json == null) return CodeAcessJSonSave.ErrorSerialize;
