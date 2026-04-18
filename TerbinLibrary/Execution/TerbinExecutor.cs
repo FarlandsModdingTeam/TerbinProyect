@@ -19,6 +19,11 @@ public class TerbinExecutor
         // TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly()); // no hay internos
         TerbinExecutableCRUDManager.RegisterFromAssembly(pAssembly);
     }
+    public TerbinExecutor()
+    {
+        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly()); // Terbin Library
+    }
+
     // TODO: perdirle a Luis que sea mi tutor.
 
     public async Task<PacketRequest> Execution(PacketRequest pRequest)
@@ -67,13 +72,14 @@ public class TerbinExecutor
         return new PacketRequest(pHead: pHead, pActionMethod: (byte)CodeTerbinProtocol.Info);
     }
 
+
+
     [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
     public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
     {
         PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Create, pParameters.ToArray());
         return r;
     }
-
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Read)]
     public static async Task<PacketRequest> Read(Header pHead, MemoryStream pParameters)
@@ -82,7 +88,6 @@ public class TerbinExecutor
         return r;
     }
 
-
     [TerbinExecutable((byte)CodeTerbinProtocol.Update)]
     public static async Task<PacketRequest> Update(Header pHead, MemoryStream pParameters)
     {
@@ -90,13 +95,13 @@ public class TerbinExecutor
         return r;
     }
 
-
     [TerbinExecutable((byte)CodeTerbinProtocol.Deleted)]
     public static async Task<PacketRequest> Deleted(Header pHead, MemoryStream pParameters)
     {
         PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Deleted, pParameters.ToArray());
         return r;
     }
+
 
 
     // ya ni me acuerdo para que era.

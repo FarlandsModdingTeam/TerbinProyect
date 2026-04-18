@@ -23,21 +23,22 @@ public class AcessJSon
 {
     private static Dictionary<string, string> _places = new Dictionary<string, string>();
 
-    public static string? Get(string pKey)
+    public static string? Get(string pKeyDir)
     {
         lock (_places)
         {
-            if (_places.ContainsKey(pKey))
-                return _places[pKey];
+            if (_places.ContainsKey(pKeyDir))
+                return _places[pKeyDir];
         }
         return null;
     }
 
-    public static void Set(string pKey, string pPlace)
+    public static void Set(string pKeyDir, string pPlace)
     {
         lock (_places)
         {
-            _places[pKey] = pPlace;
+            // Segun copilot es suficientemente inteligente como añadirlo si no existe y sustituirlo si existe (Segun copilot).
+            _places[pKeyDir] = pPlace;
         }
     }
 
@@ -48,19 +49,19 @@ public class AcessJSon
         Fail = 0,
         Succes = 1,
     }
-    public static CodeAcessJSonDel Del(string pKey)
+    public static CodeAcessJSonDel Del(string pKeyDir)
     {
         lock (_places)
         {
-            if (_places.ContainsKey(pKey))
-                return (CodeAcessJSonDel)_places.Remove(pKey).ToSByte();
+            if (_places.ContainsKey(pKeyDir))
+                return (CodeAcessJSonDel)_places.Remove(pKeyDir).ToSByte();
             return CodeAcessJSonDel.NotExistKey;
         }
     }
 
-    public static T? Acess<T>(string pKey, string pFile) where T : class
+    public static T? Acess<T>(string pKeyDir, string pFile) where T : class
     {
-        string? dir = getDir(pKey);
+        string? dir = getDir(pKeyDir);
         if (dir == null)
             return null;
 
@@ -82,9 +83,9 @@ public class AcessJSon
         NotExistKey = 0,
         Succes = 1,
     }
-    public static CodeAcessJSonSave Save<T>(string pKey, string pFile, T pContent) where T : class
+    public static CodeAcessJSonSave Save<T>(string pKeyDir, string pFile, T pContent) where T : class
     {
-        string? dir = getDir(pKey);
+        string? dir = getDir(pKeyDir);
         if (dir == null)
             return CodeAcessJSonSave.NotExistKey;
 
@@ -99,11 +100,11 @@ public class AcessJSon
         return CodeAcessJSonSave.Succes;
     }
 
-    private static string? getDir(string pKey)
+    private static string? getDir(string pKeyDir)
     {
         lock (_places)
         {
-            _places.TryGetValue(pKey, out var dir);
+            _places.TryGetValue(pKeyDir, out var dir);
             return dir;
         }
     }

@@ -13,3 +13,16 @@ public enum CodeMethodsTerbinService : byte
     ChangeFarladsRute = 100,
     ChangeInstancesRute = 101,
 }
+
+public enum CodeServices : byte
+{
+    Farland = 10,
+    FarlandsRute = 11,
+
+    Mods = 20,
+
+    Instances = 30,
+    InstancesRute = 31,
+
+    FCM = 40,
+}

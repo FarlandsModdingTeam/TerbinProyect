@@ -2,6 +2,7 @@
 using TerbinLibrary.Execution;
 using System.Reflection;
 using TerbinLibrary.Serialize;
+using TerbinLibrary;
 
 
 await Task.Delay(1000);
@@ -29,12 +30,32 @@ while (true)
         $"[Client] (byte de accion: 0 = Stop, 10 = CreateInstance, )\n" +
         $"[Client] Action -> ");
     byte input = byte.Parse(Console.ReadLine()); // alacguabar!
+    byte input2 = byte.MaxValue;
+
+    if (input >= (byte)CodeTerbinProtocol.Create &&
+        input <= (byte)CodeTerbinProtocol.Deleted)
+    {
+        Console.Write($"\n[Client] Action2 ->");
+        input2 = byte.Parse(Console.ReadLine()); // alacguabar!
+    }
     Console.Write($"[Client] ({input}), {(CodeMethodsTerbinService)input}\n" +
         $"-------(  End  )---------\n");
 
     // Esto fufa :)
-    byte[] menssaje = new byte["matenme".ToCharArray().Length * 2];
-    menssaje = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
+    byte[] menssaje;
+    if (input2 != byte.MaxValue)
+    {
+        // Incluye input2 al final del mensaje
+        var baseMsg = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
+        menssaje = new byte[baseMsg.Length + 1];
+        Array.Copy(baseMsg, menssaje, baseMsg.Length);
+        menssaje[menssaje.Length - 1] = input2;
+    }
+    else
+    {
+        menssaje = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
+    }
+
 
     //char[] m = "matenme".ToCharArray();
 
@@ -51,11 +72,17 @@ while (true)
 
     var a = spanMenssaje.ToArray();
 
-    Console.WriteLine($"[Client] Mensaje: {spanMenssaje.ToArray().ToString()}");
+    //Console.WriteLine($"[Client] Mensaje: {spanMenssaje.ToArray().ToString()}");
     try
     {
         var r = await communicator.Communicate(input, menssaje);
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} Status: {r.Head.Status})");
+        if (r.Payload.Length > 0)
+        {
+            string? rute = Serialineitor.DeserializeArray<char>(r.Payload.ToArray()).ToString();
+            rute ??= "null";
+            Console.WriteLine($"[Client] R (m: {rute})");
+        }
     }
     catch (Exception e)
     {

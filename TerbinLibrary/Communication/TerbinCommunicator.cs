@@ -36,6 +36,7 @@ namespace TerbinLibrary.Communication;
 - Communicate es para mandar sabiendo que quieres recibir una respuesta;
  */
 
+// TODO: Revisar si una respuesta manda IdMemory en None o Undefined pero payload es mas largo, cambiar eso para mandar en tanda.
 
 public class TerbinCommunicator : IDisposable
 {

@@ -139,7 +139,10 @@ public enum CodeStatus : short
 
     GenericWorkerError = 500,
     ExecutionError = 501,
-    OverMaximumTime = 550,
+    ErrorNotPayload = 502,
+    SerializeError = 503,
+
+    OverMaximumTime = 555,
 }
 
 
