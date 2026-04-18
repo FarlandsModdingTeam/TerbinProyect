@@ -9,4 +9,7 @@ public enum CodeMethodsTerbinService : byte
 {
     CreateInstance = 10,
     DeleteInstance = 11,
+
+    ChangeFarladsRute = 100,
+    ChangeInstancesRute = 101,
 }

@@ -65,6 +65,37 @@ public class TerbinExecutor
         return new PacketRequest(pHead: pHead, pActionMethod: (byte)CodeTerbinProtocol.Info);
     }
 
+    [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
+    public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
+    {
+
+        throw new NotImplementedException("Ñe");
+    }
+
+
+    [TerbinExecutable((byte)CodeTerbinProtocol.Read)]
+    public static async Task<PacketRequest> Read(Header pHead, MemoryStream pParameters)
+    {
+
+        throw new NotImplementedException("Ñe");
+    }
+
+
+    [TerbinExecutable((byte)CodeTerbinProtocol.Update)]
+    public static async Task<PacketRequest> Update(Header pHead, MemoryStream pParameters)
+    {
+
+        throw new NotImplementedException("Ñe");
+    }
+
+
+    [TerbinExecutable((byte)CodeTerbinProtocol.Deleted)]
+    public static async Task<PacketRequest> Deleted(Header pHead, MemoryStream pParameters)
+    {
+
+        throw new NotImplementedException("Ñe");
+    }
+
 
     // ya ni me acuerdo para que era.
     [TerbinExecutable((byte)CodeTerbinProtocol.Cancel)]

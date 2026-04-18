@@ -1,0 +1,5 @@
+-Mover TerbinProtocol (todo el tema de comunicacion) a un proyecto TerbinProtocol
+
+-TerbinExecutable que serialice a los parametros de la funcion
+ 
+ 

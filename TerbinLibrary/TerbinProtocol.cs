@@ -86,6 +86,14 @@ public enum CodeTerbinProtocol : byte
 
     // Si puede ayudar a ahorrarte fuciones.
     // C.R.U.D for you: 
+    Create = TerbinCRUD.Create,
+    Read = TerbinCRUD.Read,
+    Update = TerbinCRUD.Update,
+    Deleted = TerbinCRUD.Deleted,
+}
+
+public enum TerbinCRUD : byte
+{
     Create = 6,
     Read = 7,
     Update = 8,

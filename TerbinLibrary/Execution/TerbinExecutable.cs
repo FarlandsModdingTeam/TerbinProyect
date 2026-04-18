@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
@@ -29,9 +28,6 @@ public sealed class TerbinExecutableAttribute : Attribute
 
     public TerbinExecutableAttribute(byte pAction) => Action = pAction;
 }
-
-
-public delegate Task<PacketRequest> ExecutableHandler(Header pHead, MemoryStream pParameters);
 
 
 public sealed class ExecutableDispatcher
@@ -88,7 +84,7 @@ public sealed class ExecutableDispatcher
 
         if (TerbinMemory.TryGetResult(pCapsule.Head.IdMemory, out var bytes) is var r && r.succes)
         {
-            return addToMemoryStream(pCapsule, bytes);
+            return combinePayload(pCapsule, bytes);
         }
         else
         {
@@ -98,7 +94,7 @@ public sealed class ExecutableDispatcher
         return new MemoryStream();
     }
 
-    public static MemoryStream addToMemoryStream(PacketRequest pCapsule, byte[] pBytes)
+    public static MemoryStream combinePayload(PacketRequest pCapsule, byte[] pBytes)
     {
         byte[] result = new byte[pCapsule.Payload.Length + pBytes.Length];
         Buffer.BlockCopy(pCapsule.Payload, 0, result, 0, pCapsule.Payload.Length);
