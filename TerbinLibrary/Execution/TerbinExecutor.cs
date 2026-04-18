@@ -11,11 +11,13 @@ public class TerbinExecutor
 {
     //TerbinCommunicator _communicator;
 
-    public TerbinExecutor(/*TerbinCommunicator pCommunicator*/)
+    public TerbinExecutor(Assembly pAssembly)
     {
-        //this._communicator = pCommunicator;
+        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly()); // Terbin Library
+        ExecutableDispatcher.RegisterFromAssembly(pAssembly); // Externo
 
-        // ExecutableDispatcher.RegisterAll();
+        // TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly()); // no hay internos
+        TerbinExecutableCRUDManager.RegisterFromAssembly(pAssembly);
     }
     // TODO: perdirle a Luis que sea mi tutor.
 
@@ -68,32 +70,32 @@ public class TerbinExecutor
     [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
     public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
     {
-
-        throw new NotImplementedException("Ñe");
+        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Create, pParameters.ToArray());
+        return r;
     }
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Read)]
     public static async Task<PacketRequest> Read(Header pHead, MemoryStream pParameters)
     {
-
-        throw new NotImplementedException("Ñe");
+        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Read, pParameters.ToArray());
+        return r;
     }
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Update)]
     public static async Task<PacketRequest> Update(Header pHead, MemoryStream pParameters)
     {
-
-        throw new NotImplementedException("Ñe");
+        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Update, pParameters.ToArray());
+        return r;
     }
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Deleted)]
     public static async Task<PacketRequest> Deleted(Header pHead, MemoryStream pParameters)
     {
-
-        throw new NotImplementedException("Ñe");
+        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Deleted, pParameters.ToArray());
+        return r;
     }
 
 

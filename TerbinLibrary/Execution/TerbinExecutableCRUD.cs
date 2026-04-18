@@ -17,6 +17,9 @@ namespace TerbinLibrary.Execution;
   empieza: menorculas = privada.
  */
 
+
+// TODO: CRUD no deberia manejar memoria, eso lo hace TerbinExecutable normal.
+
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 public sealed class TerbinCRUDAttribute : Attribute
 {
@@ -58,6 +61,30 @@ public sealed class TerbinExecutableCRUDDispatcher
 
     public bool Unregister(byte pEntity) => _handlers.TryRemove(pEntity, out _);
 
+    // TODO: ya tengo el pAction, como tal no hay que pasarlo, (areglar).
+    public async Task<PacketRequest> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
+    {
+        tryGetEntity(pPayload, out var entity, out var memo);
+
+        if (!_handlers.TryGetValue(entity, out var handler))
+        {
+            pHead.Status = CodeStatus.ActionNotFound;
+            return new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.None, pPayload);
+        }
+
+        try
+        {
+            return await handler(pHead, memo).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"[TerbinExecutableCRUDDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
+            pHead.Status = CodeStatus.ExecutionError;
+            return new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.None, pPayload);
+        }
+    }
+
+    [Obsolete]
     public async Task<PacketRequest> DispatchAsync(PacketRequest pCapsule)
     {
         if (!tryGetEntityAndMemoryStream(pCapsule, out var entity, out var memo))
@@ -84,6 +111,7 @@ public sealed class TerbinExecutableCRUDDispatcher
         }
     }
 
+    [Obsolete]
     private static bool tryGetEntityAndMemoryStream(PacketRequest pCapsule, out byte pEntity, out MemoryStream pMemory)
     {
         pEntity = byte.MinValue;
@@ -101,6 +129,7 @@ public sealed class TerbinExecutableCRUDDispatcher
         return true;
     }
 
+    [Obsolete]
     private static bool tryGetPayloadBytes(PacketRequest pCapsule, out byte[] pBytes)
     {
         pBytes = [];
@@ -122,6 +151,14 @@ public sealed class TerbinExecutableCRUDDispatcher
 
         tryReleaseMemory(pCapsule.Head.IdMemory);
         return false;
+    }
+
+    private static bool tryGetEntity(byte[] pPayload, out byte pEntity, out MemoryStream pMemory)
+    {
+        pEntity = pPayload[0];
+        int bodyLength = pPayload.Length - 1;
+        pMemory = new MemoryStream(pPayload, 1, bodyLength, writable: false, publiclyVisible: true);
+        return true;
     }
 
     private static byte[] combinePayload(byte[] pBuffered, byte[] pLast)
@@ -175,6 +212,19 @@ public static class TerbinExecutableCRUDManager
         return dispatcher.Unregister(pEntity);
     }
 
+    public static async Task<PacketRequest> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
+    {
+        if (!_dispatchers.TryGetValue(pAction, out var dispatcher))
+        {
+            pHead.Status = CodeStatus.ActionNotFound;
+            var capsule = new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.None, pPayload);
+            return capsule;
+        }
+        return await dispatcher.DispatchAsync(pHead, pAction, pPayload);
+    }
+
+
+    [Obsolete]
     public static Task<PacketRequest> DispatchAsync(PacketRequest pCapsule)
     {
         var action = (CodeTerbinProtocol)pCapsule.ActionMethod;
@@ -183,7 +233,6 @@ public static class TerbinExecutableCRUDManager
             pCapsule.Head.Status = CodeStatus.ActionNotFound;
             return Task.FromResult(pCapsule);
         }
-
         return dispatcher.DispatchAsync(pCapsule);
     }
 

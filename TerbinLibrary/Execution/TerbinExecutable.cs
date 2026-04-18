@@ -49,8 +49,7 @@ public sealed class ExecutableDispatcher
         if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handler))
         {
             pCapsule.Head.Status = CodeStatus.ActionNotFound;
-            if (pCapsule.Head.IdMemory > TerbinProtocol.RESERVE_MEMORY)
-                TerbinMemory.Release(pCapsule.Head.IdMemory);
+            tryReleaseMemory(pCapsule.Head.IdMemory);
             return pCapsule;
         }
 
@@ -74,7 +73,7 @@ public sealed class ExecutableDispatcher
     private static bool tryGetMemoryStream(PacketRequest pCapsule, out MemoryStream pMemory)
     {
         pMemory = getMemoryStream(pCapsule);
-        return TerbinMemory.Release(pCapsule.Head.IdMemory);
+        return tryReleaseMemory(pCapsule.Head.IdMemory);
     }
 
     private static MemoryStream getMemoryStream(PacketRequest pCapsule)
@@ -100,6 +99,13 @@ public sealed class ExecutableDispatcher
         Buffer.BlockCopy(pCapsule.Payload, 0, result, 0, pCapsule.Payload.Length);
         Buffer.BlockCopy(pBytes, 0, result, pCapsule.Payload.Length, pBytes.Length);
         return new MemoryStream(result); // [.. pBytes, .. pCapsule.Payload]
+    }
+
+    private static bool tryReleaseMemory(byte pIdMemory)
+    {
+        if (pIdMemory > TerbinProtocol.RESERVE_MEMORY)
+            return TerbinMemory.Release(pIdMemory);
+        return false;
     }
 
     // Esto no funcionara porque registrara TerbinLibrary XD
