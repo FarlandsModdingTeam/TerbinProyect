@@ -11,7 +11,7 @@ namespace TerbinService.Instances;
 public partial class HandleInstances
 {
     [TerbinExecutable((byte)CodeMethodsTerbinService.CreateInstance)]
-    public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
+    public static async Task<PacketRequest> Create(Header pHead, byte[] pParameters)
     {
         Console.WriteLine($"[Worker] IdRequest: {pHead.IdRequest}");
         Console.WriteLine($"[Worker] Largo: {pParameters.Length}");

@@ -67,7 +67,7 @@ public class Worker : BackgroundService
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]
-    public static async Task<PacketRequest> Stop(Header pHead, MemoryStream pParameters)
+    public static async Task<PacketRequest> Stop(Header pHead, byte[] pParameters)
     {
         _ = Task.Run(async () =>
         {

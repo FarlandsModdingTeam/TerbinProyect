@@ -70,16 +70,22 @@ public sealed class ExecutableDispatcher
         }
     }
 
-    private static bool tryGetMemoryStream(PacketRequest pCapsule, out MemoryStream pMemory)
+    private static bool tryGetMemoryStream(PacketRequest pCapsule, out byte[] pMemory)
     {
         pMemory = getMemoryStream(pCapsule);
         return tryReleaseMemory(pCapsule.Head.IdMemory);
     }
 
-    private static MemoryStream getMemoryStream(PacketRequest pCapsule)
+    private static byte[] getMemoryStream(PacketRequest pCapsule)
     {
         if (pCapsule.Head.OrderRequest != TerbinProtocol.FINAL_PACKET)
-            return new MemoryStream(pCapsule.Payload ?? []);
+        {
+            var payload = pCapsule.Payload ?? Array.Empty<byte>();
+            var copy = new byte[payload.Length];
+            if (payload.Length > 0)
+                Array.Copy(payload, copy, payload.Length);
+            return copy;
+        }
 
         if (TerbinMemory.TryGetResult(pCapsule.Head.IdMemory, out var bytes) is var r && r.succes)
         {
@@ -90,15 +96,19 @@ public sealed class ExecutableDispatcher
             // TODO: Logger.
         }
 
-        return new MemoryStream();
+        return Array.Empty<byte>();
     }
 
-    public static MemoryStream combinePayload(PacketRequest pCapsule, byte[] pBytes)
+    public static byte[] combinePayload(PacketRequest pCapsule, byte[] pBytes)
     {
-        byte[] result = new byte[pCapsule.Payload.Length + pBytes.Length];
-        Buffer.BlockCopy(pCapsule.Payload, 0, result, 0, pCapsule.Payload.Length);
-        Buffer.BlockCopy(pBytes, 0, result, pCapsule.Payload.Length, pBytes.Length);
-        return new MemoryStream(result); // [.. pBytes, .. pCapsule.Payload]
+        var payload = pCapsule.Payload ?? Array.Empty<byte>();
+        pBytes = pBytes ?? Array.Empty<byte>();
+        byte[] result = new byte[payload.Length + pBytes.Length];
+        if (payload.Length > 0)
+            Buffer.BlockCopy(payload, 0, result, 0, payload.Length);
+        if (pBytes.Length > 0)
+            Buffer.BlockCopy(pBytes, 0, result, payload.Length, pBytes.Length);
+        return result; // [.. pBytes, .. pCapsule.Payload]
     }
 
     private static bool tryReleaseMemory(byte pIdMemory)
@@ -129,15 +139,15 @@ public sealed class ExecutableDispatcher
                 var parameters = method.GetParameters();
                 if (parameters.Length != 2 ||
                     parameters[0].ParameterType != typeof(Header) ||
-                    parameters[1].ParameterType != typeof(MemoryStream))
+                    parameters[1].ParameterType != typeof(byte[]))
                     continue;
 
                 if (method.ReturnType != typeof(Task<PacketRequest>))
                     continue;
 
                 // Crea delegate fuertemente tipado (evita reflexión por llamada)
-                var del = (Func<Header, MemoryStream, Task<PacketRequest>>)Delegate.CreateDelegate(
-                    typeof(Func<Header, MemoryStream, Task<PacketRequest>>), method);
+                var del = (Func<Header, byte[], Task<PacketRequest>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, byte[], Task<PacketRequest>>), method);
 
                 Register(attr.Action, (h, b) => del(h, b));
             }

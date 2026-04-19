@@ -50,11 +50,11 @@ public class TerbinExecutor
     //}
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Load)]
-    public static async Task<PacketRequest> Load(Header pHead, MemoryStream pParameters)
+    public static async Task<PacketRequest> Load(Header pHead, byte[] pParameters)
     {
         if (pHead.IdRequest > 0)
         {
-            TerbinMemory.Store(pHead.IdMemory, pHead.OrderRequest, pParameters.ToArray());
+            TerbinMemory.Store(pHead.IdMemory, pHead.OrderRequest, pParameters);
         }
 
 
@@ -64,7 +64,7 @@ public class TerbinExecutor
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Solicit)]
-    public static async Task<PacketRequest> Solicit(Header pHead, MemoryStream pParameters)
+    public static async Task<PacketRequest> Solicit(Header pHead, byte[] pParameters)
     {
         if (pHead.IdMemory == (byte)CodeTerbinMemory.New)
         {
@@ -80,30 +80,30 @@ public class TerbinExecutor
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
-    public static async Task<PacketRequest> Create(Header pHead, MemoryStream pParameters)
+    public static async Task<PacketRequest> Create(Header pHead, byte[] pParameters)
     {
-        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Create, pParameters.ToArray());
+        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Create, pParameters);
         return r;
     }
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Read)]
-    public static async Task<PacketRequest> Read(Header pHead, MemoryStream pParameters)
+    public static async Task<PacketRequest> Read(Header pHead, byte[] pParameters)
     {
-        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Read, pParameters.ToArray());
+        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Read, pParameters);
         return r;
     }
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Update)]
-    public static async Task<PacketRequest> Update(Header pHead, MemoryStream pParameters)
+    public static async Task<PacketRequest> Update(Header pHead, byte[] pParameters)
     {
-        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Update, pParameters.ToArray());
+        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Update, pParameters);
         return r;
     }
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Deleted)]
-    public static async Task<PacketRequest> Deleted(Header pHead, MemoryStream pParameters)
+    public static async Task<PacketRequest> Deleted(Header pHead, byte[] pParameters)
     {
-        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Deleted, pParameters.ToArray());
+        PacketRequest r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Deleted, pParameters);
         return r;
     }
 
@@ -111,7 +111,7 @@ public class TerbinExecutor
 
     // ya ni me acuerdo para que era.
     [TerbinExecutable((byte)CodeTerbinProtocol.Cancel)]
-    public static async Task<PacketRequest> Cancel(Header pHead, MemoryStream pParameters)
+    public static async Task<PacketRequest> Cancel(Header pHead, byte[] pParameters)
     {
 
         throw new NotImplementedException("Ñe");

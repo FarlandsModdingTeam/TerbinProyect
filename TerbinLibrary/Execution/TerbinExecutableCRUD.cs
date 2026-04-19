@@ -112,10 +112,10 @@ public sealed class TerbinExecutableCRUDDispatcher
     }
 
     [Obsolete]
-    private static bool tryGetEntityAndMemoryStream(PacketRequest pCapsule, out byte pEntity, out MemoryStream pMemory)
+    private static bool tryGetEntityAndMemoryStream(PacketRequest pCapsule, out byte pEntity, out byte[] pMemory)
     {
         pEntity = byte.MinValue;
-        pMemory = (MemoryStream)MemoryStream.Null;
+        pMemory = [];
 
         if (!tryGetPayloadBytes(pCapsule, out var bytes))
             return false;
@@ -125,7 +125,9 @@ public sealed class TerbinExecutableCRUDDispatcher
 
         pEntity = bytes[0];
         var bodyLength = bytes.Length - 1;
-        pMemory = new MemoryStream(bytes, 1, bodyLength, writable: false, publiclyVisible: true);
+        pMemory = new byte[bodyLength];
+        if (bodyLength > 0)
+            Array.Copy(bytes, 1, pMemory, 0, bodyLength);
         return true;
     }
 
@@ -153,11 +155,13 @@ public sealed class TerbinExecutableCRUDDispatcher
         return false;
     }
 
-    private static bool tryGetEntity(byte[] pPayload, out byte pEntity, out MemoryStream pMemory)
+    private static bool tryGetEntity(byte[] pPayload, out byte pEntity, out byte[] pMemory)
     {
         pEntity = pPayload[0];
         int bodyLength = pPayload.Length - 1;
-        pMemory = new MemoryStream(pPayload, 1, bodyLength, writable: false, publiclyVisible: true);
+        pMemory = new byte[bodyLength];
+        if (bodyLength > 0)
+            Array.Copy(pPayload, 1, pMemory, 0, bodyLength);
         return true;
     }
 
@@ -248,14 +252,14 @@ public static class TerbinExecutableCRUDManager
                 var parameters = method.GetParameters();
                 if (parameters.Length != 2 ||
                     parameters[0].ParameterType != typeof(Header) ||
-                    parameters[1].ParameterType != typeof(MemoryStream))
+                    parameters[1].ParameterType != typeof(byte[]))
                     continue;
 
                 if (method.ReturnType != typeof(Task<PacketRequest>))
                     continue;
 
-                var del = (Func<Header, MemoryStream, Task<PacketRequest>>)Delegate.CreateDelegate(
-                    typeof(Func<Header, MemoryStream, Task<PacketRequest>>), method);
+                var del = (Func<Header, byte[], Task<PacketRequest>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, byte[], Task<PacketRequest>>), method);
 
                 Register(attr.Action, attr.Entity, (h, b) => del(h, b));
             }
