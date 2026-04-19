@@ -23,11 +23,11 @@ public class BufferReader
     {
         ushort length = Get<ushort>(pBuffer, ref pOffset);
 
-        int byteLength = length * Unsafe.SizeOf<T>();
-        var slice = pBuffer.Slice(pOffset, byteLength);
+        //int byteLength = length * Unsafe.SizeOf<T>();
+        var slice = pBuffer.Slice(pOffset, length);
 
         T[] array = MemoryMarshal.Cast<byte, T>(slice).ToArray();
-        pOffset += byteLength;
+        pOffset += length;
 
         return array;
     }
@@ -55,10 +55,10 @@ public static class BufferReaderExtension
         where T : unmanaged
     {
         ushort length = pBuffer.Read<ushort>();
-        int byteLength = length * Unsafe.SizeOf<T>();
+        //int byteLength = length * Unsafe.SizeOf<T>();
 
-        T[] newArray = MemoryMarshal.Cast<byte, T>(pBuffer[..byteLength]).ToArray();
-        pBuffer = pBuffer[byteLength..];
+        T[] newArray = MemoryMarshal.Cast<byte, T>(pBuffer[..length]).ToArray();
+        pBuffer = pBuffer[length..];
 
         return newArray;
     }

@@ -5,7 +5,6 @@ using TerbinLibrary.Communication;
 using TerbinLibrary.Memory;
 
 namespace TerbinLibrary.Execution;
-
 /*
  -- Variables:
   empieza: _ = es privada NO local.
@@ -84,77 +83,6 @@ public sealed class TerbinExecutableCRUDDispatcher
         }
     }
 
-    [Obsolete]
-    public async Task<PacketRequest> DispatchAsync(PacketRequest pCapsule)
-    {
-        if (!tryGetEntityAndMemoryStream(pCapsule, out var entity, out var memo))
-        {
-            pCapsule.Head.Status = CodeStatus.BadRequest;
-            return pCapsule;
-        }
-
-        if (!_handlers.TryGetValue(entity, out var handler))
-        {
-            pCapsule.Head.Status = CodeStatus.ActionNotFound;
-            return pCapsule;
-        }
-
-        try
-        {
-            return await handler(pCapsule.Head, memo).ConfigureAwait(false);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"[TerbinExecutableCRUDDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
-            pCapsule.Head.Status = CodeStatus.ExecutionError;
-            return pCapsule;
-        }
-    }
-
-    [Obsolete]
-    private static bool tryGetEntityAndMemoryStream(PacketRequest pCapsule, out byte pEntity, out byte[] pMemory)
-    {
-        pEntity = byte.MinValue;
-        pMemory = [];
-
-        if (!tryGetPayloadBytes(pCapsule, out var bytes))
-            return false;
-
-        if (bytes.Length == 0)
-            return false;
-
-        pEntity = bytes[0];
-        var bodyLength = bytes.Length - 1;
-        pMemory = new byte[bodyLength];
-        if (bodyLength > 0)
-            Array.Copy(bytes, 1, pMemory, 0, bodyLength);
-        return true;
-    }
-
-    [Obsolete]
-    private static bool tryGetPayloadBytes(PacketRequest pCapsule, out byte[] pBytes)
-    {
-        pBytes = [];
-
-        if (pCapsule.Head.OrderRequest != TerbinProtocol.FINAL_PACKET)
-        {
-            pBytes = pCapsule.Payload ?? [];
-            tryReleaseMemory(pCapsule.Head.IdMemory);
-            return true;
-        }
-
-        if (TerbinMemory.TryGetResult(pCapsule.Head.IdMemory, out var buffered) is var r && r.succes)
-        {
-            var last = pCapsule.Payload ?? [];
-            pBytes = combinePayload(buffered, last); // buffered primero, last al final
-            tryReleaseMemory(pCapsule.Head.IdMemory);
-            return true;
-        }
-
-        tryReleaseMemory(pCapsule.Head.IdMemory);
-        return false;
-    }
-
     private static bool tryGetEntity(byte[] pPayload, out byte pEntity, out byte[] pMemory)
     {
         pEntity = pPayload[0];
@@ -225,19 +153,6 @@ public static class TerbinExecutableCRUDManager
             return capsule;
         }
         return await dispatcher.DispatchAsync(pHead, pAction, pPayload);
-    }
-
-
-    [Obsolete]
-    public static Task<PacketRequest> DispatchAsync(PacketRequest pCapsule)
-    {
-        var action = (CodeTerbinProtocol)pCapsule.ActionMethod;
-        if (!_dispatchers.TryGetValue(action, out var dispatcher))
-        {
-            pCapsule.Head.Status = CodeStatus.ActionNotFound;
-            return Task.FromResult(pCapsule);
-        }
-        return dispatcher.DispatchAsync(pCapsule);
     }
 
     public static void RegisterFromAssembly(Assembly pAssembly)

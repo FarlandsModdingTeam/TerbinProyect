@@ -83,6 +83,14 @@ public class Serialineitor
     }
 
 
+    public static ushort GetArraySize<T>(ushort pLength) where T : unmanaged
+    {
+        return (ushort)(pLength * Unsafe.SizeOf<T>());
+    }
+    public static ushort GetArraySize<T>(int pLength) where T : unmanaged
+    {
+        return (ushort)(pLength * Unsafe.SizeOf<T>());
+    }
 
 
 

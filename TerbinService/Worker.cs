@@ -49,7 +49,7 @@ public class Worker : BackgroundService
         // No habria que registrar tambien al crear uno nuevo?????
         try
         {
-            //TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+            TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
 
             var communicator = new TerbinCommunicator(true, pTokenCancellation);
             communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
@@ -78,6 +78,6 @@ public class Worker : BackgroundService
         });
         Console.WriteLine("[Worker] Stopping execution...");
         pHead.Status = CodeStatus.Succes;
-        return new PacketRequest(pHead, (byte)CodeTerbinProtocol.None, 1);
+        return new PacketRequest(pHead, (byte)CodeTerbinProtocol.None, (byte)CodeTerbinMemory.NotAsign);
     }
 }

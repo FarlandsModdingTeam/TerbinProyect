@@ -30,7 +30,7 @@ public class BufferWriter
             throw new ArgumentOutOfRangeException(nameof(pBuffer),
                 "There is not enough space in the buffer to write the length of the array.");
 
-        BitConverter.TryWriteBytes(pBuffer[pOffset..], (ushort)(pArray?.Length ?? 0));
+        BitConverter.TryWriteBytes(pBuffer[pOffset..], Serialineitor.GetArraySize<T>(pArray?.Length ?? 0));
         pOffset += 2;
 
         Span<byte> bytes = MemoryMarshal.AsBytes(pArray.AsSpan());
@@ -89,7 +89,7 @@ public static class BufferWriterExtension
         MemoryMarshal.Write(pBuffer, in pValue);
 
         pBuffer = pBuffer[Unsafe.SizeOf<T>()..];
-        return BufferErrorCode.None;
+        return BufferErrorCode.Succes;
     }
     public static BufferErrorCode WriteArray<T>(this ref Span<byte> pBuffer, T[] pArray)
         where T : unmanaged
@@ -97,7 +97,7 @@ public static class BufferWriterExtension
         if (pArray?.Length > ushort.MaxValue)
             return BufferErrorCode.SurpassesMax;
 
-        pBuffer.Write((ushort)(pArray?.Length ?? 0));
+        pBuffer.Write(Serialineitor.GetArraySize<T>(pArray?.Length ?? 0));
 
         if (pArray != null && pArray.Length > 0)
         {
@@ -110,7 +110,7 @@ public static class BufferWriterExtension
 
             pBuffer = pBuffer[bytes.Length..];
         }
-        return BufferErrorCode.None;
+        return BufferErrorCode.Succes;
     }
     public static BufferErrorCode WriteStruct<T>(this ref Span<byte> pBuffer, T pStruct)
         where T : struct, IStructSerializable
@@ -123,7 +123,7 @@ public static class BufferWriterExtension
         strucBytes.CopyTo(pBuffer);
 
         pBuffer = pBuffer[strucBytes.Length..];
-        return BufferErrorCode.None;
+        return BufferErrorCode.Succes;
     }
 
 
@@ -146,10 +146,10 @@ public static class BufferWriterExtension
 
 
 
-public enum BufferErrorCode : byte
+public enum BufferErrorCode : sbyte
 {
-    None = 0,
+    BufferSmall = -1,
+    SurpassesMax = -2,
 
-    BufferSmall = 1,
-    SurpassesMax = 2,
+    Succes = 0,
 }

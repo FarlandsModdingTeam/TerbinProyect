@@ -1,11 +1,13 @@
-﻿using TerbinLibrary.Communication;
-using TerbinLibrary.Execution;
+﻿using Newtonsoft.Json.Linq;
 using System.Reflection;
-using TerbinLibrary.Serialize;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using TerbinLibrary;
+using TerbinLibrary.Communication;
+using TerbinLibrary.Configuration;
+using TerbinLibrary.Execution;
+using TerbinLibrary.Serialize;
 
-
-await Task.Delay(1000);
 
 
 var communicator = new TerbinCommunicator(false);
@@ -22,7 +24,6 @@ else
     return;
 }
 
-await Task.Delay(1000);
 
 while (true)
 {
@@ -46,10 +47,25 @@ while (true)
     if (input2 != byte.MaxValue)
     {
         // Incluye input2 al inicio del mensaje
-        var baseMsg = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
-        menssaje = new byte[baseMsg.Length + 1];
-        menssaje[0] = input2;
-        Array.Copy(baseMsg, 0, menssaje, 1, baseMsg.Length);
+        int size = (Serialineitor.GetArraySize<char>("matenme".Length + TerbinConfiguration.RUTE_FARLANDS.ToCharArray().Length)) + 5;
+        menssaje = new byte[size];
+        Span<byte> m = menssaje;
+        BufferErrorCode er;
+        er = m.Write<byte>(input2);
+        if (er != BufferErrorCode.Succes)
+            Console.WriteLine($"1Error: {er}");
+        er = m.WriteArray<char>(TerbinConfiguration.RUTE_FARLANDS.ToCharArray());
+        if (er != BufferErrorCode.Succes)
+            Console.WriteLine($"2Error: {er}");
+        er = m.WriteArray<char>("matenme".ToCharArray());
+        if (er != BufferErrorCode.Succes)
+            Console.WriteLine($"3Error: {er}");
+        //var keyMsg = Serialineitor.SerializeArray<char>(TerbinConfiguration.RUTE_FARLANDS.ToCharArray());
+        //var baseMsg = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
+        //menssaje = new byte[keyMsg.Length + baseMsg.Length + 1];
+        //menssaje[0] = input2;
+        //Array.Copy(keyMsg, 0, menssaje, 1, keyMsg.Length);
+        //Array.Copy(baseMsg, 0, menssaje, keyMsg.Length, baseMsg.Length);
     }
     else
     {

@@ -39,7 +39,7 @@ public class ConfiguratonTerbin
                 pParameters.ToArray());
         }
 
-        ReadOnlySpan<byte> recived = pParameters.ToArray();
+        ReadOnlySpan<byte> recived = pParameters;
         string keyRute = recived.ReadArray<char>().CrString();
         string newRute = recived.ReadArray<char>().CrString();
 
@@ -69,7 +69,7 @@ public class ConfiguratonTerbin
     public static async Task<PacketRequest> ReadRute(Header pHead, byte[] pParameters)
     {
         byte[] pld;
-        string keyRute = new(Serialineitor.DeserializeArray<char>(pParameters.ToArray()));
+        string keyRute = new(Serialineitor.DeserializeArray<char>(pParameters));
         if (ManagerConfiguration.GetConfg(keyRute) is var rute && rute != null)
         {
             pld = Serialineitor.SerializeArray<char>(rute.ToCharArray());

@@ -100,6 +100,7 @@ public enum TerbinCRUD : byte
     Deleted = 9,
 }
 
+// Creo que None y NotAsign es lo mismo.
 public enum CodeTerbinMemory : byte
 {
     None = 0,
