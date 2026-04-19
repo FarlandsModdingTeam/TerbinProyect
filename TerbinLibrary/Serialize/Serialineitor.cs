@@ -81,4 +81,14 @@ public class Serialineitor
         int offset = 0;
         return BufferReader.GetArray<T>(pArray, ref offset);
     }
+
+
+
+
+
+    public static byte[] Serialize<T>(T pValue)
+    {
+
+        throw new NotImplementedException("Ñe");
+    }
 }

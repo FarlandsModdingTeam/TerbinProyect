@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -20,9 +21,31 @@ namespace TerbinLibrary.Data;
  */
 
 
+public enum CodeAcessJSonDel : sbyte
+{
+    NotExistKey = -1,
+    Fail = 0,
+    Succes = 1,
+}
+public enum CodeAcessJSonSave : sbyte
+{
+    ErrorSerialize = -1,
+    NotExistKey = 0,
+    Succes = 1,
+}
+
 public class AcessJSon
 {
     private static Dictionary<string, string> _places = new Dictionary<string, string>();
+
+    public string? this[string pKeyDir] // XD
+    {
+        get => Get(pKeyDir);
+        set
+        {
+            if (value != null) Set(pKeyDir, value);
+        }
+    }
 
     public static string? Get(string pKeyDir)
     {
@@ -44,12 +67,6 @@ public class AcessJSon
     }
 
 
-    public enum CodeAcessJSonDel : sbyte
-    {
-        NotExistKey = -1,
-        Fail = 0,
-        Succes = 1,
-    }
     public static CodeAcessJSonDel Del(string pKeyDir)
     {
         lock (_places)
@@ -78,12 +95,6 @@ public class AcessJSon
     }
 
 
-    public enum CodeAcessJSonSave : sbyte
-    {
-        ErrorSerialize = -1,
-        NotExistKey = 0,
-        Succes = 1,
-    }
     public static CodeAcessJSonSave Save<T>(string pKeyDir, string pFile, T pContent) where T : class
     {
         string? dir = getDir(pKeyDir);

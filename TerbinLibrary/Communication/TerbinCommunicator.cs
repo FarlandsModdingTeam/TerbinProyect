@@ -37,7 +37,7 @@ namespace TerbinLibrary.Communication;
  */
 
 // TODO: Revisar si una respuesta manda IdMemory en None o Undefined pero payload es mas largo, cambiar eso para mandar en tanda.
-// TODO: Llamar a si mismo. (IMPORTANTE)
+// TODO: Llamar a si mismo.
 
 public class TerbinCommunicator : IDisposable
 {

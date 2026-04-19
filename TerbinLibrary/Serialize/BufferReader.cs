@@ -48,6 +48,7 @@ public class BufferReader
     }
 }
 
+// TODO: Usar "out" para devolver el byte[] y asin funcionar directamente con arrays.
 public static class BufferReaderExtension
 {
     public static T[] ReadArray<T>(this ref ReadOnlySpan<byte> pBuffer)

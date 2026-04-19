@@ -10,8 +10,8 @@ public enum CodeMethodsTerbinService : byte
     CreateInstance = 10,
     DeleteInstance = 11,
 
-    ChangeFarladsRute = 100,
-    ChangeInstancesRute = 101,
+    //ChangeFarladsRute = 100,
+    //ChangeInstancesRute = 101,
 }
 
 public enum CodeServices : byte
@@ -25,4 +25,7 @@ public enum CodeServices : byte
     InstancesRute = 31,
 
     FCM = 40,
+
+
+    Rute = 110,
 }

@@ -137,7 +137,7 @@ public enum CodeStatus : short
     ActionNotFound = 440,
 
 
-    GenericWorkerError = 500,
+    InternalWorkerError = 500,
     ExecutionError = 501,
     ErrorNotPayload = 502,
     SerializeError = 503,
