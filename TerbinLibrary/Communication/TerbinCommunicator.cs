@@ -100,7 +100,7 @@ public class TerbinCommunicator : IDisposable
     }
 
     // ****************************( Construct )**************************** //
-    public TerbinCommunicator(bool pIsServer = false, CancellationToken pTokenCancellation = default, string pName = "TerbinPipe")
+    public TerbinCommunicator(Assembly pAssembly, bool pIsServer = false, CancellationToken pTokenCancellation = default, string pName = "TerbinPipe")
     {
         IsServer = pIsServer;
         _stopToken = pTokenCancellation;
@@ -116,7 +116,7 @@ public class TerbinCommunicator : IDisposable
         _writer = new StreamWriteStruct(_thePipe);
         _reader = new StreamReadStruct(_thePipe);
 
-        TerbinExecutor.Init(this);
+        TerbinExecutor.Init(pAssembly, this);
         if (pIsServer)
             _ = manageConnectClient();
     }
@@ -192,8 +192,12 @@ public class TerbinCommunicator : IDisposable
         //return TerbinErrorCode.None;
     }
 
-    public async Task<PacketRequest?> HandleSendFragment(byte pActionMethod, byte[] pPayload, ushort pIdRequest, CodeStatus pStatus, bool pRecuperate = true)
+    public async Task<PacketRequest?> HandleSendFragment(byte pActionMethod, byte[] pPayload, ushort pIdRequest, CodeStatus pStatus)
     {
+        var check = await Communicate(pActionMethod, [], CodeStatus.CheckExecution);
+        if (check.Head.Status != CodeStatus.Succes)
+            return check;
+
         var request = await soliciteRequestMemory();
         if (request.Head.Status != CodeStatus.Succes || request.Payload.Length <= 0)
             return request;

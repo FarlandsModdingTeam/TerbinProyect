@@ -25,6 +25,7 @@ public class TerbinProtocol
 
     public const byte LENGTH_ARRAY = 3;
 
+    /*
     public static async Task InitProtocol(CancellationToken pTokenCancellation)
     {
         await autoCreatePipe(pTokenCancellation);
@@ -34,7 +35,7 @@ public class TerbinProtocol
     {
         try
         {
-            var communicator = new TerbinCommunicator(true, pTokenCancellation);
+            var communicator = new TerbinCommunicator(Assembly.GetExecutingAssembly(), true, pTokenCancellation);
             communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
             communicator.OnNewClientConnect += async () =>
             {
@@ -45,7 +46,7 @@ public class TerbinProtocol
         {
             Console.WriteLine($"[Worker] Error-> {e.Message}");
         }
-    }
+    }*/
 }
 
 [Flags]
@@ -150,6 +151,7 @@ public enum CodeStatus : short
 
     Execute = 300, // Hace mucha falta.
     Info = 301,
+    CheckExecution = 302,
 
     BadRequest = 400,
     NotFound = 404,

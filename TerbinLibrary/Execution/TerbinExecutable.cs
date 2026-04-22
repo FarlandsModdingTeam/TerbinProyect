@@ -19,9 +19,21 @@ namespace TerbinLibrary.Execution;
   empieza: menorculas = privada.
  */
 
+public interface IExecutableAttribute
+{
+
+}
+
+public interface IExecutableDispatcher
+{
+    // public void Register(byte pEntity, ExecutableHandler pHandler);
+    // public bool Unregister(byte pEntity);
+}
+
+
 // TODO: AllowMultiple in true.
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class TerbinExecutableAttribute : Attribute
+public sealed class TerbinExecutableAttribute : Attribute, IExecutableAttribute
 {
     public byte Action { get; } // CodeAction
 
@@ -32,7 +44,74 @@ public sealed class TerbinExecutableAttribute : Attribute
 }
 
 
-public sealed class ExecutableDispatcher
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
+public sealed class TerbinCRUDAttribute : Attribute, IExecutableAttribute
+{
+    /// <summary>
+    /// Create, Read, Update, Deleted
+    /// </summary>
+    public CodeTerbinProtocol Action { get; }
+    public byte Entity { get; }
+
+    public TerbinCRUDAttribute(CodeTerbinProtocol pAction, byte pEntity)
+    {
+        Action = pAction;
+        Entity = pEntity;
+    }
+}
+public sealed class TerbinExecutableDispatcher_Testing : IExecutableDispatcher
+{
+    private readonly ConcurrentDictionary<byte, ExecutableHandler> _handlers = new();
+
+    public byte Action { get; }
+
+    public TerbinExecutableDispatcher_Testing(byte pAction)
+    {
+        Action = pAction;
+    }
+
+    public void Register(byte pEntity, ExecutableHandler pHandler)
+    {
+        if (pHandler is null) throw new ArgumentNullException(nameof(pHandler));
+        _handlers[pEntity] = pHandler;
+    }
+
+    public bool Unregister(byte pEntity) => _handlers.TryRemove(pEntity, out _);
+
+    // TODO: ya tengo el pAction, como tal no hay que pasarlo, (areglar).
+    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte pAction, byte[] pPayload)
+    {
+        tryGetEntity(pPayload, out var entity, out var memo);
+
+        if (!_handlers.TryGetValue(entity, out var handler))
+        {
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.SubActionNotFound);
+        }
+
+        try
+        {
+            return await handler(pHead, memo).ConfigureAwait(false);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"[TerbinExecutableCRUDDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionError);
+        }
+    }
+
+    private static bool tryGetEntity(byte[] pPayload, out byte pEntity, out byte[] pMemory)
+    {
+        pEntity = pPayload[0];
+        int bodyLength = pPayload.Length - 1;
+        pMemory = new byte[bodyLength];
+        if (bodyLength > 0)
+            Array.Copy(pPayload, 1, pMemory, 0, bodyLength);
+        return true;
+    }
+}
+
+
+public sealed class ExecutableDispatcher : IExecutableDispatcher
 {
     private static readonly ConcurrentDictionary<byte, ExecutableHandler> _handlers = new();
 
@@ -63,6 +142,8 @@ public sealed class ExecutableDispatcher
         try
         {
             Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {memo.Length}"); //Encoding.UTF8.GetString(memo)
+            if (pCapsule.Head.Status == CodeStatus.CheckExecution)
+                return InfoResponse.CreateSucces(pCapsule.Head.IdRequest);
 
             if (pCapsule.ActionMethod == (byte)CodeTerbinProtocol.Response)
             {

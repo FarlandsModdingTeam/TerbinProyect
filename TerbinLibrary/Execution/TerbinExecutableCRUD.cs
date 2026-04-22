@@ -20,27 +20,11 @@ namespace TerbinLibrary.Execution;
 // TODO: CRUD no deberia manejar memoria, eso lo hace TerbinExecutable normal.
 // TODO: Que no esta jarcodeado el CRUD y que pueda ser cualquier byte.
 
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class TerbinCRUDAttribute : Attribute
-{
-    /// <summary>
-    /// Create, Read, Update, Deleted
-    /// </summary>
-    public CodeTerbinProtocol Action { get; }
-    public byte Entity { get; }
-
-    public TerbinCRUDAttribute(CodeTerbinProtocol pAction, byte pEntity)
-    {
-        Action = pAction;
-        Entity = pEntity;
-    }
-}
-
 /// <summary>
 /// Dispatcher instanciable para una acción CRUD concreta.
 /// La clave interna es Entity (primer byte del payload).
 /// </summary>
-public sealed class TerbinExecutableCRUDDispatcher
+public sealed class TerbinExecutableCRUDDispatcher : IExecutableDispatcher
 {
     private readonly ConcurrentDictionary<byte, ExecutableHandler> _handlers = new();
 

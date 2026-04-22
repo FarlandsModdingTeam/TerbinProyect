@@ -13,20 +13,24 @@ public static class TerbinExecutor
 {
     private static TerbinCommunicator? _communicator;
 
-    public static void Init(TerbinCommunicator pCommunicator)
+    public static void Init(Assembly pAssembly, TerbinCommunicator pCommunicator)
     {
-        RegisterAll();
+        RegisterInternal();
+        Register(pAssembly);
         _communicator = pCommunicator;
     }
 
     // TODO: perdirle a Luis que sea mi tutor.
 
-    public static void RegisterAll()
+    public static void RegisterInternal()
     {
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
-        //ExecutableDispatcher.RegisterFromAssembly(pAssembly);
         TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
-        //TerbinExecutableCRUDManager.RegisterFromAssembly(pAssembly);
+    }
+    public static void Register(Assembly pAssembly)
+    {
+        ExecutableDispatcher.RegisterFromAssembly(pAssembly);
+        TerbinExecutableCRUDManager.RegisterFromAssembly(pAssembly);
     }
 
     public static async Task<InfoResponse?> Execution(PacketRequest pRequest)
