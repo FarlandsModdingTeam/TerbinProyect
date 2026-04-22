@@ -35,8 +35,8 @@ public static class TerbinExecutableHelper
             return TerbinErrorCode.None;
         }
         var codeError = TryAssembleStream(pCapsule, out pMemory);
-        // if (!TryReleaseMemory(pCapsule.Head.IdMemory))
-        //     codeError = (codeError != TerbinErrorCode.None) ? TerbinErrorCode.MemoryReleaseFailed : codeError;
+        if (!TryReleaseMemory(pCapsule.Head.IdMemory))
+            codeError = (codeError != TerbinErrorCode.None) ? TerbinErrorCode.MemoryReleaseFailed : codeError;
         return codeError;
     }
 

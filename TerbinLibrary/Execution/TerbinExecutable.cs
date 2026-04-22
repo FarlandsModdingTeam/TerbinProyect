@@ -58,19 +58,13 @@ public sealed class ExecutableDispatcher
 
         if (TerbinExecutableHelper.TryGetMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
         {
-            TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
-            pCapsule.ToResponseError(CodeStatus.ErrorGetPaylaodMemory);
+            var error = (r == TerbinErrorCode.MemoryReleaseFailed) ? CodeStatus.ErrorReleaseMemory : CodeStatus.ErrorGetPaylaodMemory;
+            pCapsule.ToResponseError(error);
             return pCapsule;
         }
         
         try
         {
-            if (!TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory))
-            {
-                pCapsule.ToResponseError(CodeStatus.ErrorReleaseMemory);
-                return pCapsule;
-            }
-
             Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {memo.Length}"); //Encoding.UTF8.GetString(memo)
 
             if (pCapsule.ActionMethod == (byte)CodeTerbinProtocol.Response)
