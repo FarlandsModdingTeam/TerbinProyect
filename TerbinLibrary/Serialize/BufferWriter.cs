@@ -22,16 +22,16 @@ public class BufferWriter
     public static void AddArray<T>(Span<byte> pBuffer, ref int pOffset, T[] pArray)
         where T : unmanaged
     {
-        if (pArray?.Length > ushort.MaxValue)
-            throw new InvalidOperationException("Array surpasses ushort max");
+        if (pArray?.Length > ThreeQuartersInt.MaxValue)
+            throw new InvalidOperationException("Array surpasses ThreeQuartersInt max");
 
-        // Validar que hay al menos 2 bytes para escribir la longitud
-        if (pBuffer.Length - pOffset < 2)
+        // Validar que hay al menos 3 bytes para escribir la longitud
+        if (pBuffer.Length - pOffset < TerbinProtocol.LENGH_ARRAY)
             throw new ArgumentOutOfRangeException(nameof(pBuffer),
                 "There is not enough space in the buffer to write the length of the array.");
 
         BitConverter.TryWriteBytes(pBuffer[pOffset..], Serialineitor.GetArraySize<T>(pArray?.Length ?? 0));
-        pOffset += 2;
+        pOffset += TerbinProtocol.LENGH_ARRAY;
 
         Span<byte> bytes = MemoryMarshal.AsBytes(pArray.AsSpan());
 
@@ -58,14 +58,14 @@ public class BufferWriter
     }
 
 
-
+    // ¿Para que servia?
     public static void EnsureWrite<T>(ref byte[] buffer, int offset, T value) where T : unmanaged
     {
         int size = Unsafe.SizeOf<T>();
         if (buffer.Length - offset < size)
         {
             // Crear uno más grande y copiar el contenido
-            var newBuffer = new byte[buffer.Length * 2 + size];
+            var newBuffer = new byte[buffer.Length * 2 + size]; // ¿El 2 debria actualizarlo a 3?
             Buffer.BlockCopy(buffer, 0, newBuffer, 0, buffer.Length);
             buffer = newBuffer;
         }
@@ -94,7 +94,7 @@ public static class BufferWriterExtension
     public static BufferErrorCode WriteArray<T>(this ref Span<byte> pBuffer, T[] pArray)
         where T : unmanaged
     {
-        if (pArray?.Length > ushort.MaxValue)
+        if (pArray?.Length > ThreeQuartersInt.MaxValue)
             return BufferErrorCode.SurpassesMax;
 
         pBuffer.Write(Serialineitor.GetArraySize<T>(pArray?.Length ?? 0));

@@ -43,6 +43,7 @@ public class ConfiguratonTerbin
         string keyRute = recived.ReadArray<char>().CrString();
         string newRute = recived.ReadArray<char>().CrString();
 
+        Console.WriteLine($"Memo: {newRute}");
         if (newRute == null)
         {
             pHead.Status = CodeStatus.ErrorNotPayload;

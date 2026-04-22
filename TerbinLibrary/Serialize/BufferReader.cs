@@ -21,7 +21,7 @@ public class BufferReader
     public static T[] GetArray<T>(ReadOnlySpan<byte> pBuffer, ref int pOffset)
         where T : unmanaged
     {
-        ushort length = Get<ushort>(pBuffer, ref pOffset);
+        ThreeQuartersInt length = Get<ThreeQuartersInt>(pBuffer, ref pOffset);
 
         //int byteLength = length * Unsafe.SizeOf<T>();
         var slice = pBuffer.Slice(pOffset, length);
@@ -41,7 +41,7 @@ public class BufferReader
     public static T GetStruct<T>(ReadOnlySpan<byte> pBuffer, ref int pOffset, T pStruct)
         where T : struct, IStructSerializable
     {
-        var lenth = pStruct.GetSize();
+        ThreeQuartersInt lenth = pStruct.GetSize();
         T newStruct = Serialineitor.DeserializeStruct<T>(pBuffer[pOffset..(pOffset+lenth)].ToArray());
         pOffset += lenth;
         return newStruct;
@@ -54,7 +54,7 @@ public static class BufferReaderExtension
     public static T[] ReadArray<T>(this ref ReadOnlySpan<byte> pBuffer)
         where T : unmanaged
     {
-        ushort length = pBuffer.Read<ushort>();
+        ThreeQuartersInt length = pBuffer.Read<ThreeQuartersInt>();
         //int byteLength = length * Unsafe.SizeOf<T>();
 
         T[] newArray = MemoryMarshal.Cast<byte, T>(pBuffer[..length]).ToArray();

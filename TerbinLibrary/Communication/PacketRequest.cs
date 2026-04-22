@@ -50,13 +50,12 @@ public struct Header // la memoria es constante es unmanaged.
         byte pIdMemory = (byte)CodeTerbinMemory.Undefined)
     {
         IdRequest = (pIdRequest == 0) ? (ushort)1 : pIdRequest;
-        OrderRequest = pOrderRequest ?? 0;
+        OrderRequest = pOrderRequest ?? TerbinProtocol.ORDER_SINGLE;
         Status = pStatus;
         //MaximusTime = pMaximusTime;
         IdMemory = pIdMemory;
     }
 }
-
 
 
 // TODO: Hacerles getter y setters + valor predeterminado, con eso nos olvidamos del constructor.
@@ -93,7 +92,7 @@ public struct PacketRequest : IStructSerializable
 
     // Header + bye + byte + ushort + byte[]
     // 7 + 1 + 0 + 2 + Length
-    public int GetSize() => 10 + (Payload?.Length ?? 0);
+    public ThreeQuartersInt GetSize() => 10 + (Payload?.Length ?? 0);
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
@@ -109,6 +108,13 @@ public struct PacketRequest : IStructSerializable
         ActionMethod =  pBuffer.Read<byte>(ref offset);
         //IdMemory =      pBuffer.Read<byte>(ref offset);
         Payload =       pBuffer.ReadArray<byte>(ref offset);
+    }
+
+    public void ClearPLD()
+    {
+        Head.OrderRequest = TerbinProtocol.ORDER_SINGLE;
+        Head.IdMemory = (byte)CodeTerbinMemory.NotAsign;
+        Payload = [];
     }
 
     // ¿?

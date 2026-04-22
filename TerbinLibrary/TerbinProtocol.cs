@@ -9,8 +9,8 @@ namespace TerbinLibrary;
 
 public class TerbinProtocol
 {
-    public const ushort MAX_PLD = 0xFFF; // ¡Vamos Miura!
-    public const ushort FRAGMENT_IN = 0xFFF;
+    public const ushort MAX_PLD = 0x4; // ¡Vamos Miura!
+    public const ushort FRAGMENT_IN = 0x4; // 0xFFF
     public const double FRAGMENT_IN__MULTIPLICATE_INVERSE = 1.0D / FRAGMENT_IN;
 
     public const ushort ORDER_SINGLE = ushort.MinValue;
@@ -23,6 +23,7 @@ public class TerbinProtocol
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
 
+    public const byte LENGH_ARRAY = 3;
 
     public static async Task InitProtocol(CancellationToken pTokenCancellation)
     {
@@ -65,11 +66,28 @@ public enum CodeTypeData : byte
     uLong   = 0b0000111_0,
 
     Float   = 0b0001000_0,
-    Doueble = 0b0001001_0,
+    Double  = 0b0001001_0,
     Decimal = 0b0001010_0,
 
     Char    = 0b0001011_0,
 }
+
+
+[Flags]
+public enum CodeTypeNumber : byte
+{
+    Singles = 0b000000_0_0,
+    Array   = 0b000000_0_1,
+
+    WithSign= 0b000000_0_0,
+    NoSign  = 0b000000_1_0,
+
+    b8      = 0b000000_0_0,
+    b16     = 0b000001_0_0,
+    b32     = 0b000010_0_0,
+    b64     = 0b000011_0_0,
+}
+
 
 /// <summary>
 /// 0 -> 9 | 
@@ -82,7 +100,9 @@ public enum CodeTerbinProtocol : byte
     Load = 2,
     Cancel = 3,
     Solicit = 4,
-    Info = 5,
+
+    // TODO: tratar como los CRUD.
+    Info = 5, // informar del cliente que por ejemplo otro cliente ah cambiado cierta la configuracion.
 
     // Si puede ayudar a ahorrarte fuciones.
     // C.R.U.D for you: 
@@ -107,6 +127,7 @@ public enum CodeTerbinMemory : byte
     NotAsign = 1,
     New = 2,
     Undefined = 3, // Literaly
+    ErrorRecuperate = 4,
 
     Undefined4 = 4,
     Undefined5 = 5,
@@ -120,7 +141,7 @@ public enum CodeTerbinMemory : byte
     1xx → Informativos
     2xx → Éxito (ej. 200 OK)
     3xx → Redirecciones
-    4xx → Error del cliente (ej. 404 Not Found)
+    4xx → Error en la solicitud. (ej. 404 Not Found)
     5xx → Error del worker (ej. 500 Internal Server Error)
  */
 public enum CodeStatus : short
@@ -145,6 +166,9 @@ public enum CodeStatus : short
     AccesNullOrNotExist = 504,
 
     OverMaximumTime = 555,
+
+    ErrorSoliciteMemory = 570,
+    ErrorGetPaylaodMemory = 571,
 }
 
 

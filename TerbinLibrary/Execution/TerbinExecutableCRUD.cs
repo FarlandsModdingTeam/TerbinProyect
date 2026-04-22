@@ -18,6 +18,7 @@ namespace TerbinLibrary.Execution;
 
 
 // TODO: CRUD no deberia manejar memoria, eso lo hace TerbinExecutable normal.
+// TODO: Que no esta jarcodeado el CRUD y que pueda ser cualquier byte.
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
 public sealed class TerbinCRUDAttribute : Attribute

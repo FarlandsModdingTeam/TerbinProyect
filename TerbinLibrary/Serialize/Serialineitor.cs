@@ -19,7 +19,7 @@ namespace TerbinLibrary.Serialize;
 
 public interface IStructSerializable
 {
-    int GetSize();
+    ThreeQuartersInt GetSize();
     void WriteTo(Span<byte> pBuffer);
     void ReadFrom(ReadOnlySpan<byte> pBuffer);
 }
@@ -32,7 +32,7 @@ public class Serialineitor
         int size = Marshal.SizeOf(pStruct);
         byte[] arr = new byte[size];
 
-        IntPtr ptr = Marshal.AllocHGlobal(size);
+        nint ptr = Marshal.AllocHGlobal(size);
         Marshal.StructureToPtr(pStruct, ptr, true);
         Marshal.Copy(ptr, arr, 0, size);
         Marshal.FreeHGlobal(ptr);
@@ -43,7 +43,7 @@ public class Serialineitor
     {
         T newStruct = default;
 
-        IntPtr ptr = Marshal.AllocHGlobal(pBytes.Length);
+        nint ptr = Marshal.AllocHGlobal(pBytes.Length);
         Marshal.Copy(pBytes, 0, ptr, pBytes.Length);
 
         newStruct = Marshal.PtrToStructure<T>(ptr);
@@ -71,7 +71,7 @@ public class Serialineitor
         where T : unmanaged
     {
         int offset = 0;
-        byte[] newArray = new byte[pArray.Length * Unsafe.SizeOf<T>() + 2];
+        byte[] newArray = new byte[pArray.Length * Unsafe.SizeOf<T>() + TerbinProtocol.LENGH_ARRAY];
         BufferWriter.AddArray<T>(newArray, ref offset, pArray);
         return newArray.ToArray();
     }
@@ -83,13 +83,13 @@ public class Serialineitor
     }
 
 
-    public static ushort GetArraySize<T>(ushort pLength) where T : unmanaged
+    public static ThreeQuartersInt GetArraySize<T>(ThreeQuartersInt pLength) where T : unmanaged
     {
-        return (ushort)(pLength * Unsafe.SizeOf<T>());
+        return (ThreeQuartersInt)(pLength * Unsafe.SizeOf<T>());
     }
-    public static ushort GetArraySize<T>(int pLength) where T : unmanaged
+    public static ThreeQuartersInt GetArraySize<T>(int pLength) where T : unmanaged
     {
-        return (ushort)(pLength * Unsafe.SizeOf<T>());
+        return (ThreeQuartersInt)(pLength * Unsafe.SizeOf<T>());
     }
 
 

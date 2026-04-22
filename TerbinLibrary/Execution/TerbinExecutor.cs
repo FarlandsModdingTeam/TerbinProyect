@@ -58,8 +58,8 @@ public class TerbinExecutor
         }
 
 
-        pHead.Status = CodeStatus.NotFound;
-        return new PacketRequest(pHead: pHead, pActionMethod: (byte)CodeTerbinProtocol.Info);
+        pHead.Status = CodeStatus.Succes;
+        return new PacketRequest(pHead: pHead, pActionMethod: (byte)CodeTerbinProtocol.None);
     }
 
 

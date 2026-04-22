@@ -3,7 +3,9 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
+using TerbinLibrary.Extension;
 using TerbinLibrary.Memory;
+using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Execution;
 /*
@@ -50,15 +52,20 @@ public sealed class ExecutableDispatcher
         {
             pCapsule.Head.Status = CodeStatus.ActionNotFound;
             tryReleaseMemory(pCapsule.Head.IdMemory);
+            pCapsule.ClearPLD();
             return pCapsule;
         }
 
-        if (!tryGetMemoryStream(pCapsule, out var memo))
+        if (getMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
         {
-            // TODO: Controlar.
+            pCapsule.Head.Status = CodeStatus.ErrorGetPaylaodMemory;
+            pCapsule.ClearPLD();
+            return pCapsule;
         }
+        
         try
         {
+            Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {memo.Length}"); //Encoding.UTF8.GetString(memo)
             return await handler(pCapsule.Head, memo)
                 .ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
         }
@@ -70,33 +77,38 @@ public sealed class ExecutableDispatcher
         }
     }
 
-    private static bool tryGetMemoryStream(PacketRequest pCapsule, out byte[] pMemory)
+    [Obsolete]
+    private static TerbinErrorCode tryGetMemoryStream(PacketRequest pCapsule, out byte[] pMemory)
     {
-        pMemory = getMemoryStream(pCapsule);
-        return tryReleaseMemory(pCapsule.Head.IdMemory);
+        var error = getMemoryStream(pCapsule, out pMemory);
+        if (error != TerbinErrorCode.None)
+            tryReleaseMemory(pCapsule.Head.IdMemory);
+        return error;
     }
 
-    private static byte[] getMemoryStream(PacketRequest pCapsule)
+    private static TerbinErrorCode getMemoryStream(PacketRequest pCapsule, out byte[] pMemory)
     {
+        // Si es paquete individual, recibe devuelve su PLD.
         if (pCapsule.Head.OrderRequest != TerbinProtocol.FINAL_PACKET)
         {
-            var payload = pCapsule.Payload ?? Array.Empty<byte>();
-            var copy = new byte[payload.Length];
-            if (payload.Length > 0)
-                Array.Copy(payload, copy, payload.Length);
-            return copy;
+            pMemory = pCapsule.Payload ?? Array.Empty<byte>();
+            return TerbinErrorCode.None;
         }
+        return tryAssembleStream(pCapsule, out pMemory);
+    }
 
+    private static TerbinErrorCode tryAssembleStream(PacketRequest pCapsule, out byte[] pMemory)
+    {
         if (TerbinMemory.TryGetResult(pCapsule.Head.IdMemory, out var bytes) is var r && r.succes)
         {
-            return combinePayload(pCapsule, bytes);
+            pMemory = combinePayload(pCapsule, bytes);
+            return TerbinErrorCode.None;
         }
         else
         {
-            // TODO: Logger.
+            pMemory = [];
+            return r.typeError;
         }
-
-        return Array.Empty<byte>();
     }
 
     public static byte[] combinePayload(PacketRequest pCapsule, byte[] pBytes)
@@ -104,10 +116,10 @@ public sealed class ExecutableDispatcher
         var payload = pCapsule.Payload ?? Array.Empty<byte>();
         pBytes = pBytes ?? Array.Empty<byte>();
         byte[] result = new byte[payload.Length + pBytes.Length];
-        if (payload.Length > 0)
-            Buffer.BlockCopy(payload, 0, result, 0, payload.Length);
         if (pBytes.Length > 0)
-            Buffer.BlockCopy(pBytes, 0, result, payload.Length, pBytes.Length);
+            Buffer.BlockCopy(pBytes, 0, result, 0, pBytes.Length);
+        if (payload.Length > 0)
+            Buffer.BlockCopy(payload, 0, result, pBytes.Length, payload.Length);
         return result; // [.. pBytes, .. pCapsule.Payload]
     }
 
