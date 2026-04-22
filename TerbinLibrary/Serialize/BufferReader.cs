@@ -25,7 +25,6 @@ public class BufferReader
 
         if (length == 0) return Array.Empty<T>();
 
-        //int byteLength = length * Unsafe.SizeOf<T>();
         // la longitud es de BYTES (Serialineitor.GetArraySize multiplicó por el SizeOf<T>) 
         var slice = pBuffer.Slice(pOffset, length);
 
@@ -58,7 +57,6 @@ public static class BufferReaderExtension
         where T : unmanaged
     {
         ThreeQuartersInt length = pBuffer.Read<ThreeQuartersInt>();
-        //int byteLength = length * Unsafe.SizeOf<T>();
 
         T[] newArray = MemoryMarshal.Cast<byte, T>(pBuffer[..length]).ToArray();
         pBuffer = pBuffer[length..];

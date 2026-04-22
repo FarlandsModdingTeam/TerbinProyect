@@ -24,9 +24,6 @@ namespace TerbinService.Configuration;
 
 public class ConfiguratonTerbin
 {
-    // TODO: Tener ruta predeterminada para ambos.
-
-
     [TerbinCRUD(CodeTerbinProtocol.Update, (byte)CodeServices.Rute)]
     public static async Task<PacketRequest> UpdateRute(Header pHead, byte[] pParameters)
     {
