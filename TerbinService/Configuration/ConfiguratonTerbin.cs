@@ -30,9 +30,9 @@ public class ConfiguratonTerbin
         if (pParameters.Length <= 0)
         {
             pHead.Status = CodeStatus.ErrorNotPayload;
+            pHead.IdMemory = (byte)CodeTerbinMemory.None;
             return new PacketRequest(pHead,
                 (byte)CodeTerbinProtocol.Update,
-                (byte)CodeTerbinMemory.None,
                 pParameters.ToArray());
         }
 
@@ -44,9 +44,9 @@ public class ConfiguratonTerbin
         if (newRute == null)
         {
             pHead.Status = CodeStatus.ErrorNotPayload;
+            pHead.IdMemory = (byte)CodeTerbinMemory.None;
             return new PacketRequest(pHead,
                 (byte)CodeTerbinProtocol.Update,
-                (byte)CodeTerbinMemory.None,
                 pParameters.ToArray());
         }
         var result = ManagerConfiguration.SetConfig(keyRute, newRute);
@@ -57,9 +57,9 @@ public class ConfiguratonTerbin
         else
             pHead.Status = CodeStatus.AccesNullOrNotExist;
 
+        pHead.IdMemory = (byte)CodeTerbinMemory.None;
         return new PacketRequest(pHead,
             (byte)CodeTerbinProtocol.Update,
-            (byte)CodeTerbinMemory.None,
             []);
     }
 
@@ -71,9 +71,9 @@ public class ConfiguratonTerbin
         if (string.IsNullOrEmpty(keyRute))
         {
             pHead.Status = CodeStatus.ErrorNotPayload;
+            pHead.IdMemory = (byte)CodeTerbinMemory.None;
             return new PacketRequest(pHead,
                 (byte)CodeTerbinProtocol.Update,
-                (byte)CodeTerbinMemory.None,
                 pParameters.ToArray());
         }
         if (ManagerConfiguration.GetConfg(keyRute) is var rute && rute != null)
@@ -87,9 +87,9 @@ public class ConfiguratonTerbin
             // Farlands no esta instalado.
             pHead.Status = CodeStatus.AccesNullOrNotExist;
         }
+        pHead.IdMemory = (byte)CodeTerbinMemory.None;
         return new PacketRequest(pHead,
             (byte)CodeTerbinProtocol.Update,
-            (byte)CodeTerbinMemory.NotAsign,
             pld);
     }
 }

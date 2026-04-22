@@ -60,7 +60,8 @@ public static class TerbinExecutor
         {
             byte id = TerbinMemory.GetStore();
             pHead.Status = CodeStatus.Succes;
-            return new PacketRequest(pHead: pHead, pIdMemory: id);
+            pHead.IdMemory = id;
+            return new PacketRequest(pHead: pHead);
         }
 
         return null;

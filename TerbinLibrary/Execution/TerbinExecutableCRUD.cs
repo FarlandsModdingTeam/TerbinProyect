@@ -69,7 +69,7 @@ public sealed class TerbinExecutableCRUDDispatcher
         if (!_handlers.TryGetValue(entity, out var handler))
         {
             pHead.Status = CodeStatus.SubActionNotFound;
-            return new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.Response);
+            return new PacketRequest(pHead, (byte)pAction);
         }
 
         try
@@ -80,7 +80,7 @@ public sealed class TerbinExecutableCRUDDispatcher
         {
             Console.WriteLine($"[TerbinExecutableCRUDDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
             pHead.Status = CodeStatus.ExecutionError;
-            return new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.Response, pPayload);
+            return new PacketRequest(pHead, (byte)pAction, pPayload);
         }
     }
 
@@ -138,7 +138,7 @@ public static class TerbinExecutableCRUDManager
         if (!_dispatchers.TryGetValue(pAction, out var dispatcher))
         {
             pHead.Status = CodeStatus.ActionNotFound;
-            var capsule = new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.Response, pPayload);
+            var capsule = new PacketRequest(pHead, (byte)pAction, pPayload);
             return capsule;
         }
         return await dispatcher.DispatchAsync(pHead, pAction, pPayload);
