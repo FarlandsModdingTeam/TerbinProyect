@@ -23,7 +23,7 @@ public static class TerbinExecutableHelper
     {
         return
         (
-            pMethod.ReturnType == typeof(Task<PacketRequest?>)
+            pMethod.ReturnType == typeof(Task<InfoResponse?>)
         );
     }
     public static TerbinErrorCode TryGetMemoryStream(PacketRequest pCapsule, out byte[] pMemory)
@@ -79,4 +79,35 @@ public static class TerbinExecutableHelper
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
 
+
+    public static void RegisterFromAssembly<T, E>(Assembly pAssembly, E pExecutor)
+        where T : Attribute where E : class // TODO: IExecutable tenga Register y etc...
+    {
+        throw new NotImplementedException("Ñe");
+
+        foreach (var type in pAssembly.GetTypes())
+        {
+            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
+            {
+                var attrs = method.GetCustomAttributes<T>(inherit: false);
+                if (!attrs.Any()) continue;
+
+                var parameters = method.GetParameters();
+                if (!TerbinExecutableHelper.IsFirmParameters(parameters))
+                    continue;
+
+                if (!TerbinExecutableHelper.IsFirmReturn(method))
+                    continue;
+
+                var del = (Func<Header, byte[], Task<InfoResponse?>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, byte[], Task<InfoResponse?>>), method);
+
+                foreach (var attr in attrs)
+                {
+                    //Register(attr.Action, attr.Entity, (h, b) => del(h, b));
+                    //Register(attr.Action, (h, b) => del(h, b));
+                }
+            }
+        }
+    }
 }

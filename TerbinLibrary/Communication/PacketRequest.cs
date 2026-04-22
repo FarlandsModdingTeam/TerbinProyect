@@ -45,13 +45,13 @@ public struct Header // la memoria es constante es unmanaged.
 
     public Header(
         ushort pIdRequest = 0,
-        ushort? pOrderRequest = null,
+        ushort pOrderRequest = TerbinProtocol.ORDER_SINGLE,
         CodeStatus pStatus = CodeStatus.NotAsign,
         /*ushort pMaximusTime = TerbinProtocol.MAXIMUS_RESPONSE_TIME,*/
         byte pIdMemory = (byte)CodeTerbinMemory.Undefined)
     {
         IdRequest = (pIdRequest == 0) ? (ushort)1 : pIdRequest;
-        OrderRequest = pOrderRequest ?? TerbinProtocol.ORDER_SINGLE;
+        OrderRequest = pOrderRequest;
         Status = pStatus;
         //MaximusTime = pMaximusTime;
         IdMemory = pIdMemory;
@@ -167,12 +167,46 @@ public struct PacketRequest : IStructSerializable
     }*/
 }
 
+public struct InfoResponse
+{
+    public ushort IdRequest { get => field; set => field = value; }
+    public CodeStatus Status { get => field; set => field = value; }
+    public byte ActionMethod { get => field; set => field = value; }
+    public byte[] Payload { get => field; set => field = value; }
+
+    public InfoResponse()
+    {
+        IdRequest = TerbinProtocol.ORDER_SINGLE;
+        Status = CodeStatus.NotAsign;
+        ActionMethod = (byte)CodeTerbinProtocol.Response;
+        Payload = [];
+    }
+
+
+    public static InfoResponse Create(ushort pIdRequest, CodeStatus pStatus)
+    {
+        return new InfoResponse
+        {
+            IdRequest = pIdRequest,
+            Status = pStatus,
+        };
+    }
+
+    public static InfoResponse CreateSucces(ushort pIdRequest)
+    {
+        return new InfoResponse
+        {
+            IdRequest = pIdRequest,
+            Status = CodeStatus.Succes,
+        };
+    }
+}
 
 public struct InfoPacket
 {
+    public ushort IdRequest { get => field; set => field = value; }
     public byte ActionMethod { get => field; set => field = value; }
     public byte[] Payload { get => field; set => field = value; }
-    public ushort IdRequest { get => field; set => field = value; }
     public CodeStatus Status { get => field; set => field = value; }
     public bool Recuperate { get => field; set => field = value; }
     public bool IsResponse { get => field; set => field = value; }

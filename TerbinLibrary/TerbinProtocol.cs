@@ -18,7 +18,7 @@ public class TerbinProtocol
     public const ushort FIRST_PACKET = 1;
     public const ushort FINAL_PACKET = ushort.MaxValue;
 
-    public const byte MAXIMUS_RESPONSE_TIME = 4; 
+    public const byte MAXIMUS_RESPONSE_TIME = 6; 
 
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
@@ -157,6 +157,8 @@ public enum CodeStatus : short
     ActionNotFound = 440,
     SubActionNotFound = 441,
 
+    ErrorSoliciteMemory = 470,
+    AlreadyExistsPetition = 471,
 
     InternalWorkerError = 500,
     ExecutionError = 501,
@@ -164,9 +166,9 @@ public enum CodeStatus : short
     SerializeError = 503,
     AccesNullOrNotExist = 504,
 
-    OverMaximumTime = 555,
+    OverMaximumTime = 550,
+    OverMaximunPacket = 551,
 
-    ErrorSoliciteMemory = 570,
     ErrorGetPaylaodMemory = 571,
     ErrorReleaseMemory = 572,
 }
@@ -400,6 +402,7 @@ public enum TerbinErrorCode : ushort
     ChecksumInvalid = 2007,
     ProtocolVersionUnknown = 2008,
     AlreadyExists = 2009,
+    OverMaximusPacket = 2010,
 
     // ==========================================
     // 3000 - 3999: MEMORIA Y STREAMS (TerbinMemory)

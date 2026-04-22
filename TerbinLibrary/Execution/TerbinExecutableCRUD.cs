@@ -62,14 +62,13 @@ public sealed class TerbinExecutableCRUDDispatcher
     public bool Unregister(byte pEntity) => _handlers.TryRemove(pEntity, out _);
 
     // TODO: ya tengo el pAction, como tal no hay que pasarlo, (areglar).
-    public async Task<PacketRequest?> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
+    public async Task<InfoResponse?> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
     {
         tryGetEntity(pPayload, out var entity, out var memo);
 
         if (!_handlers.TryGetValue(entity, out var handler))
         {
-            pHead.Status = CodeStatus.SubActionNotFound;
-            return new PacketRequest(pHead, (byte)pAction);
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.SubActionNotFound);
         }
 
         try
@@ -79,8 +78,7 @@ public sealed class TerbinExecutableCRUDDispatcher
         catch (Exception e)
         {
             Console.WriteLine($"[TerbinExecutableCRUDDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
-            pHead.Status = CodeStatus.ExecutionError;
-            return new PacketRequest(pHead, (byte)pAction, pPayload);
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionError);
         }
     }
 
@@ -133,13 +131,11 @@ public static class TerbinExecutableCRUDManager
         return dispatcher.Unregister(pEntity);
     }
 
-    public static async Task<PacketRequest?> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
+    public static async Task<InfoResponse?> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
     {
         if (!_dispatchers.TryGetValue(pAction, out var dispatcher))
         {
-            pHead.Status = CodeStatus.ActionNotFound;
-            var capsule = new PacketRequest(pHead, (byte)pAction, pPayload);
-            return capsule;
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.SubActionNotFound);
         }
         return await dispatcher.DispatchAsync(pHead, pAction, pPayload);
     }
@@ -150,8 +146,8 @@ public static class TerbinExecutableCRUDManager
         {
             foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
             {
-                var attr = method.GetCustomAttribute<TerbinCRUDAttribute>(inherit: false);
-                if (attr is null) continue;
+                var attrs = method.GetCustomAttributes<TerbinCRUDAttribute>(inherit: false);
+                if (!attrs.Any()) continue;
 
                 var parameters = method.GetParameters();
                 if (!TerbinExecutableHelper.IsFirmParameters(parameters))
@@ -160,10 +156,13 @@ public static class TerbinExecutableCRUDManager
                 if (!TerbinExecutableHelper.IsFirmReturn(method))
                     continue;
 
-                var del = (Func<Header, byte[], Task<PacketRequest?>>)Delegate.CreateDelegate(
-                    typeof(Func<Header, byte[], Task<PacketRequest?>>), method);
+                var del = (Func<Header, byte[], Task<InfoResponse?>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, byte[], Task<InfoResponse?>>), method);
 
-                Register(attr.Action, attr.Entity, (h, b) => del(h, b));
+                foreach (var attr in attrs)
+                {
+                    Register(attr.Action, attr.Entity, (h, b) => del(h, b));
+                }
             }
         }
     }

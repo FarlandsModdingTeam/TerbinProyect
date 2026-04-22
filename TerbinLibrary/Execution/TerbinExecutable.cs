@@ -46,23 +46,20 @@ public sealed class ExecutableDispatcher
     public static bool Unregister(byte pAction) => _handlers.TryRemove(pAction, out _);
 
 
-    public static async Task<PacketRequest?> DispatchAsync(PacketRequest pCapsule)
+    public static async Task<InfoResponse?> DispatchAsync(PacketRequest pCapsule)
     {
         if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handler))
         {
-            pCapsule.Head.Status = CodeStatus.ActionNotFound;
             TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
-            pCapsule.ClearPacket();
-            return pCapsule;
+            return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ActionNotFound);
         }
 
         if (TerbinExecutableHelper.TryGetMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
         {
             var error = (r == TerbinErrorCode.MemoryReleaseFailed) ? CodeStatus.ErrorReleaseMemory : CodeStatus.ErrorGetPaylaodMemory;
-            pCapsule.ToResponseError(error);
-            return pCapsule;
+            return InfoResponse.Create(pCapsule.Head.IdRequest, error);
         }
-        
+
         try
         {
             Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {memo.Length}"); //Encoding.UTF8.GetString(memo)
@@ -80,8 +77,7 @@ public sealed class ExecutableDispatcher
         catch (Exception e)
         {
             Console.WriteLine($"[ExecutableDispatcher>DispatchAsync] ExceptionError->  {e.Message}");
-            pCapsule.Head.Status = CodeStatus.ExecutionError;
-            return pCapsule;
+            return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ExecutionError);
         }
     }
 
@@ -92,8 +88,8 @@ public sealed class ExecutableDispatcher
         {
             foreach (MethodInfo? method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
             {
-                var attr = method.GetCustomAttribute<TerbinExecutableAttribute>(inherit: false);
-                if (attr == null) continue;
+                var attrs = method.GetCustomAttributes<TerbinExecutableAttribute>(inherit: false);
+                if (!attrs.Any()) continue;
 
                 ParameterInfo[]? parameters = method.GetParameters();
                 if (!TerbinExecutableHelper.IsFirmParameters(parameters))
@@ -103,10 +99,13 @@ public sealed class ExecutableDispatcher
                     continue;
 
                 // Crea delegate fuertemente tipado (evita reflexión por llamada)
-                var del = (Func<Header, byte[], Task<PacketRequest?>>)Delegate.CreateDelegate(
-                    typeof(Func<Header, byte[], Task<PacketRequest?>>), method);
+                var del = (Func<Header, byte[], Task<InfoResponse?>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, byte[], Task<InfoResponse?>>), method);
 
-                Register(attr.Action, (h, b) => del(h, b));
+                foreach (var attr in attrs)
+                {
+                    Register(attr.Action, (h, b) => del(h, b));
+                }
             }
         }
     }

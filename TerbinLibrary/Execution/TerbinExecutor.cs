@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
@@ -10,11 +11,12 @@ namespace TerbinLibrary.Execution;
 // TODO: (Verano) Mover a NO estatico para permitir empalmes.
 public static class TerbinExecutor
 {
-    //TerbinCommunicator _communicator;
+    private static TerbinCommunicator _communicator;
 
-    public static void Init()
+    public static void Init(TerbinCommunicator pCommunicator)
     {
         RegisterAll();
+        _communicator = pCommunicator;
     }
 
     // TODO: perdirle a Luis que sea mi tutor.
@@ -27,7 +29,7 @@ public static class TerbinExecutor
         //TerbinExecutableCRUDManager.RegisterFromAssembly(pAssembly);
     }
 
-    public static async Task<PacketRequest?> Execution(PacketRequest pRequest)
+    public static async Task<InfoResponse?> Execution(PacketRequest pRequest)
     {
         var capR = await ExecutableDispatcher.DispatchAsync(pRequest);
         return capR;
@@ -40,28 +42,29 @@ public static class TerbinExecutor
     //}
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Load)]
-    public static async Task<PacketRequest?> Load(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Load(Header pHead, byte[] pParameters)
     {
         if (pHead.IdRequest > 0)
         {
             TerbinMemory.Store(pHead.IdMemory, pHead.OrderRequest, pParameters);
         }
 
-
-        pHead.Status = CodeStatus.Succes;
-        return new PacketRequest(pHead: pHead, pActionMethod: (byte)CodeTerbinProtocol.Response);
+        return null;
     }
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Solicit)]
-    public static async Task<PacketRequest?> Solicit(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Solicit(Header pHead, byte[] pParameters)
     {
         if (pHead.IdMemory == (byte)CodeTerbinMemory.New)
         {
             byte id = TerbinMemory.GetStore();
-            pHead.Status = CodeStatus.Succes;
-            pHead.IdMemory = id;
-            return new PacketRequest(pHead: pHead);
+            return new InfoResponse
+            {
+                Status = CodeStatus.Succes,
+                IdRequest = pHead.IdRequest,
+                Payload = [id]
+            };
         }
 
         return null;
@@ -70,38 +73,45 @@ public static class TerbinExecutor
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
-    public static async Task<PacketRequest?> Create(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Create(Header pHead, byte[] pParameters)
     {
-        PacketRequest? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Create, pParameters);
+        InfoResponse? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Create, pParameters);
         return r;
     }
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Read)]
-    public static async Task<PacketRequest?> Read(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Read(Header pHead, byte[] pParameters)
     {
-        PacketRequest? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Read, pParameters);
+        InfoResponse? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Read, pParameters);
         return r;
     }
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Update)]
-    public static async Task<PacketRequest?> Update(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Update(Header pHead, byte[] pParameters)
     {
-        PacketRequest? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Update, pParameters);
+        InfoResponse? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Update, pParameters);
         return r;
     }
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Deleted)]
-    public static async Task<PacketRequest?> Deleted(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Deleted(Header pHead, byte[] pParameters)
     {
-        PacketRequest? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Deleted, pParameters);
+        InfoResponse? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Deleted, pParameters);
         return r;
     }
 
 
+    [TerbinExecutable((byte)CodeTerbinProtocol.Response)]
+    public static async Task<InfoResponse?> Response(Header pHead, byte[] pParameters)
+    {
+        _communicator.GiveResponse(new PacketRequest(pHead: pHead, (byte)CodeTerbinProtocol.Response, pParameters));
+        return null;
+    }
+
 
     // ya ni me acuerdo para que era.
     [TerbinExecutable((byte)CodeTerbinProtocol.Cancel)]
-    public static async Task<PacketRequest?> Cancel(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Cancel(Header pHead, byte[] pParameters)
     {
 
         throw new NotImplementedException("Ñe");

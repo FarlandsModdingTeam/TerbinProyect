@@ -13,6 +13,7 @@ using TerbinLibrary.SteamFarlands;
 
 
 var communicator = new TerbinCommunicator(false);
+communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
 
 if (await communicator.Connect())
 {
@@ -30,6 +31,9 @@ Console.WriteLine($"Int: {var1}");
 ThreeQuartersInt var2 = var1;
 Console.WriteLine($"TQI: {var2}");
 
+
+ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
 
 while (true)
 {

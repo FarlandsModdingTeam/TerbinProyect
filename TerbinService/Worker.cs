@@ -33,6 +33,7 @@ public class Worker : BackgroundService
         //await TerbinProtocol.InitProtocol(Cts.Token);
         await autoCreatePipe(Cts.Token);
         ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+        TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
 
 
@@ -54,6 +55,8 @@ public class Worker : BackgroundService
             {
                 _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);
             };
+            ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+            TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
         }
         catch (Exception e)
         {
@@ -63,7 +66,7 @@ public class Worker : BackgroundService
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]
-    public static async Task<PacketRequest?> Stop(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Stop(Header pHead, byte[] pParameters)
     {
         _ = Task.Run(async () =>
         {
@@ -73,6 +76,6 @@ public class Worker : BackgroundService
             Cts?.Cancel();
         });
         Console.WriteLine("[Worker] Stopping execution...");
-        return PacketRequest.CreateResponseSucces(pHead);
+        return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 }
