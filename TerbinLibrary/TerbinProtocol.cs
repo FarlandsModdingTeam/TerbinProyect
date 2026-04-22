@@ -18,7 +18,7 @@ public class TerbinProtocol
     public const ushort FIRST_PACKET = 1;
     public const ushort FINAL_PACKET = ushort.MaxValue;
 
-    public const ushort MAXIMUS_RESPONSE_TIME = 4; // ¿Se necesita un short? // 180
+    public const byte MAXIMUS_RESPONSE_TIME = 4; 
 
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
@@ -28,7 +28,6 @@ public class TerbinProtocol
     public static async Task InitProtocol(CancellationToken pTokenCancellation)
     {
         await autoCreatePipe(pTokenCancellation);
-        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
 
     private static async Task autoCreatePipe(CancellationToken pTokenCancellation)
@@ -41,7 +40,6 @@ public class TerbinProtocol
             {
                 _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);
             };
-            var executor = new TerbinExecutor();
         }
         catch(Exception e)
         {
@@ -96,7 +94,7 @@ public enum CodeTypeNumber : byte
 public enum CodeTerbinProtocol : byte
 {
     Stop = 0,
-    None = 1,
+    Response = 1,
     Load = 2,
     Cancel = 3,
     Solicit = 4,
@@ -157,6 +155,7 @@ public enum CodeStatus : short
     NotFound = 404,
 
     ActionNotFound = 440,
+    SubActionNotFound = 441,
 
 
     InternalWorkerError = 500,

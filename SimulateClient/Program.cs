@@ -11,9 +11,8 @@ using TerbinLibrary.SteamFarlands;
 
 
 
+
 var communicator = new TerbinCommunicator(false);
-var executor = new TerbinExecutor();
-ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
 
 if (await communicator.Connect())
 {
@@ -110,15 +109,19 @@ while (true)
             string rute = new(Serialineitor.DeserializeArray<char>(r.Payload));
             Console.WriteLine($"[Client] R (l: {rute.Length}, m: {rute})");
         }
+        else
+        {
+            Console.WriteLine($"[Client] R (PLD_l: {r.Payload.Length})");
+        }
+
+        if (r.Head.Status == CodeStatus.Succes && input == 0)
+        {
+            Console.WriteLine($"[Client] Desconexion elegida, esperando confirmación del servidor...");
+            break; // <-- Ahora sí, nos largamos!.
+        }
     }
     catch (Exception e)
     {
         Console.WriteLine($"[Client] Error-> {e.Message}");
-    }
-
-    if (input == 0)
-    {
-        Console.WriteLine($"[Client] Desconexion elegida, esperando confirmación del servidor...");
-        break; // <-- Ahora sí, nos largamos!.
     }
 }

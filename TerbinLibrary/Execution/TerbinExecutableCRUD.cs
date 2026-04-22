@@ -20,7 +20,7 @@ namespace TerbinLibrary.Execution;
 // TODO: CRUD no deberia manejar memoria, eso lo hace TerbinExecutable normal.
 // TODO: Que no esta jarcodeado el CRUD y que pueda ser cualquier byte.
 
-[AttributeUsage(AttributeTargets.Method, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public sealed class TerbinCRUDAttribute : Attribute
 {
     /// <summary>
@@ -62,14 +62,14 @@ public sealed class TerbinExecutableCRUDDispatcher
     public bool Unregister(byte pEntity) => _handlers.TryRemove(pEntity, out _);
 
     // TODO: ya tengo el pAction, como tal no hay que pasarlo, (areglar).
-    public async Task<PacketRequest> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
+    public async Task<PacketRequest?> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
     {
         tryGetEntity(pPayload, out var entity, out var memo);
 
         if (!_handlers.TryGetValue(entity, out var handler))
         {
-            pHead.Status = CodeStatus.ActionNotFound;
-            return new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.None, pPayload);
+            pHead.Status = CodeStatus.SubActionNotFound;
+            return new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.Response);
         }
 
         try
@@ -80,7 +80,7 @@ public sealed class TerbinExecutableCRUDDispatcher
         {
             Console.WriteLine($"[TerbinExecutableCRUDDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
             pHead.Status = CodeStatus.ExecutionError;
-            return new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.None, pPayload);
+            return new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.Response, pPayload);
         }
     }
 
@@ -94,20 +94,6 @@ public sealed class TerbinExecutableCRUDDispatcher
         return true;
     }
 
-    private static byte[] combinePayload(byte[] pBuffered, byte[] pLast)
-    {
-        var result = new byte[pBuffered.Length + pLast.Length];
-        Buffer.BlockCopy(pBuffered, 0, result, 0, pBuffered.Length);
-        Buffer.BlockCopy(pLast, 0, result, pBuffered.Length, pLast.Length);
-        return result;
-    }
-
-    private static void tryReleaseMemory(byte pIdMemory)
-    {
-        if (pIdMemory > TerbinProtocol.RESERVE_MEMORY)
-            _ = TerbinMemory.Release(pIdMemory);
-    }
-
     private static bool isCrudAction(CodeTerbinProtocol pAction) =>
         pAction is CodeTerbinProtocol.Create
             or CodeTerbinProtocol.Read
@@ -115,6 +101,8 @@ public sealed class TerbinExecutableCRUDDispatcher
             or CodeTerbinProtocol.Deleted;
 }
 
+// TODO: Renombrar a TerbinExecutableExtraManager.
+// TODO: Que admita cuaquier tipo de metodo no solo CRUD.
 /// <summary>
 /// Manager estático que enruta las 4 acciones CRUD.
 /// </summary>
@@ -145,12 +133,12 @@ public static class TerbinExecutableCRUDManager
         return dispatcher.Unregister(pEntity);
     }
 
-    public static async Task<PacketRequest> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
+    public static async Task<PacketRequest?> DispatchAsync(Header pHead, CodeTerbinProtocol pAction, byte[] pPayload)
     {
         if (!_dispatchers.TryGetValue(pAction, out var dispatcher))
         {
             pHead.Status = CodeStatus.ActionNotFound;
-            var capsule = new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.None, pPayload);
+            var capsule = new PacketRequest(pHead, (byte)pAction, (byte)CodeTerbinProtocol.Response, pPayload);
             return capsule;
         }
         return await dispatcher.DispatchAsync(pHead, pAction, pPayload);
@@ -160,22 +148,20 @@ public static class TerbinExecutableCRUDManager
     {
         foreach (var type in pAssembly.GetTypes())
         {
-            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static))
+            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
             {
                 var attr = method.GetCustomAttribute<TerbinCRUDAttribute>(inherit: false);
                 if (attr is null) continue;
 
                 var parameters = method.GetParameters();
-                if (parameters.Length != 2 ||
-                    parameters[0].ParameterType != typeof(Header) ||
-                    parameters[1].ParameterType != typeof(byte[]))
+                if (!TerbinExecutableHelper.IsFirmParameters(parameters))
                     continue;
 
-                if (method.ReturnType != typeof(Task<PacketRequest>))
+                if (!TerbinExecutableHelper.IsFirmReturn(method))
                     continue;
 
-                var del = (Func<Header, byte[], Task<PacketRequest>>)Delegate.CreateDelegate(
-                    typeof(Func<Header, byte[], Task<PacketRequest>>), method);
+                var del = (Func<Header, byte[], Task<PacketRequest?>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, byte[], Task<PacketRequest?>>), method);
 
                 Register(attr.Action, attr.Entity, (h, b) => del(h, b));
             }

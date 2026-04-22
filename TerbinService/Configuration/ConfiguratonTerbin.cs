@@ -25,7 +25,7 @@ namespace TerbinService.Configuration;
 public class ConfiguratonTerbin
 {
     [TerbinCRUD(CodeTerbinProtocol.Update, (byte)CodeServices.Rute)]
-    public static async Task<PacketRequest> UpdateRute(Header pHead, byte[] pParameters)
+    public static async Task<PacketRequest?> UpdateRute(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)
         {
@@ -64,7 +64,7 @@ public class ConfiguratonTerbin
     }
 
     [TerbinCRUD(CodeTerbinProtocol.Read, (byte)CodeServices.Rute)]
-    public static async Task<PacketRequest> ReadRute(Header pHead, byte[] pParameters)
+    public static async Task<PacketRequest?> ReadRute(Header pHead, byte[] pParameters)
     {
         byte[] pld;
         string keyRute = new(Serialineitor.DeserializeArray<char>(pParameters));
@@ -81,7 +81,7 @@ public class ConfiguratonTerbin
         }
         return new PacketRequest(pHead,
             (byte)CodeTerbinProtocol.Update,
-            (byte)CodeTerbinMemory.None,
+            (byte)CodeTerbinMemory.NotAsign,
             pld);
     }
 }

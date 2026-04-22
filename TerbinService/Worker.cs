@@ -32,7 +32,7 @@ public class Worker : BackgroundService
         Cts = CancellationTokenSource.CreateLinkedTokenSource(pStoppingToken);
         //await TerbinProtocol.InitProtocol(Cts.Token);
         await autoCreatePipe(Cts.Token);
-        TerbinExecutor.RegisterAll(Assembly.GetExecutingAssembly());
+        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
 
 
@@ -40,7 +40,6 @@ public class Worker : BackgroundService
     public async Task InitProtocol(CancellationToken pTokenCancellation)
     {
         await autoCreatePipe(pTokenCancellation);
-        TerbinExecutor.RegisterAll(Assembly.GetExecutingAssembly());
     }
 
     // Pruebas
@@ -49,15 +48,12 @@ public class Worker : BackgroundService
         // No habria que registrar tambien al crear uno nuevo?????
         try
         {
-            TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
-
             var communicator = new TerbinCommunicator(true, pTokenCancellation);
             communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
             communicator.OnNewClientConnect += async () =>
             {
                 _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);
             };
-            var executor = new TerbinExecutor();
         }
         catch (Exception e)
         {
@@ -67,7 +63,7 @@ public class Worker : BackgroundService
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]
-    public static async Task<PacketRequest> Stop(Header pHead, byte[] pParameters)
+    public static async Task<PacketRequest?> Stop(Header pHead, byte[] pParameters)
     {
         _ = Task.Run(async () =>
         {
@@ -78,6 +74,6 @@ public class Worker : BackgroundService
         });
         Console.WriteLine("[Worker] Stopping execution...");
         pHead.Status = CodeStatus.Succes;
-        return new PacketRequest(pHead, (byte)CodeTerbinProtocol.None, (byte)CodeTerbinMemory.NotAsign);
+        return new PacketRequest(pHead, (byte)CodeTerbinProtocol.Response, (byte)CodeTerbinMemory.NotAsign);
     }
 }

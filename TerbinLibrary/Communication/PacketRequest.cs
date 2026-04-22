@@ -73,14 +73,14 @@ public struct PacketRequest : IStructSerializable
     public PacketRequest()
     {
         Head = new Header();
-        ActionMethod = (byte)CodeTerbinProtocol.None;
+        ActionMethod = (byte)CodeTerbinProtocol.Response;
         //IdMemory = (byte)CodeTerbinMemory.Undefined;
         Payload = [];
     }
 
     public PacketRequest(
         Header? pHead = null,
-        byte pActionMethod = (byte)CodeTerbinProtocol.None,
+        byte pActionMethod = (byte)CodeTerbinProtocol.Response,
         byte pIdMemory = (byte)CodeTerbinMemory.Undefined,
         byte[]? pPayload = null)
     {

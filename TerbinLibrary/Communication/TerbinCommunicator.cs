@@ -51,7 +51,7 @@ public class TerbinCommunicator : IDisposable
     private readonly SemaphoreSlim _signal = new(0);
     private readonly ConcurrentDictionary<ushort, TaskCompletionSource<PacketRequest>> _pendingRequests = new();
 
-    private event Func<PacketRequest, Task<PacketRequest>>? _onRecive;
+    private event Func<PacketRequest, Task<PacketRequest?>>? _onRecive;
     private event Func<Task>? _onNewClientConnect;
 
     public bool IsServer
@@ -69,7 +69,7 @@ public class TerbinCommunicator : IDisposable
     // ****************************( Getters, Setters e Indexadores )**************************** //
     public bool IsConnect => _thePipe?.IsConnected ?? false;
 
-    public event Func<PacketRequest, Task<PacketRequest>>? OnRecive
+    public event Func<PacketRequest, Task<PacketRequest?>>? OnRecive
     {
         add => _onRecive += value;
         remove
@@ -114,6 +114,7 @@ public class TerbinCommunicator : IDisposable
         _writer = new StreamWriteStruct(_thePipe);
         _reader = new StreamReadStruct(_thePipe);
 
+        TerbinExecutor.Init();
         if (pIsServer)
             _ = manageConnectClient();
     }
@@ -195,7 +196,6 @@ public class TerbinCommunicator : IDisposable
             return null;
         // TODO: gestionar error.
         var r = await recuperateReply(pIdRequest);
-        Console.WriteLine($"[TerbinCommunicator] recuperate: {r.typeError}");
         return r.packet;
     }
 
@@ -291,6 +291,7 @@ public class TerbinCommunicator : IDisposable
         return (await tcs.Task, TerbinErrorCode.None);
     }
 
+    [Obsolete]
     private async Task handleReceive(PacketRequest pCapsule)
     {
         if (_pendingRequests.TryRemove(pCapsule.Head.IdRequest, out var tcs))
@@ -298,8 +299,9 @@ public class TerbinCommunicator : IDisposable
         if (pCapsule.Head.Status == CodeStatus.Execute &&
             _onRecive != null)
         {
-            var rCap = await _onRecive.Invoke(pCapsule);
-            await Reply(rCap);
+            PacketRequest? rCap = await _onRecive.Invoke(pCapsule);
+            if (rCap != null)
+                await Reply(rCap.Value);
         }
     }
 

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.CodeAnalysis.CSharp.Syntax;
+using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
@@ -25,22 +26,22 @@ public class StreamWriteStruct : StreamBytes
     public async Task WriteAsycn<T>(T pStruct, CancellationToken pToken = default)
         where T : struct, IStructSerializable
     {
+        if (pStruct.GetSize() > ushort.MaxValue)
+            throw new ArgumentOutOfRangeException("(StreamWriteStruct>WriteAsycn): Struct large overflow ushort max");
+
         byte[] buffer = Serialineitor.SerializeStruct<T>(pStruct);
 
-        // 1. Escribimos la longitud real del paquete primero (2 bytes)
-        //byte[] lengthPrefix = [(byte)buffer.Length];
         byte[] lengthPrefix = BitConverter.GetBytes((ushort)buffer.Length);
         try
         {
-            await PipeStream.WriteAsync(lengthPrefix.AsMemory(), pToken); // No pasa de aqui
+            await PipeStream.WriteAsync(lengthPrefix.AsMemory(), pToken);
+            await base.WriteBytesAsync(buffer, pToken);
         }
         catch (Exception e)
         {
             Console.WriteLine($"[StreamWriteStruct>WriteAsycn] ExceptionError-> {e.Message}");
+            throw;
         }
-
-        // 2. Escribimos el paquete
-        await base.WriteBytesAsync(buffer, pToken);
     }
 }
 
@@ -51,15 +52,22 @@ public class StreamReadStruct : StreamBytes
     public async Task<T> ReadAsycn<T>(CancellationToken pToken = default)
         where T : struct, IStructSerializable
     {
-        // 1. Leemos los 1 bytes que nos dicen cuánto mide el mensaje
         byte[] lengthBuffer = await base.ReadBytesAsycn(2, pToken);
-        ushort packetLength = BitConverter.ToUInt16(lengthBuffer); // ToUInt16
-        //int packetLength = lengthBuffer[0];
+        if (lengthBuffer.Length != 2)
+            throw new InvalidOperationException($"(StreamReadStruct>ReadAsycn): Expected 2 bytes for length header, got {lengthBuffer.Length}");
 
-        // 2. Leemos EXACTAMENTE la longitud dinámica del paquete
-        byte[] buffer = await base.ReadBytesAsycn(packetLength, pToken);
+        ushort packetLength = BitConverter.ToUInt16(lengthBuffer, 0); // ToUInt16
 
-        return Serialineitor.DeserializeStruct<T>(buffer);
+        try
+        {
+            byte[] buffer = await base.ReadBytesAsycn(packetLength, pToken);
+            return Serialineitor.DeserializeStruct<T>(buffer);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine($"[StreamWriteStruct>ReadAsycn] ExceptionError-> {e.Message}");
+            throw;
+        }
     }
 }
 
@@ -103,7 +111,7 @@ public abstract class StreamBytes : /*MarshalByRefObject,*/ IDisposable
 
     public virtual async Task WriteBytesAsync(byte[] buffer, CancellationToken pToken = default)
     {
-        if (buffer == null) throw new ArgumentNullException(nameof(buffer));
+        if (buffer == null) throw new ArgumentNullException("(StreamBytes>WriteBytesAsync): " + nameof(buffer));
 
         await PipeStream.WriteAsync(buffer.AsMemory(0, buffer.Length), pToken);
         await PipeStream.FlushAsync(pToken);
