@@ -26,12 +26,14 @@ public class BufferWriter
             throw new InvalidOperationException("Array surpasses ThreeQuartersInt max");
 
         // Validar que hay al menos 3 bytes para escribir la longitud
-        if (pBuffer.Length - pOffset < TerbinProtocol.LENGH_ARRAY)
+        if ((pBuffer.Length - pOffset) < TerbinProtocol.LENGTH_ARRAY)
             throw new ArgumentOutOfRangeException(nameof(pBuffer),
                 "There is not enough space in the buffer to write the length of the array.");
 
-        BitConverter.TryWriteBytes(pBuffer[pOffset..], Serialineitor.GetArraySize<T>(pArray?.Length ?? 0));
-        pOffset += TerbinProtocol.LENGH_ARRAY;
+        //BitConverter.TryWriteBytes(pBuffer[pOffset..], Serialineitor.GetArraySize<T>(pArray?.Length ?? 0));
+        ThreeQuartersInt lengthStruct = Serialineitor.GetArraySize<T>(pArray?.Length ?? 0);
+        MemoryMarshal.Write(pBuffer[pOffset..], in lengthStruct);
+        pOffset += TerbinProtocol.LENGTH_ARRAY;
 
         Span<byte> bytes = MemoryMarshal.AsBytes(pArray.AsSpan());
 

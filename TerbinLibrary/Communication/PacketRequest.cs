@@ -90,9 +90,9 @@ public struct PacketRequest : IStructSerializable
         Payload = pPayload ?? [];
     }
 
-    // Header + bye + byte + ushort + byte[]
+    // Header + bye + byte + ThreeQuartersInt + byte[]
     // 7 + 1 + 0 + 2 + Length
-    public ThreeQuartersInt GetSize() => 10 + (Payload?.Length ?? 0);
+    public ThreeQuartersInt GetSize() => 8 + TerbinProtocol.LENGTH_ARRAY + (Payload?.Length ?? 0);
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;

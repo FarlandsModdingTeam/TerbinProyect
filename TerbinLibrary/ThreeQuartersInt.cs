@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
 namespace TerbinLibrary;
 
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct ThreeQuartersInt
 {
     private byte _byte1;

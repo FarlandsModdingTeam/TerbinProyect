@@ -71,7 +71,7 @@ public class Serialineitor
         where T : unmanaged
     {
         int offset = 0;
-        byte[] newArray = new byte[pArray.Length * Unsafe.SizeOf<T>() + TerbinProtocol.LENGH_ARRAY];
+        byte[] newArray = new byte[pArray.Length * Unsafe.SizeOf<T>() + TerbinProtocol.LENGTH_ARRAY];
         BufferWriter.AddArray<T>(newArray, ref offset, pArray);
         return newArray.ToArray();
     }

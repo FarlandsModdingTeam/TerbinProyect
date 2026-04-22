@@ -9,8 +9,8 @@ namespace TerbinLibrary;
 
 public class TerbinProtocol
 {
-    public const ushort MAX_PLD = 0x4; // ¡Vamos Miura!
-    public const ushort FRAGMENT_IN = 0x4; // 0xFFF
+    public const ushort MAX_PLD = 0xFFF; // ¡Vamos Miura!
+    public const ushort FRAGMENT_IN = 0xFFF; // 0xFFF
     public const double FRAGMENT_IN__MULTIPLICATE_INVERSE = 1.0D / FRAGMENT_IN;
 
     public const ushort ORDER_SINGLE = ushort.MinValue;
@@ -23,7 +23,7 @@ public class TerbinProtocol
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
 
-    public const byte LENGH_ARRAY = 3;
+    public const byte LENGTH_ARRAY = 3;
 
     public static async Task InitProtocol(CancellationToken pTokenCancellation)
     {

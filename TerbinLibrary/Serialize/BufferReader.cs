@@ -23,7 +23,10 @@ public class BufferReader
     {
         ThreeQuartersInt length = Get<ThreeQuartersInt>(pBuffer, ref pOffset);
 
+        if (length == 0) return Array.Empty<T>();
+
         //int byteLength = length * Unsafe.SizeOf<T>();
+        // la longitud es de BYTES (Serialineitor.GetArraySize multiplicó por el SizeOf<T>) 
         var slice = pBuffer.Slice(pOffset, length);
 
         T[] array = MemoryMarshal.Cast<byte, T>(slice).ToArray();
