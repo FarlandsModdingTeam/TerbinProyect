@@ -168,6 +168,7 @@ public enum CodeStatus : short
 
     ErrorSoliciteMemory = 570,
     ErrorGetPaylaodMemory = 571,
+    ErrorReleaseMemory = 572,
 }
 
 

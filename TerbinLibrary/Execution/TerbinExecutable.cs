@@ -46,29 +46,42 @@ public sealed class ExecutableDispatcher
     public static bool Unregister(byte pAction) => _handlers.TryRemove(pAction, out _);
 
 
-    public static async Task<PacketRequest?> DispatchAsync(PacketRequest pCapsule) // Aqui es donde se ejecuta, manda cojones.
+    public static async Task<PacketRequest?> DispatchAsync(PacketRequest pCapsule)
     {
         if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handler))
         {
             pCapsule.Head.Status = CodeStatus.ActionNotFound;
             TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
-            pCapsule.ClearPLD();
+            pCapsule.ClearPacket();
             return pCapsule;
         }
 
-        // TODO: Controlar liberar memoria despues de ejecutar.
         if (TerbinExecutableHelper.TryGetMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
         {
-            pCapsule.Head.Status = CodeStatus.ErrorGetPaylaodMemory;
-            pCapsule.ClearPLD();
+            TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
+            pCapsule.ToResponseError(CodeStatus.ErrorGetPaylaodMemory);
             return pCapsule;
         }
         
         try
         {
+            if (!TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory))
+            {
+                pCapsule.ToResponseError(CodeStatus.ErrorReleaseMemory);
+                return pCapsule;
+            }
+
             Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {memo.Length}"); //Encoding.UTF8.GetString(memo)
-            return await handler(pCapsule.Head, memo)
-                .ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
+
+            if (pCapsule.ActionMethod == (byte)CodeTerbinProtocol.Response)
+            {
+                _ = handler(pCapsule.Head, memo).ConfigureAwait(false);
+                return null; // Por si alguien hace el bruto.
+            }
+            else
+                return await handler(pCapsule.Head, memo).ConfigureAwait(false);
+
+            //.ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
         }
         catch (Exception e)
         {
@@ -78,16 +91,6 @@ public sealed class ExecutableDispatcher
         }
     }
 
-    [Obsolete]
-    private static TerbinErrorCode tryGetMemoryStream(PacketRequest pCapsule, out byte[] pMemory)
-    {
-        var error = TerbinExecutableHelper.TryGetMemoryStream(pCapsule, out pMemory);
-        if (error != TerbinErrorCode.None)
-            TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
-        return error;
-    }
-
-    // Escanea métodos estáticos con [TerbinCommand(1)] y firma Task<Capsule>(Header, byte[])
     // TODO: separa de alguna manera al helper.
     public static void RegisterFromAssembly(Assembly pAssembly)
     {

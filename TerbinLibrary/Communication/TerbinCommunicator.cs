@@ -158,9 +158,9 @@ public class TerbinCommunicator : IDisposable
         ushort id = MiniID.NewS;
         PacketRequest reply;
         if (pPayload.Length <= TerbinProtocol.MAX_PLD)
-            reply = (PacketRequest) await HandleSendSigle(pActionMethod, pPayload, id, true);
+            reply = (PacketRequest) await HandleSendSigle(pActionMethod, pPayload, id, CodeStatus.Execute, true);
         else
-            reply = (PacketRequest) await HandleSendFragment(pActionMethod, pPayload, id, true);
+            reply = (PacketRequest) await HandleSendFragment(pActionMethod, pPayload, id, CodeStatus.Execute, true);
         return reply;
     }
 
@@ -172,35 +172,33 @@ public class TerbinCommunicator : IDisposable
     {
         ushort id = MiniID.NewS;
         if (pPayload.Length <= TerbinProtocol.MAX_PLD)
-            _ = HandleSendSigle(pActionMethod, pPayload, id, false);
+            _ = HandleSendSigle(pActionMethod, pPayload, id, CodeStatus.Execute, false);
         else
-            _ = HandleSendFragment(pActionMethod, pPayload, id, false);
+            _ = HandleSendFragment(pActionMethod, pPayload, id, CodeStatus.Execute, false);
         return id;
     }
 
-    //private ushort handleSendSize(byte pActionMethod, byte[] pPayload)
-    //{
-    //    ushort id = MiniID.NewS;
-    //    if (pPayload.Length <= TerbinProtocol.MAX_PLD)
-    //        _ = handleExecuteSigle(pActionMethod, pPayload, id, false);
-    //    else
-    //        _ = handleExecuteFragment(pActionMethod, pPayload, id, false);
-    //    return id;
-    //}
-
-    public async Task<PacketRequest?> HandleSendSigle(byte pActionMethod, byte[] pPayload, ushort pIdRequest, bool pRecuperate = true)
+    public async Task<PacketRequest?> HandleSendSigle(byte pActionMethod, byte[] pPayload, ushort pIdRequest, CodeStatus pStatus, bool pRecuperate = true)
     {
-        await AddQueue(0, CodeStatus.Execute, pActionMethod, (byte)CodeTerbinMemory.NotAsign, pPayload, pIdRequest);
+        await AddQueue(
+            TerbinProtocol.ORDER_SINGLE,
+            pStatus,
+            pActionMethod,
+            (byte)CodeTerbinMemory.NotAsign,
+            pPayload,
+            pIdRequest);
 
         if (!pRecuperate)
             return null;
+
         // TODO: gestionar error.
-        var r = await recuperateReply(pIdRequest);
-        return r.packet;
+        var reply = await recuperateReply(pIdRequest);
+        if (reply.typeError != TerbinErrorCode.None) Console.WriteLine($"[HandleSendSigle] recuperate {reply.typeError}");
+        return reply.packet;
     }
 
     // TODO: Controlar respuesta de guardar datos.
-    public async Task<PacketRequest?> HandleSendFragment(byte pActionMethod, byte[] pPayload, ushort pIdRequest, bool pRecuperate = true)
+    public async Task<PacketRequest?> HandleSendFragment(byte pActionMethod, byte[] pPayload, ushort pIdRequest, CodeStatus pStatus, bool pRecuperate = true)
     {
         var request = await soliciteRequestMemory();
         if (request.typeError != TerbinErrorCode.None)
@@ -212,30 +210,29 @@ public class TerbinCommunicator : IDisposable
         byte idMemory = request.packet.Head.IdMemory;
         ushort currentPacketIndex = 1;
 
-        // Extraer paquetes mientras el payload sea más grande que el límite del fragmento
         while (pPayload.Length > TerbinProtocol.MAX_PLD)
         {
             if (currentPacketIndex >= TerbinProtocol.FINAL_PACKET - 1)
             {
                 // TODO: mandar respuesta en vez de excepcion.
-                throw new Exception("¡QUE COJÓNES!");
+                throw new Exception("¡currentPacketIndex >= TerbinProtocol.FINAL_PACKET - 1!");
             }
 
             byte[] fragmentPayload = pPayload[..TerbinProtocol.FRAGMENT_IN];
-            pPayload = pPayload[TerbinProtocol.FRAGMENT_IN..]; // Reducimos el payload al resto
+            pPayload = pPayload[TerbinProtocol.FRAGMENT_IN..];
 
             await AddQueue(currentPacketIndex, CodeStatus.Execute, (byte)CodeTerbinProtocol.Load, idMemory, fragmentPayload, pIdRequest);
             currentPacketIndex++;
         }
 
-        // El remanente (o el payload completo si era igual/menor) se envía como paquete final
-        await AddQueue(TerbinProtocol.FINAL_PACKET, CodeStatus.Execute, pActionMethod, idMemory, pPayload, pIdRequest);
+
+        await AddQueue(TerbinProtocol.FINAL_PACKET, pStatus, pActionMethod, idMemory, pPayload, pIdRequest);
 
         if (!pRecuperate)
             return null;
 
-        // TODO: gestionar error.
         var reply = await recuperateReply(pIdRequest);
+        if (reply.typeError != TerbinErrorCode.None) Console.WriteLine($"[HandleSendFragment] recuperate {reply.typeError}");
         return reply.packet;
     }
 
@@ -306,19 +303,20 @@ public class TerbinCommunicator : IDisposable
     }
 
     // --- Reply --- //
-    // Soy estupido.
-    public async Task ReplySucces(byte pActionMethod, ushort pId)
-    {
-        await AddQueue(0, CodeStatus.Succes, pActionMethod, (byte)CodeTerbinMemory.NotAsign, [], pId);
-    }
-    public async Task ReplyError(CodeStatus pStatus, byte pActionMethod, ushort pId)
-    {
-        await AddQueue(0, pStatus, pActionMethod, (byte)CodeTerbinMemory.NotAsign, [], pId);
-    }
-
     public async Task Reply(PacketRequest pRequest)
     {
         await AddQueue(pRequest);
+    }
+
+
+    private ushort handleReplySize(byte pActionMethod, byte[] pPayload)
+    {
+        ushort id = MiniID.NewS;
+        if (pPayload.Length <= TerbinProtocol.MAX_PLD)
+            _ = HandleSendSigle(pActionMethod, pPayload, id, CodeStatus.InternalWorkerError, false);
+        else
+            _ = HandleSendFragment(pActionMethod, pPayload, id, CodeStatus.InternalWorkerError, false);
+        return id;
     }
 
     // --- Queue --- //

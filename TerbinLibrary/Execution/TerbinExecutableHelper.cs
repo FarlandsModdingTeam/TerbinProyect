@@ -28,13 +28,16 @@ public static class TerbinExecutableHelper
     }
     public static TerbinErrorCode TryGetMemoryStream(PacketRequest pCapsule, out byte[] pMemory)
     {
-        // Si es paquete individual, recibe devuelve su PLD.
+        // Si es paquete individual => devuelve su PLD.
         if (pCapsule.Head.OrderRequest != TerbinProtocol.FINAL_PACKET)
         {
             pMemory = pCapsule.Payload ?? Array.Empty<byte>();
             return TerbinErrorCode.None;
         }
-        return TryAssembleStream(pCapsule, out pMemory);
+        var codeError = TryAssembleStream(pCapsule, out pMemory);
+        // if (!TryReleaseMemory(pCapsule.Head.IdMemory))
+        //     codeError = (codeError != TerbinErrorCode.None) ? TerbinErrorCode.MemoryReleaseFailed : codeError;
+        return codeError;
     }
 
     public static TerbinErrorCode TryAssembleStream(PacketRequest pCapsule, out byte[] pMemory)

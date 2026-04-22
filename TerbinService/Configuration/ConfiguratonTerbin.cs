@@ -68,6 +68,14 @@ public class ConfiguratonTerbin
     {
         byte[] pld;
         string keyRute = new(Serialineitor.DeserializeArray<char>(pParameters));
+        if (string.IsNullOrEmpty(keyRute))
+        {
+            pHead.Status = CodeStatus.ErrorNotPayload;
+            return new PacketRequest(pHead,
+                (byte)CodeTerbinProtocol.Update,
+                (byte)CodeTerbinMemory.None,
+                pParameters.ToArray());
+        }
         if (ManagerConfiguration.GetConfg(keyRute) is var rute && rute != null)
         {
             pld = Serialineitor.SerializeArray<char>(rute.ToCharArray());

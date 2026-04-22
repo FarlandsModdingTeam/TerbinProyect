@@ -9,6 +9,7 @@ using System.Text.RegularExpressions;
 using TerbinLibrary.Id;
 using TerbinLibrary.Memory;
 using TerbinLibrary.Serialize;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -81,12 +82,10 @@ public struct PacketRequest : IStructSerializable
     public PacketRequest(
         Header? pHead = null,
         byte pActionMethod = (byte)CodeTerbinProtocol.Response,
-        byte pIdMemory = (byte)CodeTerbinMemory.Undefined,
         byte[]? pPayload = null)
     {
         Head = pHead ?? new Header();
         ActionMethod = pActionMethod;
-        //IdMemory = (pIdMemory < 10) ? (byte)10 : pIdMemory;
         Payload = pPayload ?? [];
     }
 
@@ -98,7 +97,6 @@ public struct PacketRequest : IStructSerializable
         int offset = 0;
         pBuffer.Write<Header>(ref offset, Head);
         pBuffer.Write<byte>(ref offset, ActionMethod);
-        //pBuffer.Write<byte>(ref offset, IdMemory);
         pBuffer.WriteArray<byte>(ref offset, Payload);
     }
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
@@ -106,24 +104,124 @@ public struct PacketRequest : IStructSerializable
         int offset = 0;
         Head =          pBuffer.Read<Header>(ref offset);
         ActionMethod =  pBuffer.Read<byte>(ref offset);
-        //IdMemory =      pBuffer.Read<byte>(ref offset);
         Payload =       pBuffer.ReadArray<byte>(ref offset);
     }
 
-    public void ClearPLD()
+    public void ToResponseError(CodeStatus pError)
+    {
+        ClearPacket();
+        Head.Status = pError;
+        ActionMethod = (byte)CodeTerbinProtocol.Response;
+    }
+    public void ToResponseSucces()
+    {
+        ClearPacket();
+        Head.Status = CodeStatus.Succes;
+        ActionMethod = (byte)CodeTerbinProtocol.Response;
+    }
+
+    public void ClearPacket()
     {
         Head.OrderRequest = TerbinProtocol.ORDER_SINGLE;
         Head.IdMemory = (byte)CodeTerbinMemory.NotAsign;
         Payload = [];
     }
 
-    // ¿?
+
+    public static PacketRequest CreateResponseError(ushort pIdRequest, CodeStatus pError)
+    {
+        Header h = new(pIdRequest: pIdRequest);
+        return CreateResponseError(h, pError);
+    }
+    public static PacketRequest CreateResponseSucces(ushort pIdRequest)
+    {
+        Header h = new(pIdRequest: pIdRequest);
+        return CreateResponseSucces(h);
+    }
+    public static PacketRequest CreateResponseError(Header pHead, CodeStatus pError)
+    {
+        pHead.Status = pError;
+        return CreateResponse(pHead);
+    }
+    public static PacketRequest CreateResponseSucces(Header pHead)
+    {
+        pHead.Status = CodeStatus.Succes;
+        return CreateResponse(pHead);
+    }
+    public static PacketRequest CreateResponse(Header pHead, byte[]? pPayload = null)
+    {
+        pHead.IdMemory = (byte)CodeTerbinMemory.NotAsign;
+        pHead.OrderRequest = TerbinProtocol.ORDER_SINGLE;
+        return new PacketRequest(pHead,
+            (byte)CodeTerbinProtocol.Response,
+            pPayload);
+    }
+
+    /*
     public static explicit operator PacketRequest(Task<PacketRequest?> v)
     {
         if (v != null)
             return (PacketRequest)v;
         else
             return new PacketRequest();
+    }*/
+}
+
+
+public struct InfoPacket
+{
+    public byte ActionMethod { get => field; set => field = value; }
+    public byte[] Payload { get => field; set => field = value; }
+    public ushort IdRequest { get => field; set => field = value; }
+    public CodeStatus Status { get => field; set => field = value; }
+    public bool Recuperate { get => field; set => field = value; }
+    public bool IsResponse { get => field; set => field = value; }
+
+    public InfoPacket()
+    {
+        ActionMethod = (byte)CodeTerbinProtocol.Info;
+        Payload = [];
+        IdRequest = TerbinProtocol.ORDER_SINGLE;
+        Status = CodeStatus.NotAsign;
+        Recuperate = false;
+        IsResponse = false;
+    }
+
+    public InfoPacket(
+        ushort pIdRequest,
+        byte pActionMethod = (byte)CodeTerbinProtocol.Response,
+        byte[]? pPayload = null,
+        CodeStatus pStatus = CodeStatus.NotAsign,
+        bool pRecuperate = false,
+        bool pIsResponse = false)
+    {
+        IdRequest = pIdRequest;
+        ActionMethod = pActionMethod;
+        Payload = pPayload ?? [];
+        Status = pStatus;
+        Recuperate = pRecuperate;
+        IsResponse = pIsResponse;
+    }
+
+    public static InfoPacket CreateResponseError(ushort pIdRequest, CodeStatus pError)
+    {
+        return CreateResponse(pIdRequest, pError);
+    }
+
+    public static InfoPacket CreateResponseSucces(ushort pIdRequest)
+    {
+        return CreateResponse(pIdRequest, CodeStatus.Succes);
+    }
+
+    public static InfoPacket CreateResponse(ushort pIdRequest, CodeStatus pStatus, byte[]? pPayload = null)
+    {
+        return new InfoPacket(
+            pIdRequest: pIdRequest,
+            pActionMethod: (byte)CodeTerbinProtocol.Response,
+            pPayload: pPayload,
+            pStatus: pStatus,
+            pIsResponse: true
+        );
     }
 }
 

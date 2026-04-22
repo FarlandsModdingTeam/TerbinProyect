@@ -73,7 +73,6 @@ public class Worker : BackgroundService
             Cts?.Cancel();
         });
         Console.WriteLine("[Worker] Stopping execution...");
-        pHead.Status = CodeStatus.Succes;
-        return new PacketRequest(pHead, (byte)CodeTerbinProtocol.Response, (byte)CodeTerbinMemory.NotAsign);
+        return PacketRequest.CreateResponseSucces(pHead);
     }
 }
