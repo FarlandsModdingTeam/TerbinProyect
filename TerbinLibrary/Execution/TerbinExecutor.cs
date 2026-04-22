@@ -11,7 +11,7 @@ namespace TerbinLibrary.Execution;
 // TODO: (Verano) Mover a NO estatico para permitir empalmes.
 public static class TerbinExecutor
 {
-    private static TerbinCommunicator _communicator;
+    private static TerbinCommunicator? _communicator;
 
     public static void Init(TerbinCommunicator pCommunicator)
     {
@@ -104,7 +104,7 @@ public static class TerbinExecutor
     [TerbinExecutable((byte)CodeTerbinProtocol.Response)]
     public static async Task<InfoResponse?> Response(Header pHead, byte[] pParameters)
     {
-        _communicator.GiveResponse(new PacketRequest(pHead: pHead, (byte)CodeTerbinProtocol.Response, pParameters));
+        _communicator?.GiveResponse(new PacketRequest(pHead: pHead, (byte)CodeTerbinProtocol.Response, pParameters));
         return null;
     }
 
