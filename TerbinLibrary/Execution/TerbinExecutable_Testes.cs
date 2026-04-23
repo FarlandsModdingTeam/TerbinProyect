@@ -18,7 +18,7 @@ namespace TerbinLibrary.Execution;
   empieza: mayorculas = publica.
   empieza: menorculas = privada.
  */
-
+/*
 public interface IExecutableAttribute
 {
 
@@ -191,3 +191,4 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
         }
     }
 }
+*/

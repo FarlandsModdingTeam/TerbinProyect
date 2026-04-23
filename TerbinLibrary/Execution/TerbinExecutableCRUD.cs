@@ -24,6 +24,7 @@ namespace TerbinLibrary.Execution;
 /// Dispatcher instanciable para una acción CRUD concreta.
 /// La clave interna es Entity (primer byte del payload).
 /// </summary>
+/*
 public sealed class TerbinExecutableCRUDDispatcher : IExecutableDispatcher
 {
     private readonly ConcurrentDictionary<byte, ExecutableHandler> _handlers = new();
@@ -150,4 +151,4 @@ public static class TerbinExecutableCRUDManager
             }
         }
     }
-}
+}*/
