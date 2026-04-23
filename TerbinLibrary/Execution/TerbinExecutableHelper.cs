@@ -74,17 +74,12 @@ public static class TerbinExecutableHelper
     }
 
 
-    public static void RegisterAll()
-    {
-        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
-    }
 
 
     public static void RegisterFromAssembly<T, E>(Assembly pAssembly, E pExecutor)
-        where T : Attribute where E : class // TODO: IExecutable tenga Register y etc...
+        where T : Attribute, IExecutableAttribute
+        where E : IExecutableDispatcher 
     {
-        throw new NotImplementedException("Ñe");
-
         foreach (var type in pAssembly.GetTypes())
         {
             foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
@@ -93,10 +88,10 @@ public static class TerbinExecutableHelper
                 if (!attrs.Any()) continue;
 
                 var parameters = method.GetParameters();
-                if (!TerbinExecutableHelper.IsFirmParameters(parameters))
+                if (!IsFirmParameters(parameters))
                     continue;
 
-                if (!TerbinExecutableHelper.IsFirmReturn(method))
+                if (!IsFirmReturn(method))
                     continue;
 
                 var del = (Func<Header, byte[], Task<InfoResponse?>>)Delegate.CreateDelegate(
@@ -104,8 +99,7 @@ public static class TerbinExecutableHelper
 
                 foreach (var attr in attrs)
                 {
-                    //Register(attr.Action, attr.Entity, (h, b) => del(h, b));
-                    //Register(attr.Action, (h, b) => del(h, b));
+                    pExecutor.Register(attr, (h, b) => del(h, b));
                 }
             }
         }

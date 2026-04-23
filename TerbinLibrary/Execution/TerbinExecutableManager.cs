@@ -22,20 +22,21 @@ namespace TerbinLibrary.Execution;
 /// <summary>
 /// Manager principal unificado que enruta tanto acciones simples como acciones compuestas (CRUD).
 /// </summary>
-public static class TerbinExecutableManager
+public static class TerbinExecutableManager : IExecutableDispatcher
 {
-    private static readonly ConcurrentDictionary<byte, IExecutableDispatcher> _dispatchers = new();
+    //private static readonly ConcurrentDictionary<byte, IExecutableDispatcher> _dispatchers = new();
+    private static readonly ConcurrentBag<IExecutableDispatcher> _dispatchers = new();
 
-    public static void RegisterSingle(byte pAction, TerbinExecutableHandler pHandler)
+    public static void RegisterSingle(byte pAction, TerbinExecutableDelegate pHandler)
     {
         _dispatchers[pAction] = new SingleExecutableDispatcher(pHandler);
     }
 
-    public static void RegisterSubAction(byte pAction, byte pSubAction, TerbinExecutableHandler pHandler)
+    public static void RegisterSubAction(byte pAction, byte pSubAction, TerbinExecutableDelegate pHandler)
     {
-        if (!_dispatchers.TryGetValue(pAction, out var dispatcher) || dispatcher is not SubActionExecutableDispatcher subActionDispatcher)
+        if (!_dispatchers.TryGetValue(pAction, out var dispatcher) || dispatcher is not CompoundExecutableDispatcher subActionDispatcher)
         {
-            subActionDispatcher = new SubActionExecutableDispatcher();
+            subActionDispatcher = new CompoundExecutableDispatcher();
             _dispatchers[pAction] = subActionDispatcher;
         }
 
@@ -87,7 +88,8 @@ public static class TerbinExecutableManager
 
                 if (!TerbinExecutableHelper.IsFirmReturn(method))
                     continue;
-                /* 
+               
+
                 // Crea delegate fuertemente tipado (evita reflexión por llamada)
                 var del = (Func<Header, byte[], Task<InfoResponse?>>)Delegate.CreateDelegate(
                     typeof(Func<Header, byte[], Task<InfoResponse?>>), method);
@@ -96,7 +98,8 @@ public static class TerbinExecutableManager
                 {
                     Register(attr.Action, (h, b) => del(h, b));
                 }
-                */
+                
+                /*
                 var del = (TerbinExecutableHandler)Delegate.CreateDelegate(typeof(TerbinExecutableHandler), method);
 
                 foreach (var attr in attrs)
@@ -109,7 +112,7 @@ public static class TerbinExecutableManager
                     {
                         RegisterSubAction(crudAttr.Action, crudAttr.Entity, del);
                     }
-                }
+                }*/
             }
         }
     }

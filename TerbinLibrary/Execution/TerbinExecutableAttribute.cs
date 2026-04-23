@@ -19,39 +19,30 @@ namespace TerbinLibrary.Execution;
 
 public interface IExecutableAttribute
 {
+    byte[] Action { get; }
     int Leght { get; }
+    Type Dispatcher { get; }
 }
 public interface IExecutableDispatcher
 {
-    void RegisterSingle(TerbinExecutableHandler pHandler, params byte[] pActions);
+    void Register(IExecutableAttribute pAttribute, TerbinExecutableDelegate pHandler);
     Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload);
 }
 
 
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class TerbinExecutableAttribute : Attribute, IExecutableAttribute
+public sealed class TerbinExecutableAttribute(byte pAction) : Attribute, IExecutableAttribute
 {
-    public byte[] Action { get; }
-
+    public byte[] Action { get; } = new byte[] { pAction };
     public int Leght => Action.Length;
-
-    public TerbinExecutableAttribute(params byte[] pAction) => Action = pAction;
+    public Type Dispatcher => typeof(SingleExecutableDispatcher);
 }
 
-/*
-[Obsolete]
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class TerbinExecutableCompoundAttribute : Attribute, IExecutableAttribute
+public sealed class TerbinExecutableCompoundAttribute(params byte[] pAction) : Attribute, IExecutableAttribute
 {
-    public byte Action { get; }
-    public byte Entity { get; }
-
-
-    public TerbinExecutableCompoundAttribute(byte pAction, byte pEntity)
-    {
-        Action = pAction;
-        Entity = pEntity;
-    }
+    public byte[] Action { get; } = pAction;
+    public int Leght => Action.Length;
+    public Type Dispatcher => typeof(CompoundExecutableDispatcher);
 }
-/

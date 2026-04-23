@@ -20,13 +20,13 @@ namespace TerbinLibrary.Execution;
  */
 
 /// <summary>
-/// Despachador para acciones simples de 1 solo nivel.
+/// 
 /// </summary>
 public sealed class SingleExecutableDispatcher : IExecutableDispatcher
 {
-    private readonly TerbinExecutableHandler _handler;
+    private readonly ConcurrentDictionary<byte, TerbinExecutableDelegate> _handlers = new();
 
-    public SingleExecutableDispatcher(TerbinExecutableHandler pHandler)
+    public SingleExecutableDispatcher(TerbinExecutableDelegate pHandler)
     {
         _handler = pHandler ?? throw new ArgumentNullException(nameof(pHandler));
     }
@@ -46,13 +46,13 @@ public sealed class SingleExecutableDispatcher : IExecutableDispatcher
 }
 
 /// <summary>
-/// Despachador para acciones compuestas (como CRUD con una entidad).
+/// 
 /// </summary>
-public sealed class SubActionExecutableDispatcher : IExecutableDispatcher
+public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
 {
-    private readonly ConcurrentDictionary<byte, TerbinExecutableHandler> _handlers = new();
+    private readonly ConcurrentDictionary<byte, TerbinExecutableDelegate> _handlers = new();
 
-    public void Register(byte pSubAction, TerbinExecutableHandler pHandler)
+    public void Register(byte pSubAction, TerbinExecutableDelegate pHandler)
     {
         if (pHandler is null) throw new ArgumentNullException(nameof(pHandler));
         _handlers[pSubAction] = pHandler;

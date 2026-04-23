@@ -5,4 +5,4 @@ using TerbinLibrary.Communication;
 
 namespace TerbinLibrary.Execution;
 
-public delegate Task<InfoResponse?> TerbinExecutableHandler(Header pHead, byte[] pParameters);
+public delegate Task<InfoResponse?> TerbinExecutableDelegate(Header pHead, byte[] pParameters);
