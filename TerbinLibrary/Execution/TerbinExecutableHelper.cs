@@ -104,4 +104,27 @@ public static class TerbinExecutableHelper
             }
         }
     }
+
+
+
+    public static async Task<InfoResponse?> ExecutionList(List<TerbinExecutableDelegate> pHandlers, Header pHead, byte[] pPayload)
+    {
+        var pendignTask = new List<Task<InfoResponse?>>(pHandlers.Count);
+        for (int i = 0; i < pHandlers.Count; i++)
+        {
+            pendignTask.Add(pHandlers[i](pHead, pPayload));
+        }
+
+        while (pendignTask.Count > 0)
+        {
+            var completeTask = await Task.WhenAny(pendignTask).ConfigureAwait(false);
+            pendignTask.Remove(completeTask);
+
+            var result = await completeTask.ConfigureAwait(false);
+            if (result != null)
+                return result;
+        }
+        return null;
+        //.ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
+    }
 }

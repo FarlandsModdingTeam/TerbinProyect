@@ -73,20 +73,49 @@ public static class TerbinExecutor
         return null;
     }
 
-    [TerbinExecutable((byte)CodeTerbinProtocol.Read)]
+
+
     [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
-    [TerbinExecutable((byte)CodeTerbinProtocol.Update)]
-    [TerbinExecutable((byte)CodeTerbinProtocol.Deleted)]
-    public static async Task<InfoResponse?> CRUD(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Create(Header pHead, byte[] pParameters)
     {
         if (!CompoundExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
-        {
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetEntity);
-        }
-
-        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, entity, memo);
+        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, (byte)CodeTerbinProtocol.Create, entity, memo);
         return r;
     }
+
+    [TerbinExecutable((byte)CodeTerbinProtocol.Read)]
+    public static async Task<InfoResponse?> Read(Header pHead, byte[] pParameters)
+    {
+        if (!CompoundExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetEntity);
+        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, (byte)CodeTerbinProtocol.Read, entity, memo);
+        return r;
+    }
+
+    [TerbinExecutable((byte)CodeTerbinProtocol.Update)]
+    public static async Task<InfoResponse?> Update(Header pHead, byte[] pParameters)
+    {
+        if (!CompoundExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetEntity);
+        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, (byte)CodeTerbinProtocol.Update, entity, memo);
+        return r;
+    }
+
+    [TerbinExecutable((byte)CodeTerbinProtocol.Deleted)]
+    public static async Task<InfoResponse?> Deleted(Header pHead, byte[] pParameters)
+    {
+        if (!CompoundExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetEntity);
+        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, (byte)CodeTerbinProtocol.Deleted, entity, memo);
+        return r;
+    }
+
+
+
+
+
+
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Response)]
     public static async Task<InfoResponse?> Response(Header pHead, byte[] pParameters)

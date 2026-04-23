@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
+using static System.Collections.Specialized.BitVector32;
 
 namespace TerbinLibrary.Execution;
 /*
@@ -22,27 +24,35 @@ namespace TerbinLibrary.Execution;
 /// </summary>
 public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
 {
-    private readonly ConcurrentDictionary<byte, TerbinExecutableDelegate> _handlers = new();
+    private readonly ConcurrentDictionary<(byte action, byte subAction), List<TerbinExecutableDelegate>> _handlers = new();
 
     public void Register(IExecutableAttribute pSubAction, TerbinExecutableDelegate pHandler)
     {
         if (pHandler is null) throw new ArgumentNullException(nameof(pHandler));
         if (pSubAction.Action.Length <= 0) throw new ArgumentException("No action.", nameof(pSubAction));
-        _handlers[pSubAction.Action[0]] = pHandler;
+
+        if (_handlers.TryGetValue((pSubAction.Action[0], pSubAction.Action[1]), out var listDelegates))
+            listDelegates.Add(pHandler);
+        else
+        {
+            listDelegates = new List<TerbinExecutableDelegate>();
+            listDelegates.Add(pHandler);
+            _handlers.TryAdd((pSubAction.Action[0], pSubAction.Action[1]), listDelegates);
+        }
     }
 
-    public bool Unregister(byte pSubAction) => _handlers.TryRemove(pSubAction, out _);
+    public bool Unregister(byte pAction, byte pSubAction) => _handlers.TryRemove((pAction, pSubAction), out _);
 
-    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte pEntity, byte[] pPayload)
+    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte pAction, byte pSubAction, byte[] pPayload)
     {
-        if (!_handlers.TryGetValue(pEntity, out var handler))
+        if (!_handlers.TryGetValue((pAction, pSubAction), out var handlers))
         {
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.SubActionNotFound);
         }
 
         try
         {
-            return await handler(pHead, pPayload).ConfigureAwait(false);
+            return await TerbinExecutableHelper.ExecutionList(handlers, pHead, pPayload);
         }
         catch (Exception e)
         {
@@ -83,11 +93,11 @@ public static class TerbinExecutableManagerCompound
     public static void Register(IExecutableAttribute pAction, TerbinExecutableDelegate pHandler) =>
         _dispatcher.Register(pAction, pHandler);
 
-    public static bool Unregister(byte pAction) =>
-        _dispatcher.Unregister(pAction);
+    public static bool Unregister(byte pAction, byte pSubAction) =>
+        _dispatcher.Unregister(pAction, pSubAction);
 
-    public static async Task<InfoResponse?> DispatchAsync(Header pHead, byte pEntity, byte[] pPayload) =>
-        await _dispatcher.DispatchAsync(pHead, pEntity, pPayload);
+    public static async Task<InfoResponse?> DispatchAsync(Header pHead, byte pAction, byte pSubAction, byte[] pPayload) =>
+        await _dispatcher.DispatchAsync(pHead, pAction, pSubAction, pPayload);
 
     public static void RegisterFromAssembly(Assembly pAssembly) =>
         _dispatcher.RegisterFromAssembly(pAssembly);

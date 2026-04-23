@@ -38,9 +38,6 @@ namespace TerbinLibrary.Communication;
 - Communicate es para mandar sabiendo que quieres recibir una respuesta;
  */
 
-// TODO: Revisar si una respuesta manda IdMemory en None o Undefined pero payload es mas largo, cambiar eso para mandar en tanda.
-// TODO: Llamar a si mismo.
-
 public class TerbinCommunicator : IDisposable
 {
     // ****************************( Variables )**************************** //
@@ -260,6 +257,7 @@ public class TerbinCommunicator : IDisposable
         if (_onRecive != null)
         {
             InfoResponse? rCap = await _onRecive.Invoke(pCapsule);
+            // TODO: Crear e implementar ManagerMemory.
             if (rCap != null)
                 await Reply(rCap.Value);
         }

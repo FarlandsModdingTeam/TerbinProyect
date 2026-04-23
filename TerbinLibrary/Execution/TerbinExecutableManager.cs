@@ -24,13 +24,21 @@ namespace TerbinLibrary.Execution;
 /// </summary>
 public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
 {
-    private readonly ConcurrentDictionary<byte, TerbinExecutableDelegate> _handlers = new();
+    private readonly ConcurrentDictionary<byte, List<TerbinExecutableDelegate>> _handlers = new();
 
     public void Register(IExecutableAttribute pAction, TerbinExecutableDelegate pHandler)
     {
         if (pHandler == null) throw new ArgumentNullException(nameof(pHandler));
         if (pAction.Action.Length <= 0) throw new ArgumentException("No action.", nameof(pAction));
-        _handlers[pAction.Action[0]] = pHandler;
+
+        if (_handlers.TryGetValue(pAction.Action[0], out var listDelegates))
+            listDelegates.Add(pHandler);
+        else
+        {
+            listDelegates = new List<TerbinExecutableDelegate>();
+            listDelegates.Add(pHandler);
+            _handlers.TryAdd(pAction.Action[0], listDelegates);
+        }
     }
 
     public bool Unregister(byte pAction) => _handlers.TryRemove(pAction, out _);
@@ -38,7 +46,7 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
 
     public async Task<InfoResponse?> DispatchAsync(PacketRequest pCapsule)
     {
-        if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handler))
+        if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handlers))
         {
             TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
             return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ActionNotFound);
@@ -58,13 +66,14 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
 
             if (pCapsule.ActionMethod == (byte)CodeTerbinProtocol.Response)
             {
-                _ = handler(pCapsule.Head, memo).ConfigureAwait(false);
+                for (int i = 0; i < handlers.Count; i++)
+                {
+                    _ = handlers[i](pCapsule.Head, memo);
+                }
                 return null; // Por si alguien hace el bruto.
             }
-            else
-                return await handler(pCapsule.Head, memo).ConfigureAwait(false);
 
-            //.ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
+            return await TerbinExecutableHelper.ExecutionList(handlers, pCapsule.Head, memo);
         }
         catch (Exception e)
         {
