@@ -22,84 +22,76 @@ namespace TerbinLibrary.Execution;
 /// <summary>
 /// 
 /// </summary>
-public sealed class SingleExecutableDispatcher : IExecutableDispatcher
+public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
 {
     private readonly ConcurrentDictionary<byte, TerbinExecutableDelegate> _handlers = new();
 
-    public SingleExecutableDispatcher(TerbinExecutableDelegate pHandler)
+    public void Register(IExecutableAttribute pAction, TerbinExecutableDelegate pHandler)
     {
-        _handler = pHandler ?? throw new ArgumentNullException(nameof(pHandler));
+        if (pHandler == null) throw new ArgumentNullException(nameof(pHandler));
+        if (pAction.Action.Length <= 0) throw new ArgumentException("No action.", nameof(pAction));
+        _handlers[pAction.Action[0]] = pHandler;
     }
 
-    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload)
+    public bool Unregister(byte pAction) => _handlers.TryRemove(pAction, out _);
+
+
+    public async Task<InfoResponse?> DispatchAsync(PacketRequest pCapsule)
     {
-        try
+        if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handler))
         {
-            return await _handler(pHead, pPayload).ConfigureAwait(false);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"[SingleExecutableDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionError);
-        }
-    }
-}
-
-/// <summary>
-/// 
-/// </summary>
-public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
-{
-    private readonly ConcurrentDictionary<byte, TerbinExecutableDelegate> _handlers = new();
-
-    public void Register(byte pSubAction, TerbinExecutableDelegate pHandler)
-    {
-        if (pHandler is null) throw new ArgumentNullException(nameof(pHandler));
-        _handlers[pSubAction] = pHandler;
-    }
-
-    public bool Unregister(byte pSubAction) => _handlers.TryRemove(pSubAction, out _);
-
-    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload)
-    {
-        if (!tryGetEntity(pPayload, out var entity, out var memo))
-        {
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetPaylaodMemory);
+            TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
+            return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ActionNotFound);
         }
 
-        if (!_handlers.TryGetValue(entity, out var handler))
+        if (TerbinExecutableHelper.TryGetMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
         {
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.SubActionNotFound);
+            var error = (r == TerbinErrorCode.MemoryReleaseFailed) ? CodeStatus.ErrorReleaseMemory : CodeStatus.ErrorGetPaylaodMemory;
+            return InfoResponse.Create(pCapsule.Head.IdRequest, error);
         }
 
         try
         {
-            return await handler(pHead, memo).ConfigureAwait(false);
+            Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {memo.Length}"); //Encoding.UTF8.GetString(memo)
+            if (pCapsule.Head.Status == CodeStatus.CheckExecution)
+                return InfoResponse.CreateSucces(pCapsule.Head.IdRequest);
+
+            if (pCapsule.ActionMethod == (byte)CodeTerbinProtocol.Response)
+            {
+                _ = handler(pCapsule.Head, memo).ConfigureAwait(false);
+                return null; // Por si alguien hace el bruto.
+            }
+            else
+                return await handler(pCapsule.Head, memo).ConfigureAwait(false);
+
+            //.ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
         }
         catch (Exception e)
         {
-            Console.WriteLine($"[SubActionExecutableDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionError);
+            Console.WriteLine($"[ExecutableDispatcher>DispatchAsync] ExceptionError->  {e.Message}");
+            return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ExecutionError);
         }
     }
 
-    private static bool tryGetEntity(byte[] pPayload, out byte pEntity, out byte[] pMemory)
+    public void RegisterFromAssembly(Assembly pAssembly)
     {
-        if (pPayload == null || pPayload.Length == 0)
-        {
-            pEntity = 0;
-            pMemory = Array.Empty<byte>();
-            return false;
-        }
-
-        pEntity = pPayload[0];
-        int bodyLength = pPayload.Length - 1;
-        pMemory = new byte[bodyLength];
-
-        if (bodyLength > 0)
-            Array.Copy(pPayload, 1, pMemory, 0, bodyLength);
-
-        return true;
+        TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutableAttribute, SimpleExecutableDispatcher>(pAssembly, this);
     }
 }
 
+public static class TerbinExecutableManager
+{
+    private static SimpleExecutableDispatcher _dispatcher = new();
+
+    public static void Register(IExecutableAttribute pAction, TerbinExecutableDelegate pHandler) =>
+        _dispatcher.Register(pAction, pHandler);
+
+    public static bool Unregister(byte pAction) =>
+        _dispatcher.Unregister(pAction);
+
+    public static async Task<InfoResponse?> DispatchAsync(PacketRequest pCapsule) =>
+        await _dispatcher.DispatchAsync(pCapsule);
+
+    public static void RegisterFromAssembly(Assembly pAssembly) =>
+        _dispatcher.RegisterFromAssembly(pAssembly);
+}

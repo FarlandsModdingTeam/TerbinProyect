@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
 
@@ -26,7 +27,9 @@ public interface IExecutableAttribute
 public interface IExecutableDispatcher
 {
     void Register(IExecutableAttribute pAttribute, TerbinExecutableDelegate pHandler);
-    Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload);
+    //Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload);
+    //Task<InfoResponse?> DispatchAsync(PacketRequest pCapsule);
+    void RegisterFromAssembly(Assembly pAssembly);
 }
 
 
@@ -36,7 +39,7 @@ public sealed class TerbinExecutableAttribute(byte pAction) : Attribute, IExecut
 {
     public byte[] Action { get; } = new byte[] { pAction };
     public int Leght => Action.Length;
-    public Type Dispatcher => typeof(SingleExecutableDispatcher);
+    public Type Dispatcher => typeof(SimpleExecutableDispatcher);
 }
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]

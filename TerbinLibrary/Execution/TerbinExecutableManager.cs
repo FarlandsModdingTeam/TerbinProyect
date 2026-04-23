@@ -22,14 +22,14 @@ namespace TerbinLibrary.Execution;
 /// <summary>
 /// Manager principal unificado que enruta tanto acciones simples como acciones compuestas (CRUD).
 /// </summary>
-public static class TerbinExecutableManager : IExecutableDispatcher
+public static class TerbinExecutableManager_bad : IExecutableDispatcher
 {
     //private static readonly ConcurrentDictionary<byte, IExecutableDispatcher> _dispatchers = new();
     private static readonly ConcurrentBag<IExecutableDispatcher> _dispatchers = new();
 
     public static void RegisterSingle(byte pAction, TerbinExecutableDelegate pHandler)
     {
-        _dispatchers[pAction] = new SingleExecutableDispatcher(pHandler);
+        _dispatchers[pAction] = new SimpleExecutableDispatcher(pHandler);
     }
 
     public static void RegisterSubAction(byte pAction, byte pSubAction, TerbinExecutableDelegate pHandler)
