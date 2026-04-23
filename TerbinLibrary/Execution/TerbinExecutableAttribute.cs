@@ -17,9 +17,13 @@ namespace TerbinLibrary.Execution;
 
 
 
-public interface IExecutableAttribute { }
+public interface IExecutableAttribute
+{
+    int Leght { get; }
+}
 public interface IExecutableDispatcher
 {
+    void RegisterSingle(TerbinExecutableHandler pHandler, params byte[] pActions);
     Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload);
 }
 
@@ -30,10 +34,12 @@ public sealed class TerbinExecutableAttribute : Attribute, IExecutableAttribute
 {
     public byte[] Action { get; }
 
+    public int Leght => Action.Length;
+
     public TerbinExecutableAttribute(params byte[] pAction) => Action = pAction;
 }
 
-
+/*
 [Obsolete]
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
 public sealed class TerbinExecutableCompoundAttribute : Attribute, IExecutableAttribute
@@ -41,9 +47,11 @@ public sealed class TerbinExecutableCompoundAttribute : Attribute, IExecutableAt
     public byte Action { get; }
     public byte Entity { get; }
 
+
     public TerbinExecutableCompoundAttribute(byte pAction, byte pEntity)
     {
         Action = pAction;
         Entity = pEntity;
     }
 }
+/

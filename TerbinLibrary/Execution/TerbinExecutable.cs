@@ -24,9 +24,9 @@ namespace TerbinLibrary.Execution;
 /// </summary>
 public sealed class SingleExecutableDispatcher : IExecutableDispatcher
 {
-    private readonly ExecutableHandler _handler;
+    private readonly TerbinExecutableHandler _handler;
 
-    public SingleExecutableDispatcher(ExecutableHandler pHandler)
+    public SingleExecutableDispatcher(TerbinExecutableHandler pHandler)
     {
         _handler = pHandler ?? throw new ArgumentNullException(nameof(pHandler));
     }
@@ -50,9 +50,9 @@ public sealed class SingleExecutableDispatcher : IExecutableDispatcher
 /// </summary>
 public sealed class SubActionExecutableDispatcher : IExecutableDispatcher
 {
-    private readonly ConcurrentDictionary<byte, ExecutableHandler> _handlers = new();
+    private readonly ConcurrentDictionary<byte, TerbinExecutableHandler> _handlers = new();
 
-    public void Register(byte pSubAction, ExecutableHandler pHandler)
+    public void Register(byte pSubAction, TerbinExecutableHandler pHandler)
     {
         if (pHandler is null) throw new ArgumentNullException(nameof(pHandler));
         _handlers[pSubAction] = pHandler;

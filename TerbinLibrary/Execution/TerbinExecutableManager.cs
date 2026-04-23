@@ -22,16 +22,16 @@ namespace TerbinLibrary.Execution;
 /// <summary>
 /// Manager principal unificado que enruta tanto acciones simples como acciones compuestas (CRUD).
 /// </summary>
-public static class ExecutableManager
+public static class TerbinExecutableManager
 {
     private static readonly ConcurrentDictionary<byte, IExecutableDispatcher> _dispatchers = new();
 
-    public static void RegisterSingle(byte pAction, ExecutableHandler pHandler)
+    public static void RegisterSingle(byte pAction, TerbinExecutableHandler pHandler)
     {
         _dispatchers[pAction] = new SingleExecutableDispatcher(pHandler);
     }
 
-    public static void RegisterSubAction(byte pAction, byte pSubAction, ExecutableHandler pHandler)
+    public static void RegisterSubAction(byte pAction, byte pSubAction, TerbinExecutableHandler pHandler)
     {
         if (!_dispatchers.TryGetValue(pAction, out var dispatcher) || dispatcher is not SubActionExecutableDispatcher subActionDispatcher)
         {
@@ -79,7 +79,7 @@ public static class ExecutableManager
             foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
             {
                 var attrs = method.GetCustomAttributes(inherit: false);
-                if (attrs.Length == 0) continue;
+                if (attrs.Length <= 0) continue;
 
                 var parameters = method.GetParameters();
                 if (!TerbinExecutableHelper.IsFirmParameters(parameters))
@@ -87,8 +87,17 @@ public static class ExecutableManager
 
                 if (!TerbinExecutableHelper.IsFirmReturn(method))
                     continue;
+                /* 
+                // Crea delegate fuertemente tipado (evita reflexión por llamada)
+                var del = (Func<Header, byte[], Task<InfoResponse?>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, byte[], Task<InfoResponse?>>), method);
 
-                var del = (ExecutableHandler)Delegate.CreateDelegate(typeof(ExecutableHandler), method);
+                foreach (var attr in attrs)
+                {
+                    Register(attr.Action, (h, b) => del(h, b));
+                }
+                */
+                var del = (TerbinExecutableHandler)Delegate.CreateDelegate(typeof(TerbinExecutableHandler), method);
 
                 foreach (var attr in attrs)
                 {
