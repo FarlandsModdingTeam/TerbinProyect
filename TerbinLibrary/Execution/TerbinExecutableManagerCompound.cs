@@ -81,7 +81,7 @@ public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
     }
 }
 
-public static class TerbinCompoundExecutableManager
+public static class TerbinExecutableManagerCompound
 {
     private static CompoundExecutableDispatcher _dispatcher = new();
 
