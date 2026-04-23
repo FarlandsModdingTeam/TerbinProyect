@@ -159,6 +159,8 @@ public enum CodeStatus : short
     ActionNotFound = 440,
     SubActionNotFound = 441,
 
+    ErrorGetEntity = 450,
+
     ErrorSoliciteMemory = 470,
     AlreadyExistsPetition = 471,
 

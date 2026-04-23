@@ -24,7 +24,7 @@ namespace TerbinService.Configuration;
 
 public class ConfiguratonTerbin
 {
-    [TerbinExecutableCompound(CodeTerbinProtocol.Update, (byte)CodeServices.Rute)]
+    [TerbinExecutableCompound((byte)CodeTerbinProtocol.Update, (byte)CodeServices.Rute)]
     public static async Task<InfoResponse?> UpdateRute(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)
@@ -49,7 +49,7 @@ public class ConfiguratonTerbin
         return InfoResponse.Create(pHead.IdRequest, pHead.Status);
     }
 
-    [TerbinExecutableCompound(CodeTerbinProtocol.Read, (byte)CodeServices.Rute)]
+    [TerbinExecutableCompound((byte)CodeTerbinProtocol.Read, (byte)CodeServices.Rute)]
     public static async Task<InfoResponse?> ReadRute(Header pHead, byte[] pParameters)
     {
         byte[] pld;

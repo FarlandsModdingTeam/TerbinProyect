@@ -13,10 +13,9 @@ public static class TerbinExecutor
 {
     private static TerbinCommunicator? _communicator;
 
-    public static void Init(Assembly pAssembly, TerbinCommunicator pCommunicator)
+    public static void Init(TerbinCommunicator pCommunicator)
     {
         RegisterInternal();
-        Register(pAssembly);
         _communicator = pCommunicator;
     }
 
@@ -24,20 +23,20 @@ public static class TerbinExecutor
 
     public static void RegisterInternal()
     {
-        ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
-        TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+        TerbinExecutableManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+        TerbinExecutableManagerCompound.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
     public static void Register(Assembly pAssembly)
     {
-        ExecutableDispatcher.RegisterFromAssembly(pAssembly);
-        TerbinExecutableCRUDManager.RegisterFromAssembly(pAssembly);
+        TerbinExecutableManager.RegisterFromAssembly(pAssembly);
+        TerbinExecutableManagerCompound.RegisterFromAssembly(pAssembly);
     }
 
-    public static async Task<InfoResponse?> Execution(PacketRequest pRequest)
-    {
-        var capR = await ExecutableDispatcher.DispatchAsync(pRequest);
-        return capR;
-    }
+    //public static async Task<InfoResponse?> Execution(PacketRequest pRequest)
+    //{
+    //    var capR = await TerbinExecutableManager.DispatchAsync(pRequest);
+    //    return capR;
+    //}
 
 
     //public void Prueba(byte[]? b = null, char[]? c = null)
@@ -74,36 +73,20 @@ public static class TerbinExecutor
         return null;
     }
 
-
-
-    [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
-    public static async Task<InfoResponse?> Create(Header pHead, byte[] pParameters)
-    {
-        InfoResponse? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Create, pParameters);
-        return r;
-    }
-
     [TerbinExecutable((byte)CodeTerbinProtocol.Read)]
-    public static async Task<InfoResponse?> Read(Header pHead, byte[] pParameters)
-    {
-        InfoResponse? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Read, pParameters);
-        return r;
-    }
-
+    [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
     [TerbinExecutable((byte)CodeTerbinProtocol.Update)]
-    public static async Task<InfoResponse?> Update(Header pHead, byte[] pParameters)
-    {
-        InfoResponse? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Update, pParameters);
-        return r;
-    }
-
     [TerbinExecutable((byte)CodeTerbinProtocol.Deleted)]
-    public static async Task<InfoResponse?> Deleted(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> CRUD(Header pHead, byte[] pParameters)
     {
-        InfoResponse? r = await TerbinExecutableCRUDManager.DispatchAsync(pHead, CodeTerbinProtocol.Deleted, pParameters);
+        if (!CompoundExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
+        {
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetEntity);
+        }
+
+        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, entity, memo);
         return r;
     }
-
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Response)]
     public static async Task<InfoResponse?> Response(Header pHead, byte[] pParameters)

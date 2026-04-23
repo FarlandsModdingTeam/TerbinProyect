@@ -100,7 +100,7 @@ public class TerbinCommunicator : IDisposable
     }
 
     // ****************************( Construct )**************************** //
-    public TerbinCommunicator(Assembly pAssembly, bool pIsServer = false, CancellationToken pTokenCancellation = default, string pName = "TerbinPipe")
+    public TerbinCommunicator(bool pIsServer = false, CancellationToken pTokenCancellation = default, string pName = "TerbinPipe")
     {
         IsServer = pIsServer;
         _stopToken = pTokenCancellation;
@@ -116,7 +116,7 @@ public class TerbinCommunicator : IDisposable
         _writer = new StreamWriteStruct(_thePipe);
         _reader = new StreamReadStruct(_thePipe);
 
-        TerbinExecutor.Init(pAssembly, this);
+        TerbinExecutor.Init(this);
         if (pIsServer)
             _ = manageConnectClient();
     }

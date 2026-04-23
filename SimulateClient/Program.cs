@@ -12,8 +12,9 @@ using TerbinLibrary.SteamFarlands;
 
 
 
-var communicator = new TerbinCommunicator(Assembly.GetExecutingAssembly(), false);
-communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
+var communicator = new TerbinCommunicator(false);
+TerbinExecutor.Register(Assembly.GetExecutingAssembly());
+communicator.OnRecive += TerbinExecutableManager.DispatchAsync;
 
 if (await communicator.Connect())
 {
@@ -68,6 +69,7 @@ while (true)
         er = m.WriteArray<char>(pruebaEspacio);
         if (er != BufferErrorCode.Succes) Console.WriteLine($"3Error: {er}");
 
+        Console.WriteLine($"-- Prueba Espacio mide: {pruebaEspacio.Length}");
 
         //var keyMsg = Serialineitor.SerializeArray<char>(TerbinConfiguration.RUTE_FARLANDS.ToCharArray());
         //var baseMsg = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
@@ -100,6 +102,7 @@ while (true)
     //Console.WriteLine($"[Client] Mensaje: {spanMenssaje.ToArray().ToString()}");
     try
     {
+        Console.WriteLine($"[Client] M (l:{menssaje.Length})");
         var r = await communicator.Communicate(input, menssaje);
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
         if (r.Payload.Length > 0)

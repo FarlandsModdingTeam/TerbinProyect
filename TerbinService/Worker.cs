@@ -49,8 +49,9 @@ public class Worker : BackgroundService
         // No habria que registrar tambien al crear uno nuevo?????
         try
         {
-            var communicator = new TerbinCommunicator(Assembly.GetExecutingAssembly(), true, pTokenCancellation);
-            communicator.OnRecive += ExecutableDispatcher.DispatchAsync;
+            var communicator = new TerbinCommunicator(true, pTokenCancellation);
+            TerbinExecutor.Register(Assembly.GetExecutingAssembly());
+            communicator.OnRecive += TerbinExecutableManager.DispatchAsync;
             communicator.OnNewClientConnect += async () =>
             {
                 _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);

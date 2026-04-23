@@ -33,21 +33,16 @@ public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
 
     public bool Unregister(byte pSubAction) => _handlers.TryRemove(pSubAction, out _);
 
-    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload)
+    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte pEntity, byte[] pPayload)
     {
-        if (!tryGetEntity(pPayload, out var entity, out var memo))
-        {
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetPaylaodMemory);
-        }
-
-        if (!_handlers.TryGetValue(entity, out var handler))
+        if (!_handlers.TryGetValue(pEntity, out var handler))
         {
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.SubActionNotFound);
         }
 
         try
         {
-            return await handler(pHead, memo).ConfigureAwait(false);
+            return await handler(pHead, pPayload).ConfigureAwait(false);
         }
         catch (Exception e)
         {
@@ -56,7 +51,7 @@ public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
         }
     }
 
-    private static bool tryGetEntity(byte[] pPayload, out byte pEntity, out byte[] pMemory)
+    public static bool TryGetEntity(byte[] pPayload, out byte pEntity, out byte[] pMemory)
     {
         if (pPayload == null || pPayload.Length == 0)
         {
@@ -91,8 +86,8 @@ public static class TerbinExecutableManagerCompound
     public static bool Unregister(byte pAction) =>
         _dispatcher.Unregister(pAction);
 
-    public static async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload) =>
-        await _dispatcher.DispatchAsync(pHead, pPayload);
+    public static async Task<InfoResponse?> DispatchAsync(Header pHead, byte pEntity, byte[] pPayload) =>
+        await _dispatcher.DispatchAsync(pHead, pEntity, pPayload);
 
     public static void RegisterFromAssembly(Assembly pAssembly) =>
         _dispatcher.RegisterFromAssembly(pAssembly);
