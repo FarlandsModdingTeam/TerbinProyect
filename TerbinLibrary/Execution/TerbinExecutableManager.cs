@@ -48,19 +48,12 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
     {
         if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handlers))
         {
-            TerbinExecutableHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
+            TerbinMemoryHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
             return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ActionNotFound);
         }
-
-        if (TerbinExecutableHelper.TryGetMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
-        {
-            var error = (r == TerbinErrorCode.MemoryReleaseFailed) ? CodeStatus.ErrorReleaseMemory : CodeStatus.ErrorGetPaylaodMemory;
-            return InfoResponse.Create(pCapsule.Head.IdRequest, error);
-        }
-
+        Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {pCapsule.Payload.Length}"); //Encoding.UTF8.GetString(memo)
         try
         {
-            Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {memo.Length}"); //Encoding.UTF8.GetString(memo)
             if (pCapsule.Head.Status == CodeStatus.CheckExecution)
                 return InfoResponse.CreateSucces(pCapsule.Head.IdRequest);
 
@@ -68,12 +61,12 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
             {
                 for (int i = 0; i < handlers.Count; i++)
                 {
-                    _ = handlers[i](pCapsule.Head, memo);
+                    _ = handlers[i](pCapsule.Head, pCapsule.Payload);
                 }
                 return null; // Por si alguien hace el bruto.
             }
 
-            return await TerbinExecutableHelper.ExecutionList(handlers, pCapsule.Head, memo);
+            return await TerbinExecutableHelper.ExecutionList(handlers, pCapsule.Head, pCapsule.Payload);
         }
         catch (Exception e)
         {

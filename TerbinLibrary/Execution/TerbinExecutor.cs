@@ -49,7 +49,7 @@ public static class TerbinExecutor
     {
         if (pHead.IdRequest > 0)
         {
-            TerbinMemory.Store(pHead.IdMemory, pHead.OrderRequest, pParameters);
+            TerbinMemoryManager.Store(pHead.IdMemory, pHead.OrderRequest, pParameters);
         }
 
         return null;
@@ -61,7 +61,7 @@ public static class TerbinExecutor
     {
         if (pHead.IdMemory == (byte)CodeTerbinMemory.New)
         {
-            byte id = TerbinMemory.GetStore();
+            byte id = TerbinMemoryManager.GetStore();
             return new InfoResponse
             {
                 Status = CodeStatus.Succes,

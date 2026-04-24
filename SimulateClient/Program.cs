@@ -126,3 +126,21 @@ while (true)
         Console.WriteLine($"[Client] Error-> {e.Message}");
     }
 }
+
+//public class ProgramStoped
+//{
+
+//    [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]
+//    public static async Task<InfoResponse?> Stop(Header pHead, byte[] pParameters)
+//    {
+//        _ = Task.Run(async () =>
+//        {
+//            await Task.Delay(100);
+//            Console.WriteLine("[Worker] Execution stoped");
+//            _appLifetime?.StopApplication();
+//            Cts?.Cancel();
+//        });
+//        Console.WriteLine("[Worker] Stopping execution...");
+//        return InfoResponse.CreateSucces(pHead.IdRequest);
+//    }
+//}

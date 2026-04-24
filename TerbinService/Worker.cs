@@ -56,8 +56,6 @@ public class Worker : BackgroundService
             {
                 _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);
             };
-            //ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
-            //TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
         }
         catch (Exception e)
         {
@@ -72,6 +70,7 @@ public class Worker : BackgroundService
         _ = Task.Run(async () =>
         {
             await Task.Delay(100);
+
             Console.WriteLine("[Worker] Execution stoped");
             _appLifetime?.StopApplication();
             Cts?.Cancel();

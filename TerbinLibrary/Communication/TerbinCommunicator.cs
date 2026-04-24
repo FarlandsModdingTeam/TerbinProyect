@@ -254,13 +254,20 @@ public class TerbinCommunicator : IDisposable
 
     private async Task handleReceive(PacketRequest pCapsule)
     {
-        if (_onRecive != null)
+        if (_onRecive == null)
+            return;
+
+        if (TerbinMemoryHelper.TryGetMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
         {
-            InfoResponse? rCap = await _onRecive.Invoke(pCapsule);
-            // TODO: Crear e implementar ManagerMemory.
-            if (rCap != null)
-                await Reply(rCap.Value);
+            var error = (r == TerbinErrorCode.MemoryReleaseFailed) ? CodeStatus.ErrorReleaseMemory : CodeStatus.ErrorGetPaylaodMemory;
+            await Reply(InfoResponse.Create(pCapsule.Head.IdRequest, error));
+            return;
         }
+        pCapsule.Payload = memo;
+
+        InfoResponse? rCap = await _onRecive.Invoke(pCapsule);
+        if (rCap != null)
+            await Reply(rCap.Value);
     }
 
     public void GiveResponse(PacketRequest pCapsule)

@@ -16,17 +16,10 @@ namespace TerbinLibrary.Memory;
   empieza: minusculas = privada.
  */
 
-// TODO: Solicitar memoria
-// ├─Solicita.
-// ├─Crea o asigna memoria.
-// └─Devuelve Id de memoria.
 
-// TODO: Sobre escribe datos.
-// TODO: Añade datos.
-// TODO: Limpia (pero desde Containers).
-public static class TerbinMemory
+public static class TerbinMemoryManager
 {
-    private static readonly ConcurrentDictionary<byte, TerbinRAM> _containers = new();
+    private static readonly ConcurrentDictionary<byte, TerbinMemory> _containers = new();
 
 
     public static byte GetStore()
@@ -48,12 +41,12 @@ public static class TerbinMemory
     private static (bool succes, byte id) createStore()
     {
         byte id = MiniID.NewB;
-        return (_containers.TryAdd(id, new TerbinRAM { Id = id }), id);
+        return (_containers.TryAdd(id, new TerbinMemory { Id = id }), id);
     }
 
     public static void Store(byte pIdMemory, ushort pOrder, byte[] pData)
     {
-        var container = _containers.GetOrAdd(pIdMemory, id => new TerbinRAM { IdRequest = id });
+        var container = _containers.GetOrAdd(pIdMemory, id => new TerbinMemory { IdRequest = id });
         container.AddFragment(pOrder, pData);
     }
 
@@ -68,7 +61,7 @@ public static class TerbinMemory
                 return (false, r.typeError);
         }
         pData = [];
-        // no habia una excepcion de intentar hacceder a null?
+        // ¿no habia una excepcion de intentar hacceder a null?
         return (false, TerbinErrorCode.ValueOutOfRange);
     }
 

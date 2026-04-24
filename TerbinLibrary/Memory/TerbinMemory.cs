@@ -14,7 +14,7 @@ namespace TerbinLibrary.Memory;
   empieza: minusculas = privada.
  */
 
-public class TerbinRAM
+public class TerbinMemory
 {
     public byte Id
     {
@@ -52,30 +52,6 @@ public class TerbinRAM
         OnAdd?.Invoke();
     }
 
-    // TODO: Comprobar si falta alguna parte intermedia.
-    // TODO: Fragmentar/Encapsular.
-    [Obsolete]
-    public byte[] GetFullData()
-    {
-        KeyValuePair<ushort, byte[]>[] fragmentsCopy;
-        int totalSizeCopy;
-        lock (_fragments)
-        {
-            fragmentsCopy = _fragments.ToArray();
-            totalSizeCopy = _totalSize;
-        }
-
-        Array.Sort(fragmentsCopy, (a, b) => a.Key.CompareTo(b.Key));
-
-        var result = new byte[totalSizeCopy];
-        int offset = 0;
-        foreach (var f in fragmentsCopy)
-        {
-            Buffer.BlockCopy(f.Value, 0, result, offset, f.Value.Length);
-            offset += f.Value.Length;
-        }
-        return result;
-    }
 
     public (bool succes, TerbinErrorCode typeError) TryGetFullData(out byte[] pData)
     {
