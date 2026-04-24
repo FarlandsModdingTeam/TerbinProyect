@@ -145,13 +145,3 @@ public static class BufferWriterExtension
         BufferWriter.AddStruct<T>(pBuffer, ref pOffset, pStruct);
     }
 }
-
-
-
-public enum BufferErrorCode : sbyte
-{
-    BufferSmall = -1,
-    SurpassesMax = -2,
-
-    Succes = 0,
-}

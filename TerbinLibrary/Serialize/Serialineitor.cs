@@ -24,9 +24,70 @@ public interface IStructSerializable
     void ReadFrom(ReadOnlySpan<byte> pBuffer);
 }
 
-// TODO: CreateArray: Le puedas pasar todo lo que quieras en orden y lo serializara y añadira a un array que te devolvera.
 public class Serialineitor
 {
+    private byte[] _content;
+    private int _offset;
+
+    public Serialineitor() : this(2) { }
+    public Serialineitor(int pSize) : this(null, pSize) { }
+    public Serialineitor(byte[]? pInitialContent, int pSize = 2)
+    {
+        this._content = pInitialContent ?? new byte[pSize];
+        this._offset = pInitialContent?.Length ?? 0;
+    }
+
+    private void ensureCapacity(int pNeededBytes)
+    {
+        if (_content.Length - _offset < pNeededBytes)
+        {
+            int newCapacity = Math.Max(_content.Length * 2, _content.Length + pNeededBytes);
+            Array.Resize(ref _content, newCapacity);
+        }
+    }
+
+
+    public Serialineitor Add<T>(T pValue) where T : unmanaged
+    {
+        ensureCapacity(Unsafe.SizeOf<T>());
+
+        BufferWriter.Add<T>(_content, ref _offset, pValue);
+
+        return this; 
+    }
+
+    public Serialineitor AddArray<T>(T[] pArray) where T : unmanaged
+    {
+        int elementsBytes = (pArray?.Length ?? 0) * Unsafe.SizeOf<T>();
+        ensureCapacity(TerbinProtocol.LENGTH_ARRAY + elementsBytes);
+
+        BufferWriter.AddArray<T>(_content, ref _offset, pArray);
+
+        return this;
+    }
+
+    public Serialineitor AddStruct<T>(T pStruct) where T : struct, IStructSerializable
+    {
+        int structSize = (int)pStruct.GetSize();
+        ensureCapacity(structSize);
+
+        BufferWriter.AddStruct<T>(_content, ref _offset, pStruct);
+
+        return this;
+    }
+
+    public byte[] ToArray()
+    {
+        return _content.AsSpan(0, _offset).ToArray();
+    }
+
+
+
+
+
+
+
+
     public static byte[] SerializeStructConst<T>(T pStruct) where T : struct
     {
         int size = Marshal.SizeOf(pStruct);
@@ -99,4 +160,15 @@ public class Serialineitor
 
         throw new NotImplementedException("Ñe");
     }
+}
+
+
+
+
+public enum BufferErrorCode : sbyte
+{
+    Succes = 1,
+
+    SurpassesMax = 2,
+    BufferSmall = 3,
 }
