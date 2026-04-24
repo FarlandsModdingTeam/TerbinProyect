@@ -91,7 +91,7 @@ public static class NetUtil
     /// </returns>
     public static async Task<(StatusNetUtil status, string tempFilePath)> DownloadAny(
                                             string pUrl,
-                                            IProgress<double>? pProgress = null,
+                                            IProgress<byte>? pProgress = null,
                                             CancellationToken pCancellationToken = default)
     {
         string tmp = Path.Combine(Path.GetTempPath(), $"tmp_{Guid.NewGuid():N}");
@@ -187,13 +187,15 @@ public static class NetUtil
                                             Stream pSource,
                                             Stream pDestination,
                                             long? pTotal,
-                                            IProgress<double>? pProgress,
+                                            IProgress<byte>? pProgress,
                                             CancellationToken pCancellationToken)
     {
         var buffer = new byte[81920];
         long totalRead = 0;
         int read;
 
+        double? totalInverse = (pTotal.HasValue) ? (100.0d / pTotal.Value) : null;
+        int lastPercentage = -1;
         while ((read = await pSource.ReadAsync(
                    buffer.AsMemory(0, buffer.Length),
                    pCancellationToken)) > 0)
@@ -204,14 +206,14 @@ public static class NetUtil
 
             totalRead += read;
 
-            ReportProgress(totalRead, pTotal, pProgress);
+            ReportProgress(totalRead, totalInverse, pProgress, ref lastPercentage);
         }
     }
     /// <summary>
     /// Calcula y reporta el porcentaje de progreso de la operación.
     /// </summary>
     /// <param name="pTotalRead">Cantidad total de bytes leídos.</param>
-    /// <param name="pTotal">Cantidad total esperada de bytes.</param>
+    /// <param name="pTotalInverse">Cantidad total esperada de bytes de multiplicacion inversa.</param>
     /// <param name="pProgress">
     /// Objeto opcional para reportar el progreso.
     /// </param>
@@ -219,13 +221,19 @@ public static class NetUtil
     /// Si el tamaño total es desconocido o no se proporcionó un
     /// objeto de progreso, no se reporta nada.
     /// </remarks>
-    public static void ReportProgress(long pTotalRead, long? pTotal, IProgress<double>? pProgress)
+    public static void ReportProgress(long pTotalRead, double? pTotalInverse, IProgress<byte>? pProgress, ref int pPrevouslyReported)
     {
-        if (!pTotal.HasValue || pProgress == null)
+        if (!pTotalInverse.HasValue || pProgress == null)
             return;
 
-        double percent = (double)pTotalRead / pTotal.Value * 100;
-        pProgress.Report(percent);
+        int percent = (int)(pTotalRead * pTotalInverse.Value);
+
+        if (percent > pPrevouslyReported)
+        {
+            pPrevouslyReported = percent;
+            pProgress.Report((byte)percent);
+        }
+
     }
 
 
