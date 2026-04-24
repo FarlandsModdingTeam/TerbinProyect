@@ -4,8 +4,7 @@ using System.Text;
 using System.Net;
 using System.IO.Compression;
 
-namespace TerbinService;
-
+namespace TerbinService.Useful;
 /*
  -- Variables:
   empieza: _ = es privada NO local.
@@ -17,46 +16,50 @@ namespace TerbinService;
   empieza: menorculas = privada.
  */
 
+
+public enum StatusNetUtil : sbyte
+{
+    ExceptionDeleteTemporalFile = -11,
+    ExceptionOnDownload = -10,
+
+    DestinationInvalid = -4,
+    NotSuchSpace = -3,
+    ErrorOnDownload = -2,
+    InvalidURL = -1,
+
+    Succes = 1,
+}
 public static class NetUtil
 {
     private static readonly HttpClient _httpClient = new();
 
-    public static async Task<bool> InstallZip(string pUrl, string pDestination)
+    public static async Task<StatusNetUtil> InstallZip(string pUrl, string pDestination)
     {
-        bool result = true;
+        StatusNetUtil result = StatusNetUtil.Succes;
         string tmp = "";
         // TODO: Comprobar que carpetas al destino existen.
 
+
+        if (await DownloadAny(pUrl) is var r && r.status == StatusNetUtil.Succes)
+        {
+            tmp = r.tempFilePath;
+            ZipFile.ExtractToDirectory(sourceArchiveFileName: r.tempFilePath,
+                                       destinationDirectoryName: pDestination,
+                                       overwriteFiles: true);
+        }
+        else
+        {
+            result = r.status;
+        }
+
         try
         {
-            if (await DownloadAny(pUrl) is var r && r.success)
-            {
-                tmp = r.tempFilePath;
-                ZipFile.ExtractToDirectory(sourceArchiveFileName: r.tempFilePath,
-                                           destinationDirectoryName: pDestination,
-                                           overwriteFiles: true);
-            }
-            else
-            {
-                result = false;
-            }
+            if (File.Exists(tmp))
+                File.Delete(tmp);
         }
-        catch (Exception e)
+        catch
         {
-            // TODO: DebugLogger.
-            result = false;
-        }
-        finally
-        {
-            try
-            {
-                if (File.Exists(tmp))
-                    File.Delete(tmp);
-            }
-            catch
-            {
-                // TODO: DebugLogger.
-            }
+            result = StatusNetUtil.ExceptionDeleteTemporalFile;
         }
 
         return result;
@@ -86,31 +89,44 @@ public static class NetUtil
     /// </item>
     /// </list>
     /// </returns>
-    public static async Task<(bool success, string tempFilePath)> DownloadAny(
+    public static async Task<(StatusNetUtil status, string tempFilePath)> DownloadAny(
                                             string pUrl,
                                             IProgress<double>? pProgress = null,
                                             CancellationToken pCancellationToken = default)
     {
         string tmp = Path.Combine(Path.GetTempPath(), $"tmp_{Guid.NewGuid():N}");
 
-        using var response = await GetResponseAsync(pUrl, pCancellationToken);
+        if (!Uri.TryCreate(pUrl, UriKind.Absolute, out _))
+            return (StatusNetUtil.InvalidURL, "");
+        try
+        {
+            using var response = await GetResponseAsync(pUrl, pCancellationToken);
 
-        if (!response.IsSuccessStatusCode)
-            return (false, "");
+            if (!response.IsSuccessStatusCode)
+                return (StatusNetUtil.ErrorOnDownload, "");
 
-        var total = response.Content.Headers.ContentLength;
+            var total = response.Content.Headers.ContentLength;
 
-        await using var networkStream = await response.Content.ReadAsStreamAsync(pCancellationToken);
-        await using var fileStream = CreateFileStream(tmp);
+            var driveInfo = new DriveInfo(tmp);
+            if (total.HasValue && driveInfo.AvailableFreeSpace < total.Value)
+                return (StatusNetUtil.NotSuchSpace, "");
 
-        await CopyStreamWithProgressAsync(
-            networkStream,
-            fileStream,
-            total,
-            pProgress,
-            pCancellationToken);
+            await using var networkStream = await response.Content.ReadAsStreamAsync(pCancellationToken);
+            await using var fileStream = CreateFileStream(tmp);
 
-        return (true, tmp);
+            await CopyStreamWithProgressAsync(
+                networkStream,
+                fileStream,
+                total,
+                pProgress,
+                pCancellationToken);
+
+            return (StatusNetUtil.Succes, tmp);
+        }
+        catch (Exception e)
+        {
+            return (StatusNetUtil.ExceptionOnDownload, e.Message);
+        }
     }
     /// <summary>
     /// Envía una solicitud HTTP GET y devuelve la respuesta sin descargar

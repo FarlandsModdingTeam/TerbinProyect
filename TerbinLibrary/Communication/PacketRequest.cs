@@ -1,15 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Net.NetworkInformation;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Runtime.Serialization.Formatters.Binary;
-using System.Text.RegularExpressions;
-using TerbinLibrary.Id;
 using TerbinLibrary.Memory;
 using TerbinLibrary.Serialize;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -202,6 +196,7 @@ public struct InfoResponse
     }
 }
 
+[Obsolete]
 public struct InfoPacket
 {
     public ushort IdRequest { get => field; set => field = value; }

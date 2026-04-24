@@ -11,7 +11,7 @@ namespace TerbinService.Instances;
 public partial class HandleInstances
 {
     [TerbinExecutable((byte)CodeMethodsTerbinService.CreateInstance)]
-    public static async Task<PacketRequest?> Create(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Create(Header pHead, byte[] pParameters)
     {
         Console.WriteLine($"[Worker] IdRequest: {pHead.IdRequest}");
         Console.WriteLine($"[Worker] Largo: {pParameters.Length}");
@@ -25,16 +25,7 @@ public partial class HandleInstances
             Console.WriteLine("[Worker] Mensaje: (Sin payload)");
         }
 
-        // Me acuerdo que con MemoryStream podias elegir que cosa leer o algo así.
-        // no me acuerdo porque elegi MemoryStream para leer datos.
-        // TODO: Acordarme.
-
-        pHead.Status = CodeStatus.Succes;
-        return new PacketRequest
-        {
-            Head = pHead,
-            ActionMethod = (byte)CodeMethodsTerbinService.CreateInstance,
-        };
+        return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
 
