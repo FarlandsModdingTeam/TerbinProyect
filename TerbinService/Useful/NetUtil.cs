@@ -37,8 +37,9 @@ public static class NetUtil
     {
         StatusNetUtil result = StatusNetUtil.Succes;
         string tmp = "";
-        // TODO: Comprobar que carpetas al destino existen.
 
+        if (!Directory.Exists(pDestination))
+            return StatusNetUtil.DestinationInvalid;
 
         if (await DownloadAny(pUrl) is var r && r.status == StatusNetUtil.Succes)
         {
