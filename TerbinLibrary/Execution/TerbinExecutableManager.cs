@@ -71,7 +71,7 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
         catch (Exception e)
         {
             Console.WriteLine($"[ExecutableDispatcher>DispatchAsync] ExceptionError->  {e.Message}");
-            return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ExecutionError);
+            return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ExecutionException);
         }
     }
 

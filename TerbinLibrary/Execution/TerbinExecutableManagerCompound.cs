@@ -57,7 +57,7 @@ public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
         catch (Exception e)
         {
             Console.WriteLine($"[SubActionExecutableDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionError);
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionException);
         }
     }
 

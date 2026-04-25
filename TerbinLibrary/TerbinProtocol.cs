@@ -100,7 +100,6 @@ public enum CodeTerbinProtocol : byte
     Cancel = 3,
     Solicit = 4,
 
-    // TODO: tratar como los CRUD.
     Info = 5, // informar del cliente que por ejemplo otro cliente ah cambiado cierta la configuracion.
 
     // Si puede ayudar a ahorrarte fuciones.
@@ -153,7 +152,8 @@ public enum CodeStatus : short
     Info = 301,
     CheckExecution = 302,
 
-    BadRequest = 400,
+    ClientError = 400,
+    BadRequest = 401,
     NotFound = 404,
 
     ActionNotFound = 440,
@@ -165,10 +165,11 @@ public enum CodeStatus : short
     AlreadyExistsPetition = 471,
 
     InternalWorkerError = 500,
-    ExecutionError = 501,
+
+    ExecutionException = 501,
     ErrorNotPayload = 502,
-    SerializeError = 503,
-    AccesNullOrNotExist = 504,
+    SerializeError = 503, // ¿?
+    AccesNullOrNotExist = 504, // ¿?
 
     OverMaximumTime = 550,
     OverMaximunPacket = 551,

@@ -61,7 +61,7 @@ public class BufferWriter
 
 
     // ¿Para que servia?
-    public static void EnsureWrite<T>(ref byte[] buffer, int offset, T value) where T : unmanaged
+    public static void EnsureAdd<T>(ref byte[] buffer, int offset, T value) where T : unmanaged
     {
         int size = Unsafe.SizeOf<T>();
         if (buffer.Length - offset < size)

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.IO.Compression;
+using TerbinLibrary.Serialize;
 
 namespace TerbinService.Useful;
 /*
@@ -19,21 +20,28 @@ namespace TerbinService.Useful;
 
 public enum StatusNetUtil : sbyte
 {
+    ExceptionOnExtractZip = -12,
     ExceptionDeleteTemporalFile = -11,
     ExceptionOnDownload = -10,
 
-    DestinationInvalid = -4,
-    NotSuchSpace = -3,
-    ErrorOnDownload = -2,
-    InvalidURL = -1,
-
     Succes = 1,
+
+    InvalidURL = 2,
+    ErrorOnDownload = 3,
+    NotSuchSpace = 4,
+    DestinationInvalid = 5,
 }
 public static class NetUtil
 {
+    public const int BUFFER_SIZE = 81920;
+
     private static readonly HttpClient _httpClient = new();
 
-    public static async Task<StatusNetUtil> InstallZip(string pUrl, string pDestination)
+    public static async Task<StatusNetUtil> InstallZip(
+                                            string pUrl,
+                                            string pDestination,
+                                            IProgress<byte[]>? pProgress = null,
+                                            CancellationToken pCancellationToken = default)
     {
         StatusNetUtil result = StatusNetUtil.Succes;
         string tmp = "";
@@ -44,9 +52,16 @@ public static class NetUtil
         if (await DownloadAny(pUrl) is var r && r.status == StatusNetUtil.Succes)
         {
             tmp = r.tempFilePath;
-            ZipFile.ExtractToDirectory(sourceArchiveFileName: r.tempFilePath,
-                                       destinationDirectoryName: pDestination,
-                                       overwriteFiles: true);
+            try
+            {
+                ZipFile.ExtractToDirectory(sourceArchiveFileName: r.tempFilePath,
+                                           destinationDirectoryName: pDestination,
+                                           overwriteFiles: true);
+            }
+            catch
+            {
+                result = StatusNetUtil.ExceptionOnExtractZip;
+            }
         }
         else
         {
@@ -92,7 +107,7 @@ public static class NetUtil
     /// </returns>
     public static async Task<(StatusNetUtil status, string tempFilePath)> DownloadAny(
                                             string pUrl,
-                                            IProgress<byte>? pProgress = null,
+                                            IProgress<byte[]>? pProgress = null,
                                             CancellationToken pCancellationToken = default)
     {
         string tmp = Path.Combine(Path.GetTempPath(), $"tmp_{Guid.NewGuid():N}");
@@ -166,7 +181,7 @@ public static class NetUtil
             FileMode.Create,
             FileAccess.Write,
             FileShare.None,
-            bufferSize: 81920,
+            bufferSize: BUFFER_SIZE,
             useAsync: true);
     }
     /// <summary>
@@ -188,11 +203,11 @@ public static class NetUtil
                                             Stream pSource,
                                             Stream pDestination,
                                             long? pTotal,
-                                            IProgress<byte>? pProgress,
+                                            IProgress<byte[]>? pProgress,
                                             CancellationToken pCancellationToken)
     {
-        var buffer = new byte[81920];
-        long totalRead = 0;
+        var buffer = new byte[BUFFER_SIZE];
+        long currentRead = 0;
         int read;
 
         double? totalInverse = (pTotal.HasValue) ? (100.0d / pTotal.Value) : null;
@@ -205,48 +220,44 @@ public static class NetUtil
                 buffer.AsMemory(0, read),
                 pCancellationToken);
 
-            totalRead += read;
+            currentRead += read;
 
-            ReportProgress(totalRead, totalInverse, pProgress, ref lastPercentage);
+            Util.ReportProgress(currentRead, pTotal, totalInverse, pProgress, ref lastPercentage);
         }
     }
-    /// <summary>
-    /// Calcula y reporta el porcentaje de progreso de la operación.
-    /// </summary>
-    /// <param name="pTotalRead">Cantidad total de bytes leídos.</param>
-    /// <param name="pTotalInverse">Cantidad total esperada de bytes de multiplicacion inversa.</param>
-    /// <param name="pProgress">
-    /// Objeto opcional para reportar el progreso.
-    /// </param>
-    /// <remarks>
-    /// Si el tamaño total es desconocido o no se proporcionó un
-    /// objeto de progreso, no se reporta nada.
-    /// </remarks>
-    public static void ReportProgress(long pTotalRead, double? pTotalInverse, IProgress<byte>? pProgress, ref int pPrevouslyReported)
+
+
+    public static async Task<long?> GetContentLength(string pUrl, CancellationToken pCancellationToken = default)
     {
-        if (!pTotalInverse.HasValue || pProgress == null)
-            return;
+        if (!Uri.TryCreate(pUrl, UriKind.Absolute, out _))
+            return null;
 
-        int percent = (int)(pTotalRead * pTotalInverse.Value);
-
-        if (percent > pPrevouslyReported)
+        try
         {
-            pPrevouslyReported = percent;
-            pProgress.Report((byte)percent);
+            using var response = await GetHead(pUrl, pCancellationToken);
+            if (response.IsSuccessStatusCode)
+            {
+                return response.Content.Headers.ContentLength;
+            }
+        }
+        catch (Exception)
+        {
+            
         }
 
+        return null;
     }
 
-
+    public static async Task<HttpResponseMessage> GetHead(string pUrl, CancellationToken pCancellationToken = default)
+    {
+        using var request = new HttpRequestMessage(HttpMethod.Head, pUrl);
+        return await _httpClient.SendAsync(request, HttpCompletionOption.ResponseHeadersRead, pCancellationToken);
+    }
 
     // NOTA: no se si borrar estas funciones.
     public static bool IsResponseOk(HttpResponseMessage pResponse)
     {
         return pResponse.IsSuccessStatusCode;
-    }
-    public static long? GetContentLength(HttpResponseMessage pResponse)
-    {
-        return pResponse.Content.Headers.ContentLength;
     }
     public static Task<Stream> GetNetworkStreamAsync(HttpResponseMessage pResponse, CancellationToken pCancellationToken)
     {

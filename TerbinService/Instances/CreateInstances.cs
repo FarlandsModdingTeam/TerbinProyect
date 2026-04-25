@@ -10,7 +10,8 @@ namespace TerbinService.Instances;
 
 public partial class HandleInstances
 {
-    [TerbinExecutable((byte)CodeMethodsTerbinService.CreateInstance)]
+    /*
+    [TerbinExecutable((byte)CodeService.CreateInstance)]
     public static async Task<InfoResponse?> Create(Header pHead, byte[] pParameters)
     {
         Console.WriteLine($"[Worker] IdRequest: {pHead.IdRequest}");
@@ -27,7 +28,7 @@ public partial class HandleInstances
 
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
-
+    */
 
 
     /// <summary>

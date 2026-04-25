@@ -85,8 +85,8 @@ public class Serialineitor
 
 
 
-
-
+    // ******************************( Parte Estatic )****************************** //
+    // TODO: Que no dependa de los Buffers sino al reve.
 
     public static byte[] SerializeStructConst<T>(T pStruct) where T : struct
     {
@@ -155,10 +155,23 @@ public class Serialineitor
 
 
 
-    public static byte[] Serialize<T>(T pValue)
+    public static byte[] Serialize<T>(T pValue) where T : unmanaged
     {
+        int size = Unsafe.SizeOf<T>();
+        byte[] buffer = new byte[size];
 
-        throw new NotImplementedException("Ñe");
+        MemoryMarshal.Write(buffer.AsSpan(), in pValue);
+        
+        return buffer;
+    }
+
+    public static T Deserialize<T>(byte[] pBuffer) where T : unmanaged
+    {
+        return MemoryMarshal.Read<T>(pBuffer.AsSpan());
+    }
+    public static T Deserialize<T>(byte[] pBuffer, int pOffset) where T : unmanaged
+    {
+        return MemoryMarshal.Read<T>(pBuffer[pOffset..]);
     }
 }
 
