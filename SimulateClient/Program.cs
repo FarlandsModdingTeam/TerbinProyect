@@ -6,6 +6,7 @@ using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Execution;
+using TerbinLibrary.Memory;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.SteamFarlands;
 
@@ -110,12 +111,25 @@ while (true)
     {
         Console.WriteLine($"[Client] M (l:{menssage.Length})");
         var r = await communicator.Communicate(input, menssage);
+
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (r.Payload.Length > 0)
+        if (input == (byte)CodeService.InstallBepInEx)
+        {
+            ReadOnlySpan<byte> w = r.Payload;
+            byte id = w.Read<byte>();
+            long max = w.Read<long>();
+
+            DrawPercentage(id, max);
+        }
+        else if (r.Payload.Length > 0 && r.Head.Status == CodeStatus.Succes)
         {
             string rute = new(Serialineitor.DeserializeArray<char>(r.Payload));
             Console.WriteLine($"[Client] R (l: {rute.Length}, m: {rute})");
             pruebaEspacio = rute.ToCharArray();
+        }
+        else if (r.Payload.Length > 0 && r.Head.Status == CodeStatus.InternalWorkerError)
+        {
+            Console.WriteLine($"[Client] R (error: {(CodeInternalErrors)Serialineitor.Deserialize<ushort>(r.Payload)})");
         }
         else
         {
@@ -132,6 +146,41 @@ while (true)
     {
         Console.WriteLine($"[Client] Error-> {e.Message}");
     }
+}
+
+void DrawPercentage(byte pIdMemory, long pMaxSize)
+{
+    if (!TerbinMemoryManager.TryGetMemory(pIdMemory, out var memory))
+    {
+        Console.Write($"[Client] Memoria no encontrada");
+        return;
+    }
+    Action add = () => { OnAddDrawPercentage(pMaxSize, memory); };
+    Action release = () => { OnRelease(memory, add, release); };
+
+    memory.OnAdd += add;
+    memory.OnRelease += release;
+}
+
+void OnAddDrawPercentage(long pMaxSize, TerbinMemory pMemory)
+{
+    if (pMemory.TryGetFullData(out byte[] bytes) is var r && !r.succes)
+    {
+        Console.Write($"[Client] Error Draw: {r.typeError}");
+        return;
+    }
+
+    ReadOnlySpan<byte> w = bytes;
+    byte percentage = w.Read<byte>();
+    long current = w.Read<long>();
+
+    Console.Write($"\rDescargando... {Math.Round((float)percentage, 2)}% completado | Total:{pMaxSize}/{current}:Actual");
+}
+
+void OnRelease(TerbinMemory pMemory, Action pOnAdd, Action pOnRealease)
+{
+    pMemory.OnAdd -= pOnAdd;
+    pMemory.OnRelease -= pOnRealease;
 }
 
 //public class ProgramStoped

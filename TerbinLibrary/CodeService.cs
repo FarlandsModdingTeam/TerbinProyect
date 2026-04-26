@@ -27,6 +27,8 @@ public enum CodeSubServices : byte
 
 public enum CodeInternalErrors : ushort
 {
+    ErrorSoliciteId = 11,
+
     // Farland = 100,
 
     // Mods = 200,

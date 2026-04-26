@@ -34,7 +34,7 @@ public static class TerbinExecutableHelper
     {
         foreach (var type in pAssembly.GetTypes())
         {
-            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Instance))
+            foreach (var method in type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static /*| BindingFlags.Instance*/))
             {
                 var attrs = method.GetCustomAttributes<T>(inherit: false);
                 if (!attrs.Any()) continue;

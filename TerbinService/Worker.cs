@@ -22,6 +22,8 @@ public class Worker : BackgroundService
     public static CancellationTokenSource? Cts;
     private static IHostApplicationLifetime? _appLifetime;
 
+    public static AsyncLocal<AmongInfoThreads> CurrentConst = new AsyncLocal<AmongInfoThreads>();
+
     public Worker(ILogger<Worker> pLogger, IHostApplicationLifetime pAppLifetime)
     {
         Worker._appLifetime = pAppLifetime;
@@ -46,12 +48,18 @@ public class Worker : BackgroundService
     // Pruebas
     private async Task autoCreatePipe(CancellationToken pTokenCancellation)
     {
-        // No habria que registrar tambien al crear uno nuevo?????
         try
         {
             var communicator = new TerbinCommunicator(true, pTokenCancellation);
             TerbinExecutor.Register(Assembly.GetExecutingAssembly());
-            communicator.OnRecive += TerbinExecutableManager.DispatchAsync;
+            communicator.OnRecive += async (pCapsule) =>
+            {
+                CurrentConst.Value = new AmongInfoThreads
+                {
+                    Communicator = communicator,
+                };
+                return await TerbinExecutableManager.DispatchAsync(pCapsule);
+            };
             communicator.OnNewClientConnect += async () =>
             {
                 _ = Task.Run(() => autoCreatePipe(pTokenCancellation), pTokenCancellation);

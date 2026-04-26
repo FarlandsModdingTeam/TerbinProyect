@@ -149,6 +149,12 @@ public class TerbinCommunicator : IDisposable
     }
 
 
+    public async Task<PacketRequest> CommunicateByInfoPacket(InfoPacket pInfo)
+    {
+        // Puede.
+        throw new NotImplementedException("=> CommunicateByInfoPacket <=");
+    }
+
     public async Task<PacketRequest> Communicate(byte pActionMethod, byte[] pPayload, CodeStatus pStatus = CodeStatus.Execute, ushort? pId = null)
     {
         ushort id = pId ?? MiniID.NewS;
@@ -195,7 +201,7 @@ public class TerbinCommunicator : IDisposable
         if (check.Head.Status != CodeStatus.Succes)
             return check;
 
-        var request = await soliciteRequestMemory();
+        var request = await SoliciteRequestMemory();
         if (request.Head.Status != CodeStatus.Succes || request.Payload.Length <= 0)
             return request;
 
@@ -212,14 +218,14 @@ public class TerbinCommunicator : IDisposable
             byte[] fragmentPayload = pPayload[..TerbinProtocol.FRAGMENT_IN];
             pPayload = pPayload[TerbinProtocol.FRAGMENT_IN..];
 
-            await addQueue(currentPacketIndex, CodeStatus.Execute, (byte)CodeTerbinProtocol.Load, idMemory, fragmentPayload, pIdRequest);
+            await Load(currentPacketIndex, idMemory, fragmentPayload, pIdRequest);
             currentPacketIndex++;
         }
         await addQueue(TerbinProtocol.FINAL_PACKET, pStatus, pActionMethod, idMemory, pPayload, pIdRequest);
         return null;
     }
 
-    private async Task<PacketRequest> soliciteRequestMemory()
+    public async Task<PacketRequest> SoliciteRequestMemory()
     {
         ushort idR = MiniID.NewS;
         await addQueue(TerbinProtocol.ORDER_SINGLE, CodeStatus.Execute, (byte)CodeTerbinProtocol.Solicit, (byte)CodeTerbinMemory.New, [], idR);
@@ -228,6 +234,19 @@ public class TerbinCommunicator : IDisposable
         return r;
     }
 
+    public async Task<bool> Load(
+                ushort pOrderRequest,
+                byte pIdMemory,
+                byte[] pPayload,
+                ushort? pIdRequest = null)
+    {
+        pIdRequest ??= MiniID.NewS;
+        if (pPayload.Length >= TerbinProtocol.MAX_PLD)
+            return false;
+
+        await addQueue(pOrderRequest, CodeStatus.Execute, (byte)CodeTerbinProtocol.Load, pIdMemory, pPayload, pIdRequest.Value);
+        return true;
+    }
 
     private async Task<PacketRequest> recuperateReply(ushort pId)
     {

@@ -26,7 +26,7 @@ namespace TerbinService.Configuration;
 // ├─ Temporal de Proton
 // └─ Steam Instalado
 
-public class ConfiguratonTerbin
+public class ConfiguratonService
 {
     [TerbinExecutableCompound((byte)CodeTerbinProtocol.Update, (byte)CodeSubServices.Rute)]
     public static async Task<InfoResponse?> UpdateRute(Header pHead, byte[] pParameters)

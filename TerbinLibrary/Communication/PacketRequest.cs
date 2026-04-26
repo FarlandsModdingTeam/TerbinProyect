@@ -186,6 +186,18 @@ public struct InfoResponse
         };
     }
 
+
+    public static InfoResponse CreateInteralError(ushort pIdRequest, params byte[] pPld)
+    {
+        return new InfoResponse
+        {
+            IdRequest = pIdRequest,
+            Status = CodeStatus.InternalWorkerError,
+            Payload = pPld,
+        };
+    }
+
+
     public static InfoResponse CreateSucces(ushort pIdRequest)
     {
         return new InfoResponse
@@ -194,63 +206,33 @@ public struct InfoResponse
             Status = CodeStatus.Succes,
         };
     }
+    public static InfoResponse CreateSucces(ushort pIdRequest, byte[] pPLD)
+    {
+        return new InfoResponse
+        {
+            IdRequest = pIdRequest,
+            Status = CodeStatus.Succes,
+            Payload = pPLD,
+        };
+    }
 }
 
-[Obsolete]
+
 public struct InfoPacket
 {
-    public ushort IdRequest { get => field; set => field = value; }
-    public byte ActionMethod { get => field; set => field = value; }
-    public byte[] Payload { get => field; set => field = value; }
-    public CodeStatus Status { get => field; set => field = value; }
+    public ushort? IdRequest { get => field; set => field = value; }
+    public byte? ActionMethod { get => field; set => field = value; }
+    public byte[]? Payload { get => field; set => field = value; }
+    public CodeStatus? Status { get => field; set => field = value; }
     public bool Recuperate { get => field; set => field = value; }
-    public bool IsResponse { get => field; set => field = value; }
 
     public InfoPacket()
     {
-        ActionMethod = (byte)CodeTerbinProtocol.Info;
-        Payload = [];
-        IdRequest = TerbinProtocol.ORDER_SINGLE;
-        Status = CodeStatus.NotAsign;
-        Recuperate = false;
-        IsResponse = false;
-    }
-
-    public InfoPacket(
-        ushort pIdRequest,
-        byte pActionMethod = (byte)CodeTerbinProtocol.Response,
-        byte[]? pPayload = null,
-        CodeStatus pStatus = CodeStatus.NotAsign,
-        bool pRecuperate = false,
-        bool pIsResponse = false)
-    {
-        IdRequest = pIdRequest;
-        ActionMethod = pActionMethod;
-        Payload = pPayload ?? [];
-        Status = pStatus;
-        Recuperate = pRecuperate;
-        IsResponse = pIsResponse;
-    }
-
-    public static InfoPacket CreateResponseError(ushort pIdRequest, CodeStatus pError)
-    {
-        return CreateResponse(pIdRequest, pError);
-    }
-
-    public static InfoPacket CreateResponseSucces(ushort pIdRequest)
-    {
-        return CreateResponse(pIdRequest, CodeStatus.Succes);
-    }
-
-    public static InfoPacket CreateResponse(ushort pIdRequest, CodeStatus pStatus, byte[]? pPayload = null)
-    {
-        return new InfoPacket(
-            pIdRequest: pIdRequest,
-            pActionMethod: (byte)CodeTerbinProtocol.Response,
-            pPayload: pPayload,
-            pStatus: pStatus,
-            pIsResponse: true
-        );
+        ActionMethod = null;
+        Payload      = null;
+        IdRequest    = null;
+        Status       = null;
+        Recuperate   = false;
     }
 }
 

@@ -35,6 +35,11 @@ public static class NetUtil
 {
     public const int BUFFER_SIZE = 81920;
 
+    static NetUtil() // Constructor estático para configurar el cliente
+    {
+        _httpClient.DefaultRequestHeaders.Add("User-Agent", "TerbinService-Downloader/0.0.9");
+    }
+
     private static readonly HttpClient _httpClient = new();
 
     public static async Task<StatusNetUtil> InstallZip(
@@ -49,7 +54,7 @@ public static class NetUtil
         if (!Directory.Exists(pDestination))
             return StatusNetUtil.DestinationInvalid;
 
-        if (await DownloadAny(pUrl) is var r && r.status == StatusNetUtil.Succes)
+        if (await DownloadAny(pUrl, pProgress) is var r && r.status == StatusNetUtil.Succes)
         {
             tmp = r.tempFilePath;
             try
@@ -110,7 +115,7 @@ public static class NetUtil
                                             IProgress<byte[]>? pProgress = null,
                                             CancellationToken pCancellationToken = default)
     {
-        string tmp = Path.Combine(Path.GetTempPath(), $"tmp_{Guid.NewGuid():N}");
+        string tmp = Path.Combine(Path.GetTempPath(), $"terbin_tmp_{Guid.NewGuid():N}");
 
         if (!Uri.TryCreate(pUrl, UriKind.Absolute, out _))
             return (StatusNetUtil.InvalidURL, "");
