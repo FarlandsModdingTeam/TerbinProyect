@@ -35,17 +35,18 @@ public static class NetUtil
 {
     public const int BUFFER_SIZE = 81920;
 
-    static NetUtil() // Constructor estático para configurar el cliente
-    {
-        _httpClient.DefaultRequestHeaders.Add("User-Agent", "TerbinService-Downloader/0.0.9");
-    }
+    // Descomentar para http y comentar para https 
+    //static NetUtil() // Constructor estático para configurar el cliente
+    //{
+    //    _httpClient.DefaultRequestHeaders.Add("User-Agent", "TerbinService-Downloader/0.0.9");
+    //}
 
     private static readonly HttpClient _httpClient = new();
 
     public static async Task<StatusNetUtil> InstallZip(
                                             string pUrl,
                                             string pDestination,
-                                            IProgress<byte[]>? pProgress = null,
+                                            IProgress<TerbinInfoProgrss>? pProgress = null,
                                             CancellationToken pCancellationToken = default)
     {
         StatusNetUtil result = StatusNetUtil.Succes;
@@ -112,7 +113,7 @@ public static class NetUtil
     /// </returns>
     public static async Task<(StatusNetUtil status, string tempFilePath)> DownloadAny(
                                             string pUrl,
-                                            IProgress<byte[]>? pProgress = null,
+                                            IProgress<TerbinInfoProgrss>? pProgress = null,
                                             CancellationToken pCancellationToken = default)
     {
         string tmp = Path.Combine(Path.GetTempPath(), $"terbin_tmp_{Guid.NewGuid():N}");
@@ -208,12 +209,13 @@ public static class NetUtil
                                             Stream pSource,
                                             Stream pDestination,
                                             long? pTotal,
-                                            IProgress<byte[]>? pProgress,
+                                            IProgress<TerbinInfoProgrss>? pProgress,
                                             CancellationToken pCancellationToken)
     {
         var buffer = new byte[BUFFER_SIZE];
         long currentRead = 0;
         int read;
+        bool last = false;
 
         double? totalInverse = (pTotal.HasValue) ? (100.0d / pTotal.Value) : null;
         int lastPercentage = -1;
@@ -227,7 +229,9 @@ public static class NetUtil
 
             currentRead += read;
 
-            Util.ReportProgress(currentRead, pTotal, totalInverse, pProgress, ref lastPercentage);
+            last = (pTotal.HasValue) ? (currentRead >= pTotal.Value) : false;
+
+            Util.ReportProgress(currentRead, totalInverse, pProgress, last, ref lastPercentage);
         }
     }
 

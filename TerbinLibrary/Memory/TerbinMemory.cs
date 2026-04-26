@@ -102,6 +102,11 @@ public class TerbinMemory
         OnAdd = null;
         OnRelease?.Invoke();
 
+        Clear();
+    }
+
+    public void Clear()
+    {
         lock (_fragments)
         {
             _fragments.Clear();

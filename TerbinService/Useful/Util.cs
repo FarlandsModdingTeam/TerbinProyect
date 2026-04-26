@@ -5,6 +5,30 @@ using TerbinLibrary.Serialize;
 
 namespace TerbinService.Useful;
 
+public struct TerbinInfoProgrss
+{
+    public byte[] Content;
+    public bool Last;
+
+    public static TerbinInfoProgrss CreateLast(byte[] pContent)
+    {
+        return new TerbinInfoProgrss
+        {
+            Last = true,
+            Content = pContent,
+        };
+    }
+
+    public static TerbinInfoProgrss Create(byte[] pContent, bool Last = false)
+    {
+        return new TerbinInfoProgrss
+        {
+            Last = Last,
+            Content = pContent,
+        };
+    }
+}
+
 public static class Util
 {
     /// <summary>
@@ -19,9 +43,9 @@ public static class Util
     /// Si el tamaño total es desconocido o no se proporcionó un
     /// objeto de progreso, no se reporta nada.
     /// </remarks>
-    public static void ReportProgress(long pCurrentRead, long? pTotal, double? pTotalInverse, IProgress<byte[]>? pProgress, ref int pPrevouslyReported)
+    public static void ReportProgress(long pCurrentRead, double? pTotalInverse, IProgress<TerbinInfoProgrss>? pProgress, bool last, ref int pPrevouslyReported)
     {
-        if (!pTotalInverse.HasValue || !pTotal.HasValue || pProgress == null)
+        if (!pTotalInverse.HasValue || pProgress == null)
             return;
 
         int percent = (int)(pCurrentRead * pTotalInverse.Value);
@@ -29,8 +53,9 @@ public static class Util
         if (percent > pPrevouslyReported)
         {
             pPrevouslyReported = percent;
-            byte[] m = [(byte)percent, .. Serialineitor.Serialize(pTotal.Value)];
-            pProgress.Report(m);
+            byte[] bytesTotal = Serialineitor.Serialize<long>(pCurrentRead);
+            byte[] m = [(byte)percent, .. bytesTotal];
+            pProgress.Report(TerbinInfoProgrss.Create(m, last));
         }
     }
 }

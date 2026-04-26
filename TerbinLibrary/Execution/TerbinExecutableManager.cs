@@ -51,7 +51,7 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
             TerbinMemoryHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
             return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ActionNotFound);
         }
-        Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {pCapsule.Payload.Length}"); //Encoding.UTF8.GetString(memo)
+        //Console.WriteLine($"[DispatchAsync] id: {pCapsule.Head.IdMemory}, Order: {pCapsule.Head.OrderRequest}, L: {pCapsule.Payload.Length}"); //Encoding.UTF8.GetString(memo)
         try
         {
             if (pCapsule.Head.Status == CodeStatus.CheckExecution)

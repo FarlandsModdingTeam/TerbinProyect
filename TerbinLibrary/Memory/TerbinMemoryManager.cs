@@ -77,11 +77,30 @@ public static class TerbinMemoryManager
     /// <param name="pIdMemory">Identificador del contenedor de memoria a sobrescribir.</param>
     /// <param name="pOrder">El orden que corresponde a este nuevo fragmento de datos.</param>
     /// <param name="pData">El nuevo arreglo de bytes a almacenar.</param>
-    public static void OverwriteStore(byte pIdMemory, ushort pOrder, byte[] pData)
+    public static void ReStore(byte pIdMemory, ushort pOrder, byte[] pData)
     {
         var newContainer = new TerbinMemory { IdRequest = pIdMemory };
         newContainer.AddFragment(pOrder, pData);
         _containers.AddOrUpdate(pIdMemory, newContainer, (_, _) => newContainer);
+    }
+
+    /// <summary>
+    /// Sobrescribe de manera forzada el contenido de un contenedor de memoria con nuevos datos.
+    /// </summary>
+    /// <param name="pIdMemory">Identificador del contenedor de memoria a sobrescribir.</param>
+    /// <param name="pOrder">El orden que corresponde a este nuevo fragmento de datos.</param>
+    /// <param name="pData">El nuevo arreglo de bytes a almacenar.</param>
+    public static void OverwriteStore(byte pIdMemory, ushort pOrder, byte[] pData)
+    {
+        if (_containers.TryGetValue(pIdMemory, out var container))
+        {
+            container.Clear();
+            container.AddFragment(pOrder, pData);
+        }
+        else
+        {
+            Store(pIdMemory, pOrder, pData);
+        }
     }
 
     /// <summary>

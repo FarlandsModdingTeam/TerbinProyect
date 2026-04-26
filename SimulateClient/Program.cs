@@ -113,7 +113,7 @@ while (true)
         var r = await communicator.Communicate(input, menssage);
 
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (input == (byte)CodeService.InstallBepInEx)
+        if (input == (byte)CodeService.InstallBepInEx && r.Head.Status == CodeStatus.Succes)
         {
             ReadOnlySpan<byte> w = r.Payload;
             byte id = w.Read<byte>();
@@ -155,11 +155,35 @@ void DrawPercentage(byte pIdMemory, long pMaxSize)
         Console.Write($"[Client] Memoria no encontrada");
         return;
     }
-    Action add = () => { OnAddDrawPercentage(pMaxSize, memory); };
-    Action release = () => { OnRelease(memory, add, release); };
 
-    memory.OnAdd += add;
-    memory.OnRelease += release;
+    void onAdd()
+    {
+        if (memory.TryGetFullData(out byte[] bytes) is var r && !r.succes)
+        {
+            Console.Write($"[Client] Error Draw: {r.typeError}");
+            return;
+        }
+
+        ReadOnlySpan<byte> w = bytes;
+        byte percentage = w.Read<byte>();
+        long current = w.Read<long>();
+
+        Console.Write($"\rDescargando... {Math.Round((float)percentage, 2)}% completado | Total:{pMaxSize}/{current}:Actual");
+
+        if (percentage >= 100)
+            memory.Release();
+    }
+
+    void onRelease()
+    {
+        memory.OnAdd -= onAdd;
+        memory.OnRelease -= onRelease;
+        Console.WriteLine();
+    }
+
+    // Suscripción a los eventos
+    memory?.OnAdd += onAdd;
+    memory?.OnRelease += onRelease;
 }
 
 void OnAddDrawPercentage(long pMaxSize, TerbinMemory pMemory)
@@ -181,6 +205,7 @@ void OnRelease(TerbinMemory pMemory, Action pOnAdd, Action pOnRealease)
 {
     pMemory.OnAdd -= pOnAdd;
     pMemory.OnRelease -= pOnRealease;
+    Console.WriteLine();
 }
 
 //public class ProgramStoped

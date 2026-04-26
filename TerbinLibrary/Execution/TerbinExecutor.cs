@@ -47,11 +47,11 @@ public static class TerbinExecutor
     [TerbinExecutable((byte)CodeTerbinProtocol.Load)]
     public static async Task<InfoResponse?> Load(Header pHead, byte[] pParameters)
     {
-        if (pHead.IdRequest > 0)
+        if (pHead.OrderRequest > 0)
         {
             TerbinMemoryManager.Store(pHead.IdMemory, pHead.OrderRequest, pParameters);
         }
-        else if (pHead.IdRequest == 0)
+        else if (pHead.OrderRequest == 0)
         {
             TerbinMemoryManager.OverwriteStore(pHead.IdMemory, 1, pParameters);
         }

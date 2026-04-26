@@ -45,26 +45,35 @@ public class BepInExService
         {
             IdRequest = pHead.IdRequest,
             Status = CodeStatus.Succes,
-            Payload = [idMemory, .. Serialineitor.Serialize(sizeBepInEx.Value)],
+            Payload = [idMemory, .. Serialineitor.Serialize<long>(sizeBepInEx.Value)],
         };
     }
 
 
     private static async Task handleInstallBepInEx(byte pIdMemory, string pDir)
     {
-        IProgress<byte[]> progressBarr = new Progress<byte[]>(p =>
+        IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
         {
             AmongInfoThreads info = Worker.CurrentConst.Value;
-            _ = info.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, p);
+            _ = info.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, p.Content);
+
+            // TODO: comprobar si es el ultimo, si lo es mandar mensaje de release.
+
+            ReadOnlySpan<byte> w = p.Content;
+            byte percentage = w.Read<byte>();
+            long current = w.Read<long>();
+
+            Console.Write($"\rDescargando... {Math.Round((float)percentage, 2)}% completado | Total:X/{current}:Actual ");
+
             //Console.Write($"\rDescargando... {Math.Round((float)p[0], 2)}% completado|");
         });
         StatusNetUtil r = StatusNetUtil.Succes;
         try
         {
-            //r = await NetUtil.InstallZip(TerbinURLs.BepInEx, pDir, progressBarr);
-            var result = await NetUtil.DownloadAny(TerbinURLs.TEST_1GB, progressBarr); // pDir, 
-            r = result.status;
-            Console.WriteLine($"Archivo => {result.tempFilePath}|");
+            r = await NetUtil.InstallZip(TerbinURLs.BepInEx, pDir, progressBarr);
+            //var result = await NetUtil.DownloadAny(TerbinURLs.BepInEx, progressBarr); // pDir, 
+            //r = result.status;
+            //Console.WriteLine($"Archivo => {result.tempFilePath}|");
         }
         catch (Exception e)
         {
