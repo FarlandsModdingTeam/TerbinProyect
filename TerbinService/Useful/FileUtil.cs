@@ -27,8 +27,7 @@ public static class FileUtil
                                             string pSourceDir,
                                             string pDestinationDir,
                                             bool pOverwrite,
-                                            IProgress<TerbinInfoProgrss>? pProgress = null,
-                                            CancellationToken pCancellationToken = default)
+                                            IProgress<TerbinInfoProgrss>? pProgress = null)
     {
         List<string>? allFiles;
         List<string>? allDictories;
@@ -44,7 +43,7 @@ public static class FileUtil
         if (!Directory.Exists(pDestinationDir))
             Directory.CreateDirectory(pDestinationDir);
 
-        inverse = Util.GetInverse(allFiles.Count);
+        inverse = (pProgress != null) ? Util.GetInverse(allFiles.Count) : null;
         for (int i = 0; i < allFiles.Count; i++)
         {
             string  file = allFiles[i];
@@ -56,12 +55,15 @@ public static class FileUtil
             File.Copy(file, destFile, pOverwrite);
 
             last = (i + 1) < allFiles.Count;
-            Util.ReportProgress(i + 1, inverse, pProgress, last, ref previus);
+            if (pProgress != null)
+                Util.ReportProgressPercent(i + 1, inverse, pProgress, last, ref previus);
         }
 
         allDictories = GetAllDirectories(pSourceDir);
         if (allDictories is null)
             return StatusFileUtil.InvalidSource;
+
+        inverse = (pProgress != null) ? Util.GetInverse(allDictories.Count) : null;
 
         for (int i = 0; i < allDictories.Count; i++)
         {
@@ -69,6 +71,9 @@ public static class FileUtil
             string rel = Path.GetRelativePath(pSourceDir, dir);
             string destSub = Path.Combine(pDestinationDir, rel);
             if (!Directory.Exists(destSub)) Directory.CreateDirectory(destSub);
+
+            if (pProgress != null)
+                Util.ReportProgressPercent(i + 1, inverse, pProgress, last, ref previus);
         }
 
         return StatusFileUtil.Succes;

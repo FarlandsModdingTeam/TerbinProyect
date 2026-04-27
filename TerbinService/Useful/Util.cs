@@ -10,8 +10,9 @@ public struct TerbinInfoProgrss
     [Obsolete]
     public byte[] Content;
 
-
-    public bool Last;
+    public long Current;
+    public byte Percentage; // 0 => 100
+    public bool Last; // alert to release
 
     [Obsolete]
     public static TerbinInfoProgrss CreateLast(byte[] pContent)
@@ -31,6 +32,16 @@ public struct TerbinInfoProgrss
             Last = Last,
             Content = pContent,
         };
+    }
+
+    public readonly byte[] ToArray()
+    {
+        byte[] array = new Serialineitor()
+            .Add(Percentage)
+            .Add(Current)
+            .Add(Last)
+            .ToArray();
+        return array;
     }
 }
 
@@ -58,9 +69,13 @@ public static class Util
         if (percent > pPrevouslyReported)
         {
             pPrevouslyReported = percent;
-            byte[] bytesTotal = Serialineitor.Serialize<long>(pCurrentRead);
-            byte[] m = [(byte)percent, .. bytesTotal];
-            pProgress.Report(TerbinInfoProgrss.Create(m, pLast));
+            var info = new TerbinInfoProgrss
+            {
+                Percentage = (byte)percent,
+                Current = pCurrentRead,
+                Last = pLast,
+            };
+            pProgress.Report(info);
         }
     }
 
