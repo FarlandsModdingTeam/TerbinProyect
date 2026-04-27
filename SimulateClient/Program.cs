@@ -46,7 +46,7 @@ while (true)
         Console.Write($"[Client] Action2 ->");
         input2 = byte.Parse(Console.ReadLine()); // alacguabar!
     }
-    Console.Write($"[Client] ({input}), {(CodeService)input}\n" +
+    Console.Write($"[Client] ({input}), {(CodeServices)input}\n" +
         $"-------(  End  )---------\n");
 
     //char[] dirFarlands = ManagerFarlands.GetRuteSteamFarlands()?.ToCharArray() ?? "matenme".ToCharArray();
@@ -113,7 +113,7 @@ while (true)
         var r = await communicator.Communicate(input, menssage);
 
         Console.WriteLine($"[Client] R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (input == (byte)CodeService.InstallBepInEx && r.Head.Status == CodeStatus.Succes)
+        if (input == (byte)CodeServices.InstallBepInEx && r.Head.Status == CodeStatus.Succes)
         {
             ReadOnlySpan<byte> w = r.Payload;
             byte id = w.Read<byte>();

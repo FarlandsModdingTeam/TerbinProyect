@@ -5,7 +5,7 @@ using System.Text;
 namespace TerbinLibrary;
 
 // methods:
-public enum CodeService : byte
+public enum CodeServices : byte
 {
     InstallBepInEx = 10,
 }

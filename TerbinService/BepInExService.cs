@@ -15,7 +15,7 @@ namespace TerbinService;
 
 public class BepInExService
 {
-    [TerbinExecutable((byte)CodeService.InstallBepInEx)]
+    [TerbinExecutable((byte)CodeServices.InstallBepInEx)]
     public static async Task<InfoResponse?> IntallBepInEx(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)
@@ -76,7 +76,7 @@ public class BepInExService
             AmongInfoThreads info = Worker.CurrentConst.Value;
             byte[] pld = new Serialineitor()
                 .Add(TypeService.Service)
-                .Add(CodeService.InstallBepInEx)
+                .Add(CodeServices.InstallBepInEx)
                 .Add(error)
                 .ToArray();
             _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
