@@ -8,7 +8,7 @@ using TerbinLibrary.Serialize;
 
 namespace TerbinService.Instances;
 
-public partial class HandleInstances
+public partial class InstancesService
 {
     /*
     [TerbinExecutable((byte)CodeService.CreateInstance)]
@@ -30,18 +30,6 @@ public partial class HandleInstances
     }
     */
 
-
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public static bool InstallBepInEx(string eDest)
-    {
-        string url = TerbinURLs.BepInEx;
-        // return NetUtil.InstallZip(url, eDest); // devuelve Task<>
-    
-        throw new NotImplementedException();
-    }
 
     /// <summary>
     /// 

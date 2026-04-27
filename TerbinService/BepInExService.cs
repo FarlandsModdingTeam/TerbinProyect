@@ -30,8 +30,10 @@ public class BepInExService
 
         string rute = Serialineitor.DeserializeArray<char>(pParameters).CrString();
         // Habra alguna forma de saber si es un direccion valida?
+
         if (!Directory.Exists(rute))
             Directory.CreateDirectory(rute);
+        // TODO: Comprobar si BepInEx ya esta instalado.
 
         byte idMemory = 0;
         var rId = await info.Communicator.SoliciteRequestMemory();

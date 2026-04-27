@@ -27,10 +27,11 @@ public static class FileUtil
                                             string pSourceDir,
                                             string pDestinationDir,
                                             bool pOverwrite,
-                                            IProgress<byte>? pProgress = null,
+                                            IProgress<TerbinInfoProgrss>? pProgress = null,
                                             CancellationToken pCancellationToken = default)
     {
         List<string>? allFiles;
+        List<string>? allDictories;
         int totalFiles;
 
         allFiles = GetAllFiles(pSourceDir);
@@ -39,9 +40,34 @@ public static class FileUtil
 
         totalFiles = allFiles.Count;
 
+        if (!Directory.Exists(pDestinationDir))
+            Directory.CreateDirectory(pDestinationDir);
 
+        for (int i = 0; i < totalFiles; i++)
+        {
+            string  file = allFiles[i];
+            string  rel = Path.GetRelativePath(pSourceDir, file);
+            string  destFile = Path.Combine(pDestinationDir, rel);
+            string? destFolder = Path.GetDirectoryName(destFile);
+            if (!string.IsNullOrEmpty(destFolder)) Directory.CreateDirectory(destFolder);
 
-        throw new NotImplementedException("Ñe");
+            File.Copy(file, destFile, pOverwrite);
+            // Actualizar progreso
+        }
+
+        allDictories = GetAllDirectories(pSourceDir);
+        if (allDictories is null)
+            return StatusFileUtil.InvalidSource;
+
+        for (int i = 0; i < allDictories.Count; i++)
+        {
+            string dir = allDictories[i];
+            string rel = Path.GetRelativePath(pSourceDir, dir);
+            string destSub = Path.Combine(pDestinationDir, rel);
+            if (!Directory.Exists(destSub)) Directory.CreateDirectory(destSub);
+        }
+
+        return StatusFileUtil.Succes;
     }
 
     public static List<string>? GetAllFiles(string pDir)
