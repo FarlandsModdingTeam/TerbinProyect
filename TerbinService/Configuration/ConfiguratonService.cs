@@ -43,12 +43,12 @@ public class ConfiguratonService
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
         var result = ManagerConfiguration.SetConfig(keyRute, newRute);
-        if (result == CodeAcessJSonSave.Succes)
-            pHead.Status = CodeStatus.Succes;
-        else if (result == CodeAcessJSonSave.ErrorSerialize)
-            pHead.Status = CodeStatus.SerializeError;
-        else
-            pHead.Status = CodeStatus.AccesNullOrNotExist;
+        pHead.Status = result switch
+        {
+            CodeAcessJSonSave.Succes => CodeStatus.Succes,
+            CodeAcessJSonSave.ErrorSerialize => CodeStatus.SerializeError,
+            _ => CodeStatus.AccesNullOrNotExist,
+        };
 
         return InfoResponse.Create(pHead.IdRequest, pHead.Status);
     }
