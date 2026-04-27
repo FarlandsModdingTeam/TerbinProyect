@@ -32,18 +32,20 @@ public static class FileUtil
     {
         List<string>? allFiles;
         List<string>? allDictories;
-        int totalFiles;
+        bool last = false;
+        int previus = -1;
+        double? inverse;
+
 
         allFiles = GetAllFiles(pSourceDir);
         if (allFiles is null)
             return StatusFileUtil.InvalidSource;
 
-        totalFiles = allFiles.Count;
-
         if (!Directory.Exists(pDestinationDir))
             Directory.CreateDirectory(pDestinationDir);
 
-        for (int i = 0; i < totalFiles; i++)
+        inverse = Util.GetInverse(allFiles.Count);
+        for (int i = 0; i < allFiles.Count; i++)
         {
             string  file = allFiles[i];
             string  rel = Path.GetRelativePath(pSourceDir, file);
@@ -52,7 +54,9 @@ public static class FileUtil
             if (!string.IsNullOrEmpty(destFolder)) Directory.CreateDirectory(destFolder);
 
             File.Copy(file, destFile, pOverwrite);
-            // Actualizar progreso
+
+            last = (i + 1) < allFiles.Count;
+            Util.ReportProgress(i + 1, inverse, pProgress, last, ref previus);
         }
 
         allDictories = GetAllDirectories(pSourceDir);

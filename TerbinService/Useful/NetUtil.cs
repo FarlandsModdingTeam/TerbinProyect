@@ -217,7 +217,7 @@ public static class NetUtil
         int read;
         bool last = false;
 
-        double? totalInverse = (pTotal.HasValue) ? (100.0d / pTotal.Value) : null;
+        double? totalInverse = Util.GetInverse(pTotal);
         int lastPercentage = -1;
         while ((read = await pSource.ReadAsync(
                    buffer.AsMemory(0, buffer.Length),

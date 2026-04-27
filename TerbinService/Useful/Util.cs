@@ -58,4 +58,10 @@ public static class Util
             pProgress.Report(TerbinInfoProgrss.Create(m, last));
         }
     }
+
+
+    public static double? GetInverse(long? pTotal)
+    {
+       return (pTotal.HasValue) ? (100.0d / pTotal.Value) : null;
+    }
 }
