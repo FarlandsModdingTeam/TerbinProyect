@@ -57,15 +57,13 @@ public class BepInExService
         IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
         {
             AmongInfoThreads info = Worker.CurrentConst.Value;
-            _ = info.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, p.Content);
+
+            var Content = p.ToArray();
+            _ = info.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
 
             // TODO: comprobar si es el ultimo, si lo es mandar mensaje de release.
 
-            ReadOnlySpan<byte> w = p.Content;
-            byte percentage = w.Read<byte>();
-            long current = w.Read<long>();
-
-            Console.Write($"\rDescargando... {Math.Round((float)percentage, 2)}% completado | Total:X/{current}:Actual ");
+            Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
 
             //Console.Write($"\rDescargando... {Math.Round((float)p[0], 2)}% completado|");
         });
