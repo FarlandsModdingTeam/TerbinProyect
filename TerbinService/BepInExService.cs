@@ -23,7 +23,7 @@ public class BepInExService
 
         long? sizeBepInEx = await NetUtil.GetContentLength(TerbinURLs.BepInEx);
         if (sizeBepInEx is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.NotConectToBepInEx));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.BepInExNotConect));
 
         AmongInfoThreads info = Worker.CurrentConst.Value;
 
@@ -38,10 +38,10 @@ public class BepInExService
         byte idMemory = 0;
         var rId = await info.Communicator.SoliciteRequestMemory();
         if (rId.Head.Status != CodeStatus.Succes)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.ErrorSoliciteId));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.IdSoliciteError));
 
         idMemory = rId.Payload[0];
-        _ = handleInstallBepInEx(idMemory, rute);
+        _ = handleInstallBepInExWithProgress(idMemory, rute);
 
         return new InfoResponse
         {
@@ -52,7 +52,7 @@ public class BepInExService
     }
 
 
-    private static async Task handleInstallBepInEx(byte pIdMemory, string pDir)
+    private static async Task handleInstallBepInExWithProgress(byte pIdMemory, string pDir)
     {
         IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
         {
@@ -62,61 +62,32 @@ public class BepInExService
             _ = info.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
 
             Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
-
-            //Console.Write($"\rDescargando... {Math.Round((float)p[0], 2)}% completado|");
         });
-        StatusNetUtil r = StatusNetUtil.Succes;
-        try
-        {
-            r = await NetUtil.InstallZip(TerbinURLs.BepInEx, pDir, progressBarr);
-            //var result = await NetUtil.DownloadAny(TerbinURLs.BepInEx, progressBarr); // pDir, 
-            //r = result.status;
-            //Console.WriteLine($"Archivo => {result.tempFilePath}|");
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine($"exception: {e.Message}|");
-        }
-        Console.WriteLine($"Result: {r}|");
+        StatusNetUtil r = await HandleInstallBepInEx(TerbinURLs.BepInEx, progressBarr);
         if (r != StatusNetUtil.Succes)
         {
-            // TODO: Informar del error al cliente por el communicator que no tengo
+            CodeInternalErrors error = r switch
+            {
+                StatusNetUtil.ExceptionOnExtractZip => CodeInternalErrors.ZipExtractException,
+                StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
+                _ => CodeInternalErrors.ZipExtractError
+            };
+
+            AmongInfoThreads info = Worker.CurrentConst.Value;
+            byte[] pld = new Serialineitor()
+                .Add(TypeService.Service)
+                .Add(CodeService.InstallBepInEx)
+                .Add(error)
+                .ToArray();
+            _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
         }
     }
 
-
-    [TerbinExecutable(255)]
-    public static async Task<InfoResponse?> TestDowload(Header pHead, byte[] pParameters)
+    public static async Task<StatusNetUtil> HandleInstallBepInEx(string pDir, IProgress<TerbinInfoProgrss>? pProgress = default)
     {
-        if (pParameters.Length <= 0)
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
-
-        long? sizeBepInEx = await NetUtil.GetContentLength(TerbinURLs.BepInEx);
-        if (sizeBepInEx is null)
-            return new InfoResponse
-            {
-                IdRequest = pHead.IdRequest,
-                Status = CodeStatus.InternalWorkerError,
-                Payload = Serialineitor.Serialize<ushort>((ushort)CodeInternalErrors.NotConectToBepInEx),
-
-            };
-
-        string rute = Serialineitor.DeserializeArray<char>(pParameters).CrString();
-        // Habra alguna forma de saber si es un direccion valida?
-        if (!Directory.Exists(rute))
-            Directory.CreateDirectory(rute);
-
-        // TODO: Solicitar IdMemory :)
-        byte idPlaceHolder = 0;
-
-        _ = handleInstallBepInEx(idPlaceHolder, rute);
-
-        return new InfoResponse
-        {
-            IdRequest = pHead.IdRequest,
-            Status = CodeStatus.Succes,
-            Payload = [idPlaceHolder, .. Serialineitor.Serialize(sizeBepInEx.Value)],
-        };
+        StatusNetUtil r = StatusNetUtil.Succes;
+        r = await NetUtil.InstallZip(TerbinURLs.BepInEx, pDir, pProgress);
+        return r;
     }
 
 }

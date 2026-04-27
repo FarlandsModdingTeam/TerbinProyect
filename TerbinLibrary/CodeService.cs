@@ -24,10 +24,15 @@ public enum CodeSubServices : byte
     Rute_Antiguo_Obsoleto_MagincianPuto = 110,
 }
 
+public enum TypeService : byte
+{
+    Service = 1,
+    SubService = 2,
+}
 
 public enum CodeInternalErrors : ushort
 {
-    ErrorSoliciteId = 11,
+    IdSoliciteError = 11,
 
     // Farland = 100,
 
@@ -38,9 +43,14 @@ public enum CodeInternalErrors : ushort
     // FCM = 400,
 
     // Rute = 500,
-    RuteErrorSerialize = 501,
+    RuteSerializeError = 501,
     RuteAccesNullOrNotExist = 502,
 
     // BepInEx = 600,
-    NotConectToBepInEx = 601,
+    BepInExNotConect = 601,
+
+    // Zip = 1000,
+    ZipExtractError = 1001,
+    ZipExtractException = 1002,
+    ZipDeletedTempException = 1003,
 }
