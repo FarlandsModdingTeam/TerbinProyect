@@ -31,7 +31,6 @@ public static class FileUtil
     {
         List<string>? allFiles;
         List<string>? allDictories;
-        bool last = false;
         int previus = -1;
         double? inverse;
 
@@ -54,9 +53,8 @@ public static class FileUtil
 
             File.Copy(file, destFile, pOverwrite);
 
-            last = (i + 1) < allFiles.Count;
             if (pProgress != null)
-                Util.ReportProgressPercent(i + 1, inverse, pProgress, last, ref previus);
+                Util.ReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         allDictories = GetAllDirectories(pSourceDir);
@@ -64,6 +62,7 @@ public static class FileUtil
             return StatusFileUtil.InvalidSource;
 
         inverse = (pProgress != null) ? Util.GetInverse(allDictories.Count) : null;
+        previus = -1;
 
         for (int i = 0; i < allDictories.Count; i++)
         {
@@ -73,8 +72,11 @@ public static class FileUtil
             if (!Directory.Exists(destSub)) Directory.CreateDirectory(destSub);
 
             if (pProgress != null)
-                Util.ReportProgressPercent(i + 1, inverse, pProgress, last, ref previus);
+                Util.ReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
+
+        if (pProgress != null)
+            Util.ReportProgressPercent(previus, inverse, pProgress, true, ref previus);
 
         return StatusFileUtil.Succes;
     }

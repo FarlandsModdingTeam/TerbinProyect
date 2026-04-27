@@ -9,14 +9,14 @@ public struct TerbinInfoProgrss
 {
     public long Current;
     public byte Percentage; // 0 => 100
-    public bool Last; // alert to release
+    public bool Finish; // alert to release
 
     public readonly byte[] ToArray()
     {
         byte[] array = new Serialineitor()
             .Add(Percentage)
             .Add(Current)
-            .Add(Last)
+            .Add(Finish)
             .ToArray();
         return array;
     }
@@ -36,7 +36,7 @@ public static class Util
     /// Si el tamaño total es desconocido o no se proporcionó un
     /// objeto de progreso, no se reporta nada.
     /// </remarks>
-    public static void ReportProgressPercent(long pCurrentRead, double? pTotalInverse, IProgress<TerbinInfoProgrss>? pProgress, bool pLast, ref int pPrevouslyReported)
+    public static void ReportProgressPercent(long pCurrentRead, double? pTotalInverse, IProgress<TerbinInfoProgrss>? pProgress, bool pFinish, ref int pPrevouslyReported)
     {
         if (!pTotalInverse.HasValue || pProgress == null)
             return;
@@ -50,7 +50,7 @@ public static class Util
             {
                 Percentage = (byte)percent,
                 Current = pCurrentRead,
-                Last = pLast,
+                Finish = pFinish,
             };
             pProgress.Report(info);
         }
