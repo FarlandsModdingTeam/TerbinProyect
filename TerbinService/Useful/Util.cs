@@ -7,32 +7,9 @@ namespace TerbinService.Useful;
 
 public struct TerbinInfoProgrss
 {
-    [Obsolete]
-    public byte[] Content;
-
     public long Current;
     public byte Percentage; // 0 => 100
     public bool Last; // alert to release
-
-    [Obsolete]
-    public static TerbinInfoProgrss CreateLast(byte[] pContent)
-    {
-        return new TerbinInfoProgrss
-        {
-            Last = true,
-            Content = pContent,
-        };
-    }
-
-    [Obsolete]
-    public static TerbinInfoProgrss Create(byte[] pContent, bool Last = false)
-    {
-        return new TerbinInfoProgrss
-        {
-            Last = Last,
-            Content = pContent,
-        };
-    }
 
     public readonly byte[] ToArray()
     {
