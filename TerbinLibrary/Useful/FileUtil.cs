@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TerbinService.Useful;
+namespace TerbinLibrary.Useful;
 /*
  -- Variables:
   empieza: _ = es privada NO local.

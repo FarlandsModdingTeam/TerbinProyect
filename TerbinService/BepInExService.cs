@@ -9,7 +9,7 @@ using TerbinLibrary.Communication;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
-using TerbinService.Useful;
+using TerbinLibrary.Useful;
 
 namespace TerbinService;
 

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text;
+using TerbinLibrary.Useful;
 
 namespace TerbinLibrary.SteamFarlands;
 
 public static class ManagerFarlands
 {
     public const int KEY_FARLANDS = 2252680;
+    public const string FARLANDS_EXE = "Farlands.exe";
 
     public static bool IsOpenSteam
     {
@@ -20,9 +21,9 @@ public static class ManagerFarlands
         NotInstaled = -1,
         Succes = 0,
     }
-    public static ErrorLaunchFarlands LaunchFarlands(string? pDir = null)
+    public static ErrorLaunchFarlands LaunchFarlands(string? pName = null)
     {
-        if (pDir == null)
+        if (pName == null)
             return LaunchFarlandsBySteam();
 
         // TODO: Lanzar juego de la instancia,
@@ -69,4 +70,14 @@ public static class ManagerFarlands
     {
         return SteamLocator.GetGamePath(KEY_FARLANDS);
     }
+
+    public static bool IsFarlands(string pDir)
+    {
+        if (!Directory.Exists(pDir))
+            return false;
+
+        string pFilePath = Path.Combine(pDir, FARLANDS_EXE);
+        return File.Exists(pFilePath);
+    }
+
 }

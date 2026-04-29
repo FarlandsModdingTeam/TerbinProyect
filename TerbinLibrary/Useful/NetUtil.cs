@@ -5,7 +5,7 @@ using System.Net;
 using System.IO.Compression;
 using TerbinLibrary.Serialize;
 
-namespace TerbinService.Useful;
+namespace TerbinLibrary.Useful;
 /*
  -- Variables:
   empieza: _ = es privada NO local.

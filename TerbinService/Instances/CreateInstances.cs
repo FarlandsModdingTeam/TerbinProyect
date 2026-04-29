@@ -1,10 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using TerbinLibrary.Execution;
 using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
+using TerbinLibrary.Configuration;
+using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.SteamFarlands;
+using TerbinLibrary.Useful;
+using TerbinService.Configuration;
 
 namespace TerbinService.Instances;
 
@@ -32,17 +36,30 @@ public partial class InstancesService
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
-    public static async Task HandleCreateInstance()
+    public static async Task HandleCreateInstance(string pName)
     {
         // TODO: De la carpeta destino.
         // ├─Comprobar si esta vacia.
         // └─Comprobar si ya hay una instancia.
     }
-    public static async Task HandleCloneFarlands()
+    public static async Task<(Task<StatusFileUtil> result, long? maxFiles, long? maxDir)?>
+                HandleCloneFarlands(string pDir, IProgress<TerbinInfoProgrss> pProgrss = default)
     {
-        // TODO: Clonar Farlands.
-        // ├─Crear Manifest.
-        // └─Guardar en Config la dir de la instancia.
+        string? dirFarlands = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_FARLANDS);
+
+        if (dirFarlands is null)
+            return null;
+
+        if (!ManagerFarlands.IsFarlands(dirFarlands))
+                return null; // (StatusFileUtil.InvalidSource, null, null)
+
+        var countDir = FileUtil.GetCountDirectories(dirFarlands);
+        var countFiles = FileUtil.GetCountFiles(dirFarlands);
+        var result = FileUtil.CloneDirectory(dirFarlands, pDir, true, pProgrss);
+
+        // TODO:Crear manifiesto.
+
+        return (result, countFiles, countDir);
     }
 
     /// <summary>

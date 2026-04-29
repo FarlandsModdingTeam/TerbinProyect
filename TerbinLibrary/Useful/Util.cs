@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Serialize;
 
-namespace TerbinService.Useful;
+namespace TerbinLibrary.Useful;
 
 public struct TerbinInfoProgrss
 {
