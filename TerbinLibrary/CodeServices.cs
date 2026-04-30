@@ -33,6 +33,8 @@ public enum TypeService : byte
 public enum CodeInternalErrors : ushort
 {
     IdSoliciteError = 11,
+    TODO_WIP = 12,
+    TODO_SoliciteInfo = 13,
 
     // Farland = 100,
 
