@@ -29,28 +29,35 @@ public partial class InstancesService
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
-    public static async Task HandleCreateInstance(string pName)
+    public static async Task<(Task<StatusFileUtil> result, long? maxFiles, long? maxDir)?>
+        HandleCreateInstance(string pName, byte pIdMemory)
     {
         string? dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
         if (dir == null)
-            return;
-
-        string? dirF = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_FARLANDS);
-        if (dirF == null)
-            return;
+            return null;
 
         var newInstace = Path.Combine(dir, pName);
         if (!Directory.Exists(newInstace))
             Directory.CreateDirectory(newInstace);
         else
             if (Directory.EnumerateFileSystemEntries(newInstace).Any())
-                return; // TODO: Preguntar si quiere sobreescribir
+                return null; // TODO: Preguntar si quiere sobreescribir
                         // Worker.CurrentConst.Value.Communicator.Send();
 
         // TODO: Comprobar si existe un manifest y IsFarlands()
 
 
+        IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
+        {
+            AmongInfoThreads info = Worker.CurrentConst.Value;
 
+            var Content = p.ToArray();
+            _ = info.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
+
+            Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
+        });
+        var result = HandleCloneFarlands(newInstace, progressBarr);
+        return result; // matenme pls
 
         // TODO: De carpeta de Farlands.
         // ├─Coger Dir Carpeta.
