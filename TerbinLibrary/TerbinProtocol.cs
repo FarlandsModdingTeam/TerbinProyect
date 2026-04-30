@@ -97,9 +97,10 @@ public enum CodeTerbinProtocol : byte
     Stop = 0,
     Response = 1,
     Load = 2,
-    Cancel = 3,
+    Cancel = 3, // Esto tendria que ser un status
     Solicit = 4,
 
+ // Alert = X,
     Info = 5, // informar del cliente que por ejemplo otro cliente ah cambiado cierta la configuracion.
 
     // Si puede ayudar a ahorrarte fuciones.

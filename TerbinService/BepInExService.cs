@@ -27,7 +27,6 @@ public class BepInExService
 
         AmongInfoThreads info = Worker.CurrentConst.Value;
 
-
         string rute = Serialineitor.DeserializeArray<char>(pParameters).CrString();
         // Habra alguna forma de saber si es un direccion valida?
 
@@ -89,5 +88,4 @@ public class BepInExService
         r = await NetUtil.InstallZip(TerbinURLs.BepInEx, pDir, pProgress);
         return r;
     }
-
 }

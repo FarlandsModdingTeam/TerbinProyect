@@ -38,6 +38,15 @@ namespace TerbinLibrary.Communication;
 - Communicate es para mandar sabiendo que quieres recibir una respuesta;
  */
 
+
+// PaVerano:
+// se que si utilizo las propias funciones del servicio para solicitar info faltante o preguntar algo (llamando al cliente)?
+// ¿Como hago para que pasa si no exite la funcion? ¿que pasa si excede tiempo? ¿como cancelo su hay que hacerlo?
+// ¡¡Como cancelo!!
+// ¡¡El CheckExecution solo comprueba si existe los metodos de primer nivel!! no ahonda!
+// Seria ideal que al cancelar puedieras revertirlo, al clonar farlands borrarlo, al instalar bepiex desintalarlo, etc.
+// Tengo mucho sueño
+
 public class TerbinCommunicator : IDisposable
 {
     // ****************************( Variables )**************************** //

@@ -21,13 +21,6 @@ public partial class InstancesService
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
-        // TODO: De carpeta de Farlands.
-        // ├─Coger Dir Carpeta.
-        // └─Comprobar si esta el ejecutable <todo: mover dentro del metodo>.
-
-        // TODO: Del nombre carpeta destino.
-        // └─Comprobar si la carpeta esta vacia.
-
         // HandleCreateInstance(); // Tengo sueño.
         // HandleCloneFarlands();
 
@@ -38,6 +31,30 @@ public partial class InstancesService
 
     public static async Task HandleCreateInstance(string pName)
     {
+        string? dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+        if (dir == null)
+            return;
+
+        string? dirF = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_FARLANDS);
+        if (dirF == null)
+            return;
+
+        var newInstace = Path.Combine(dir, pName);
+        if (!Directory.Exists(newInstace))
+            Directory.CreateDirectory(newInstace);
+        else
+            if (Directory.EnumerateFileSystemEntries(newInstace).Any())
+                return; // TODO: Preguntar si quiere sobreescribir
+                        // Worker.CurrentConst.Value.Communicator.Send();
+
+        // TODO: Comprobar si existe un manifest y IsFarlands()
+
+
+
+
+        // TODO: De carpeta de Farlands.
+        // ├─Coger Dir Carpeta.
+        // └─Comprobar si esta el ejecutable <todo: mover dentro del metodo>.
         // TODO: De la carpeta destino.
         // ├─Comprobar si esta vacia.
         // └─Comprobar si ya hay una instancia.
@@ -55,6 +72,7 @@ public partial class InstancesService
 
         var countDir = FileUtil.GetCountDirectories(dirFarlands);
         var countFiles = FileUtil.GetCountFiles(dirFarlands);
+        // TODO: Gurdar Json.
         var result = FileUtil.CloneDirectory(dirFarlands, pDir, true, pProgrss);
 
         // TODO:Crear manifiesto.
