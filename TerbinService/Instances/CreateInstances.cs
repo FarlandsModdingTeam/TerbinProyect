@@ -32,8 +32,6 @@ public partial class InstancesService
         if (sizes.maxFiles == null || sizes.maxDir == null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
 
-        (long maxFiles, long maxDir) sizeNotNull = (sizes.maxFiles.Value, sizes.maxDir.Value);
-
         ReadOnlySpan<byte> reader = pParameters;
         var name = reader.ReadArray<char>().CrString();
         var instalBepInEx = reader.Read<bool>();
@@ -62,8 +60,8 @@ public partial class InstancesService
         byte[] pld = new Serialineitor()
             .Add(idFarlands)
             .Add(idBepInEx)
-            .Add(sizeNotNull.maxFiles)
-            .Add(sizeNotNull.maxDir)
+            .Add(sizes.maxFiles.Value)
+            .Add(sizes.maxDir.Value)
             .ToArray();
 
         return new InfoResponse
