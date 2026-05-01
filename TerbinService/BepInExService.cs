@@ -59,7 +59,8 @@ public class BepInExService
             _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
             Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
         });
-        StatusNetUtil r = await HandleInstallBepInEx(TerbinURLs.BepInEx, progressBarr);
+        StatusNetUtil? r = await HandleInstallBepInEx(TerbinURLs.BepInEx, progressBarr);
+        if (r is null) throw new Exception("TODO: informar de que BepInEx ya esta instalado");
         if (r != StatusNetUtil.Succes)
         {
             CodeInternalErrors error = r switch
@@ -68,10 +69,12 @@ public class BepInExService
                 StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
                 _ => CodeInternalErrors.ZipExtractError
             };
+            throw new Exception($"TODO: informar de {error}");
 
+            // Prototipo del funcionamiento de Info
             AmongInfoThreads info = Worker.CurrentConst.Value;
             byte[] pld = new Serialineitor()
-                .Add(TypeService.Service) // Esto no me gusta
+                .Add(TypeService.Service)
                 .Add(CodeServices.InstallBepInEx)
                 .Add(error)
                 .ToArray();
@@ -79,10 +82,17 @@ public class BepInExService
         }
     }
 
-    public static async Task<StatusNetUtil> HandleInstallBepInEx(string pDir, IProgress<TerbinInfoProgrss>? pProgress = default)
+    public static async Task<StatusNetUtil?> HandleInstallBepInEx(string pDir, IProgress<TerbinInfoProgrss>? pProgress = default)
     {
         StatusNetUtil r = StatusNetUtil.Succes;
+        if (CheckInstallBepInEx(pDir)) return null;
         r = await NetUtil.InstallZip(TerbinURLs.BepInEx, pDir, pProgress);
         return r;
+    }
+
+    public static bool CheckInstallBepInEx(string pDir)
+    {
+        string bep = Path.Combine(pDir, "BepInEx");
+        return Directory.Exists(bep);
     }
 }
