@@ -8,4 +8,6 @@ public class TerbinConfiguration
 {
     public const string RUTE_FARLANDS = "rute_farlands";
     public const string RUTE_INSTANCES = "rute_instances";
+
+    public const string NAME_OF_MANIFEST = "Manifest.json";
 }

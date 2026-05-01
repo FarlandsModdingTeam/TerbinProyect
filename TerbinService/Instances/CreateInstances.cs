@@ -113,7 +113,7 @@ public partial class InstancesService
             Version = ManagerFarlands.GetVersion(),
             Mods = []
         };
-        AcessJSon.SaveDirect(dirInstace, "Manifest.json", manifest);
+        AcessJSon.SaveDirect(dirInstace, TerbinConfiguration.NAME_OF_MANIFEST, manifest);
 
         HandleManifest.UpdateCoreManifest(pName);
 

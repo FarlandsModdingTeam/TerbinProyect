@@ -89,7 +89,17 @@ public class AcessJSon
         if (!File.Exists(routeComplete)) return null;
 
         string json = File.ReadAllText(routeComplete);
-        if (json == null) return null;
+
+        return JsonConvert.DeserializeObject<T>(json);
+    }
+    public static T? AcessDirect<T>(string pDir, string pFile) where T : class
+    {
+        string fileName = getFileName(pFile);
+
+        string routeComplete = Path.Combine(pDir, fileName);
+        if (!File.Exists(routeComplete)) return null;
+
+        string json = File.ReadAllText(routeComplete);
 
         return JsonConvert.DeserializeObject<T>(json);
     }

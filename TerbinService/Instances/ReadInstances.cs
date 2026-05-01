@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Configuration;
+using TerbinLibrary.Data;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
 using TerbinService.Configuration;
-using System.Text.Json;
+using TerbinService.Data;
 
 namespace TerbinService.Instances;
 
@@ -46,7 +48,7 @@ public partial class InstancesService
         ReadOnlySpan<byte> reader = pParameters;
         var name = reader.ReadArray<char>().CrString();
 
-        var manifest = GetManifestIntance(name);
+        var manifest = GetStringManifest(name);
         if (manifest is null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExistOrConfigError));
 
@@ -61,7 +63,7 @@ public partial class InstancesService
     }
 
 
-    public static string? GetManifestIntance(string pName)
+    public static string? GetStringManifest(string pName)
     {
         string? dir = GetIntance(pName);
         if (dir == null)
@@ -72,6 +74,15 @@ public partial class InstancesService
             return null;
 
         return File.ReadAllText(file);
+    }
+
+    public static InstanceManifest? GetManifest(string pName)
+    {
+        string? dir = GetIntance(pName);
+        if (dir == null)
+            return null;
+
+        return AcessJSon.AcessDirect<InstanceManifest>(dir, TerbinConfiguration.NAME_OF_MANIFEST);
     }
 
     public static string? GetIntance(string pName)
