@@ -29,7 +29,7 @@ public partial class InstancesService
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
-    public static async Task<(Task<StatusFileUtil> result, long? maxFiles, long? maxDir)?>
+    public static async Task<(Task<(StatusFileUtil status, string? json)> result, long? maxFiles, long? maxDir)?>
         HandleCreateInstance(string pName, byte pIdMemory)
     {
         string? dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
@@ -56,8 +56,9 @@ public partial class InstancesService
 
             Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
         });
-        var result = HandleCloneFarlands(newInstace, progressBarr);
-        return result; // matenme pls
+        var result = await HandleCloneFarlands(newInstace, progressBarr);
+        // TODO:Crear manifiesto.
+        return result; 
 
         // TODO: De carpeta de Farlands.
         // ├─Coger Dir Carpeta.
@@ -66,7 +67,7 @@ public partial class InstancesService
         // ├─Comprobar si esta vacia.
         // └─Comprobar si ya hay una instancia.
     }
-    public static async Task<(Task<StatusFileUtil> result, long? maxFiles, long? maxDir)?>
+    public static async Task<(Task<(StatusFileUtil status, string? json)> result, long? maxFiles, long? maxDir)?>
                 HandleCloneFarlands(string pDir, IProgress<TerbinInfoProgrss> pProgrss = default)
     {
         string? dirFarlands = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_FARLANDS);
@@ -81,8 +82,6 @@ public partial class InstancesService
         var countFiles = FileUtil.GetCountFiles(dirFarlands);
         // TODO: Gurdar Json.
         var result = FileUtil.CloneDirectory(dirFarlands, pDir, true, pProgrss);
-
-        // TODO:Crear manifiesto.
 
         return (result, countFiles, countDir);
     }

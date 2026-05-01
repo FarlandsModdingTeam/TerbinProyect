@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 
 namespace TerbinLibrary.Useful;
 /*
@@ -20,13 +21,18 @@ public enum StatusFileUtil : sbyte
 
     InvalidSource = 2,
 }
+public class DirectoryHandwritten
+{
+    public List<string> Directories { get; set; } = new();
+    public List<string> Files { get; set; } = new();
+}
 
 public static class FileUtil
 {
     // PaVerano:
     // TODO: Devolver un json con todos los archivos y carpetas clonadas.
     // (Permitira actualizar farlands borrando solo el contenido marcado del json y volver a clonar actualizar de version la instancia)
-    public static async Task<StatusFileUtil> CloneDirectory(
+    public static async Task<(StatusFileUtil status, string? json)> CloneDirectory(
                                             string pSourceDir,
                                             string pDestinationDir,
                                             bool pOverwrite,
@@ -37,10 +43,11 @@ public static class FileUtil
         int previus = -1;
         double? inverse;
 
+        DirectoryHandwritten handwritten = new();
 
         allFiles = GetAllFiles(pSourceDir);
         if (allFiles is null)
-            return StatusFileUtil.InvalidSource;
+            return (StatusFileUtil.InvalidSource, null);
 
         if (!Directory.Exists(pDestinationDir))
             Directory.CreateDirectory(pDestinationDir);
@@ -52,9 +59,15 @@ public static class FileUtil
             string  rel = Path.GetRelativePath(pSourceDir, file);
             string  destFile = Path.Combine(pDestinationDir, rel);
             string? destFolder = Path.GetDirectoryName(destFile);
-            if (!string.IsNullOrEmpty(destFolder)) Directory.CreateDirectory(destFolder);
+            if (!string.IsNullOrEmpty(destFolder))
+            {
+                if (!Directory.Exists(destFolder))
+                    Directory.CreateDirectory(destFolder);
+            }
 
             File.Copy(file, destFile, pOverwrite);
+
+            handwritten.Files.Add(rel);
 
             if (pProgress != null)
                 Util.ReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
@@ -62,7 +75,7 @@ public static class FileUtil
 
         allDictories = GetAllDirectories(pSourceDir);
         if (allDictories is null)
-            return StatusFileUtil.InvalidSource;
+            return (StatusFileUtil.InvalidSource, null);
 
         inverse = (pProgress != null) ? Util.GetInverse(allDictories.Count) : null;
         previus = -1;
@@ -74,6 +87,8 @@ public static class FileUtil
             string destSub = Path.Combine(pDestinationDir, rel);
             if (!Directory.Exists(destSub)) Directory.CreateDirectory(destSub);
 
+            handwritten.Directories.Add(rel);
+
             if (pProgress != null)
                 Util.ReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
@@ -81,8 +96,13 @@ public static class FileUtil
         if (pProgress != null)
             Util.ReportProgressPercent(previus, inverse, pProgress, true, ref previus);
 
-        return StatusFileUtil.Succes;
+        string handwrittenJson = JsonSerializer.Serialize(handwritten, new JsonSerializerOptions { WriteIndented = true });
+
+        return (StatusFileUtil.Succes, handwrittenJson);
     }
+
+    // TODO: metodo que le dar una direccion y un DirectoryHandwritten en json (string) y te lo borra.
+    // └─Luego borra directorios vacios.
 
     public static List<string>? GetAllFiles(string pDir)
     {
