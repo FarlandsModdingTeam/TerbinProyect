@@ -40,7 +40,7 @@ public class BepInExService
             return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.IdSoliciteError));
 
         idMemory = rId.Payload[0];
-        _ = handleInstallBepInExWithProgress(idMemory, rute);
+        _ = HandleInstallBepInExWithProgress(idMemory, rute);
 
         return new InfoResponse
         {
@@ -51,15 +51,12 @@ public class BepInExService
     }
 
 
-    private static async Task handleInstallBepInExWithProgress(byte pIdMemory, string pDir)
+    public static async Task HandleInstallBepInExWithProgress(byte pIdMemory, string pDir)
     {
         IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
         {
-            AmongInfoThreads info = Worker.CurrentConst.Value;
-
             var Content = p.ToArray();
-            _ = info.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
-
+            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
             Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
         });
         StatusNetUtil r = await HandleInstallBepInEx(TerbinURLs.BepInEx, progressBarr);
@@ -74,7 +71,7 @@ public class BepInExService
 
             AmongInfoThreads info = Worker.CurrentConst.Value;
             byte[] pld = new Serialineitor()
-                .Add(TypeService.Service)
+                .Add(TypeService.Service) // Esto no me gusta
                 .Add(CodeServices.InstallBepInEx)
                 .Add(error)
                 .ToArray();

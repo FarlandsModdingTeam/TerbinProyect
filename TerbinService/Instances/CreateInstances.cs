@@ -4,11 +4,14 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Configuration;
+using TerbinLibrary.Data;
 using TerbinLibrary.Execution;
+using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
 using TerbinService.Configuration;
+using TerbinService.Data;
 
 namespace TerbinService.Instances;
 
@@ -21,53 +24,109 @@ public partial class InstancesService
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
-        // HandleCreateInstance(); // Tengo sueño.
-        // HandleCloneFarlands();
+        string? dirFarlands = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_FARLANDS);
+        if (dirFarlands == null) 
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.FarlandRuteNotExist));
+        var sizes = GetSizeDir(dirFarlands);
 
-        // TODO: Instalar BepInEx si el entrante es que si.
+        if (sizes.maxFiles == null || sizes.maxDir == null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
 
-        return InfoResponse.CreateSucces(pHead.IdRequest);
+        (long maxFiles, long maxDir) sizeNotNull = (sizes.maxFiles.Value, sizes.maxDir.Value);
+
+        ReadOnlySpan<byte> reader = pParameters;
+        var name = reader.ReadArray<char>().CrString();
+        var instalBepInEx = reader.Read<bool>();
+
+        AmongInfoThreads info = Worker.CurrentConst.Value;
+
+        byte idBepInEx = 0;
+        var rIdB = await info.Communicator.SoliciteRequestMemory();
+        if (rIdB.Head.Status != CodeStatus.Succes)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.IdSoliciteError));
+        idBepInEx = rIdB.Payload[0];
+
+        byte idFarlands = 0;
+        if (instalBepInEx)
+        {
+            var rIdF = await info.Communicator.SoliciteRequestMemory();
+            if (rIdF.Head.Status != CodeStatus.Succes)
+                return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.IdSoliciteError));
+            idFarlands = rIdF.Payload[0];
+        }
+        else
+            idFarlands = (byte)CodeTerbinMemory.None;
+
+        _ = HandleCreateInstance(name, idFarlands, idBepInEx, instalBepInEx);
+
+        byte[] pld = new Serialineitor()
+            .Add(idFarlands)
+            .Add(idBepInEx)
+            .Add(sizeNotNull.maxFiles)
+            .Add(sizeNotNull.maxDir)
+            .ToArray();
+
+        return new InfoResponse
+        {
+            IdRequest = pHead.IdRequest,
+            Status = CodeStatus.Succes,
+            Payload = pld,
+        };
     }
 
-    public static async Task<(Task<(StatusFileUtil status, string? json)> result, long? maxFiles, long? maxDir)?>
-        HandleCreateInstance(string pName, byte pIdMemory)
+    public static async Task
+        HandleCreateInstance(string pName, byte pIdGame, byte pIdBepInEx, bool pInstallBepInEx)
     {
         string? dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
         if (dir == null)
-            return null;
+            return;
 
-        var newInstace = Path.Combine(dir, pName);
-        if (!Directory.Exists(newInstace))
-            Directory.CreateDirectory(newInstace);
+        var dirInstace = Path.Combine(dir, pName);
+        if (!Directory.Exists(dirInstace))
+            Directory.CreateDirectory(dirInstace);
         else
-            if (Directory.EnumerateFileSystemEntries(newInstace).Any())
-                return null; // TODO: Preguntar si quiere sobreescribir
-                        // Worker.CurrentConst.Value.Communicator.Send();
+            if (Directory.EnumerateFileSystemEntries(dirInstace).Any())
+                throw new Exception("TODO: Preguntar si quiere sobreescribir");
 
         // TODO: Comprobar si existe un manifest y IsFarlands()
+        if (ManagerFarlands.IsFarlands(dirInstace))
+            throw new Exception("TODO: Solicitar si quiere reinstalar");
 
 
         IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
         {
-            AmongInfoThreads info = Worker.CurrentConst.Value;
-
             var Content = p.ToArray();
-            _ = info.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
+            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdGame, Content);
 
-            Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
+            Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual  | Finalizado: {p.Finish}");
         });
-        var result = await HandleCloneFarlands(newInstace, progressBarr);
-        // TODO:Crear manifiesto.
-        return result; 
+        var result = await HandleCloneFarlands(dirInstace, progressBarr);
+        if (result == null)
+            throw new Exception("TODO: Informar Algo ah pasado al coger a farlands");
 
-        // TODO: De carpeta de Farlands.
-        // ├─Coger Dir Carpeta.
-        // └─Comprobar si esta el ejecutable <todo: mover dentro del metodo>.
-        // TODO: De la carpeta destino.
-        // ├─Comprobar si esta vacia.
-        // └─Comprobar si ya hay una instancia.
+        var (status, json) = await result;
+        if (status != StatusFileUtil.Succes)
+            throw new Exception("TODO: Informar de que farlands no se ah podido clonar");
+
+
+        File.WriteAllText(dirInstace, json);
+        var manifest = new InstanceManifest
+        {
+            Name = pName,
+            Version = ManagerFarlands.GetVersion(),
+            Mods = []
+        };
+        AcessJSon.SaveDirect(dirInstace, "Manifest.json", manifest);
+
+        HandleManifest.UpdateCoreManifest(pName);
+
+        if (!pInstallBepInEx || pIdBepInEx <= TerbinProtocol.RESERVE_MEMORY)
+            return;
+
+        _ = BepInExService.HandleInstallBepInExWithProgress(pIdBepInEx, dirInstace);
     }
-    public static async Task<(Task<(StatusFileUtil status, string? json)> result, long? maxFiles, long? maxDir)?>
+
+    public static async Task<Task<(StatusFileUtil status, string? json)>?>
                 HandleCloneFarlands(string pDir, IProgress<TerbinInfoProgrss> pProgrss = default)
     {
         string? dirFarlands = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_FARLANDS);
@@ -76,24 +135,16 @@ public partial class InstancesService
             return null;
 
         if (!ManagerFarlands.IsFarlands(dirFarlands))
-                return null; // (StatusFileUtil.InvalidSource, null, null)
+                return null; 
 
-        var countDir = FileUtil.GetCountDirectories(dirFarlands);
-        var countFiles = FileUtil.GetCountFiles(dirFarlands);
-        // TODO: Gurdar Json.
         var result = FileUtil.CloneDirectory(dirFarlands, pDir, true, pProgrss);
-
-        return (result, countFiles, countDir);
+        return result;
     }
 
-    /// <summary>
-    /// 
-    /// </summary>
-    /// <returns></returns>
-    public static bool CreateManifest()
+    public static (long? maxFiles, long? maxDir) GetSizeDir(string pDir)
     {
-        // TODO: Crear manifiesto de la instancia con todos los mods.
-
-        throw new NotImplementedException();
+        long? countFiles = FileUtil.GetCountFiles(pDir);
+        long? countDir = FileUtil.GetCountDirectories(pDir);
+        return (countFiles, countDir);
     }
 }

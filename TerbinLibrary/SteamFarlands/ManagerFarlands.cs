@@ -80,4 +80,9 @@ public static class ManagerFarlands
         return File.Exists(pFilePath);
     }
 
+
+    public static string? GetVersion()
+    {
+        return "0.0.9";
+    }
 }

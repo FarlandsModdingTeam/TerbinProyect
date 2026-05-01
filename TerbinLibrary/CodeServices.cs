@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary;
 
@@ -8,6 +9,8 @@ namespace TerbinLibrary;
 public enum CodeServices : byte
 {
     InstallBepInEx = 10,
+
+    GetAllInstances = 30,
 }
 
 public enum CodeSubServices : byte
@@ -37,10 +40,12 @@ public enum CodeInternalErrors : ushort
     TODO_SoliciteInfo = 13,
 
     // Farland = 100,
+    FarlandRuteNotExist = 101,
 
     // Mods = 200,
 
     // Instances = 300,
+    InstaceGetSizeError = 301,
 
     // FCM = 400,
 
@@ -55,4 +60,12 @@ public enum CodeInternalErrors : ushort
     ZipExtractError = 1001,
     ZipExtractException = 1002,
     ZipDeletedTempException = 1003,
+}
+
+public class TSHelper
+{
+    public static byte[] GetError(CodeInternalErrors pError)
+    {
+        return Serialineitor.Serialize((ushort)pError);
+    }
 }

@@ -114,6 +114,22 @@ public class AcessJSon
         return CodeAcessJSonSave.Succes;
     }
 
+
+    public static CodeAcessJSonSave SaveDirect<T>(string pDir, string pFile, T pContent) where T : class
+    {
+        string fileName = getFileName(pFile);
+
+        string routeComplete = Path.Combine(pDir, fileName);
+        if (!File.Exists(routeComplete))
+            Directory.CreateDirectory(pDir);
+
+        string json = JsonConvert.SerializeObject(pContent); // Formatting.Indented
+        if (json == null) return CodeAcessJSonSave.ErrorSerialize;
+
+        File.WriteAllText(routeComplete, json);
+        return CodeAcessJSonSave.Succes;
+    }
+
     private static string? getDir(string pKeyDir)
     {
         lock (_places)
