@@ -10,7 +10,7 @@ public enum CodeServices : byte
 {
     InstallBepInEx = 10,
 
-    GetAllInstances = 30,
+    ReadAllInstances = 30,
 }
 
 public enum CodeSubServices : byte
@@ -46,6 +46,7 @@ public enum CodeInternalErrors : ushort
 
     // Instances = 300,
     InstaceGetSizeError = 301,
+    InstaceNotExistOrConfigError = 302,
 
     // FCM = 400,
 

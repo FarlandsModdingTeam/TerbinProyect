@@ -77,11 +77,10 @@ public partial class InstancesService
     public static async Task
         HandleCreateInstance(string pName, byte pIdGame, byte pIdBepInEx, bool pInstallBepInEx)
     {
-        string? dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
-        if (dir == null)
+        var dirInstace = GetIntance(pName);
+        if (dirInstace == null)
             return;
 
-        var dirInstace = Path.Combine(dir, pName);
         if (!Directory.Exists(dirInstace))
             Directory.CreateDirectory(dirInstace);
         else
