@@ -32,7 +32,6 @@ public class BepInExService
 
         if (!Directory.Exists(rute))
             Directory.CreateDirectory(rute);
-        // TODO: Comprobar si BepInEx ya esta instalado.
 
         byte idMemory = 0;
         var rId = await info.Communicator.SoliciteRequestMemory();
