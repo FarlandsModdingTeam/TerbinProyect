@@ -13,6 +13,8 @@ public enum CodeServices : byte
     Plugin_Tests = 20,
 
     ReadAllInstances = 30,
+
+    WIP_NewService = 255,
 }
 
 public enum CodeSubServices : byte

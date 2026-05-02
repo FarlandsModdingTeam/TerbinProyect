@@ -82,7 +82,7 @@ public partial class InstancesService
         if (dir == null)
             return null;
 
-        return AcessJSon.AcessDirect<InstanceManifest>(dir, TerbinConfiguration.NAME_OF_MANIFEST);
+        return AcessJSon.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.NAME_OF_MANIFEST);
     }
 
     public static string? GetIntance(string pName)

@@ -15,8 +15,8 @@ public partial class PluginServices
     private static string _ñññ = "https://github.com/FarlandsModdingTeam/FarlandsCoreMod/releases/download/v0.1.2/FCM_0.1.2.zip";
     private static string _ññ  = "https://github.com/FarlandsModdingTeam/UnityExplorer/releases/download/v4.9.0/com.sinai.unityexplorer.zip";
 
-    [TerbinExecutable((byte)CodeServices.InstallBepInEx)]
-    public static async Task<InfoResponse?> IntallBepInEx(Header pHead, byte[] pParameters)
+    [TerbinExecutable((byte)CodeServices.WIP_NewService)]
+    public static async Task<InfoResponse?> WIP_NewService(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
