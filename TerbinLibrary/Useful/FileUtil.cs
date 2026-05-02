@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Linq;
 
 namespace TerbinLibrary.Useful;
 /*
@@ -117,6 +118,16 @@ public static class FileUtil
         return Directory.EnumerateDirectories(pDir, "*", SearchOption.AllDirectories).ToList();
     }
 
+    public static List<string>? GetAllExeFiles(string pDir)
+    {
+        if (!Directory.Exists(pDir))
+            return null;
+
+        return Directory.EnumerateFiles(pDir, "*", SearchOption.AllDirectories)
+            .Where(file => file.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
+            .ToList();
+    }
+
     public static long? GetCountFiles(string pDir)
     {
         if (!Directory.Exists(pDir))
@@ -142,11 +153,13 @@ public static class FileUtil
         return count;
     }
 
-
     public static (long? maxFiles, long? maxDir) GetSizeDir(string pDir)
     {
         long? countFiles = GetCountFiles(pDir);
         long? countDir = GetCountDirectories(pDir);
         return (countFiles, countDir);
     }
+
+
+
 }

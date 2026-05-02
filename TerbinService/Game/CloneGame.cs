@@ -70,11 +70,8 @@ public partial class GameService
         if (dirInstace == null)
             return;
 
-        if (!Directory.Exists(dirInstace))
-            throw new Exception("TODO: Informar que NO existe la instancia");
-
         if (InstancesService.IsInstance(dirInstace))
-            throw new Exception("TODO: Informar que NO existe el manifiesto");
+            throw new Exception("TODO: Informar que NO existe la instancia O el manifiesto");
 
         var (status, json) = await FileUtil.CloneDirectory(pDirGame, dirInstace, true, pProgrss);
 
