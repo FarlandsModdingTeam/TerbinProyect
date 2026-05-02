@@ -37,15 +37,6 @@ public class JSonUtil
 {
     private static Dictionary<string, string> _places = new Dictionary<string, string>();
 
-    public string? this[string pKeyDir] // XD
-    {
-        get => Get(pKeyDir);
-        set
-        {
-            if (value != null) Set(pKeyDir, value);
-        }
-    }
-
     public static string? Get(string pKeyDir)
     {
         lock (_places)
@@ -152,5 +143,43 @@ public class JSonUtil
     {
         return pFile.EndsWith(".json", StringComparison.OrdinalIgnoreCase)
                 ? pFile : pFile + ".json";
+    }
+
+
+
+
+    // ********************( Prototipos )******************** //
+
+    public string? this[string pKeyDir] // XD
+    {
+        get => Get(pKeyDir);
+        set
+        {
+            if (value != null) Set(pKeyDir, value);
+        }
+    }
+
+    /// <summary>
+    /// Carga un JSON, ejecuta las modificaciones dadas y lo guarda automáticamente.
+    /// </summary>
+    public static CodeAcessJSonSave Update<T>(string pKeyDir, string pFile, Action<T> updateAction) where T : class, new()
+    {
+        T data = Acess<T>(pKeyDir, pFile) ?? new T();
+
+        updateAction(data);
+
+        return Save(pKeyDir, pFile, data);
+    }
+
+    /// <summary>
+    /// Carga un JSON, ejecuta las modificaciones dadas y lo guarda automáticamente.
+    /// </summary>
+    public static CodeAcessJSonSave UpdateDirect<T>(string pDir, string pFile, Action<T> updateAction) where T : class, new()
+    {
+        T data = AcessDirect<T>(pDir, pFile) ?? new T();
+
+        updateAction(data);
+
+        return Save(pDir, pFile, data);
     }
 }
