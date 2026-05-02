@@ -4,9 +4,9 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Configuration;
-using TerbinLibrary.Data;
 using TerbinLibrary.Extension;
 using TerbinLibrary.SteamFarlands;
+using TerbinLibrary.Useful;
 
 namespace TerbinService.Configuration;
 
@@ -22,14 +22,14 @@ internal static class ManagerConfiguration
 
     public static string? GetConfg(string pKey)
     {
-        if (AcessJSon.Get(KEY) == null)
-            AcessJSon.Set(KEY, FOLDER);
+        if (JSonUtil.Get(KEY) == null)
+            JSonUtil.Set(KEY, FOLDER);
 
-        var r = AcessJSon.Acess<Dictionary<string, string>>(KEY, JSON);
+        var r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
         if (r == null)
         {
             setPredeterminatedConfig();
-            r = AcessJSon.Acess<Dictionary<string, string>>(KEY, JSON);
+            r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
             if (r == null)
                 return null;
         }
@@ -43,17 +43,17 @@ internal static class ManagerConfiguration
     public static CodeAcessJSonSave SetConfig(string pKey, string pData)
     {
         Dictionary<string, string> data;
-        if (AcessJSon.Acess<Dictionary<string, string>>(KEY, JSON) is var r && r != null)
+        if (JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON) is var r && r != null)
             data = r;
         else
         {
-            AcessJSon.Set(KEY, FOLDER);
+            JSonUtil.Set(KEY, FOLDER);
             data = new();
         }
 
         data[pKey] = pData;
 
-        var result = AcessJSon.Save(KEY, JSON, data);
+        var result = JSonUtil.Save(KEY, JSON, data);
         _ = Task.Run(async () =>
         {
             await Task.Delay(100);
@@ -73,8 +73,8 @@ internal static class ManagerConfiguration
                 data.Add(TerbinConfiguration.RUTE_FARLANDS, dirFarlands);
             // TODO: Conseguir ruta instancias predeterminadas.
 
-            AcessJSon.Set(KEY, FOLDER);
-            AcessJSon.Save(KEY, JSON, data);
+            JSonUtil.Set(KEY, FOLDER);
+            JSonUtil.Save(KEY, JSON, data);
         }
     }
 }

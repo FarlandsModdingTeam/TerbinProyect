@@ -5,10 +5,10 @@ using System.Text.Json;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Configuration;
-using TerbinLibrary.Data;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.Useful;
 using TerbinService.Configuration;
 using TerbinService.Data;
 
@@ -82,7 +82,7 @@ public partial class InstancesService
         if (dir == null)
             return null;
 
-        return AcessJSon.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.NAME_OF_MANIFEST);
+        return JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.NAME_OF_MANIFEST);
     }
 
     public static string? GetIntance(string pName)

@@ -7,8 +7,7 @@ using System.Numerics;
 using System.Resources;
 using TerbinLibrary.Extension;
 
-namespace TerbinLibrary.Data;
-
+namespace TerbinLibrary.Useful;
 /*
  -- Variables:
   empieza: _ = es privada NO local.
@@ -34,7 +33,7 @@ public enum CodeAcessJSonSave : sbyte
     Succes = 1,
 }
 
-public class AcessJSon
+public class JSonUtil
 {
     private static Dictionary<string, string> _places = new Dictionary<string, string>();
 

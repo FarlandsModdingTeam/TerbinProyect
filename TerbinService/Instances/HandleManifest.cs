@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Configuration;
-using TerbinLibrary.Data;
+using TerbinLibrary.Useful;
 
 namespace TerbinService.Instances;
 
@@ -14,18 +14,18 @@ public class HandleManifest
     {
         var allInstaces = GetCore();
         allInstaces.Add(pName);
-        AcessJSon.Save(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES, allInstaces);
+        JSonUtil.Save(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES, allInstaces);
     }
     public static void DeleteInstanceCoreManifest(string pName)
     {
         var allInstaces = GetCore();
         allInstaces.Remove(pName);
-        AcessJSon.Save(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES, allInstaces);
+        JSonUtil.Save(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES, allInstaces);
     }
 
     public static List<string> GetCore()
     {
-        var allInstaces = AcessJSon.Acess<List<string>>(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES);
+        var allInstaces = JSonUtil.Acess<List<string>>(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES);
         allInstaces ??= new();
         return allInstaces;
     }

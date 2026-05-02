@@ -4,7 +4,6 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Configuration;
-using TerbinLibrary.Data;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
@@ -115,7 +114,7 @@ public partial class InstancesService
             Version = ManagerFarlands.GetVersion(),
             Plugins = []
         };
-        AcessJSon.SaveDirect(dirInstace, TerbinServiceConst.NAME_OF_MANIFEST, manifest);
+        JSonUtil.SaveDirect(dirInstace, TerbinServiceConst.NAME_OF_MANIFEST, manifest);
 
         HandleManifest.UpdateCoreManifest(pName);
 
@@ -180,6 +179,6 @@ public partial class InstancesService
             Version = ManagerFarlands.GetVersion(),
             Plugins = []
         };
-        AcessJSon.SaveDirect(pDir, TerbinServiceConst.NAME_OF_MANIFEST, manifest);
+        JSonUtil.SaveDirect(pDir, TerbinServiceConst.NAME_OF_MANIFEST, manifest);
     }
 }
