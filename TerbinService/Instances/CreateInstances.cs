@@ -76,7 +76,7 @@ public partial class InstancesService
     public static async Task
         HandleCreateInstance(string pName, byte pIdMemoryGame, byte pIdMemoryBepInEx, bool pInstallBepInEx)
     {
-        var dirInstace = GetIntance(pName);
+        var dirInstace = MakePathFolder(pName);
         if (dirInstace == null)
             return;
 
@@ -149,7 +149,7 @@ public partial class InstancesService
 
     public static void NewInstance(string pName)
     {
-        var dirInstace = GetIntance(pName);
+        var dirInstace = MakePathFolder(pName);
         if (dirInstace == null)
             return;
 
@@ -163,22 +163,10 @@ public partial class InstancesService
             Directory.CreateDirectory(dirInstace);
         }
 
-        string dirInfo = Path.Combine(dirInstace, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
-        Directory.CreateDirectory(dirInfo);
 
-        createPredeterminatedInstanceManifest(pName, dirInfo);
+        HandleManifest.CreatePredeterminated(pName);
 
         HandleManifest.UpdateCoreManifest(pName);
     }
 
-    private static void createPredeterminatedInstanceManifest(string pName, string pDir, string? pGame = null)
-    {
-        var manifest = new InstanceManifest
-        {
-            Name = pName,
-            Version = ManagerFarlands.GetVersion(),
-            Plugins = []
-        };
-        JSonUtil.SaveDirect(pDir, TerbinServiceConst.NAME_OF_MANIFEST, manifest);
-    }
 }

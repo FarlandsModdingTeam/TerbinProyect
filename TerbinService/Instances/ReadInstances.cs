@@ -65,7 +65,7 @@ public partial class InstancesService
 
     public static string? GetStringManifest(string pName)
     {
-        string? dir = GetIntance(pName);
+        string? dir = MakePathFolder(pName);
         if (dir == null)
             return null;
 
@@ -78,14 +78,23 @@ public partial class InstancesService
 
     public static InstanceManifest? GetManifest(string pName)
     {
-        string? dir = GetIntance(pName);
+        string? dir = MakePathFolder(pName);
         if (dir == null)
             return null;
 
         return JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.NAME_OF_MANIFEST);
     }
 
-    public static string? GetIntance(string pName)
+    public static string? MakePathFolderInformation(string pName)
+    {
+        var dir = MakePathFolder(pName);
+        if (dir == null)
+            return null;
+
+        return Path.Combine(dir, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
+    }
+
+    public static string? MakePathFolder(string pName)
     {
         var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
         if (dir == null)

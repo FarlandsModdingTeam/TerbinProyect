@@ -4,7 +4,6 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Configuration;
-using TerbinLibrary.Data;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
@@ -66,7 +65,7 @@ public partial class GameService
 
     public static async Task HandleCloneInInstance(string pName, byte pIdMemoryGame, string pDirGame, IProgress<TerbinInfoProgrss> pProgrss = default)
     {
-        var dirInstace = InstancesService.GetIntance(pName);
+        var dirInstace = InstancesService.MakePathFolder(pName);
         if (dirInstace == null)
             return;
 
@@ -80,7 +79,14 @@ public partial class GameService
 
         File.WriteAllText(dirInstace, json);
 
-        // TODO: Actualizar manifiesto.
+
+        var exes = FileUtil.GetAllExeFiles(dirInstace);
+        if (exes is null)
+            return;
+
+        HandleManifest.UpdateInstace(pName, dirInstace, manifest => {
+            manifest.Executable = exes[0];
+        });
     }
 
 

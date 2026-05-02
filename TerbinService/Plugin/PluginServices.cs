@@ -84,7 +84,7 @@ public partial class PluginServices
     public static async Task<StatusNetUtil?> HandleInstallPlugin(string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default)
     {
         StatusNetUtil r = StatusNetUtil.Succes;
-        string? dir = InstancesService.GetIntance(pNameInstance);
+        string? dir = InstancesService.MakePathFolder(pNameInstance);
         if (dir is null) return null;
 
         if (!BepInExService.CheckInstallBepInEx(dir)) return null;
