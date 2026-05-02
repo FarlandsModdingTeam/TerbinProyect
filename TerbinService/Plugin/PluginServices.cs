@@ -1,20 +1,20 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Diagnostics;
 using System.Text;
-using System.IO;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Execution;
-using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
+using TerbinLibrary.Extension;
+using TerbinService.Instances;
 
-namespace TerbinService;
+namespace TerbinService.Plugin;
 
-public class BepInExService
+public partial class PluginServices
 {
+    private static string _ñññ = "https://github.com/FarlandsModdingTeam/FarlandsCoreMod/releases/download/v0.1.2/FCM_0.1.2.zip";
+    private static string _ññ  = "https://github.com/FarlandsModdingTeam/UnityExplorer/releases/download/v4.9.0/com.sinai.unityexplorer.zip";
+
     [TerbinExecutable((byte)CodeServices.InstallBepInEx)]
     public static async Task<InfoResponse?> IntallBepInEx(Header pHead, byte[] pParameters)
     {
@@ -27,7 +27,7 @@ public class BepInExService
 
         AmongInfoThreads info = Worker.CurrentConst.Value;
 
-        string rute = Serialineitor.DeserializeArray<char>(pParameters).CrString();
+        string rute = Serialineitor.DeserializeArray<char>(ref pParameters).CrString();
         // Habra alguna forma de saber si es un direccion valida?
 
         if (!Directory.Exists(rute))
@@ -58,7 +58,7 @@ public class BepInExService
             _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
             Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
         });
-        StatusNetUtil? r = await HandleInstallBepInEx(TerbinURLs.BepInEx, progressBarr);
+        StatusNetUtil? r = await HandleInstallPlugin(TerbinURLs.BepInEx, progressBarr);
         if (r is null) throw new Exception("TODO: informar de que BepInEx ya esta instalado");
         if (r != StatusNetUtil.Succes)
         {
@@ -81,34 +81,14 @@ public class BepInExService
         }
     }
 
-    public static async Task<StatusNetUtil?> HandleInstallBepInEx(string pDir, IProgress<TerbinInfoProgrss>? pProgress = default)
+    public static async Task<StatusNetUtil?> HandleInstallPlugin(string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default)
     {
         StatusNetUtil r = StatusNetUtil.Succes;
-        if (CheckInstallBepInEx(pDir)) return null;
-        r = await NetUtil.InstallZip(TerbinURLs.BepInEx, pDir, pProgress);
+        string? dir = InstancesService.GetIntance(pNameInstance);
+        if (dir is null) return null;
+
+        if (!BepInExService.CheckInstallBepInEx(dir)) return null;
+        r = await NetUtil.InstallZip(TerbinURLs.BepInEx, dir, pProgress);
         return r;
-    }
-
-    public static bool CheckInstallBepInEx(string pDir)
-    {
-        string bep = Path.Combine(pDir, "BepInEx");
-        return Directory.Exists(bep);
-    }
-
-
-    public static string GetBepInExFolderPlugin(string pDirInstance) // BepInEx/plugins/
-    {
-        string dirBepInExFolder;
-        string dirPlugins;
-
-        dirBepInExFolder = Path.Combine(pDirInstance, "BepInEx");
-        if (!Directory.Exists(dirBepInExFolder))
-            Directory.CreateDirectory(dirBepInExFolder);
-
-        dirPlugins = Path.Combine(dirBepInExFolder, "plugins");
-        if (!Directory.Exists(dirPlugins))
-            Directory.CreateDirectory(dirPlugins);
-
-        return dirPlugins;
     }
 }

@@ -10,6 +10,8 @@ public enum CodeServices : byte
 {
     InstallBepInEx = 10,
 
+    Plugin_Tests = 20,
+
     ReadAllInstances = 30,
 }
 
@@ -17,7 +19,7 @@ public enum CodeSubServices : byte
 {
     Farland = 10,
 
-    Mods = 20,
+    Plugin = 20,
 
     Instances = 30,
 

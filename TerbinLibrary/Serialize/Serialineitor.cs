@@ -134,7 +134,7 @@ public class Serialineitor
         int offset = 0;
         byte[] newArray = new byte[pArray.Length * Unsafe.SizeOf<T>() + TerbinProtocol.LENGTH_ARRAY];
         BufferWriter.AddArray<T>(newArray, ref offset, pArray);
-        return newArray.ToArray();
+        return newArray;
     }
     public static T[] DeserializeArray<T>(byte[] pArray)
         where T : unmanaged
@@ -142,7 +142,12 @@ public class Serialineitor
         int offset = 0;
         return BufferReader.GetArray<T>(pArray, ref offset);
     }
-
+    public static T[] DeserializeArray<T>(ref byte[] pArray)
+        where T : unmanaged
+    {
+        ReadOnlySpan<byte> buffer = pArray;
+        return buffer.ReadArray<T>();
+    }
 
     public static ThreeQuartersInt GetArraySize<T>(ThreeQuartersInt pLength) where T : unmanaged
     {
