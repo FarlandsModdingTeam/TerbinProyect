@@ -84,7 +84,8 @@ public partial class GameService
         if (exes is null)
             return;
 
-        HandleManifest.UpdateInstace(pName, dirInstace, manifest => {
+        HandleManifest.UpdateInstace(pName, dirInstace, manifest =>
+        {
             manifest.Executable = exes[0];
         });
     }
