@@ -91,8 +91,8 @@ public partial class InstancesService
         if (dir == null)
             return null;
 
-        if (!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
+        //if (!Directory.Exists(dir))
+        //    Directory.CreateDirectory(dir);
 
         return Path.Combine(dir, pName);
     }

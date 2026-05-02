@@ -17,6 +17,7 @@ namespace TerbinService.Instances;
 
 public partial class InstancesService
 {
+    [Obsolete]
     // El nombre de la instancia, bool si quieres instalar BepInEx, 
     [TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Instances)]
     public static async Task<InfoResponse?> CreateInstance(Header pHead, byte[] pParameters)
@@ -72,8 +73,9 @@ public partial class InstancesService
         };
     }
 
+    [Obsolete]
     public static async Task
-        HandleCreateInstance(string pName, byte pIdGame, byte pIdBepInEx, bool pInstallBepInEx)
+        HandleCreateInstance(string pName, byte pIdMemoryGame, byte pIdMemoryBepInEx, bool pInstallBepInEx)
     {
         var dirInstace = GetIntance(pName);
         if (dirInstace == null)
@@ -93,7 +95,7 @@ public partial class InstancesService
         IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
         {
             var Content = p.ToArray();
-            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdGame, Content);
+            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemoryGame, Content);
 
             Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual  | Finalizado: {p.Finish}");
         });
@@ -111,16 +113,16 @@ public partial class InstancesService
         {
             Name = pName,
             Version = ManagerFarlands.GetVersion(),
-            Mods = []
+            Plugins = []
         };
-        AcessJSon.SaveDirect(dirInstace, TerbinConfiguration.NAME_OF_MANIFEST, manifest);
+        AcessJSon.SaveDirect(dirInstace, TerbinServiceConst.NAME_OF_MANIFEST, manifest);
 
         HandleManifest.UpdateCoreManifest(pName);
 
-        if (!pInstallBepInEx || pIdBepInEx <= TerbinProtocol.RESERVE_MEMORY)
+        if (!pInstallBepInEx || pIdMemoryBepInEx <= TerbinProtocol.RESERVE_MEMORY)
             return;
 
-        _ = BepInExService.HandleInstallBepInExWithProgress(pIdBepInEx, dirInstace);
+        _ = BepInExService.HandleInstallBepInExWithProgress(pIdMemoryBepInEx, dirInstace);
     }
 
     public static async Task<Task<(StatusFileUtil status, string? json)>?>
@@ -143,5 +145,39 @@ public partial class InstancesService
         long? countFiles = FileUtil.GetCountFiles(pDir);
         long? countDir = FileUtil.GetCountDirectories(pDir);
         return (countFiles, countDir);
+    }
+
+
+    public static void NewInstance(string pName)
+    {
+        var dirInstace = GetIntance(pName);
+        if (dirInstace == null)
+            return;
+
+        if (Directory.Exists(dirInstace))
+        {
+            if (Directory.EnumerateFileSystemEntries(dirInstace).Any())
+                throw new Exception("TODO: Preguntar si quiere sobreescribir");
+        }
+        else
+        {
+            Directory.CreateDirectory(dirInstace);
+        }
+
+        string dirInfo = Path.Combine(dirInstace, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
+        Directory.CreateDirectory(dirInfo);
+
+        createPredeterminatedInstanceManifest(pName, dirInfo);
+    }
+
+    private static void createPredeterminatedInstanceManifest(string pName, string pDir, string? pGame = null)
+    {
+        var manifest = new InstanceManifest
+        {
+            Name = pName,
+            Version = ManagerFarlands.GetVersion(),
+            Plugins = []
+        };
+        AcessJSon.SaveDirect(pDir, TerbinServiceConst.NAME_OF_MANIFEST, manifest);
     }
 }
