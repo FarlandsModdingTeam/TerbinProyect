@@ -18,14 +18,14 @@ public partial class InstancesService
 {
     [Obsolete]
     // El nombre de la instancia, bool si quieres instalar BepInEx, 
-    [TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Instances)]
-    public static async Task<InfoResponse?> CreateInstance(Header pHead, byte[] pParameters)
+    //[TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Instances)]
+    public static async Task<InfoResponse?> CreateInstance_Obsolete(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
         string? dirFarlands = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_FARLANDS);
-        if (dirFarlands == null) 
+        if (dirFarlands == null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.FarlandRuteNotExist));
         var sizes = GetSizeDir(dirFarlands);
 
@@ -84,7 +84,7 @@ public partial class InstancesService
             Directory.CreateDirectory(dirInstace);
         else
             if (Directory.EnumerateFileSystemEntries(dirInstace).Any())
-                throw new Exception("TODO: Preguntar si quiere sobreescribir");
+            throw new Exception("TODO: Preguntar si quiere sobreescribir");
 
         // TODO: Comprobar si existe un manifest y IsFarlands()
         if (ManagerFarlands.IsFarlands(dirInstace))
@@ -133,7 +133,7 @@ public partial class InstancesService
             return null;
 
         if (!ManagerFarlands.IsFarlands(dirFarlands))
-                return null; 
+            return null;
 
         var result = FileUtil.CloneDirectory(dirFarlands, pDir, true, pProgrss);
         return result;
@@ -147,11 +147,31 @@ public partial class InstancesService
     }
 
 
-    public static void NewInstance(string pName)
+    // El nombre de la instancia, bool si quieres instalar BepInEx, 
+    [TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Instances)]
+    public static async Task<InfoResponse?> CreateInstance(Header pHead, byte[] pParameters)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        ReadOnlySpan<byte> reader = pParameters;
+        var name = reader.ReadArray<char>().CrString();
+
+        NewInstance(name);
+
+        return new InfoResponse
+        {
+            IdRequest = pHead.IdRequest,
+            Status = CodeStatus.Succes,
+            Payload = [],
+        };
+    }
+
+    public static bool NewInstance(string pName)
     {
         var dirInstace = MakePathFolder(pName);
         if (dirInstace == null)
-            return;
+            return false;
 
         if (Directory.Exists(dirInstace))
         {
@@ -167,6 +187,7 @@ public partial class InstancesService
         HandleManifest.CreatePredeterminated(pName);
 
         HandleManifest.UpdateCoreManifest(pName);
+        return true;
     }
 
 }
