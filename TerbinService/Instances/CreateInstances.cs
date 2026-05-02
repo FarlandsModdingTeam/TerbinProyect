@@ -124,7 +124,7 @@ public partial class InstancesService
 
         _ = BepInExService.HandleInstallBepInExWithProgress(pIdMemoryBepInEx, dirInstace);
     }
-
+    [Obsolete]
     public static async Task<Task<(StatusFileUtil status, string? json)>?>
                 HandleCloneFarlands(string pDir, IProgress<TerbinInfoProgrss> pProgrss = default)
     {
@@ -139,7 +139,7 @@ public partial class InstancesService
         var result = FileUtil.CloneDirectory(dirFarlands, pDir, true, pProgrss);
         return result;
     }
-
+    [Obsolete]
     public static (long? maxFiles, long? maxDir) GetSizeDir(string pDir)
     {
         long? countFiles = FileUtil.GetCountFiles(pDir);
@@ -168,6 +168,8 @@ public partial class InstancesService
         Directory.CreateDirectory(dirInfo);
 
         createPredeterminatedInstanceManifest(pName, dirInfo);
+
+        HandleManifest.UpdateCoreManifest(pName);
     }
 
     private static void createPredeterminatedInstanceManifest(string pName, string pDir, string? pGame = null)
