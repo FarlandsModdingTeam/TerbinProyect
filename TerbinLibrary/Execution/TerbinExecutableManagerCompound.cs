@@ -4,8 +4,6 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
-using static System.Collections.Specialized.BitVector32;
 
 namespace TerbinLibrary.Execution;
 /*
@@ -24,6 +22,7 @@ namespace TerbinLibrary.Execution;
 /// </summary>
 public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
 {
+    // TODO: Que la key sea un array de byte.
     private readonly ConcurrentDictionary<(byte action, byte subAction), List<TerbinExecutableDelegate>> _handlers = new();
 
     public void Register(IExecutableAttribute pSubAction, TerbinExecutableDelegate pHandler)

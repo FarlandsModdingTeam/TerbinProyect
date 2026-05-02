@@ -141,4 +141,12 @@ public static class FileUtil
         }
         return count;
     }
+
+
+    public static (long? maxFiles, long? maxDir) GetSizeDir(string pDir)
+    {
+        long? countFiles = GetCountFiles(pDir);
+        long? countDir = GetCountDirectories(pDir);
+        return (countFiles, countDir);
+    }
 }

@@ -42,7 +42,7 @@ public partial class InstancesService
         byte idBepInEx = 0;
         var rIdB = await info.Communicator.SoliciteRequestMemory();
         if (rIdB.Head.Status != CodeStatus.Succes)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.IdSoliciteError));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         idBepInEx = rIdB.Payload[0];
 
         byte idFarlands = 0;
@@ -50,7 +50,7 @@ public partial class InstancesService
         {
             var rIdF = await info.Communicator.SoliciteRequestMemory();
             if (rIdF.Head.Status != CodeStatus.Succes)
-                return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.IdSoliciteError));
+                return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
             idFarlands = rIdF.Payload[0];
         }
         else

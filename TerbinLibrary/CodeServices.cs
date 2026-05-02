@@ -19,7 +19,7 @@ public enum CodeServices : byte
 
 public enum CodeSubServices : byte
 {
-    Farland = 10,
+    Game = 10,
 
     Plugin = 20,
 

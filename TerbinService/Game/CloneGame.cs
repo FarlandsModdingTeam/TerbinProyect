@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary;
+using TerbinLibrary.Communication;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
+using TerbinLibrary.Execution;
+using TerbinLibrary.Extension;
+using TerbinLibrary.Serialize;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
 using TerbinService.Configuration;
@@ -14,22 +18,42 @@ namespace TerbinService.Game;
 
 public partial class GameService
 {
-
-
-
-
-    public static async Task HandleCloneInInstance(string pName, byte pIdMemoryGame, string pDirGame)
+    [TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Game)]
+    public static async Task<InfoResponse?> CloneGame(Header pHead, byte[] pParameters)
     {
-        var dirInstace = InstancesService.GetIntance(pName);
-        if (dirInstace == null)
-            return;
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
-        if (!Directory.Exists(dirInstace))
-            throw new Exception("TODO: Informar que no existe la instancia");
+        ReadOnlySpan<byte> buffer = pParameters;
+        string nameInstance = buffer.ReadArray<char>().CrString();
+        string dirGame = buffer.ReadArray<char>().CrString();
 
-        // TODO: Comprobar si existe un manifest
+        var sizes = GetSizeDir(dirGame);
+        if (sizes.maxFiles == null || sizes.maxDir == null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
+
+        var rId = await Worker.CurrentConst.Value.Communicator.SoliciteRequestMemory();
+        if (rId.Head.Status != CodeStatus.Succes)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
+        byte id = rId.Payload[0];
+
+        _ = HandleCloneInInstanceWithProgress(nameInstance, id, dirGame);
+
+        return new InfoResponse
+        {
+            IdRequest = pHead.IdRequest,
+            Status = CodeStatus.Succes,
+            Payload = new Serialineitor()
+                        .Add(id)
+                        .Add(sizes.maxFiles.Value)
+                        .Add(sizes.maxDir.Value)
+                        .ToArray(),
+        };
+    }
 
 
+    public static async Task HandleCloneInInstanceWithProgress(string pName, byte pIdMemoryGame, string pDirGame)
+    {
         IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
         {
             var Content = p.ToArray();
@@ -37,8 +61,22 @@ public partial class GameService
 
             Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual  | Finalizado: {p.Finish}");
         });
-        //var result = await HandleCloneGame(pDirGame, dirInstace, progressBarr);
-        var (status, json) = await FileUtil.CloneDirectory(pDirGame, dirInstace, true, progressBarr);
+        await HandleCloneInInstance(pName, pIdMemoryGame, pDirGame, progressBarr);
+    }
+
+    public static async Task HandleCloneInInstance(string pName, byte pIdMemoryGame, string pDirGame, IProgress<TerbinInfoProgrss> pProgrss = default)
+    {
+        var dirInstace = InstancesService.GetIntance(pName);
+        if (dirInstace == null)
+            return;
+
+        if (!Directory.Exists(dirInstace))
+            throw new Exception("TODO: Informar que NO existe la instancia");
+
+        if (InstancesService.IsInstance(dirInstace))
+            throw new Exception("TODO: Informar que NO existe el manifiesto");
+
+        var (status, json) = await FileUtil.CloneDirectory(pDirGame, dirInstace, true, pProgrss);
 
         if (status != StatusFileUtil.Succes)
             throw new Exception("TODO: Informar de que farlands no se ah podido clonar");
