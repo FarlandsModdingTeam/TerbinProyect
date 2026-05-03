@@ -55,7 +55,17 @@ public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
         }
         catch (Exception e)
         {
-            Console.WriteLine($"[SubActionExecutableDispatcher>DispatchAsync] ExceptionError-> {e.Message}");
+            string exceptionString = $$"""
+                [CompoundExecutableDispatcher>DispatchAsync] ExceptionError->
+                {
+                    Message: {{e.Message}};
+                    Source: {{e.Source}};
+                    Inner: {{e.InnerException?.Message ?? "N/A"}};
+                    Trace: {{e.StackTrace}};
+                    String: {{e.ToString()}}
+                }
+                """;
+            Console.WriteLine(exceptionString);
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionException);
         }
     }
