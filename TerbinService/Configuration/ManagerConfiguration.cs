@@ -37,7 +37,13 @@ internal static class ManagerConfiguration
         if (r.TryGetValue(pKey, out string? value))
             return value;
         else
-            return GetPredeterminated(pKey);
+        {
+            string? pre = GetPredeterminated(pKey);
+            if (pre is null) return null;
+            r.Add(pKey, pre);
+            JSonUtil.Save(KEY, JSON, r);
+            return pre;
+        }
     }
 
     public static CodeAcessJSonSave SetConfig(string pKey, string pData)
