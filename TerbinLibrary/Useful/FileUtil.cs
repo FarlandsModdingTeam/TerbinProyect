@@ -22,11 +22,6 @@ public enum StatusFileUtil : sbyte
 
     InvalidSource = 2,
 }
-public class DirectoryHandwritten
-{
-    public List<string> Directories { get; set; } = new();
-    public List<string> Files { get; set; } = new();
-}
 
 public static class FileUtil
 {
@@ -71,7 +66,7 @@ public static class FileUtil
             handwritten.Files.Add(rel);
 
             if (pProgress != null)
-                Util.ReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
+                Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         allDictories = GetAllDirectories(pSourceDir);
@@ -91,11 +86,11 @@ public static class FileUtil
             handwritten.Directories.Add(rel);
 
             if (pProgress != null)
-                Util.ReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
+                Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         if (pProgress != null)
-            Util.ReportProgressPercent(previus, inverse, pProgress, true, ref previus);
+            Util.TryReportProgressPercent(previus, inverse, pProgress, true, ref previus);
 
         string handwrittenJson = JsonSerializer.Serialize(handwritten, new JsonSerializerOptions { WriteIndented = true });
 

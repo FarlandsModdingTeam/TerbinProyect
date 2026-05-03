@@ -231,7 +231,7 @@ public static class NetUtil
 
             last = (pTotal.HasValue) ? (currentRead >= pTotal.Value) : false;
 
-            Util.ReportProgressPercent(currentRead, totalInverse, pProgress, last, ref lastPercentage);
+            Util.TryReportProgressPercent(currentRead, totalInverse, pProgress, last, ref lastPercentage);
         }
     }
 

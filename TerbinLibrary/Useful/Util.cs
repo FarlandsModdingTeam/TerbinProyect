@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Text.Json;
 using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Useful;
@@ -22,6 +23,18 @@ public struct TerbinInfoProgrss
     }
 }
 
+public class DirectoryHandwritten
+{
+    public List<string> Directories { get; set; } = new();
+    public List<string> Files { get; set; } = new();
+
+    public string ToJson(JsonSerializerOptions options) => JsonSerializer.Serialize(this, options);
+    public string ToJson()
+    {
+        return JsonSerializer.Serialize(this, new JsonSerializerOptions { WriteIndented = true });
+    }
+}
+
 public static class Util
 {
     /// <summary>
@@ -36,29 +49,39 @@ public static class Util
     /// Si el tamaño total es desconocido o no se proporcionó un
     /// objeto de progreso, no se reporta nada.
     /// </remarks>
-    public static void ReportProgressPercent(long pCurrentRead, double? pTotalInverse, IProgress<TerbinInfoProgrss>? pProgress, bool pFinish, ref int pPrevouslyReported)
+    public static bool TryReportProgressPercent(long pCurrentRead, double? pTotalInverse, IProgress<TerbinInfoProgrss>? pProgress, bool pFinish, ref int pPrevouslyReported)
     {
         if (!pTotalInverse.HasValue || pProgress == null)
-            return;
+            return false;
 
         int percent = (int)(pCurrentRead * pTotalInverse.Value);
 
         if (percent > pPrevouslyReported)
         {
             pPrevouslyReported = percent;
-            var info = new TerbinInfoProgrss
-            {
-                Percentage = (byte)percent,
-                Current = pCurrentRead,
-                Finish = pFinish,
-            };
-            pProgress.Report(info);
+            ReportProgressPercent(percent, pCurrentRead, pFinish, pProgress);
+            return true;
         }
+        return false;
     }
 
+    public static void ReportProgressPercent(int pPercent, long pCurrentRead, bool pFinish, IProgress<TerbinInfoProgrss> pProgress)
+    {
+        var info = new TerbinInfoProgrss
+        {
+            Percentage = (byte)pPercent,
+            Current = pCurrentRead,
+            Finish = pFinish,
+        };
+        pProgress.Report(info);
+    }
 
     public static double? GetInverse(long? pTotal)
     {
        return (pTotal.HasValue) ? (100.0d / pTotal.Value) : null;
+    }
+    public static double GetInverse(long pTotal)
+    {
+        return (100.0d / pTotal);
     }
 }
