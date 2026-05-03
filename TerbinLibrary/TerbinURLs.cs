@@ -25,5 +25,9 @@ public class TerbinURLs
 
     public const string TEST_10GB_BIN =
         "https://nbg1-speed.hetzner.com/10GB.bin";
+
+
+    public const string MOD_FCM = "https://github.com/FarlandsModdingTeam/FarlandsCoreMod/releases/download/v0.1.2/FCM_0.1.2.zip";
+    public const string MOD_EXPLORER = "https://github.com/FarlandsModdingTeam/UnityExplorer/releases/download/v4.9.0/com.sinai.unityexplorer.zip";
 }
 

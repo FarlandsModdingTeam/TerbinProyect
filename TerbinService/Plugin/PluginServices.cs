@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Text;
+using System.Xml.Linq;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Execution;
+using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
-using TerbinLibrary.Extension;
 using TerbinService.Instances;
 
 namespace TerbinService.Plugin;
@@ -21,14 +22,25 @@ public partial class PluginServices
         AmongInfoThreads info = Worker.CurrentConst.Value;
 
         ReadOnlySpan<byte> reader = pParameters;
-        var name = reader.ReadArray<char>().CrString();
-        var urlPlugin = reader.ReadArray<char>().CrString();
+        string name = reader.ReadArray<char>().CrString();
+        string urlPlugin = reader.ReadArray<char>().CrString();
+        bool requierBepInEx = reader.Read<bool>();
 
-        string? pathInstance = InstancesService.MakePathFolder(name);
+        string? pathInstance;
+        string pathPlugin;
+        pathInstance = InstancesService.MakePathFolder(name);
         if (pathInstance is null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExit));
-        if (!BepInExService.CheckInstallBepInEx(pathInstance))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.BepInExNotInstall));
+        if (requierBepInEx)
+        {
+            if (!BepInExService.CheckInstallBepInEx(pathInstance))
+                return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.BepInExNotInstall));
+            pathPlugin = MakePathPluginByInstance(pathInstance);
+        }
+        else
+        {
+            pathPlugin = pathInstance;
+        }
 
 
         long? sizePlugin = await NetUtil.GetContentLength(urlPlugin);
@@ -46,7 +58,7 @@ public partial class PluginServices
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         byte memoryExtract = rId.Payload[0];
 
-        _ = HandleInstallPluginWithProgress(memoryDownload, memoryExtract, pathInstance, urlPlugin);
+        _ = HandleInstallPluginWithProgress(memoryDownload, memoryExtract, pathPlugin, urlPlugin);
 
         return new InfoResponse
         {
@@ -110,5 +122,28 @@ public partial class PluginServices
 
         r = await NetUtil.InstallZipWithProgress(pUrl, pathInstance, pProgressExtract, pProgressDownload);
         return r;
+    }
+
+
+
+    public static string? MakePathPluginByName(string pNameInstance)
+    {
+        string? pathInstance;
+        string pathPlugin;
+        pathInstance = InstancesService.MakePathFolder(pNameInstance);
+        if (pathInstance is null)
+            return null;
+        pathPlugin = Path.Combine(pathInstance, TerbinServiceConst.PATH_BEPINEX_PLUGIN);
+        if (!Directory.Exists(pathPlugin))
+            Directory.CreateDirectory(pathPlugin);
+        return pathPlugin;
+    }
+    public static string MakePathPluginByInstance(string pPathInstance)
+    {
+        string pathPlugin;
+        pathPlugin = Path.Combine(pPathInstance, TerbinServiceConst.PATH_BEPINEX_PLUGIN);
+        if (!Directory.Exists(pathPlugin))
+            Directory.CreateDirectory(pathPlugin);
+        return pathPlugin;
     }
 }
