@@ -83,10 +83,21 @@ public class ZipUtil
         // pero la iteración asíncrona debajo es lo que realmente evita bloqueos de I/O.
         using ZipArchive archive = ZipFile.OpenRead(pSourceZipPath);
         int totalEntries = archive.Entries.Count;
-        int currentEntry = 0;
+
+        long totalSize = 0; // archive.Entries.Sum(e => e.Length)
+        if (pProgress != null)
+        {
+            for (int i = 0; i < archive.Entries.Count; i++)
+            {
+                totalSize += archive.Entries[i].Length;
+            }
+        }
+        else
+            totalSize = 100;
+        long currentSize = 0;
         int previusly = -1;
 
-        double totalInverse = Util.GetInverse(totalEntries);
+        double totalInverse = Util.GetInverse(totalSize);
 
         for (int i = 0; i < totalEntries; i++)
         {
@@ -131,12 +142,12 @@ public class ZipUtil
                 handwritten.Files.Add(destinationRelative);
             }
 
-            currentEntry++;
-            Util.TryReportProgressPercent(currentEntry, totalInverse, pProgress, false, ref previusly);
+            currentSize += entry.Length;
+            Util.TryReportProgressPercent(currentSize, totalInverse, pProgress, false, ref previusly);
         }
 
         if (pProgress != null)
-            Util.ReportProgressPercent(100, currentEntry, true, pProgress);
+            Util.ReportProgressPercent(100, currentSize, true, pProgress);
 
         return handwritten;
     }
