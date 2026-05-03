@@ -37,7 +37,7 @@ internal static class ManagerConfiguration
         if (r.TryGetValue(pKey, out string? value))
             return value;
         else
-            return null;
+            return GetPredeterminated(pKey);
     }
 
     public static CodeAcessJSonSave SetConfig(string pKey, string pData)
@@ -71,10 +71,38 @@ internal static class ManagerConfiguration
             string? dirFarlands = ManagerFarlands.GetRuteSteamFarlands();
             if (dirFarlands != null)
                 data.Add(TerbinConfiguration.RUTE_FARLANDS, dirFarlands);
-            // TODO: Conseguir ruta instancias predeterminadas.
+
+            data.Add(TerbinConfiguration.RUTE_INSTANCES, MakePathInstances());
 
             JSonUtil.Set(KEY, FOLDER);
             JSonUtil.Save(KEY, JSON, data);
         }
+    }
+
+    public static string? GetPredeterminated(string pKey)
+    {
+        return pKey switch
+        {
+            TerbinConfiguration.RUTE_FARLANDS => ManagerFarlands.GetRuteSteamFarlands(),
+            TerbinConfiguration.RUTE_INSTANCES => MakePathInstances(),
+
+            _ => null
+        };
+    }
+
+    public static string MakePathInstances()
+    {
+        string d = GetPathDocument();
+        return Path.Combine(d, "TerbinInstaces");
+    }
+
+
+    public static string GetPathDocument()
+    {
+        string d;
+        d = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+        if (string.IsNullOrEmpty(d))
+            d = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        return d;
     }
 }

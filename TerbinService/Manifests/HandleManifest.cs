@@ -5,20 +5,21 @@ using TerbinLibrary.Configuration;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
 using TerbinService.Data;
+using TerbinService.Instances;
 
-namespace TerbinService.Instances;
+namespace TerbinService.Manifests;
 
-public class HandleManifest
+public static class HandleManifest
 {
-    private const string _INSTANCES = ".Instances.json";
+    private const string _INSTANCES = ".IndexInstances.json";
 
-    public static void UpdateCoreManifest(string pName)
+    public static void UpdateCore(string pName)
     {
         var allInstaces = GetCore();
         allInstaces.Add(pName);
         JSonUtil.Save(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES, allInstaces);
     }
-    public static void DeleteInstanceCoreManifest(string pName)
+    public static void DeleteInstanceCore(string pName)
     {
         var allInstaces = GetCore();
         allInstaces.Remove(pName);
@@ -57,20 +58,20 @@ public class HandleManifest
 
     public static bool UpdateInstace(string pName, Action<InstanceManifest> updateAction)
     {
-        var dirInstace = InstancesService.MakePathFolder(pName);
-        if (dirInstace == null)
+        var pathInstance = InstancesService.MakePathFolder(pName);
+        if (pathInstance == null)
             return false;
 
-        return UpdateInstace(pName, dirInstace, updateAction);
+        return UpdateInstace(pName, pathInstance, updateAction);
     }
 
-    public static bool UpdateInstace(string pName, string pDirInstance, Action<InstanceManifest> updateAction)
+    public static bool UpdateInstace(string pName, string pPathInstance, Action<InstanceManifest> updateAction)
     {
-        var path = InstancesService.MakePathFolderInformation(pName);
-        if (path is null)
+        var pathInformation = InstancesService.MakePathFolderInformation(pName);
+        if (pathInformation is null)
             return false;
 
-        JSonUtil.UpdateDirect<InstanceManifest>(path, TerbinServiceConst.NAME_OF_MANIFEST, updateAction);
+        JSonUtil.UpdateDirect<InstanceManifest>(pathInformation, TerbinServiceConst.NAME_OF_MANIFEST, updateAction);
         return true;
     }
 }

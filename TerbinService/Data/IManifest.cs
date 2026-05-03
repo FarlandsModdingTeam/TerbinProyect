@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary.Data;
 
 namespace TerbinService.Data;
 
@@ -18,7 +19,7 @@ public class InstanceManifest : IManifest
     public string? Name { get; set; }
     public string? Version { get; set; }
     public string? Executable { get; set; }
-    public List<string>? Plugins { get; set; }
+    public List<ReferencePlugin>? Plugins { get; set; }
 
     public string? GetId()
     {
@@ -43,7 +44,7 @@ public class PluginManifest : IManifest
     public string? Owner { get; set; }
     public string? UrlWeb { get; set; }
     public string? Version { get; set; }
-    public string? Content { get; set; }
+    public DirectoryHandwritten? Content { get; set; }
 
     public string? GetId()
     {

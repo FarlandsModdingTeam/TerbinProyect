@@ -7,6 +7,7 @@ using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
+using TerbinService.BepInEx;
 using TerbinService.Instances;
 
 namespace TerbinService.Plugin;
@@ -85,7 +86,7 @@ public partial class PluginServices
             _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdExtract, p.Serialize());
             Console.Write($"\rInstalando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
         });
-        StatusNetUtil r = await NetUtil.InstallZipWithProgress(pUrl, pPathInstance, progressBarrExtract, progressBarrDownload);
+        StatusNetUtil r = await HandleInstallPlugin(pUrl, pPathInstance, progressBarrExtract, progressBarrDownload);
         if (r != StatusNetUtil.Succes)
         {
             CodeInternalErrors error = r switch
@@ -106,9 +107,7 @@ public partial class PluginServices
             _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
         } 
     }
-
-
-    public static async Task<StatusNetUtil?> HandleInstallPlugin(
+    public static async Task<StatusNetUtil?> SimpleInstallPlugin(
         string pNameInstance,
         string pUrl,
         IProgress<TerbinInfoProgrss>? pProgressDownload = default,
@@ -120,8 +119,21 @@ public partial class PluginServices
         if (pathInstance is null) return null;
         if (!BepInExService.CheckInstallBepInEx(pathInstance)) return null;
 
-        r = await NetUtil.InstallZipWithProgress(pUrl, pathInstance, pProgressExtract, pProgressDownload);
+        r = await HandleInstallPlugin(pUrl, pathInstance, pProgressExtract, pProgressDownload);
         return r;
+    }
+
+    public static async Task<StatusNetUtil> HandleInstallPlugin(
+                                            string pUrl,
+                                            string pPathInstance,
+                                            IProgress<TerbinInfoProgrss>? pProgressZip = null,
+                                            IProgress<TerbinInfoProgrss>? pProgressDowload = null,
+                                            CancellationToken pCancellationToken = default)
+    {
+        var (status, json) = await NetUtil.InstallZipWithProgress(pUrl, pPathInstance, pProgressZip, pProgressDowload);
+
+
+        return status;
     }
 
 

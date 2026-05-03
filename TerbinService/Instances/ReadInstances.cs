@@ -11,6 +11,7 @@ using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 using TerbinService.Configuration;
 using TerbinService.Data;
+using TerbinService.Manifests;
 
 namespace TerbinService.Instances;
 

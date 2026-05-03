@@ -11,7 +11,7 @@ using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 
-namespace TerbinService;
+namespace TerbinService.BepInEx;
 
 public class BepInExService
 {

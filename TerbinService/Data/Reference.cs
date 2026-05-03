@@ -13,3 +13,10 @@ public class Reference
     public string? GUID;
     public string? manifestUrl;
 }
+
+public class ReferencePlugin
+{
+    public string? Name;
+    public string? GUID;
+    public string? Path;
+}

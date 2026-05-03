@@ -11,6 +11,7 @@ using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
 using TerbinService.Configuration;
 using TerbinService.Data;
+using TerbinService.Manifests;
 
 namespace TerbinService.Instances;
 
@@ -55,7 +56,7 @@ public partial class InstancesService
 
         HandleManifest.CreatePredeterminated(pName);
 
-        HandleManifest.UpdateCoreManifest(pName);
+        HandleManifest.UpdateCore(pName);
         return true;
     }
 

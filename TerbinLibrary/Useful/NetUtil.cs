@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Net;
 using System.IO.Compression;
-using TerbinLibrary.Serialize;
+using TerbinLibrary.Data;
 
 namespace TerbinLibrary.Useful;
 /*
@@ -88,7 +88,7 @@ public static class NetUtil
         return result;
     }
 
-    public static async Task<StatusNetUtil> InstallZipWithProgress(
+    public static async Task<(StatusNetUtil status, DirectoryHandwritten? json)> InstallZipWithProgress(
                                             string pUrl,
                                             string pDestination,
                                             IProgress<TerbinInfoProgrss>? pProgressZip = null,
@@ -97,16 +97,17 @@ public static class NetUtil
     {
         StatusNetUtil result = StatusNetUtil.Succes;
         string tmp = "";
+        DirectoryHandwritten? json = null;
 
         if (!Directory.Exists(pDestination))
-            return StatusNetUtil.DestinationInvalid;
+            return (StatusNetUtil.DestinationInvalid, null);
 
         if (await DownloadAny(pUrl, pProgressDowload) is var r && r.status == StatusNetUtil.Succes)
         {
             tmp = r.tempFilePath;
             try
             {
-                var json = await ZipUtil.ExtractWithProgress(r.tempFilePath, pDestination, pProgressZip);
+                json = await ZipUtil.ExtractWithProgress(r.tempFilePath, pDestination, pProgressZip);
             }
             catch
             {
@@ -128,7 +129,7 @@ public static class NetUtil
             result = StatusNetUtil.ExceptionDeleteTemporalFile;
         }
 
-        return result;
+        return (result, json);
     }
 
     /// <summary>
