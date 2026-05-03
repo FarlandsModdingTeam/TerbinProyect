@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Configuration;
+using TerbinLibrary.Data;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
 using TerbinService.Data;
@@ -73,5 +74,34 @@ public static class HandleManifest
 
         JSonUtil.UpdateDirect<InstanceManifest>(pathInformation, TerbinServiceConst.NAME_OF_MANIFEST, updateAction);
         return true;
+    }
+
+
+    public static void HandleAddPlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
+    {
+        var information = InstancesService.MakePathFolderInformation(pNameInstace);
+        if (information is null)
+            throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
+
+        Guid g = Guid.NewGuid();
+        string name = $"{g:N}";
+        string file = $"{g:N}.json";
+        string pathManifest = Path.Combine(information, $"{g:N}.json");
+
+        var manifest = new PluginManifest
+        {
+            Name = name,
+            Content = pHandwritten,
+        };
+        JSonUtil.SaveDirect(information, file, manifest);
+
+        var reference = new ReferencePlugin
+        {
+            Name = name,
+            GUID = name,
+            Path = pathManifest,
+        };
+
+        HandleManifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
     }
 }

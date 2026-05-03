@@ -19,7 +19,7 @@ public class InstanceManifest : IManifest
     public string? Name { get; set; }
     public string? Version { get; set; }
     public string? Executable { get; set; }
-    public List<ReferencePlugin>? Plugins { get; set; }
+    public List<ReferencePlugin> Plugins { get; set; } = [];
 
     public string? GetId()
     {

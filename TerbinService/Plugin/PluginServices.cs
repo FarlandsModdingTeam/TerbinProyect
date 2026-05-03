@@ -8,7 +8,9 @@ using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 using TerbinService.BepInEx;
+using TerbinService.Data;
 using TerbinService.Instances;
+using TerbinService.Manifests;
 
 namespace TerbinService.Plugin;
 
@@ -59,7 +61,7 @@ public partial class PluginServices
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         byte memoryExtract = rId.Payload[0];
 
-        _ = HandleInstallPluginWithProgress(memoryDownload, memoryExtract, pathPlugin, urlPlugin);
+        _ = HandleInstallPluginWithProgress(name, memoryDownload, memoryExtract, pathPlugin, urlPlugin);
 
         return new InfoResponse
         {
@@ -74,7 +76,7 @@ public partial class PluginServices
     }
 
 
-    public static async Task HandleInstallPluginWithProgress(byte pIdDownload, byte pIdExtract, string pPathInstance, string pUrl)
+    public static async Task HandleInstallPluginWithProgress(string pNameInstace, byte pIdDownload, byte pIdExtract, string pPathPlugin, string pUrl)
     {
         IProgress<TerbinInfoProgrss> progressBarrDownload = new Progress<TerbinInfoProgrss>(p =>
         {
@@ -86,7 +88,7 @@ public partial class PluginServices
             _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdExtract, p.Serialize());
             Console.Write($"\rInstalando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
         });
-        StatusNetUtil r = await HandleInstallPlugin(pUrl, pPathInstance, progressBarrExtract, progressBarrDownload);
+        StatusNetUtil r = await HandleInstallPlugin(pNameInstace, pUrl, pPathPlugin, progressBarrExtract, progressBarrDownload);
         if (r != StatusNetUtil.Succes)
         {
             CodeInternalErrors error = r switch
@@ -119,19 +121,21 @@ public partial class PluginServices
         if (pathInstance is null) return null;
         if (!BepInExService.CheckInstallBepInEx(pathInstance)) return null;
 
-        r = await HandleInstallPlugin(pUrl, pathInstance, pProgressExtract, pProgressDownload);
+        r = await HandleInstallPlugin(pNameInstance, pUrl, pathInstance, pProgressExtract, pProgressDownload);
         return r;
     }
 
     public static async Task<StatusNetUtil> HandleInstallPlugin(
+                                            string pNameInstace,
                                             string pUrl,
-                                            string pPathInstance,
+                                            string pPathPlugin,
                                             IProgress<TerbinInfoProgrss>? pProgressZip = null,
                                             IProgress<TerbinInfoProgrss>? pProgressDowload = null,
                                             CancellationToken pCancellationToken = default)
     {
-        var (status, json) = await NetUtil.InstallZipWithProgress(pUrl, pPathInstance, pProgressZip, pProgressDowload);
+        var (status, json) = await NetUtil.InstallZipWithProgress(pUrl, pPathPlugin, pProgressZip, pProgressDowload);
 
+        HandleManifest.HandleAddPlugin(pNameInstace, json);
 
         return status;
     }
