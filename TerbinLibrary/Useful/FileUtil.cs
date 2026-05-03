@@ -25,6 +25,10 @@ public enum StatusFileUtil : sbyte
 
 public static class FileUtil
 {
+    private const ushort _falseSizeFolder = 0xFFFF;
+
+    // Son los unicos que el tamaño no es por el peso de los archivos en bytes.
+
     // PaVerano:
     // TODO: 
     // (Permitira actualizar farlands borrando solo el contenido marcado del json y volver a clonar actualizar de version la instancia)
