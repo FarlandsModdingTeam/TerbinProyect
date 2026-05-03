@@ -74,10 +74,10 @@ public partial class GameService
 
         var (status, json) = await FileUtil.CloneDirectory(pDirGame, dirInstace, true, pProgrss);
 
-        if (status != StatusFileUtil.Succes)
+        if (status != StatusFileUtil.Succes) // si es Succes, json no es null
             throw new Exception("TODO: Informar de que farlands no se ah podido clonar");
 
-        File.WriteAllText(dirInstace, json);
+        File.WriteAllText(dirInstace, json.ToJson());
 
 
         var exes = FileUtil.GetAllExeFiles(dirInstace);
@@ -91,7 +91,7 @@ public partial class GameService
     }
 
 
-    public static async Task<Task<(StatusFileUtil status, string? json)>?>
+    public static async Task<Task<(StatusFileUtil status, DirectoryHandwritten? json)>?>
                 HandleCloneGame(string pDirSource, string pDirTarjet, IProgress<TerbinInfoProgrss> pProgrss = default)
     {
         if (!ManagerFarlands.IsFarlands(pDirSource))

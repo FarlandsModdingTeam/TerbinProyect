@@ -28,7 +28,7 @@ public static class FileUtil
     // PaVerano:
     // TODO: Devolver un json con todos los archivos y carpetas clonadas.
     // (Permitira actualizar farlands borrando solo el contenido marcado del json y volver a clonar actualizar de version la instancia)
-    public static async Task<(StatusFileUtil status, string? json)> CloneDirectory(
+    public static async Task<(StatusFileUtil status, DirectoryHandwritten? json)> CloneDirectory(
                                             string pSourceDir,
                                             string pDestinationDir,
                                             bool pOverwrite,
@@ -92,9 +92,9 @@ public static class FileUtil
         if (pProgress != null)
             Util.TryReportProgressPercent(previus, inverse, pProgress, true, ref previus);
 
-        string handwrittenJson = JsonSerializer.Serialize(handwritten, new JsonSerializerOptions { WriteIndented = true });
+        //string handwrittenJson = JsonSerializer.Serialize(handwritten, new JsonSerializerOptions { WriteIndented = true });
 
-        return (StatusFileUtil.Succes, handwrittenJson);
+        return (StatusFileUtil.Succes, handwritten);
     }
 
     // TODO: metodo que le dar una direccion y un DirectoryHandwritten en json (string) y te lo borra.
