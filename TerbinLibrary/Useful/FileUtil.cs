@@ -32,7 +32,8 @@ public static class FileUtil
                                             string pSourceDir,
                                             string pDestinationDir,
                                             bool pOverwrite,
-                                            IProgress<TerbinInfoProgrss>? pProgress = null)
+                                            IProgress<TerbinInfoProgrss>? pProgress = null,
+                                            CancellationToken pCancellationToken = default)
     {
         List<string>? allFiles;
         List<string>? allDictories;
@@ -51,6 +52,8 @@ public static class FileUtil
         inverse = (pProgress != null) ? Util.GetInverse(allFiles.Count) : null;
         for (int i = 0; i < allFiles.Count; i++)
         {
+            if (pCancellationToken.IsCancellationRequested)
+                break;
             string  file = allFiles[i];
             string  rel = Path.GetRelativePath(pSourceDir, file);
             string  destFile = Path.Combine(pDestinationDir, rel);
@@ -65,8 +68,7 @@ public static class FileUtil
 
             handwritten.Files.Add(rel);
 
-            if (pProgress != null)
-                Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
+            Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         allDictories = GetAllDirectories(pSourceDir);
@@ -78,6 +80,8 @@ public static class FileUtil
 
         for (int i = 0; i < allDictories.Count; i++)
         {
+            if (pCancellationToken.IsCancellationRequested)
+                break;
             string dir = allDictories[i];
             string rel = Path.GetRelativePath(pSourceDir, dir);
             string destSub = Path.Combine(pDestinationDir, rel);
@@ -85,20 +89,17 @@ public static class FileUtil
 
             handwritten.Directories.Add(rel);
 
-            if (pProgress != null)
-                Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
+            Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         if (pProgress != null)
-            Util.TryReportProgressPercent(previus, inverse, pProgress, true, ref previus);
-
-        //string handwrittenJson = JsonSerializer.Serialize(handwritten, new JsonSerializerOptions { WriteIndented = true });
+            Util.ReportProgressPercent(100, previus, true, pProgress);
 
         return (StatusFileUtil.Succes, handwritten);
     }
 
-    // TODO: metodo que le dar una direccion y un DirectoryHandwritten en json (string) y te lo borra.
-    // └─Luego borra directorios vacios.
+    // TODO: metodo que le dar una direccion y un DirectoryHandwritten y te lo borra.
+    // └─Luego borra directorios vacios, solo vacios.
 
     public static List<string>? GetAllFiles(string pDir)
     {

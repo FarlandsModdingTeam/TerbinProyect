@@ -87,11 +87,12 @@ public partial class PluginServices
     public static async Task<StatusNetUtil?> HandleInstallPlugin(string pNameInstance, string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default)
     {
         StatusNetUtil r = StatusNetUtil.Succes;
-        string? dir = InstancesService.MakePathFolder(pNameInstance);
-        if (dir is null) return null;
+        string? pathInstance = InstancesService.MakePathFolder(pNameInstance);
 
-        if (!BepInExService.CheckInstallBepInEx(dir)) return null;
-        r = await NetUtil.InstallZip(pUrl, dir, pProgress);
+        if (pathInstance is null) return null;
+        if (!BepInExService.CheckInstallBepInEx(pathInstance)) return null;
+
+        r = await NetUtil.InstallZipWithProgress(pUrl, pathInstance, pProgressDowload: pProgress);
         return r;
     }
 }

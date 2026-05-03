@@ -67,10 +67,11 @@ public class ZipUtil
     }
 
     public static async Task<DirectoryHandwritten> ExtractWithProgress(
-                                string pSourceZipPath,
-                                string pDestinationDirectory,
-                                IProgress<TerbinInfoProgrss>? pProgress = default,
-                                bool pOverwrite = true)
+                                    string pSourceZipPath,
+                                    string pDestinationDirectory,
+                                    IProgress<TerbinInfoProgrss>? pProgress = default,
+                                    bool pOverwrite = true,
+                                    CancellationToken pCancellationToken = default)
     {
         DirectoryHandwritten handwritten = new();
         string fullDestDir = Path.GetFullPath(pDestinationDirectory);
@@ -89,6 +90,9 @@ public class ZipUtil
 
         for (int i = 0; i < totalEntries; i++)
         {
+            if (pCancellationToken.IsCancellationRequested)
+                break;
+
             ZipArchiveEntry entry = archive.Entries[i];
             string destinationPath = Path.GetFullPath(Path.Combine(fullDestDir, entry.FullName));
             string destinationRelative = Path.GetRelativePath(fullDestDir, destinationPath);

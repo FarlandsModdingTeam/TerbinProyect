@@ -87,6 +87,49 @@ public static class NetUtil
         return result;
     }
 
+    public static async Task<StatusNetUtil> InstallZipWithProgress(
+                                            string pUrl,
+                                            string pDestination,
+                                            IProgress<TerbinInfoProgrss>? pProgressZip = null,
+                                            IProgress<TerbinInfoProgrss>? pProgressDowload = null,
+                                            CancellationToken pCancellationToken = default)
+    {
+        StatusNetUtil result = StatusNetUtil.Succes;
+        string tmp = "";
+
+        if (!Directory.Exists(pDestination))
+            return StatusNetUtil.DestinationInvalid;
+
+        if (await DownloadAny(pUrl, pProgressDowload) is var r && r.status == StatusNetUtil.Succes)
+        {
+            tmp = r.tempFilePath;
+            try
+            {
+                var json = await ZipUtil.ExtractWithProgress(r.tempFilePath, pDestination, pProgressZip);
+            }
+            catch
+            {
+                result = StatusNetUtil.ExceptionOnExtractZip;
+            }
+        }
+        else
+        {
+            result = r.status;
+        }
+
+        try
+        {
+            if (File.Exists(tmp))
+                File.Delete(tmp);
+        }
+        catch
+        {
+            result = StatusNetUtil.ExceptionDeleteTemporalFile;
+        }
+
+        return result;
+    }
+
     /// <summary>
     /// Descarga un recurso desde la URL especificada y lo guarda en un archivo temporal,
     /// informando opcionalmente del progreso.
