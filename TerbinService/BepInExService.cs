@@ -76,7 +76,7 @@ public class BepInExService
                 .Add(TypeService.Service)
                 .Add(CodeServices.InstallBepInEx)
                 .Add(error)
-                .ToArray();
+                .Serialize();
             _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
         }
     }

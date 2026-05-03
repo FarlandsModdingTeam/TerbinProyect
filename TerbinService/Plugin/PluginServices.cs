@@ -12,18 +12,11 @@ namespace TerbinService.Plugin;
 
 public partial class PluginServices
 {
-    private static string _ñññ = "https://github.com/FarlandsModdingTeam/FarlandsCoreMod/releases/download/v0.1.2/FCM_0.1.2.zip";
-    private static string _ññ = "https://github.com/FarlandsModdingTeam/UnityExplorer/releases/download/v4.9.0/com.sinai.unityexplorer.zip";
-
-    [TerbinExecutable((byte)CodeServices.WIP_NewService)]
-    public static async Task<InfoResponse?> WIP_NewService(Header pHead, byte[] pParameters)
+    [TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Plugin)]
+    public static async Task<InfoResponse?> InstallPlugin(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
-
-        long? sizeBepInEx = await NetUtil.GetContentLength(TerbinURLs.BepInEx);
-        if (sizeBepInEx is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.BepInExNotConect));
 
         AmongInfoThreads info = Worker.CurrentConst.Value;
 
@@ -31,38 +24,56 @@ public partial class PluginServices
         var name = reader.ReadArray<char>().CrString();
         var urlPlugin = reader.ReadArray<char>().CrString();
 
-        // Habra alguna forma de saber si es un direccion valida?
+        string? pathInstance = InstancesService.MakePathFolder(name);
+        if (pathInstance is null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExit));
+        if (!BepInExService.CheckInstallBepInEx(pathInstance))
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.BepInExNotInstall));
 
-        if (!Directory.Exists(rute))
-            Directory.CreateDirectory(rute);
 
-        byte idMemory = 0;
+        long? sizePlugin = await NetUtil.GetContentLength(urlPlugin);
+        if (sizePlugin is null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.PluginNotConect));
+
+        // Solicitar id de memoria.
         var rId = await info.Communicator.SoliciteRequestMemory();
         if (rId.Head.Status != CodeStatus.Succes)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize((ushort)CodeInternalErrors.IdSoliciteError));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
+        byte memoryDownload = rId.Payload[0];
 
-        idMemory = rId.Payload[0];
-        _ = HandleInstallPluginWithProgress(idMemory, name, urlPlugin);
+        rId = await info.Communicator.SoliciteRequestMemory();
+        if (rId.Head.Status != CodeStatus.Succes)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
+        byte memoryExtract = rId.Payload[0];
+
+        _ = HandleInstallPluginWithProgress(memoryDownload, memoryExtract, pathInstance, urlPlugin);
 
         return new InfoResponse
         {
             IdRequest = pHead.IdRequest,
             Status = CodeStatus.Succes,
-            Payload = [idMemory, .. Serialineitor.Serialize<long>(sizeBepInEx.Value)],
+            Payload = new Serialineitor()
+                        .Add(memoryDownload)
+                        .Add(memoryExtract)
+                        .Add(sizePlugin.Value)
+                        .Serialize(),
         };
     }
 
 
-    public static async Task HandleInstallPluginWithProgress(byte pIdMemory, string pNameInstance, string pUrl)
+    public static async Task HandleInstallPluginWithProgress(byte pIdDownload, byte pIdExtract, string pPathInstance, string pUrl)
     {
-        IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
+        IProgress<TerbinInfoProgrss> progressBarrDownload = new Progress<TerbinInfoProgrss>(p =>
         {
-            var Content = p.ToArray();
-            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
+            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdDownload, p.Serialize());
             Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
         });
-        StatusNetUtil? r = await HandleInstallPlugin(pNameInstance, pUrl, progressBarr);
-        if (r is null) throw new Exception("TODO: informar de que BepInEx ya esta instalado");
+        IProgress<TerbinInfoProgrss> progressBarrExtract = new Progress<TerbinInfoProgrss>(p =>
+        {
+            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdExtract, p.Serialize());
+            Console.Write($"\rInstalando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
+        });
+        StatusNetUtil r = await NetUtil.InstallZipWithProgress(pUrl, pPathInstance, progressBarrExtract, progressBarrDownload);
         if (r != StatusNetUtil.Succes)
         {
             CodeInternalErrors error = r switch
@@ -79,12 +90,17 @@ public partial class PluginServices
                 .Add(TypeService.Service)
                 .Add(CodeServices.InstallBepInEx)
                 .Add(error)
-                .ToArray();
+                .Serialize();
             _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
-        }
+        } 
     }
 
-    public static async Task<StatusNetUtil?> HandleInstallPlugin(string pNameInstance, string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default)
+
+    public static async Task<StatusNetUtil?> HandleInstallPlugin(
+        string pNameInstance,
+        string pUrl,
+        IProgress<TerbinInfoProgrss>? pProgressDownload = default,
+        IProgress<TerbinInfoProgrss>? pProgressExtract = default)
     {
         StatusNetUtil r = StatusNetUtil.Succes;
         string? pathInstance = InstancesService.MakePathFolder(pNameInstance);
@@ -92,7 +108,7 @@ public partial class PluginServices
         if (pathInstance is null) return null;
         if (!BepInExService.CheckInstallBepInEx(pathInstance)) return null;
 
-        r = await NetUtil.InstallZipWithProgress(pUrl, pathInstance, pProgressDowload: pProgress);
+        r = await NetUtil.InstallZipWithProgress(pUrl, pathInstance, pProgressExtract, pProgressDownload);
         return r;
     }
 }

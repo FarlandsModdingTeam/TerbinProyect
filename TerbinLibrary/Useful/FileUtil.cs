@@ -26,7 +26,7 @@ public enum StatusFileUtil : sbyte
 public static class FileUtil
 {
     // PaVerano:
-    // TODO: Devolver un json con todos los archivos y carpetas clonadas.
+    // TODO: 
     // (Permitira actualizar farlands borrando solo el contenido marcado del json y volver a clonar actualizar de version la instancia)
     public static async Task<(StatusFileUtil status, DirectoryHandwritten? json)> CloneDirectory(
                                             string pSourceDir,

@@ -46,7 +46,7 @@ public partial class GameService
                         .Add(id)
                         .Add(sizes.maxFiles.Value)
                         .Add(sizes.maxDir.Value)
-                        .ToArray(),
+                        .Serialize(),
         };
     }
 

@@ -41,6 +41,7 @@ public static class NetUtil
     //    _httpClient.DefaultRequestHeaders.Add("User-Agent", "TerbinService-Downloader/0.0.9");
     //}
 
+    // TODO: tener uno en configuracion y pasarlo por funcion.
     private static readonly HttpClient _httpClient = new();
 
     public static async Task<StatusNetUtil> InstallZip(

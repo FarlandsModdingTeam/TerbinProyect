@@ -76,11 +76,15 @@ public class Serialineitor
         return this;
     }
 
-    public byte[] ToArray()
+    public byte[] Serialize()
     {
         return _content.AsSpan(0, _offset).ToArray();
     }
 
+    public byte[] ToArray()
+    {
+        return Serialize();
+    }
 
 
 

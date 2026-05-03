@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary.Communication;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.Useful;
 
 namespace TerbinLibrary;
 
@@ -47,10 +49,12 @@ public enum CodeInternalErrors : ushort
     FarlandRuteNotExist = 101,
 
     // Mods = 200,
+    PluginNotConect = 201,
 
     // Instances = 300,
     InstaceGetSizeError = 301,
     InstaceNotExistOrConfigError = 302,
+    InstaceNotExit = 303,
 
     // FCM = 400,
 
@@ -60,6 +64,7 @@ public enum CodeInternalErrors : ushort
 
     // BepInEx = 600,
     BepInExNotConect = 601,
+    BepInExNotInstall = 602,
 
     // Zip = 1000,
     ZipExtractError = 1001,
@@ -72,5 +77,15 @@ public class TSHelper
     public static byte[] GetError(CodeInternalErrors pError)
     {
         return Serialineitor.Serialize((ushort)pError);
+    }
+
+    public static IProgress<TerbinInfoProgrss> CreateProgessBarr(TerbinCommunicator pCommunicator, byte pIdMemory)
+    {
+        if (pIdMemory <= TerbinProtocol.RESERVE_MEMORY)
+            throw new OverflowException($"Id memory is reserved! {pIdMemory}");
+        return new Progress<TerbinInfoProgrss>(p =>
+        {
+            _ = pCommunicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, p.ToArray());
+        });
     }
 }

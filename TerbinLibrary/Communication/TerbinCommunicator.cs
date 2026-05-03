@@ -47,6 +47,9 @@ namespace TerbinLibrary.Communication;
 // Seria ideal que al cancelar puedieras revertirlo, al clonar farlands borrarlo, al instalar bepiex desintalarlo, etc.
 // Tengo mucho sueño
 
+// TODO: (importante) Mandar al cliente un paquete si hah avido una excepcion.
+// └─Un evento que se dispare al recibir una excepcion.
+
 public class TerbinCommunicator : IDisposable
 {
     // ****************************( Variables )**************************** //
@@ -345,6 +348,8 @@ public class TerbinCommunicator : IDisposable
             try
             {
                 PacketRequest r = await _reader.ReadAsycn<PacketRequest>(_stopToken);
+                if (_stopToken.IsCancellationRequested)
+                    break;
                 _ = handleReceive(r);
             }
             catch (OperationCanceledException)
@@ -369,6 +374,8 @@ public class TerbinCommunicator : IDisposable
                 if (!_queue.TryDequeue(out PacketRequest data))
                     continue;
 
+                if (_stopToken.IsCancellationRequested)
+                    break;
                 await _writer.WriteAsycn<PacketRequest>(data, _stopToken);
             }
             catch (EndOfStreamException)

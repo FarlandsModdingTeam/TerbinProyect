@@ -60,7 +60,7 @@ while (true)
                     .Add<byte>(input2)
                     .AddArray<char>(TerbinConfiguration.RUTE_FARLANDS.ToCharArray())
                     .AddArray<char>(pruebaEspacio)
-                    .ToArray();
+                    .Serialize();
 
         // Incluye input2 al inicio del mensaje
         int size = (Serialineitor.GetArraySize<char>(pruebaEspacio.Length + TerbinConfiguration.RUTE_FARLANDS.ToCharArray().Length)) + 8; // 3<Array> + 3<Array> + 2
@@ -87,7 +87,7 @@ while (true)
         //menssage = Serialineitor.SerializeArray<char>("matenme".ToCharArray());
         menssage = new Serialineitor()
                     .AddArray<char>(pruebaEspacio)
-                    .ToArray();
+                    .Serialize();
     }
 
 

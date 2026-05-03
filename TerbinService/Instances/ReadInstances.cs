@@ -35,7 +35,7 @@ public partial class InstancesService
         {
             IdRequest = pHead.IdRequest,
             Status = CodeStatus.Succes,
-            Payload = s.ToArray(),
+            Payload = s.Serialize(),
         };
     }
 

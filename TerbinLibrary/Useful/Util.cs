@@ -15,11 +15,16 @@ public struct TerbinInfoProgrss
 
     public readonly byte[] ToArray()
     {
+        return Serialize();
+    }
+
+    public readonly byte[] Serialize()
+    {
         byte[] array = new Serialineitor()
             .Add(Percentage)
             .Add(Current)
             .Add(Finish)
-            .ToArray();
+            .Serialize();
         return array;
     }
 }
