@@ -30,6 +30,8 @@ else
 
 await installMod();
 
+// TODO: No cambiarle el nombre al descargar.
+// TODO: Antes de instalar ver si dentro tiene una carpeta llamada Plugins.
 // TODO: InstallByInstace y InstallByPath
 async Task installMod()
 {
