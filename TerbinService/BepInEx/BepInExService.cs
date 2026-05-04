@@ -58,26 +58,43 @@ public class BepInExService
             _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
             Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
         });
-        StatusNetUtil? r = await HandleInstallBepInEx(TerbinURLs.BepInEx, progressBarr);
-        if (r is null) throw new Exception("TODO: informar de que BepInEx ya esta instalado");
-        if (r != StatusNetUtil.Succes)
+        try
         {
-            CodeInternalErrors error = r switch
+            StatusNetUtil? r = await HandleInstallBepInEx(TerbinURLs.BepInEx, progressBarr);
+            if (r is null) throw new Exception("TODO: informar de que BepInEx ya esta instalado");
+            if (r != StatusNetUtil.Succes)
             {
-                StatusNetUtil.ExceptionOnExtractZip => CodeInternalErrors.ZipExtractException,
-                StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
-                _ => CodeInternalErrors.ZipExtractError
-            };
-            throw new Exception($"TODO: informar de {error}");
+                CodeInternalErrors error = r switch
+                {
+                    StatusNetUtil.ExceptionOnExtractZip => CodeInternalErrors.ZipExtractException,
+                    StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
+                    _ => CodeInternalErrors.ZipExtractError
+                };
+                throw new Exception($"TODO: informar de {error}");
 
-            // Prototipo del funcionamiento de Info
-            AmongInfoThreads info = Worker.CurrentConst.Value;
-            byte[] pld = new Serialineitor()
-                .Add(TypeService.Service)
-                .Add(CodeServices.InstallBepInEx)
-                .Add(error)
-                .Serialize();
-            _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
+                // Prototipo del funcionamiento de Info
+                AmongInfoThreads info = Worker.CurrentConst.Value;
+                byte[] pld = new Serialineitor()
+                    .Add(TypeService.Service)
+                    .Add(CodeServices.InstallBepInEx)
+                    .Add(error)
+                    .Serialize();
+                _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
+            }
+        }
+        catch (Exception e)
+        {
+            string exceptionString = $$"""
+                [PitufiChingada] ExceptionError->
+                {
+                    Message: {{e.Message}};
+                    Source: {{e.Source}};
+                    Inner: {{e.InnerException?.Message ?? "N/A"}};
+                    Trace: {{e.StackTrace}};
+                    String: {{e.ToString()}}
+                }
+                """;
+            Console.WriteLine(exceptionString);
         }
     }
 

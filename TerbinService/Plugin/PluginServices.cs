@@ -88,26 +88,44 @@ public partial class PluginServices
             _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdExtract, p.Serialize());
             Console.Write($"\rInstalando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
         });
-        StatusNetUtil r = await HandleInstallPlugin(pNameInstace, pUrl, pPathPlugin, progressBarrExtract, progressBarrDownload);
-        if (r != StatusNetUtil.Succes)
+        try
         {
-            CodeInternalErrors error = r switch
+            StatusNetUtil r = await HandleInstallPlugin(pNameInstace, pUrl, pPathPlugin, progressBarrExtract, progressBarrDownload);
+            if (r != StatusNetUtil.Succes)
             {
-                StatusNetUtil.ExceptionOnExtractZip => CodeInternalErrors.ZipExtractException,
-                StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
-                _ => CodeInternalErrors.ZipExtractError
-            };
-            throw new Exception($"TODO: informar de {error}");
+                CodeInternalErrors error = r switch
+                {
+                    StatusNetUtil.ExceptionOnExtractZip => CodeInternalErrors.ZipExtractException,
+                    StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
+                    _ => CodeInternalErrors.ZipExtractError
+                };
+                throw new Exception($"TODO: informar de {error}");
 
-            // Prototipo del funcionamiento de Info
-            AmongInfoThreads info = Worker.CurrentConst.Value;
-            byte[] pld = new Serialineitor()
-                .Add(TypeService.Service)
-                .Add(CodeServices.InstallBepInEx)
-                .Add(error)
-                .Serialize();
-            _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
-        } 
+                // Prototipo del funcionamiento de Info
+                AmongInfoThreads info = Worker.CurrentConst.Value;
+                byte[] pld = new Serialineitor()
+                    .Add(TypeService.Service)
+                    .Add(CodeServices.InstallBepInEx)
+                    .Add(error)
+                    .Serialize();
+                _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
+            }
+        }
+        catch (Exception e)
+        {
+            string exceptionString = $$"""
+                [PitufiChingada] ExceptionError->
+                {
+                    Message: {{e.Message}};
+                    Source: {{e.Source}};
+                    Inner: {{e.InnerException?.Message ?? "N/A"}};
+                    Trace: {{e.StackTrace}};
+                    String: {{e.ToString()}};
+                    URL: {{pUrl}};
+                }
+                """;
+            Console.WriteLine(exceptionString);
+        }
     }
     public static async Task<StatusNetUtil?> SimpleInstallPlugin(
         string pNameInstance,

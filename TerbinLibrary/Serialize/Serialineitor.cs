@@ -78,7 +78,10 @@ public class Serialineitor
 
     public byte[] Serialize()
     {
-        return _content.AsSpan(0, _offset).ToArray();
+        if (_content != null)
+            return _content.AsSpan(0, _offset).ToArray();
+        else
+            return [];
     }
 
     public byte[] ToArray()
@@ -87,6 +90,14 @@ public class Serialineitor
     }
 
 
+    public void Clear()
+    {
+        if (_content != null)
+        {
+            Array.Clear(_content, 0, _content.Length);
+        }
+        _offset = 0;
+    }
 
 
     // ******************************( Parte Estatic )****************************** //

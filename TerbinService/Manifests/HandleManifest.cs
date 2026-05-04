@@ -41,7 +41,8 @@ public static class HandleManifest
         string? dirInfo = InstancesService.MakePathFolderInformation(pName);
         if (dirInfo == null)
             return;
-        Directory.CreateDirectory(dirInfo);
+        DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
+        directoryInfo.Attributes |= FileAttributes.Hidden;
         CreatePredeterminatedInstance(pName, dirInfo);
     }
 
@@ -103,5 +104,15 @@ public static class HandleManifest
         };
 
         HandleManifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+    }
+
+
+    public static void WriteHandwritten(string pPath, DirectoryHandwritten? pJson)
+    {
+        if (pJson == null)
+            return;
+
+        pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE, TerbinServiceConst.HANDWRITTEN);
+        File.WriteAllText(pPath, pJson.ToJson());
     }
 }
