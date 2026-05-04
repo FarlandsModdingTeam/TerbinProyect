@@ -83,7 +83,7 @@ public partial class InstancesService
         if (dir == null)
             return null;
 
-        return JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.NAME_OF_MANIFEST);
+        return JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
     }
 
     public static string? MakePathFolderInformation(string pName)

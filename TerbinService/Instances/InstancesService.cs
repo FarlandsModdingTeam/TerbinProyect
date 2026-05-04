@@ -19,7 +19,7 @@ public partial class InstancesService
 
         if (!Directory.Exists(information)) return false;
 
-        manifest = Path.Combine(information, TerbinServiceConst.NAME_OF_MANIFEST);
+        manifest = Path.Combine(information, TerbinServiceConst.MANIFEST_INSTANCE);
 
         return File.Exists(manifest);
     }

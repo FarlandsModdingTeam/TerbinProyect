@@ -100,8 +100,11 @@ async Task installMod()
     await pressAnyKeyToContinue();
     Console.WriteLine($"[Client] Instalamos BepInEx");
     s = new Serialineitor()
-                .AddArray(nameInstace.ToCharArray());
-    r = await communicator.Communicate((byte)CodeServices.InstallBepInEx, s.Serialize());
+                .Add((byte)CodeSubServices.Plugin)
+                .AddArray(nameInstace.ToCharArray())
+                .AddArray(TerbinURLs.BepInEx.ToCharArray())
+                .Add(false);
+    r = await communicator.Communicate((byte)CodeTerbinProtocol.Create, s.Serialize());
     Console.WriteLine($"[Client] 5 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (r.Head.Status != CodeStatus.Succes) return;
 

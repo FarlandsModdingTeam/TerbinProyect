@@ -113,19 +113,19 @@ public class BepInExService
     }
 
 
-    public static string GetBepInExFolderPlugin(string pDirInstance) // BepInEx/plugins/
+    public static string GetBepInExFolderPlugin(string pPathInstance) // BepInEx/plugins/
     {
-        string dirBepInExFolder;
-        string dirPlugins;
+        string pathBepInExFolder;
+        string pathPlugins;
 
-        dirBepInExFolder = Path.Combine(pDirInstance, "BepInEx");
-        if (!Directory.Exists(dirBepInExFolder))
-            Directory.CreateDirectory(dirBepInExFolder);
+        pathBepInExFolder = Path.Combine(pPathInstance, "BepInEx");
+        if (!Directory.Exists(pathBepInExFolder))
+            Directory.CreateDirectory(pathBepInExFolder);
 
-        dirPlugins = Path.Combine(dirBepInExFolder, "plugins");
-        if (!Directory.Exists(dirPlugins))
-            Directory.CreateDirectory(dirPlugins);
+        pathPlugins = Path.Combine(pathBepInExFolder, "plugins");
+        if (!Directory.Exists(pathPlugins))
+            Directory.CreateDirectory(pathPlugins);
 
-        return dirPlugins;
+        return pathPlugins;
     }
 }

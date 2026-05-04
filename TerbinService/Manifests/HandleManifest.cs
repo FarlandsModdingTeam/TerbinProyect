@@ -54,7 +54,7 @@ public static class HandleManifest
             Version = ManagerFarlands.GetVersion(),
             Plugins = []
         };
-        JSonUtil.SaveDirect(pDir, TerbinServiceConst.NAME_OF_MANIFEST, manifest);
+        JSonUtil.SaveDirect(pDir, TerbinServiceConst.MANIFEST_INSTANCE, manifest);
     }
 
 
@@ -73,7 +73,7 @@ public static class HandleManifest
         if (pathInformation is null)
             return false;
 
-        JSonUtil.UpdateDirect<InstanceManifest>(pathInformation, TerbinServiceConst.NAME_OF_MANIFEST, updateAction);
+        JSonUtil.UpdateDirect<InstanceManifest>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
         return true;
     }
 

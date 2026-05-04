@@ -29,5 +29,6 @@ public class TerbinURLs
 
     public const string MOD_FCM = "https://github.com/FarlandsModdingTeam/FarlandsCoreMod/releases/download/v0.1.2/FCM_0.1.2.zip";
     public const string MOD_EXPLORER = "https://github.com/FarlandsModdingTeam/UnityExplorer/releases/download/v4.9.0/com.sinai.unityexplorer.zip";
+    public const string MOD_EXPLORER_MONO_B5 = "https://github.com/sinai-dev/UnityExplorer/releases/download/4.9.0/UnityExplorer.BepInEx5.Mono.zip";
 }
 

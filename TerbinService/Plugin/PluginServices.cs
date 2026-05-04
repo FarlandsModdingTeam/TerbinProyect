@@ -38,7 +38,8 @@ public partial class PluginServices
         {
             if (!BepInExService.CheckInstallBepInEx(pathInstance))
                 return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.BepInExNotInstall));
-            pathPlugin = MakePathPluginByInstance(pathInstance);
+            //pathPlugin = MakePathPluginByInstance(pathInstance);
+            pathPlugin = BepInExService.GetBepInExFolderPlugin(pathInstance);
         }
         else
         {
@@ -99,7 +100,7 @@ public partial class PluginServices
                     StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
                     _ => CodeInternalErrors.ZipExtractError
                 };
-                throw new Exception($"TODO: informar de {error}");
+                throw new Exception($"TODO: informar de {error}, {r}");
 
                 // Prototipo del funcionamiento de Info
                 AmongInfoThreads info = Worker.CurrentConst.Value;
@@ -151,6 +152,9 @@ public partial class PluginServices
                                             IProgress<TerbinInfoProgrss>? pProgressDowload = null,
                                             CancellationToken pCancellationToken = default)
     {
+        if (!Directory.Exists(pPathPlugin))
+            Directory.CreateDirectory(pPathPlugin);
+
         var (status, json) = await NetUtil.InstallZipWithProgress(pUrl, pPathPlugin, pProgressZip, pProgressDowload);
 
         HandleManifest.HandleAddPlugin(pNameInstace, json);

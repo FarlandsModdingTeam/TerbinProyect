@@ -6,8 +6,8 @@ namespace TerbinService;
 
 internal class TerbinServiceConst
 {
-    public const string NAME_OF_MANIFEST = "_Manifest.json";
+    public const string MANIFEST_INSTANCE = "_Manifest.json";
+    public const string HANDWRITTEN = "_Handwritten.json";
     public const string FOLDER_INFORMATION_INSTANCE = ".TerbinInstaceInformation";
     public const string PATH_BEPINEX_PLUGIN = "/BepInEx/Plugin";
-    public const string HANDWRITTEN = "handwritten.json";
 }

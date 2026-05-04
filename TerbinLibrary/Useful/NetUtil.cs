@@ -100,7 +100,7 @@ public static class NetUtil
         DirectoryHandwritten? json = null;
 
         if (!Directory.Exists(pDestination))
-            return (StatusNetUtil.DestinationInvalid, null);
+            Directory.CreateDirectory(pDestination);//return(StatusNetUtil.DestinationInvalid, null);
 
         if (await DownloadAny(pUrl, pProgressDowload) is var r && r.status == StatusNetUtil.Succes)
         {
