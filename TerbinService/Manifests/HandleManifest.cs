@@ -5,6 +5,7 @@ using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
+using TerbinService.Configuration;
 using TerbinService.Data;
 using TerbinService.Instances;
 
@@ -14,24 +15,32 @@ public static class HandleManifest
 {
     private const string _INSTANCES = ".IndexInstances.json";
 
-    public static void UpdateCore(string pName)
+    public static bool UpdateIndex(string pName)
     {
-        var allInstaces = GetCore();
-        allInstaces.Add(pName);
-        JSonUtil.Save(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES, allInstaces);
+        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+        if (dir == null)
+            return false;
+
+        JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Add(pName); });
+        return true;
     }
-    public static void DeleteInstanceCore(string pName)
+    public static bool DeleteIndex(string pName)
     {
-        var allInstaces = GetCore();
-        allInstaces.Remove(pName);
-        JSonUtil.Save(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES, allInstaces);
+        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+        if (dir == null)
+            return false;
+
+        JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Remove(pName); });
+        return true;
     }
 
-    public static List<string> GetCore()
+
+    public static List<string> GetIndex()
     {
-        var allInstaces = JSonUtil.Acess<List<string>>(TerbinConfiguration.RUTE_INSTANCES, _INSTANCES);
-        allInstaces ??= new();
-        return allInstaces;
+        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+        if (dir == null)
+            return new List<string>();
+        return JSonUtil.AcessDirect<List<string>>(dir, _INSTANCES) ?? new List<string>();
     }
 
 

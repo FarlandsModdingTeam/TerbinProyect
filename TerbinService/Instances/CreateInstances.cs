@@ -56,7 +56,7 @@ public partial class InstancesService
 
         HandleManifest.CreatePredeterminated(pName);
 
-        HandleManifest.UpdateCore(pName);
+        HandleManifest.UpdateIndex(pName);
         return true;
     }
 

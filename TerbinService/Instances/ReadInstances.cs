@@ -20,7 +20,7 @@ public partial class InstancesService
     [TerbinExecutable((byte)CodeServices.ReadAllInstances)]
     public static async Task<InfoResponse?> GetAllInstances(Header pHead, byte[] pParameters)
     {
-        List<string> instances = HandleManifest.GetCore();
+        List<string> instances = HandleManifest.GetIndex();
         Serialineitor s = new();
 
         if (instances.Count <= 0)
