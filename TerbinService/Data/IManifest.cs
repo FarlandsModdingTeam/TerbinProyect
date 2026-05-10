@@ -42,8 +42,10 @@ public class PluginManifest : IManifest
 {
     public string? Name { get; set; }
     public string? Owner { get; set; }
+    public string? File { get; set; }
     public string? UrlWeb { get; set; }
     public string? Version { get; set; }
+    public string? PathRoot { get; set; }
     public DirectoryHandwritten? Content { get; set; }
 
     public string? GetId()

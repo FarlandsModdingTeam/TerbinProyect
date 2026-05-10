@@ -17,7 +17,7 @@ namespace TerbinService.Plugin;
 public partial class PluginServices
 {
     [TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Plugin)]
-    public static async Task<InfoResponse?> InstallPlugin(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> InstallPluginService(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
@@ -183,5 +183,18 @@ public partial class PluginServices
         if (!Directory.Exists(pathPlugin))
             Directory.CreateDirectory(pathPlugin);
         return pathPlugin;
+    }
+
+
+    public static string MakeNameByFile(string pFile)
+    {
+        if (string.IsNullOrWhiteSpace(pFile))
+            return string.Empty;
+
+        string fileName = Path.GetFileNameWithoutExtension(pFile);
+        
+        fileName = fileName.Replace('_', ' ').Replace('-', ' ');
+
+        return string.Join(' ', fileName.Split(' ', StringSplitOptions.RemoveEmptyEntries));
     }
 }

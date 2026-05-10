@@ -32,6 +32,8 @@ await installMod();
 
 // TODO: No cambiarle el nombre al descargar.
 // TODO: Antes de instalar ver si dentro tiene una carpeta llamada Plugins.
+// TODO: Los Manifest esten protegidos anti Multihilo.
+// TODO: Manifest de Plugin guarde si requiere BepInEx.
 // TODO: InstallByInstace y InstallByPath
 async Task installMod()
 {
@@ -78,7 +80,7 @@ async Task installMod()
     pathFarlands = reader1.ReadArray<char>().CrString();
 
 
-    await pressAnyKeyToContinue();
+    //await pressAnyKeyToContinue();
     Console.WriteLine($"[Client] Creamos instancia");
     s = new Serialineitor()
                 .Add((byte)CodeSubServices.Instances)
@@ -88,7 +90,7 @@ async Task installMod()
     if (r.Head.Status != CodeStatus.Succes) return;
 
 
-    await pressAnyKeyToContinue();
+    //await pressAnyKeyToContinue();
     Console.WriteLine($"[Client] Clonamos Farlands");
     s = new Serialineitor()
                 .Add((byte)CodeSubServices.Game)
@@ -99,7 +101,7 @@ async Task installMod()
     if (r.Head.Status != CodeStatus.Succes) return;
 
 
-    await pressAnyKeyToContinue();
+    //await pressAnyKeyToContinue();
     Console.WriteLine($"[Client] Instalamos BepInEx");
     s = new Serialineitor()
                 .Add((byte)CodeSubServices.Plugin)
@@ -111,7 +113,7 @@ async Task installMod()
     if (r.Head.Status != CodeStatus.Succes) return;
 
 
-    await pressAnyKeyToContinue();
+    //await pressAnyKeyToContinue();
     Console.WriteLine($"[Client] Instalamos Exploratior");
     s = new Serialineitor()
                 .Add((byte)CodeSubServices.Plugin)
@@ -123,7 +125,7 @@ async Task installMod()
     if (r.Head.Status != CodeStatus.Succes) return;
 
 
-    await pressAnyKeyToContinue();
+    //await pressAnyKeyToContinue();
     Console.WriteLine($"[Client] Instalamos FCM");
     s = new Serialineitor()
                 .Add((byte)CodeSubServices.Plugin)
