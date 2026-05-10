@@ -6,6 +6,7 @@ using TerbinLibrary.Communication;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Extension;
+using TerbinService.Managers;
 using static TerbinService.Managers.ManagerGames;
 
 namespace TerbinService.Services;
@@ -22,7 +23,7 @@ internal static class ServiceGames
         string nameInstance = buffer.ReadArray<char>().CrString();
         string dirGame = buffer.ReadArray<char>().CrString();
 
-        var sizes = GetSizeDir(dirGame);
+        var sizes = ManagerNode.GetSizeDir(dirGame);
         if (sizes.maxFiles == null || sizes.maxDir == null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
 
