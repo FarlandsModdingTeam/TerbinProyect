@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Memory;
+using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Execution;
 
@@ -18,8 +19,6 @@ public static class TerbinExecutor
         RegisterInternal();
         _communicator = pCommunicator;
     }
-
-    // TODO: perdirle a Luis que sea mi tutor.
 
     public static void RegisterInternal()
     {
@@ -36,12 +35,6 @@ public static class TerbinExecutor
     //{
     //    var capR = await TerbinExecutableManager.DispatchAsync(pRequest);
     //    return capR;
-    //}
-
-
-    //public void Prueba(byte[]? b = null, char[]? c = null)
-    //{
-    //    Prueba(c:['1', '2', '3']);
     //}
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Load)]
@@ -118,6 +111,13 @@ public static class TerbinExecutor
 
 
 
+    [TerbinExecutable((byte)CodeTerbinProtocol.Prolong)]
+    public static async Task<InfoResponse?> Prolong(Header pHead, byte[] pParameters)
+    {
+        ushort id = Serialineitor.Deserialize<ushort>(pParameters);
+        _communicator?.GiveProlong(id);
+        return null;
+    }
 
 
 
@@ -126,14 +126,5 @@ public static class TerbinExecutor
     {
         _communicator?.GiveResponse(new PacketRequest(pHead: pHead, (byte)CodeTerbinProtocol.Response, pParameters));
         return null;
-    }
-
-
-    // ya ni me acuerdo para que era.
-    [TerbinExecutable((byte)CodeTerbinProtocol.Cancel)]
-    public static async Task<InfoResponse?> Cancel(Header pHead, byte[] pParameters)
-    {
-
-        throw new NotImplementedException("Ñe");
     }
 }
