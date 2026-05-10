@@ -9,7 +9,7 @@ public partial class InstancesService
 {
 
 
-
+    [Obsolete]
     public static bool IsInstance(string pDir)
     {
         string information;
