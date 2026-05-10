@@ -1,6 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary;
+using TerbinLibrary.Serialize;
+using TerbinLibrary.Useful;
+using TerbinService.BepInEx;
+using TerbinService.Services;
+using TerbinService.Managers;
 
 namespace TerbinService.Managers;
 /*
@@ -17,5 +23,124 @@ namespace TerbinService.Managers;
 
 public static class PluginManager
 {
+    public static async Task HandleInstallPluginWithProgress(string pNameInstace, byte pIdDownload, byte pIdExtract, string pPathPlugin, string pUrl)
+    {
+        IProgress<TerbinInfoProgrss> progressBarrDownload = new Progress<TerbinInfoProgrss>(p =>
+        {
+            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdDownload, p.Serialize());
+            Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
+        });
+        IProgress<TerbinInfoProgrss> progressBarrExtract = new Progress<TerbinInfoProgrss>(p =>
+        {
+            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdExtract, p.Serialize());
+            Console.Write($"\rInstalando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
+        });
+        try
+        {
+            StatusNetUtil r = await HandleInstallPlugin(pNameInstace, pUrl, pPathPlugin, progressBarrExtract, progressBarrDownload);
+            if (r != StatusNetUtil.Succes)
+            {
+                CodeInternalErrors error = r switch
+                {
+                    StatusNetUtil.ExceptionOnExtractZip => CodeInternalErrors.ZipExtractException,
+                    StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
+                    _ => CodeInternalErrors.ZipExtractError
+                };
+                throw new Exception($"TODO: informar de {error}, {r}");
 
+                // Prototipo del funcionamiento de Info
+                AmongInfoThreads info = Worker.CurrentConst.Value;
+                byte[] pld = new Serialineitor()
+                    .Add(TypeService.Service)
+                    .Add(CodeServices.InstallBepInEx)
+                    .Add(error)
+                    .Serialize();
+                _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
+            }
+        }
+        catch (Exception e)
+        {
+            string exceptionString = $$"""
+                [PitufiChingada] ExceptionError->
+                {
+                    Message: {{e.Message}};
+                    Source: {{e.Source}};
+                    Inner: {{e.InnerException?.Message ?? "N/A"}};
+                    Trace: {{e.StackTrace}};
+                    String: {{e.ToString()}};
+                    URL: {{pUrl}};
+                }
+                """;
+            Console.WriteLine(exceptionString);
+        }
+    }
+    public static async Task<StatusNetUtil?> SimpleInstallPlugin(
+        string pNameInstance,
+        string pUrl,
+        IProgress<TerbinInfoProgrss>? pProgressDownload = default,
+        IProgress<TerbinInfoProgrss>? pProgressExtract = default)
+    {
+        StatusNetUtil r = StatusNetUtil.Succes;
+        string? pathInstance = InstancesManager.MakePathFolder(pNameInstance);
+
+        if (pathInstance is null) return null;
+        if (!BepInExService.CheckInstallBepInEx(pathInstance)) return null;
+
+        r = await HandleInstallPlugin(pNameInstance, pUrl, pathInstance, pProgressExtract, pProgressDownload);
+        return r;
+    }
+
+    public static async Task<StatusNetUtil> HandleInstallPlugin(
+                                            string pNameInstace,
+                                            string pUrl,
+                                            string pPathPlugin,
+                                            IProgress<TerbinInfoProgrss>? pProgressZip = null,
+                                            IProgress<TerbinInfoProgrss>? pProgressDowload = null,
+                                            CancellationToken pCancellationToken = default)
+    {
+        if (!Directory.Exists(pPathPlugin))
+            Directory.CreateDirectory(pPathPlugin);
+
+        var (status, json) = await NetUtil.InstallZipWithProgress(pUrl, pPathPlugin, pProgressZip, pProgressDowload);
+
+        ManifestManager.HandleAddPlugin(pNameInstace, json);
+
+        return status;
+    }
+
+
+
+    public static string? MakePathPluginByName(string pNameInstance)
+    {
+        string? pathInstance;
+        string pathPlugin;
+        pathInstance = InstancesManager.MakePathFolder(pNameInstance);
+        if (pathInstance is null)
+            return null;
+        pathPlugin = Path.Combine(pathInstance, TerbinServiceConst.PATH_BEPINEX_PLUGIN);
+        if (!Directory.Exists(pathPlugin))
+            Directory.CreateDirectory(pathPlugin);
+        return pathPlugin;
+    }
+    public static string MakePathPluginByInstance(string pPathInstance)
+    {
+        string pathPlugin;
+        pathPlugin = Path.Combine(pPathInstance, TerbinServiceConst.PATH_BEPINEX_PLUGIN);
+        if (!Directory.Exists(pathPlugin))
+            Directory.CreateDirectory(pathPlugin);
+        return pathPlugin;
+    }
+
+
+    public static string MakeNameByFile(string pFile)
+    {
+        if (string.IsNullOrWhiteSpace(pFile))
+            return string.Empty;
+
+        string fileName = Path.GetFileNameWithoutExtension(pFile);
+
+        fileName = fileName.Replace('_', ' ').Replace('-', ' ');
+
+        return string.Join(' ', fileName.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+    }
 }
