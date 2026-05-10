@@ -79,7 +79,7 @@ public static class Util
     }
 
 
-    public static IProgress<TerbinInfoProgrss> CreateProgessBarr(
+    public static IProgress<TerbinInfoProgrss> CreateProgessBarrForMemory(
         TerbinCommunicator pCommunicator, byte pIdMemory, Action<TerbinInfoProgrss>? pAction = default)
     {
         if (pIdMemory <= TerbinProtocol.RESERVE_MEMORY)
