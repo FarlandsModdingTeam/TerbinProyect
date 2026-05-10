@@ -204,20 +204,20 @@ public class Serialineitor
         Array.Copy(pSecond, 0, buffer, pFirst.Length, pSecond.Length);
         return buffer;
     }
-    public static byte[] Splice(params List<byte[]> pArrays)
+    public static byte[] Splice(params byte[][] pArrays)
     {
         byte[] buffer;
         int offset = 0;
         int size = 0;
 
-        for (int i = 0; i < pArrays.Count; i++)
+        for (int i = 0; i < pArrays.Length; i++)
         {
             checked { size += pArrays[i].Length; }
         }
 
         buffer = new byte[size];
 
-        for (int i = 0; i < pArrays.Count; i++)
+        for (int i = 0; i < pArrays.Length; i++)
         {
             Array.Copy(pArrays[i], 0, buffer, offset, pArrays[i].Length);
             offset += pArrays[i].Length;
