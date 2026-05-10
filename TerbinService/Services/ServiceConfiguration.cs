@@ -7,7 +7,7 @@ using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Extension;
-using static TerbinService.Managers.ConfigurationManager;
+using static TerbinService.Managers.ManagerConfiguration;
 
 namespace TerbinService.Services;
 /*
@@ -26,7 +26,7 @@ namespace TerbinService.Services;
 // ├─ Temporal de Proton
 // └─ Steam Instalado
 
-internal static class ConfiguratonService
+internal static class ServiceConfiguration
 {
     [TerbinExecutableCompound((byte)CodeTerbinProtocol.Update, (byte)CodeSubServices.Rute)]
     public static async Task<InfoResponse?> UpdateRute(Header pHead, byte[] pParameters)

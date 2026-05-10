@@ -15,7 +15,7 @@ namespace TerbinService.Managers;
  */
 
 
-public static class NodeManager
+public static class ManagerNode
 {
 
 }

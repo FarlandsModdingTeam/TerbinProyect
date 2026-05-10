@@ -5,8 +5,8 @@ using TerbinLibrary.Communication;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
-using TerbinService.Manifests;
-using static TerbinService.Managers.InstancesManager;
+using TerbinService.Managers;
+using static TerbinService.Managers.ManagerInstances;
 
 namespace TerbinService.Services;
 /*
@@ -21,7 +21,7 @@ namespace TerbinService.Services;
  */
 
 
-internal static class InstancesService
+internal static class ServiceInstances
 {
     [TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Instances)]
     public static async Task<InfoResponse?> CreateInstance(Header pHead, byte[] pParameters)
@@ -45,7 +45,7 @@ internal static class InstancesService
     [TerbinExecutable((byte)CodeServices.ReadAllInstances)]
     public static async Task<InfoResponse?> GetAllInstances(Header pHead, byte[] pParameters)
     {
-        List<string> instances = HandleManifest.GetIndex();
+        List<string> instances = ManagerManifest.GetIndex();
         Serialineitor s = new();
 
         if (instances.Count <= 0)

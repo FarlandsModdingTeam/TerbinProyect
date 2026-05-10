@@ -8,7 +8,7 @@ using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Extension;
 using TerbinService.BepInEx;
-using static TerbinService.Managers.PluginManager;
+using static TerbinService.Managers.ManagerPlugin;
 using TerbinService.Managers;
 
 namespace TerbinService.Services;
@@ -24,7 +24,7 @@ namespace TerbinService.Services;
  */
 
 
-internal static class PluginsServices
+internal static class ServicesPlugins
 {
     [TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Plugin)]
     public static async Task<InfoResponse?> InstallPluginService(Header pHead, byte[] pParameters)
@@ -41,7 +41,7 @@ internal static class PluginsServices
 
         string? pathInstance;
         string pathPlugin;
-        pathInstance = InstancesManager.MakePathFolder(name);
+        pathInstance = ManagerInstances.MakePathFolder(name);
         if (pathInstance is null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExit));
         if (requierBepInEx)

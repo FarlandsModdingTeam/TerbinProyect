@@ -15,7 +15,7 @@ namespace TerbinService.Managers;
  */
 
 
-public static class FarlandsManager
+public static class ManagerFarlands
 {
 
 }

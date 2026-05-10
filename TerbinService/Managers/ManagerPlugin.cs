@@ -21,7 +21,7 @@ namespace TerbinService.Managers;
  */
 
 
-public static class PluginManager
+public static class ManagerPlugin
 {
     public static async Task HandleInstallPluginWithProgress(string pNameInstace, byte pIdDownload, byte pIdExtract, string pPathPlugin, string pUrl)
     {
@@ -81,7 +81,7 @@ public static class PluginManager
         IProgress<TerbinInfoProgrss>? pProgressExtract = default)
     {
         StatusNetUtil r = StatusNetUtil.Succes;
-        string? pathInstance = InstancesManager.MakePathFolder(pNameInstance);
+        string? pathInstance = ManagerInstances.MakePathFolder(pNameInstance);
 
         if (pathInstance is null) return null;
         if (!BepInExService.CheckInstallBepInEx(pathInstance)) return null;
@@ -103,7 +103,7 @@ public static class PluginManager
 
         var (status, json) = await NetUtil.InstallZipWithProgress(pUrl, pPathPlugin, pProgressZip, pProgressDowload);
 
-        ManifestManager.HandleAddPlugin(pNameInstace, json);
+        ManagerManifest.HandleAddPlugin(pNameInstace, json);
 
         return status;
     }
@@ -114,7 +114,7 @@ public static class PluginManager
     {
         string? pathInstance;
         string pathPlugin;
-        pathInstance = InstancesManager.MakePathFolder(pNameInstance);
+        pathInstance = ManagerInstances.MakePathFolder(pNameInstance);
         if (pathInstance is null)
             return null;
         pathPlugin = Path.Combine(pathInstance, TerbinServiceConst.PATH_BEPINEX_PLUGIN);

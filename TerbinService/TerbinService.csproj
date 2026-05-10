@@ -20,5 +20,6 @@
     <Folder Include="Configuration\" />
     <Folder Include="Instances\" />
     <Folder Include="Manifests\" />
+    <Folder Include="Plugin\" />
   </ItemGroup>
 </Project>

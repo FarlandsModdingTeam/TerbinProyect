@@ -18,7 +18,7 @@ namespace TerbinService.Managers;
  */
 
 
-public static class ConfigurationManager
+public static class ManagerConfiguration
 {
     private const string FOLDER = "config/";
     private const string JSON = "config.json";
@@ -82,7 +82,7 @@ public static class ConfigurationManager
         lock (_lockPredeterminated)
         {
             var data = new Dictionary<string, string>();
-            string? dirFarlands = ManagerFarlands.GetRuteSteamFarlands();
+            string? dirFarlands = TerbinLibrary.SteamFarlands.ManagerFarlands.GetRuteSteamFarlands();
             if (dirFarlands != null)
                 data.Add(TerbinConfiguration.RUTE_FARLANDS, dirFarlands);
 
@@ -97,7 +97,7 @@ public static class ConfigurationManager
     {
         return pKey switch
         {
-            TerbinConfiguration.RUTE_FARLANDS => ManagerFarlands.GetRuteSteamFarlands(),
+            TerbinConfiguration.RUTE_FARLANDS => TerbinLibrary.SteamFarlands.ManagerFarlands.GetRuteSteamFarlands(),
             TerbinConfiguration.RUTE_INSTANCES => MakePathInstances(),
 
             _ => null

@@ -18,7 +18,7 @@ namespace TerbinService.Managers;
  */
 
 
-public static class InstancesManager
+public static class ManagerInstances
 {
     public static bool NewInstance(string pName)
     {
@@ -37,9 +37,9 @@ public static class InstancesManager
         }
 
 
-        ManifestManager.CreatePredeterminated(pName);
+        ManagerManifest.CreatePredeterminated(pName);
 
-        ManifestManager.UpdateIndex(pName);
+        ManagerManifest.UpdateIndex(pName);
         return true;
     }
     public static bool IsInstance(string pDir)
@@ -99,7 +99,7 @@ public static class InstancesManager
     }
     public static string? MakePathFolder(string pName)
     {
-        var dir = ConfigurationManager.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
         if (dir == null)
             return null;
 

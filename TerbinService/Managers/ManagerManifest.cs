@@ -21,14 +21,14 @@ namespace TerbinService.Managers;
  */
 
 
-public static class ManifestManager
+public static class ManagerManifest
 {
 
     private const string _INSTANCES = ".IndexInstances.json";
 
     public static bool UpdateIndex(string pName)
     {
-        var dir = ConfigurationManager.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
         if (dir == null)
             return false;
 
@@ -37,7 +37,7 @@ public static class ManifestManager
     }
     public static bool DeleteIndex(string pName)
     {
-        var dir = ConfigurationManager.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
         if (dir == null)
             return false;
 
@@ -48,7 +48,7 @@ public static class ManifestManager
 
     public static List<string> GetIndex()
     {
-        var dir = ConfigurationManager.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
         if (dir == null)
             return new List<string>();
         return JSonUtil.AcessDirect<List<string>>(dir, _INSTANCES) ?? new List<string>();
@@ -58,7 +58,7 @@ public static class ManifestManager
 
     public static void CreatePredeterminated(string pName)
     {
-        string? dirInfo = InstancesManager.MakePathFolderInformation(pName);
+        string? dirInfo = ManagerInstances.MakePathFolderInformation(pName);
         if (dirInfo == null)
             return;
         DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
@@ -71,7 +71,7 @@ public static class ManifestManager
         var manifest = new InstanceManifest
         {
             Name = pName,
-            Version = ManagerFarlands.GetVersion(),
+            Version = TerbinLibrary.SteamFarlands.ManagerFarlands.GetVersion(),
             Plugins = []
         };
         JSonUtil.SaveDirect(pDir, TerbinServiceConst.MANIFEST_INSTANCE, manifest);
@@ -80,7 +80,7 @@ public static class ManifestManager
 
     public static bool UpdateInstace(string pName, Action<InstanceManifest> updateAction)
     {
-        var pathInstance = InstancesManager.MakePathFolder(pName);
+        var pathInstance = ManagerInstances.MakePathFolder(pName);
         if (pathInstance == null)
             return false;
 
@@ -89,7 +89,7 @@ public static class ManifestManager
 
     public static bool UpdateInstace(string pName, string pPathInstance, Action<InstanceManifest> updateAction)
     {
-        var pathInformation = InstancesManager.MakePathFolderInformation(pName);
+        var pathInformation = ManagerInstances.MakePathFolderInformation(pName);
         if (pathInformation is null)
             return false;
 
@@ -100,7 +100,7 @@ public static class ManifestManager
 
     public static void HandleAddPlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
     {
-        var information = InstancesManager.MakePathFolderInformation(pNameInstace);
+        var information = ManagerInstances.MakePathFolderInformation(pNameInstace);
         if (information is null)
             throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
 
@@ -123,7 +123,7 @@ public static class ManifestManager
             Path = pathManifest,
         };
 
-        ManifestManager.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+        ManagerManifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
     }
 
 
