@@ -15,8 +15,4 @@
   <ItemGroup>
     <ProjectReference Include="..\TerbinLibrary\TerbinLibrary.csproj" />
   </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="BepInEx\" />
-  </ItemGroup>
 </Project>
