@@ -20,9 +20,6 @@ namespace TerbinService.Managers;
 
 public static class ManagerNode
 {
-
-
-
     public static async Task<Task<(StatusFileUtil status, DirectoryHandwritten? json)>?>
                 HandleCloneGame(string pDirSource, string pDirTarjet, IProgress<TerbinInfoProgrss> pProgrss = default)
     {

@@ -60,7 +60,7 @@ public class TerbinCommunicator : IDisposable
 
     private readonly ConcurrentQueue<PacketRequest> _queue = new();
     private readonly SemaphoreSlim _signal = new(0);
-    private readonly ConcurrentDictionary<ushort, TaskCompletionSource<PacketRequest>> _pendingRequests = new();
+    private readonly ConcurrentDictionary<ushort, (TaskCompletionSource<PacketRequest> Tcs, CancellationTokenSource Cts)> _pendingRequests = new();
 
     private event Func<PacketRequest, Task<InfoResponse?>>? _onRecive;
     private event Func<Task>? _onNewClientConnect;
@@ -263,20 +263,24 @@ public class TerbinCommunicator : IDisposable
     private async Task<PacketRequest> recuperateReply(ushort pId)
     {
         var tcs = new TaskCompletionSource<PacketRequest>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(MaximumResponseTime));
 
-        if (!_pendingRequests.TryAdd(pId, tcs))
+        if (!_pendingRequests.TryAdd(pId, (tcs, cts)))
+        {
+            cts.Dispose();
             return PacketRequest.CreateResponseError(pId, CodeStatus.AlreadyExistsPetition);
+        }
 
-        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(MaximumResponseTime));
 
         cts.Token.Register(() =>
         {
             // Intentamos sacar la petición del diccionario
-            if (_pendingRequests.TryRemove(pId, out TaskCompletionSource<PacketRequest>? removedTcs))
+            if (_pendingRequests.TryRemove(pId, out var removedTcs))
             {
                 var timeoutHeader = new Header(pIdRequest: pId, pOrderRequest: TerbinProtocol.ORDER_SINGLE, pStatus: CodeStatus.OverMaximumTime);
                 var timeoutPacket = new PacketRequest(pHead: timeoutHeader);
-                removedTcs.TrySetResult(timeoutPacket);
+                removedTcs.Tcs.TrySetResult(timeoutPacket);
+                removedTcs.Cts.Dispose();
             }
         });
 
@@ -303,8 +307,19 @@ public class TerbinCommunicator : IDisposable
 
     public void GiveResponse(PacketRequest pCapsule)
     {
-        if (_pendingRequests.TryRemove(pCapsule.Head.IdRequest, out var tcs))
-            tcs.TrySetResult(pCapsule);
+        if (_pendingRequests.TryRemove(pCapsule.Head.IdRequest, out var entry))
+        {
+            entry.Tcs.TrySetResult(pCapsule);
+            entry.Cts.Dispose();
+        }
+    }
+
+    public void GiveProlong(ushort pIdRequest)
+    {
+        if (_pendingRequests.TryGetValue(pIdRequest, out var entry))
+        {
+            entry.Cts.CancelAfter(TimeSpan.FromSeconds(MaximumResponseTime));
+        }
     }
 
     // --- Reply --- //

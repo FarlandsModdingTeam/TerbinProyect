@@ -10,7 +10,10 @@ namespace TerbinLibrary;
 // methods:
 public enum CodeServices : byte
 {
-    InstallBepInEx = 10,
+    Info = 10,
+    Alert = 11,
+
+    InstallBepInEx = 12,
 
     Plugin_Tests = 20,
 

@@ -18,7 +18,7 @@ public class TerbinProtocol
     public const ushort FIRST_PACKET = 1;
     public const ushort FINAL_PACKET = ushort.MaxValue;
 
-    public const byte MAXIMUS_RESPONSE_TIME = 6; 
+    public const byte MAXIMUS_RESPONSE_TIME = 32;
 
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
@@ -97,11 +97,12 @@ public enum CodeTerbinProtocol : byte
     Stop = 0,
     Response = 1,
     Load = 2,
-    Cancel = 3, // Esto tendria que ser un status
+    Prolong = 3,
     Solicit = 4,
+    ExceptionAlert = 5,
 
- // Alert = X,
-    Info = 5, // informar del cliente que por ejemplo otro cliente ah cambiado cierta la configuracion.
+    // La realidad esque CodeTerbinProtocol solo deberia contener lo minimo para el protocolo \
+    // y el resto de cosas las deberia hacer el propio usuario, si se lo gestiona mal no es mi culpa.
 
     // Si puede ayudar a ahorrarte fuciones.
     // C.R.U.D for you: 
@@ -152,6 +153,7 @@ public enum CodeStatus : short
     Execute = 300, // Hace mucha falta.
     Info = 301,
     CheckExecution = 302,
+    Cancel = 303,
 
     ClientError = 400,
     BadRequest = 401,
