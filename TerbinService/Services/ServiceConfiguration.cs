@@ -38,7 +38,6 @@ internal static class ServiceConfiguration
         string keyRute = recived.ReadArray<char>().CrString();
         string newRute = recived.ReadArray<char>().CrString();
 
-        Console.WriteLine($"Memo: {newRute}");
         if (newRute == null)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
