@@ -19,7 +19,7 @@ namespace TerbinLibrary.Serialize;
 
 public interface IStructSerializable
 {
-    ThreeQuartersInt GetSize();
+    ushort GetSize();
     void WriteTo(Span<byte> pBuffer);
     void ReadFrom(ReadOnlySpan<byte> pBuffer);
 }

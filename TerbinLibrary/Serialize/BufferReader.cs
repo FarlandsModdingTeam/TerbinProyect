@@ -43,7 +43,7 @@ public class BufferReader
     public static T GetStruct<T>(ReadOnlySpan<byte> pBuffer, ref int pOffset, T pStruct)
         where T : struct, IStructSerializable
     {
-        ThreeQuartersInt lenth = pStruct.GetSize();
+        ushort lenth = pStruct.GetSize();
         T newStruct = Serialineitor.DeserializeStruct<T>(pBuffer[pOffset..(pOffset+lenth)].ToArray());
         pOffset += lenth;
         return newStruct;
