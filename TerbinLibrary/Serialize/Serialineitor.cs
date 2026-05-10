@@ -193,6 +193,38 @@ public class Serialineitor
     {
         return MemoryMarshal.Read<T>(pBuffer[pOffset..]);
     }
+
+
+
+
+    public static byte[] Splice(byte[] pFirst, byte[] pSecond)
+    {
+        byte[] buffer = new byte[pFirst.Length + pSecond.Length];
+        Array.Copy(pFirst, 0, buffer, 0, pFirst.Length);
+        Array.Copy(pSecond, 0, buffer, pFirst.Length, pSecond.Length);
+        return buffer;
+    }
+    public static byte[] Splice(params List<byte[]> pArrays)
+    {
+        byte[] buffer;
+        int offset = 0;
+        int size = 0;
+
+        for (int i = 0; i < pArrays.Count; i++)
+        {
+            checked { size += pArrays[i].Length; }
+        }
+
+        buffer = new byte[size];
+
+        for (int i = 0; i < pArrays.Count; i++)
+        {
+            Array.Copy(pArrays[i], 0, buffer, offset, pArrays[i].Length);
+            offset += pArrays[i].Length;
+        }
+
+        return buffer;
+    }
 }
 
 
