@@ -6,7 +6,6 @@ using TerbinLibrary.Data;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
 using TerbinService.Data;
-using TerbinService.Manifests;
 using TerbinService.Services;
 
 namespace TerbinService.Managers;
@@ -124,7 +123,7 @@ public static class ManifestManager
             Path = pathManifest,
         };
 
-        HandleManifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+        ManifestManager.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
     }
 
 

@@ -3,9 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Useful;
-using TerbinService.Configuration;
 using TerbinService.Data;
-using TerbinService.Manifests;
 
 namespace TerbinService.Managers;
 /*
@@ -39,9 +37,9 @@ public static class InstancesManager
         }
 
 
-        HandleManifest.CreatePredeterminated(pName);
+        ManifestManager.CreatePredeterminated(pName);
 
-        HandleManifest.UpdateIndex(pName);
+        ManifestManager.UpdateIndex(pName);
         return true;
     }
     public static bool IsInstance(string pDir)
@@ -101,7 +99,7 @@ public static class InstancesManager
     }
     public static string? MakePathFolder(string pName)
     {
-        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+        var dir = ConfigurationManager.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
         if (dir == null)
             return null;
 
