@@ -6,7 +6,10 @@ using TerbinLibrary.Communication;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
+using TerbinLibrary.Extension;
 using TerbinService.BepInEx;
+using static TerbinService.Managers.PluginManager;
+using TerbinService.Managers;
 
 namespace TerbinService.Services;
 /*
@@ -38,7 +41,7 @@ internal static class PluginsServices
 
         string? pathInstance;
         string pathPlugin;
-        pathInstance = InstancesService.MakePathFolder(name);
+        pathInstance = InstancesManager.MakePathFolder(name);
         if (pathInstance is null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExit));
         if (requierBepInEx)
@@ -82,3 +85,4 @@ internal static class PluginsServices
                         .Serialize(),
         };
     }
+}
