@@ -7,7 +7,6 @@ using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Extension;
-using TerbinService.BepInEx;
 using static TerbinService.Managers.ManagerPlugin;
 using TerbinService.Managers;
 
@@ -46,10 +45,10 @@ internal static class ServicesPlugins
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExit));
         if (requierBepInEx)
         {
-            if (!BepInExService.CheckInstallBepInEx(pathInstance))
+            if (!BepInExManager.CheckInstallBepInEx(pathInstance))
                 return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.BepInExNotInstall));
             //pathPlugin = MakePathPluginByInstance(pathInstance);
-            pathPlugin = BepInExService.GetBepInExFolderPlugin(pathInstance);
+            pathPlugin = BepInExManager.GetBepInExFolderPlugin(pathInstance);
         }
         else
         {

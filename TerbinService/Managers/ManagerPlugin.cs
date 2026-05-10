@@ -4,9 +4,7 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
-using TerbinService.BepInEx;
 using TerbinService.Services;
-using TerbinService.Managers;
 
 namespace TerbinService.Managers;
 /*
@@ -84,7 +82,7 @@ public static class ManagerPlugin
         string? pathInstance = ManagerInstances.MakePathFolder(pNameInstance);
 
         if (pathInstance is null) return null;
-        if (!BepInExService.CheckInstallBepInEx(pathInstance)) return null;
+        if (!BepInExManager.CheckInstallBepInEx(pathInstance)) return null;
 
         r = await HandleInstallPlugin(pNameInstance, pUrl, pathInstance, pProgressExtract, pProgressDownload);
         return r;

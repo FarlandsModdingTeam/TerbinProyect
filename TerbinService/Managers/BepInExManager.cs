@@ -11,10 +11,11 @@ using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 
-namespace TerbinService.BepInEx;
+namespace TerbinService.Managers;
 
-public class BepInExService
+public class BepInExManager
 {
+#if false
     [TerbinExecutable((byte)CodeServices.InstallBepInEx)]
     public static async Task<InfoResponse?> IntallBepInEx(Header pHead, byte[] pParameters)
     {
@@ -48,6 +49,7 @@ public class BepInExService
             Payload = [idMemory, .. Serialineitor.Serialize<long>(sizeBepInEx.Value)],
         };
     }
+#endif
 
 
     public static async Task HandleInstallBepInExWithProgress(byte pIdMemory, string pDir)
