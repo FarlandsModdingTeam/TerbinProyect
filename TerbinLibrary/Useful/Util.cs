@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary.Communication;
 using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Useful;
 
 public struct TerbinInfoProgrss
 {
-    public long Current;
     public byte Percentage; // 0 => 100
+    public long Current;
     public bool Finish; // alert to release
 
     public readonly byte[] ToArray()
@@ -75,5 +76,35 @@ public static class Util
     public static double GetInverse(long pTotal)
     {
         return (100.0d / pTotal);
+    }
+
+
+    public static IProgress<TerbinInfoProgrss> CreateProgessBarr(
+        TerbinCommunicator pCommunicator, byte pIdMemory, Action<TerbinInfoProgrss>? pAction = default)
+    {
+        if (pIdMemory <= TerbinProtocol.RESERVE_MEMORY)
+            throw new OverflowException($"Id memory is reserved! {pIdMemory}");
+        return new Progress<TerbinInfoProgrss>(p =>
+        {
+            pAction?.Invoke(p);
+            _ = pCommunicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, p.Serialize());
+        });
+    }
+    public static IProgress<TerbinInfoProgrss> CreateProgessBarr(
+        TerbinCommunicator pCommunicator, ushort pIdRequest, Action<TerbinInfoProgrss>? pAction = default, params byte[] pMethod)
+    {
+        if (pMethod.Length <= 0)
+            throw new OverflowException($"¡No Action send!");
+
+        byte method = pMethod[0];
+        byte[] restMethod = pMethod[1..];
+        byte[] id = Serialineitor.Serialize(pIdRequest);
+        return new Progress<TerbinInfoProgrss>(p =>
+        {
+            pAction?.Invoke(p);
+            byte[] pld = Serialineitor.Splice(restMethod, p.Serialize());
+            _ = pCommunicator.Send(method, pld);
+            _ = pCommunicator.Send((byte)CodeTerbinProtocol.Prolong, id);
+        });
     }
 }

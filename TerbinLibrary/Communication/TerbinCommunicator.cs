@@ -185,6 +185,12 @@ public class TerbinCommunicator : IDisposable
         return await send(pActionMethod, pPayload, pStatus, id);
     }
 
+    public async Task<PacketRequest?> SendBytes(byte pActionMethod,CodeStatus pStatus = CodeStatus.Execute, ushort? pId = null, params byte[] pPayload)
+    {
+        ushort id = pId ?? MiniID.NewS;
+        return await send(pActionMethod, pPayload, pStatus, id);
+    }
+
     public async Task<PacketRequest?> send(byte pActionMethod, byte[] pPayload, CodeStatus pStatus, ushort pId)
     {
         PacketRequest? error = null;

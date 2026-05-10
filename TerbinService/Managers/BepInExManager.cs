@@ -51,7 +51,7 @@ public class BepInExManager
     }
 #endif
 
-
+    [Obsolete]
     public static async Task HandleInstallBepInExWithProgress(byte pIdMemory, string pDir)
     {
         IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
@@ -81,7 +81,7 @@ public class BepInExManager
                     .Add(CodeServices.InstallBepInEx)
                     .Add(error)
                     .Serialize();
-                _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
+                _ = info.Communicator.Send((byte)CodeTerbinProtocol.ExceptionAlert, pld);
             }
         }
         catch (Exception e)

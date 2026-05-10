@@ -81,14 +81,4 @@ public class TSHelper
     {
         return Serialineitor.Serialize((ushort)pError);
     }
-
-    public static IProgress<TerbinInfoProgrss> CreateProgessBarr(TerbinCommunicator pCommunicator, byte pIdMemory)
-    {
-        if (pIdMemory <= TerbinProtocol.RESERVE_MEMORY)
-            throw new OverflowException($"Id memory is reserved! {pIdMemory}");
-        return new Progress<TerbinInfoProgrss>(p =>
-        {
-            _ = pCommunicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, p.ToArray());
-        });
-    }
 }

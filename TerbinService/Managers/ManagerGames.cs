@@ -23,12 +23,8 @@ public static class ManagerGames
 {
     public static async Task HandleCloneInInstanceWithProgress(string pName, byte pIdMemoryGame, string pDirGame)
     {
-        IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
-        {
-            var Content = p.ToArray();
-            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemoryGame, Content);
-
-            Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual  | Finalizado: {p.Finish}");
+        IProgress<TerbinInfoProgrss> progressBarr = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdMemoryGame, p => {
+            Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
         });
         try
         {
