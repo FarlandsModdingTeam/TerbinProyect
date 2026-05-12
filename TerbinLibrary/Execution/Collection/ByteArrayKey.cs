@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
@@ -16,7 +17,7 @@ namespace TerbinLibrary.Execution.Collection;
  */
 
 
-public readonly struct ByteArrayKey : IEquatable<ByteArrayKey>, IEquatable<IEnumerable<byte>>
+public readonly struct ByteArrayKey : IEnumerable<byte>, IEquatable<ByteArrayKey>, IEquatable<IEnumerable<byte>>
 {
     private readonly byte[] _data;
 
@@ -41,6 +42,11 @@ public readonly struct ByteArrayKey : IEquatable<ByteArrayKey>, IEquatable<IEnum
         return _data.SequenceEqual(pOther);
     }
 
+    public IEnumerator<byte> GetEnumerator()
+    {
+        return ((IEnumerable<byte>)_data).GetEnumerator();
+    }
+
     public override int GetHashCode()
     {
         unchecked
@@ -52,6 +58,39 @@ public readonly struct ByteArrayKey : IEquatable<ByteArrayKey>, IEquatable<IEnum
         }
     }
 
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return _data.GetEnumerator();
+    }
+
     public static bool operator ==(ByteArrayKey pLeft, ByteArrayKey pRight) => pLeft.Equals(pRight);
     public static bool operator !=(ByteArrayKey pLeft, ByteArrayKey pRight) => !pLeft.Equals(pRight);
+    public static implicit operator ByteArrayKey(byte[] pData) => new ByteArrayKey(pData);
+}
+
+public static class ByteArrayKeyExtensions
+{
+    public static bool TryGetValue<T>(
+        this ConcurrentDictionary<ByteArrayKey, T> pDictionary,
+        byte[] pKey,
+        out T pValue)
+    {
+        return pDictionary.TryGetValue(new ByteArrayKey(pKey), out pValue);
+    }
+
+    public static bool TryAdd<T>(
+        this ConcurrentDictionary<ByteArrayKey, T> pDictionary,
+        byte[] pKey,
+        T pValue)
+    {
+        return pDictionary.TryAdd(new ByteArrayKey(pKey), pValue);
+    }
+
+    public static bool TryRemove<T>(
+        this ConcurrentDictionary<ByteArrayKey, T> pDictionary,
+        byte[] pKey,
+        out T pValue)
+    {
+        return pDictionary.TryRemove(new ByteArrayKey(pKey), out pValue);
+    }
 }
