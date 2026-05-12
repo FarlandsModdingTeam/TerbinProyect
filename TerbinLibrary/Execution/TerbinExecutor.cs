@@ -77,7 +77,7 @@ public static class TerbinExecutor
     {
         if (!CompoundExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetEntity);
-        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, (byte)CodeTerbinProtocol.Create, entity, memo);
+        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, memo, (byte)CodeTerbinProtocol.Create, entity);
         return r;
     }
 
@@ -86,7 +86,7 @@ public static class TerbinExecutor
     {
         if (!CompoundExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetEntity);
-        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, (byte)CodeTerbinProtocol.Read, entity, memo);
+        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, memo, (byte)CodeTerbinProtocol.Read, entity);
         return r;
     }
 
@@ -95,7 +95,7 @@ public static class TerbinExecutor
     {
         if (!CompoundExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetEntity);
-        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, (byte)CodeTerbinProtocol.Update, entity, memo);
+        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, memo, (byte)CodeTerbinProtocol.Update, entity);
         return r;
     }
 
@@ -104,7 +104,7 @@ public static class TerbinExecutor
     {
         if (!CompoundExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorGetEntity);
-        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, (byte)CodeTerbinProtocol.Deleted, entity, memo);
+        InfoResponse? r = await TerbinExecutableManagerCompound.DispatchAsync(pHead, memo, (byte)CodeTerbinProtocol.Deleted, entity);
         return r;
     }
 
