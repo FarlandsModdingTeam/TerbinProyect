@@ -42,7 +42,7 @@ public struct PacketRequest : IStructSerializable
 
     // Header + bye + byte + ThreeQuartersInt + byte[]
     // 7 + 1 + 0 + 2 + Length
-    public ushort GetSize() => (ushort)(8 + TerbinProtocol.LENGTH_ARRAY + (Payload?.Length ?? 0));
+    public readonly ushort GetSize() => (ushort)(8 + TerbinProtocol.LENGTH_ARRAY + (Payload?.Length ?? 0));
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;

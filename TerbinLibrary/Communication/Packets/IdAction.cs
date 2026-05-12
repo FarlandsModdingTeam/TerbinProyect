@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Communication.Packets;
 /*
@@ -15,7 +16,7 @@ namespace TerbinLibrary.Communication.Packets;
  */
 
 
-public struct IdAction
+public struct IdAction : IStructSerializable
 {
     private byte[] _actionMethod;
 
@@ -40,5 +41,19 @@ public struct IdAction
     public void SetAction(params byte[] pActionMethod)
     {
         ActionMethod = pActionMethod;
+    }
+
+    public readonly ushort GetSize() => (ushort)(_actionMethod.Length + 1);
+
+    public void WriteTo(Span<byte> pBuffer)
+    {
+        int offset = 0;
+        pBuffer.Write<byte>(ref offset, (byte)_actionMethod.Length);
+        // TODO: Serializar.
+    }
+
+    public void ReadFrom(ReadOnlySpan<byte> pBuffer)
+    {
+        throw new NotImplementedException();
     }
 }
