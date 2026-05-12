@@ -151,9 +151,10 @@ public enum CodeStatus : short
     Succes = 200,
 
     Execute = 300, // Hace mucha falta.
-    Info = 301,
-    CheckExecution = 302,
-    Cancel = 303,
+    ExecuteInternal = 301,
+    Info = 302,
+    CheckExecution = 303,
+    Cancel = 304,
 
     ClientError = 400,
     BadRequest = 401,
