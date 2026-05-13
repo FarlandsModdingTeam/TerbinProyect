@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
-using TerbinLibrary.Communication;
+using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution.Collection;
 
 

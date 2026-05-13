@@ -58,7 +58,9 @@ public class Serialineitor
 
     public Serialineitor AddArray<T>(T[] pArray) where T : unmanaged
     {
-        int elementsBytes = (pArray?.Length ?? 0) * Unsafe.SizeOf<T>();
+        ArgumentNullException.ThrowIfNull(pArray);
+        
+        int elementsBytes = pArray.Length * Unsafe.SizeOf<T>();
         ensureCapacity(TerbinProtocol.LENGTH_ARRAY + elementsBytes);
 
         BufferWriter.AddArray<T>(_content, ref _offset, pArray);

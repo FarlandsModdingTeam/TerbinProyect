@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Reflection;
 using System.Threading.Tasks;
-using TerbinLibrary.Communication;
+using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Memory;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
