@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary;
-using TerbinLibrary.Communication;
+using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
@@ -56,7 +56,7 @@ internal static class ServiceConfiguration
     public static async Task<InfoResponse?> ReadRute(Header pHead, byte[] pParameters)
     {
         byte[] pld;
-        string keyRute = new(Serialineitor.DeserializeArray<char>(pParameters));
+        string keyRute = new(Serialineitor.DeserializeArray<char>(ref pParameters));
         if (string.IsNullOrEmpty(keyRute))
         {
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);

@@ -151,6 +151,14 @@ public class Serialineitor
         BufferWriter.AddArray<T>(newArray, ref offset, pArray);
         return newArray;
     }
+    public static byte[] SerializeArrayRaw<T>(T[] pArray, int pOffset = 0) // TODO: Un deserialize Raw.
+        where T : unmanaged
+    {
+        byte[] newArray = new byte[pArray.Length * Unsafe.SizeOf<T>()];
+        Span<byte> bytes = MemoryMarshal.AsBytes(pArray.AsSpan());
+        bytes.CopyTo(newArray.AsSpan()[pOffset..]);
+        return newArray;
+    }
     public static T[] DeserializeArray<T>(byte[] pArray)
         where T : unmanaged
     {
@@ -162,6 +170,12 @@ public class Serialineitor
     {
         ReadOnlySpan<byte> buffer = pArray;
         return buffer.ReadArray<T>();
+    }
+    public static T[] DeserializeArrayRaw<T>(byte[] pArray, int pLenght = 0)
+        where T : unmanaged
+    {
+        T[] newArray = MemoryMarshal.Cast<byte, T>(pArray.AsSpan()[..pLenght]).ToArray();
+        return newArray;
     }
 
     public static ThreeQuartersInt GetArraySize<T>(ThreeQuartersInt pLength) where T : unmanaged
@@ -225,6 +239,9 @@ public class Serialineitor
 
         return buffer;
     }
+
+
+    
 }
 
 

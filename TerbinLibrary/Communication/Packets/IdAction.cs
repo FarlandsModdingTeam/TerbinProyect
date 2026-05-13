@@ -49,6 +49,7 @@ public struct IdAction : IStructSerializable
     {
         int offset = 0;
         pBuffer.Write<byte>(ref offset, (byte)_actionMethod.Length);
+        
         // TODO: Serializar.
     }
 
