@@ -65,7 +65,9 @@ public readonly struct ByteArrayKey : IEnumerable<byte>, IEquatable<ByteArrayKey
 
     public static bool operator ==(ByteArrayKey pLeft, ByteArrayKey pRight) => pLeft.Equals(pRight);
     public static bool operator !=(ByteArrayKey pLeft, ByteArrayKey pRight) => !pLeft.Equals(pRight);
+
     public static implicit operator ByteArrayKey(byte[] pData) => new ByteArrayKey(pData);
+    public static implicit operator byte[](ByteArrayKey pKey) => pKey._data;
 }
 
 public static class ByteArrayKeyExtensions
@@ -73,9 +75,11 @@ public static class ByteArrayKeyExtensions
     public static bool TryGetValue<T>(
         this ConcurrentDictionary<ByteArrayKey, T> pDictionary,
         byte[] pKey,
-        out T pValue) where T : notnull
+        out T pValue)
     {
+#pragma warning disable CS8601 // Posible asignación de referencia nula
         return pDictionary.TryGetValue(new ByteArrayKey(pKey), out pValue);
+#pragma warning restore CS8601 // Posible asignación de referencia nula
     }
 
     public static bool TryAdd<T>(
@@ -89,8 +93,10 @@ public static class ByteArrayKeyExtensions
     public static bool TryRemove<T>(
         this ConcurrentDictionary<ByteArrayKey, T> pDictionary,
         byte[] pKey,
-        out T pValue) where T : notnull
+        out T pValue)
     {
+#pragma warning disable CS8601 // Posible asignación de referencia nula
         return pDictionary.TryRemove(new ByteArrayKey(pKey), out pValue);
+#pragma warning restore CS8601 // Posible asignación de referencia nula
     }
 }
