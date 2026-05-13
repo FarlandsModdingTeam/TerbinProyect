@@ -61,4 +61,6 @@ public struct IdAction : IStructSerializable
         length = pBuffer.Read<byte>();
         _actionMethod = Serialineitor.DeserializeArrayRaw<byte>(pBuffer, length);
     }
+
+    public static implicit operator IdAction(byte[] pData) => new IdAction(pData);
 }

@@ -125,7 +125,7 @@ public static class TerbinExecutor
     [TerbinExecutable((byte)CodeTerbinProtocol.Response)]
     public static async Task<InfoResponse?> Response(Header pHead, byte[] pParameters)
     {
-        _communicator?.GiveResponse(new PacketRequest(pHead: pHead, (byte)CodeTerbinProtocol.Response, pParameters));
+        _communicator?.GiveResponse(new PacketRequest(pHead: pHead, [(byte)CodeTerbinProtocol.Response], pParameters));
         return null;
     }
 }
