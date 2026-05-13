@@ -6,6 +6,9 @@ using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace TerbinService;
 

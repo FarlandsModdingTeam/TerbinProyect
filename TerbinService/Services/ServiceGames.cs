@@ -9,6 +9,9 @@ using TerbinLibrary.Serialize;
 using TerbinLibrary.Extension;
 using TerbinService.Managers;
 using static TerbinService.Managers.ManagerGames;
+using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace TerbinService.Services;
 

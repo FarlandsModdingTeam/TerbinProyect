@@ -10,6 +10,9 @@ using TerbinLibrary.Useful;
 using TerbinLibrary.Extension;
 using static TerbinService.Managers.ManagerPlugin;
 using TerbinService.Managers;
+using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace TerbinService.Services;
 /*

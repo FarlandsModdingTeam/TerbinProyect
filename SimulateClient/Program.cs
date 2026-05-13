@@ -10,6 +10,9 @@ using TerbinLibrary.Extension;
 using TerbinLibrary.Memory;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 
 

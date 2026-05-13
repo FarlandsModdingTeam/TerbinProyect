@@ -5,6 +5,9 @@ using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution.Collection;
+using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 
 namespace TerbinLibrary.Execution;

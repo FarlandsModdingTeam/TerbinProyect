@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
-namespace TerbinLibrary.TerbinServiceHelper.Extensions;
+namespace TerbinLibrary.TerbinServiceHelper.Exceptions;
 /*
  -- Variables:
   empieza: _ = es privada NO local.
