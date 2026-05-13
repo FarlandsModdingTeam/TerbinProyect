@@ -26,7 +26,7 @@ public struct InfoResponse
     {
         IdRequest = TerbinProtocol.ORDER_SINGLE;
         Status = CodeStatus.NotAsign;
-        ActionMethod = new((byte)CodeTerbinProtocol.Response);
+        ActionMethod = new IdAction((byte)CodeTerbinProtocol.Response);
         Payload = [];
     }
 

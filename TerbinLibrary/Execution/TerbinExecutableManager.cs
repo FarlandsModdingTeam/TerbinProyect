@@ -22,6 +22,7 @@ namespace TerbinLibrary.Execution;
 /// <summary>
 /// 
 /// </summary>
+[Obsolete]
 public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
 {
     private readonly ConcurrentDictionary<byte, List<TerbinExecutableDelegate>> _handlers = new();
@@ -91,6 +92,7 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
     }
 }
 
+[Obsolete]
 public static class TerbinExecutableManager
 {
     private static SimpleExecutableDispatcher _dispatcher = new();
