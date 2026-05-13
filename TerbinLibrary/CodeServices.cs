@@ -82,4 +82,28 @@ public class TSHelper
     {
         return Serialineitor.Serialize((ushort)pError);
     }
+
+    public static string CreateStringException(Exception pE, string pSite = "ExceptionError")
+    {
+        return
+        $$"""
+            [{{pSite}}] =>
+            {
+                Message: {{pE.Message}};
+                Source: {{pE.Source ?? "N/A"}};
+                Inner: {{pE.InnerException?.Message ?? "N/A"}};
+                Trace: {{pE.StackTrace ?? "N/A"}};
+                String: {{pE.ToString()}}
+            }
+        """;
+    }
+}
+
+
+public static class ExceptionExtension
+{
+    public static string CrString(this Exception pE, string pSite = "ExceptionError")
+    {
+        return TSHelper.CreateStringException(pE, pSite);
+    }
 }

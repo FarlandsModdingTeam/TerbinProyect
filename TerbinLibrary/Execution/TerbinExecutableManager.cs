@@ -71,17 +71,7 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
         }
         catch (Exception e)
         {
-            string exceptionString = $$"""
-                [ExecutableDispatcher>DispatchAsync] ExceptionError->
-                {
-                    Message: {{e.Message}};
-                    Source: {{e.Source}};
-                    Inner: {{e.InnerException?.Message ?? "N/A"}};
-                    Trace: {{e.StackTrace}};
-                    String: {{e.ToString()}}
-                }
-                """;
-            Console.WriteLine(exceptionString);
+            Console.WriteLine(e.CrString("ExecutableDispatcher>DispatchAsync"));
             return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ExecutionException);
         }
     }

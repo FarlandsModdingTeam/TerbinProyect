@@ -58,18 +58,7 @@ public static class ManagerPlugin
         }
         catch (Exception e)
         {
-            string exceptionString = $$"""
-                [PitufiChingada] ExceptionError->
-                {
-                    Message: {{e.Message}};
-                    Source: {{e.Source}};
-                    Inner: {{e.InnerException?.Message ?? "N/A"}};
-                    Trace: {{e.StackTrace}};
-                    String: {{e.ToString()}};
-                    URL: {{pUrl}};
-                }
-                """;
-            Console.WriteLine(exceptionString);
+            Console.WriteLine(e.CrString("HandleInstallPluginWithProgress"));
         }
     }
     public static async Task<StatusNetUtil?> SimpleInstallPlugin(

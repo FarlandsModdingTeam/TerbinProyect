@@ -32,17 +32,7 @@ public static class ManagerGames
         }
         catch (Exception e)
         {
-            string exceptionString = $$"""
-                [PitufiChingada] ExceptionError->
-                {
-                    Message: {{e.Message}};
-                    Source: {{e.Source}};
-                    Inner: {{e.InnerException?.Message ?? "N/A"}};
-                    Trace: {{e.StackTrace}};
-                    String: {{e.ToString()}}
-                }
-                """;
-            Console.WriteLine(exceptionString);
+            Console.WriteLine(e.CrString("HandleCloneInInstanceWithProgress"));
         }
 
     }
