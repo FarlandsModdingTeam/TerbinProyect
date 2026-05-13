@@ -109,8 +109,6 @@ public class TSHelper
         {
             Console.Log($"{pObj.GetType()}: {pObj.GetHashCode()}");
         }
-
-
     }
 }
 
@@ -121,31 +119,56 @@ public static class ConsoleExtension
     {
         public static void Log(string pMsg)
         {
-            print(pMsg, ConsoleColor.Cyan);
+            Console.PrintLn(pMsg, ConsoleColor.Cyan);
         }
 
         public static void Warn(string pMsg)
         {
-            print(pMsg, ConsoleColor.Yellow);
+            Console.PrintLn(pMsg, ConsoleColor.Yellow);
         }
 
         public static void Error(string pMsg)
         {
-            print(pMsg, ConsoleColor.Red);
+            Console.PrintLn(pMsg, ConsoleColor.Red);
         }
 
-        private static void print(string pMsg, ConsoleColor pColor)
+        public static void PrintLn(string pMsg, ConsoleColor pColor = ConsoleColor.White)
+        {
+            lock (_lock)
+            {
+                var old = Console.ForegroundColor;
+                Console.ForegroundColor = pColor;
+                Console.WriteLine(pMsg);
+                Console.ForegroundColor = old;
+            }
+        }
+        public static void Print(string pMsg, ConsoleColor pColor = ConsoleColor.White)
+        {
+            lock (_lock)
+            {
+                var old = Console.ForegroundColor;
+                Console.ForegroundColor = pColor;
+                Console.Write(pMsg);
+                Console.ForegroundColor = old;
+            }
+        }
+    }
+}
+
+public abstract class APrint
+{
+    private static readonly object _lock = new();
+    public static void Print(string pMsg, ConsoleColor pColor)
+    {
+        lock (_lock)
         {
             var old = Console.ForegroundColor;
-
             Console.ForegroundColor = pColor;
-
-            lock (_lock)
-                Console.WriteLine(pMsg);
-
+            Console.Print(pMsg);
             Console.ForegroundColor = old;
         }
     }
+    public abstract void Print(string pMsg);
 }
 
 public static class ExceptionExtension
