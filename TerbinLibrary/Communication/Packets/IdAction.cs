@@ -22,13 +22,19 @@ public struct IdAction : IStructSerializable
 
     public byte[] ActionMethod
     {
-        get => _actionMethod;
+        readonly get => _actionMethod;
         set
         {
             if (value.Length > byte.MaxValue)
                 throw new OverflowException($"Actionre overflow byte max");
             _actionMethod = value;
         }
+    }
+
+    public readonly byte this[byte pIndex]
+    {
+        get => _actionMethod[pIndex];
+        set => _actionMethod[pIndex] = value;
     }
 
     public IdAction(params byte[] pAction)
@@ -45,7 +51,7 @@ public struct IdAction : IStructSerializable
 
     public readonly ushort GetSize() => (ushort)(_actionMethod.Length + 1);
 
-    public void WriteTo(Span<byte> pBuffer)
+    public readonly void WriteTo(Span<byte> pBuffer)
     {
         if (_actionMethod.Length > byte.MaxValue)
             throw new OverflowException("Over Size Action Method");

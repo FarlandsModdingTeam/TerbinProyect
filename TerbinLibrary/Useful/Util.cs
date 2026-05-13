@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Communication;
+using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Useful;
@@ -103,8 +104,8 @@ public static class Util
         {
             pAction?.Invoke(p);
             byte[] pld = Serialineitor.Splice(restMethod, p.Serialize());
-            _ = pCommunicator.Send(method, pld);
-            _ = pCommunicator.Send((byte)CodeTerbinProtocol.Prolong, id);
+            _ = pCommunicator.Send(new IdAction(method), pld);
+            _ = pCommunicator.Send(new IdAction((byte)CodeTerbinProtocol.Prolong), id);
         });
     }
 }

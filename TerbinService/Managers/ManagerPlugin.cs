@@ -53,7 +53,7 @@ public static class ManagerPlugin
                     .Add(CodeServices.InstallBepInEx)
                     .Add(error)
                     .Serialize();
-                _ = info.Communicator.Send((byte)CodeTerbinProtocol.Info, pld);
+                _ = info.Communicator.Send(new((byte)CodeTerbinProtocol.ExceptionAlert), pld);
             }
         }
         catch (Exception e)

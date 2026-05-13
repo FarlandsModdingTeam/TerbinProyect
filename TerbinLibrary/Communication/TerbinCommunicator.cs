@@ -260,7 +260,7 @@ public class TerbinCommunicator : IDisposable
     {
         pIdRequest ??= MiniID.NewS;
         if (pPayload.Length >= TerbinProtocol.MAX_PLD)
-            return false;
+            return false; // TODO: que false ni ostia, metele una excepcion.
 
         await addQueue(pOrderRequest, CodeStatus.Execute, new IdAction((byte)CodeTerbinProtocol.Load), pIdMemory, pPayload, pIdRequest.Value);
         return true;

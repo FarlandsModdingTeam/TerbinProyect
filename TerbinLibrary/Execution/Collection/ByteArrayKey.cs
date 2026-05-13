@@ -73,7 +73,7 @@ public static class ByteArrayKeyExtensions
     public static bool TryGetValue<T>(
         this ConcurrentDictionary<ByteArrayKey, T> pDictionary,
         byte[] pKey,
-        out T pValue)
+        out T pValue) where T : notnull
     {
         return pDictionary.TryGetValue(new ByteArrayKey(pKey), out pValue);
     }
@@ -89,7 +89,7 @@ public static class ByteArrayKeyExtensions
     public static bool TryRemove<T>(
         this ConcurrentDictionary<ByteArrayKey, T> pDictionary,
         byte[] pKey,
-        out T pValue)
+        out T pValue) where T : notnull
     {
         return pDictionary.TryRemove(new ByteArrayKey(pKey), out pValue);
     }

@@ -46,7 +46,7 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
 
     public async Task<InfoResponse?> DispatchAsync(PacketRequest pCapsule)
     {
-        if (!_handlers.TryGetValue(pCapsule.ActionMethod, out var handlers))
+        if (!_handlers.TryGetValue(pCapsule.ActionMethod[0], out var handlers))
         {
             TerbinMemoryHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
             return InfoResponse.Create(pCapsule.Head.IdRequest, CodeStatus.ActionNotFound);
@@ -57,7 +57,7 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
             if (pCapsule.Head.Status == CodeStatus.CheckExecution)
                 return InfoResponse.CreateSucces(pCapsule.Head.IdRequest);
 
-            if (pCapsule.ActionMethod == (byte)CodeTerbinProtocol.Response)
+            if (pCapsule.ActionMethod[0] == (byte)CodeTerbinProtocol.Response)
             {
                 for (int i = 0; i < handlers.Count; i++)
                 {

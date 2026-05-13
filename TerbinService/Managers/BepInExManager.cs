@@ -81,7 +81,7 @@ public class BepInExManager
                     .Add(CodeServices.InstallBepInEx)
                     .Add(error)
                     .Serialize();
-                _ = info.Communicator.Send((byte)CodeTerbinProtocol.ExceptionAlert, pld);
+                _ = info.Communicator.Send(new((byte)CodeTerbinProtocol.ExceptionAlert), pld);
             }
         }
         catch (Exception e)
