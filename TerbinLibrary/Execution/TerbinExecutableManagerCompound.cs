@@ -54,6 +54,7 @@ public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
     {
         if (!_handlers.TryGetValue(pActions, out var handlers))
         {
+            TSHelper.Debug.PrintHas(pActions);
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.SubActionNotFound);
         }
 

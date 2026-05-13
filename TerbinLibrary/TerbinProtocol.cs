@@ -162,6 +162,7 @@ public enum CodeStatus : short
     NotFound = 404,
 
     ActionNotFound = 440,
+    [Obsolete(message: "Use ActionNotFound normal en su lugar (440)")]
     SubActionNotFound = 441,
 
     ErrorGetEntity = 450,

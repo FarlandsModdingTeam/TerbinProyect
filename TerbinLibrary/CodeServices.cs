@@ -85,8 +85,77 @@ public class TSHelper
 
     public static string CreateStringException(Exception pE, string pSite = "ExceptionError")
     {
-        return
-        $$"""
+        return ExceptionExtension.CreateStringException(pE, pSite);
+    }
+
+    public static class Debug
+    {
+        public static void PrintHas(params object[] pObjs)
+        {
+            string allHas = "";
+            for (int i = 0; i < pObjs.Length; i++)
+            {
+                allHas += pObjs[i].GetType() + ": ";
+                allHas += pObjs[i].GetHashCode() + ((i < pObjs.Length) ? "; \n" : "");
+            }
+            Console.Log($"{allHas}");
+        }
+        public static void PrintAllHas(params object[] pObjs)
+        {
+            string allHas = string.Join("; \n", pObjs.Select(o => $"{o.GetType()}: {o.GetHashCode()}"));
+            Console.Log($"{allHas}");
+        }
+        public static void PrintHas(object pObj)
+        {
+            Console.Log($"{pObj.GetType()}: {pObj.GetHashCode()}");
+        }
+
+
+    }
+}
+
+public static class ConsoleExtension
+{
+    private static readonly object _lock = new();
+    extension (Console)
+    {
+        public static void Log(string pMsg)
+        {
+            print(pMsg, ConsoleColor.Cyan);
+        }
+
+        public static void Warn(string pMsg)
+        {
+            print(pMsg, ConsoleColor.Yellow);
+        }
+
+        public static void Error(string pMsg)
+        {
+            print(pMsg, ConsoleColor.Red);
+        }
+
+        private static void print(string pMsg, ConsoleColor pColor)
+        {
+            var old = Console.ForegroundColor;
+
+            Console.ForegroundColor = pColor;
+
+            lock (_lock)
+                Console.WriteLine(pMsg);
+
+            Console.ForegroundColor = old;
+        }
+    }
+}
+
+public static class ExceptionExtension
+{
+    extension (Exception)
+    {
+        public static string CreateStringException(Exception pE, string pSite = "ExceptionError")
+        {
+            return
+            $$"""
             [{{pSite}}] =>
             {
                 Message: {{pE.Message}};
@@ -95,15 +164,17 @@ public class TSHelper
                 Trace: {{pE.StackTrace ?? "N/A"}};
                 String: {{pE.ToString()}}
             }
-        """;
+            """;
+        }
     }
-}
 
-
-public static class ExceptionExtension
-{
     public static string CrString(this Exception pE, string pSite = "ExceptionError")
     {
-        return TSHelper.CreateStringException(pE, pSite);
+        return Exception.CreateStringException(pE, pSite);
+    }
+    public static void PrintException(this Exception pE, string pSite = "ExceptionError")
+    {
+        string e = Exception.CreateStringException(pE, pSite);
+        Console.Error(e);
     }
 }
