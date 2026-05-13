@@ -47,14 +47,18 @@ public struct IdAction : IStructSerializable
 
     public void WriteTo(Span<byte> pBuffer)
     {
+        if (_actionMethod.Length > byte.MaxValue)
+            throw new OverflowException("Over Size Action Method");
         int offset = 0;
         pBuffer.Write<byte>(ref offset, (byte)_actionMethod.Length);
-        
-        // TODO: Serializar.
+        Span<byte> bytes = Serialineitor.SerializeArrayRaw<byte>(_actionMethod, _actionMethod.Length).AsSpan();
+        bytes.CopyTo(pBuffer[offset..]);
     }
 
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
     {
-        throw new NotImplementedException();
+        byte length;
+        length = pBuffer.Read<byte>();
+        _actionMethod = Serialineitor.DeserializeArrayRaw<byte>(pBuffer, length);
     }
 }

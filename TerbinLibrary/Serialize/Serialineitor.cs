@@ -171,10 +171,10 @@ public class Serialineitor
         ReadOnlySpan<byte> buffer = pArray;
         return buffer.ReadArray<T>();
     }
-    public static T[] DeserializeArrayRaw<T>(byte[] pArray, int pLenght = 0)
+    public static T[] DeserializeArrayRaw<T>(ReadOnlySpan<byte> pArray, int pLenght = 0)
         where T : unmanaged
     {
-        T[] newArray = MemoryMarshal.Cast<byte, T>(pArray.AsSpan()[..pLenght]).ToArray();
+        T[] newArray = MemoryMarshal.Cast<byte, T>(pArray[..pLenght]).ToArray();
         return newArray;
     }
 
