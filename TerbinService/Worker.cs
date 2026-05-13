@@ -1,6 +1,7 @@
 using System.IO.Pipes;
 using System.Reflection;
 using TerbinLibrary.Communication;
+using TerbinLibrary.Communication.Packets;
 using TerbinLibrary;
 using TerbinLibrary.Execution;
 

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
+using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;

@@ -20,23 +20,32 @@ namespace TerbinLibrary.Communication.Packets;
 public struct PacketRequest : IStructSerializable
 {
     public Header Head;
-    public byte[] ActionMethod;
+    public IdAction ActionMethod;
     public byte[] Payload;
 
     public PacketRequest()
     {
         Head = new Header();
-        ActionMethod = [(byte)CodeTerbinProtocol.Response];
+        ActionMethod = new IdAction([(byte)CodeTerbinProtocol.Response]);
         Payload = [];
     }
 
+    public PacketRequest(Header? pHead = null)
+        : this (pHead, (byte[]?)null, (byte[]?)null)
+    { }
     public PacketRequest(
         Header? pHead = null,
         byte[]? pActionMethod = null,
         byte[]? pPayload = null)
+        : this (pHead, new IdAction(pActionMethod ?? [(byte)CodeTerbinProtocol.Response]), pPayload)
+    { }
+    public PacketRequest(
+        Header? pHead = null,
+        IdAction? pActionMethod = null,
+        byte[]? pPayload = null)
     {
         Head = pHead ?? new Header();
-        ActionMethod = pActionMethod ?? [(byte)CodeTerbinProtocol.Response];
+        ActionMethod = pActionMethod ?? new IdAction([(byte)CodeTerbinProtocol.Response]);
         Payload = pPayload ?? [];
     }
 
@@ -47,14 +56,14 @@ public struct PacketRequest : IStructSerializable
     {
         int offset = 0;
         pBuffer.Write<Header>(ref offset, Head);
-        pBuffer.WriteArray<byte>(ref offset, ActionMethod);
+        pBuffer.WriteStruct<IdAction>(ref offset, ActionMethod);
         pBuffer.WriteArray<byte>(ref offset, Payload);
     }
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
     {
         int offset = 0;
         Head = pBuffer.Read<Header>(ref offset);
-        ActionMethod = pBuffer.ReadArray<byte>(ref offset);
+        ActionMethod = pBuffer.ReadStruct<IdAction>(ref offset);
         Payload = pBuffer.ReadArray<byte>(ref offset);
     }
 

@@ -95,4 +95,10 @@ public static class BufferReaderExtension
     {
         return BufferReader.GetStruct<T>(pBuffer, ref pOffset, pStruct);
     }
+    public static T ReadStruct<T>(this ReadOnlySpan<byte> pBuffer, ref int pOffset)
+        where T : struct, IStructSerializable
+    {
+        T newStruct = new T();
+        return BufferReader.GetStruct<T>(pBuffer, ref pOffset, newStruct);
+    }
 }

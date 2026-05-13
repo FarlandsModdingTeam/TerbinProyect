@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TerbinLibrary.Communication;
+using TerbinLibrary.Communication.Packets;
 
 namespace TerbinLibrary.Memory;
 /*

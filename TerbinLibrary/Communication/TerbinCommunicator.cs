@@ -12,7 +12,7 @@ using TerbinLibrary.Execution;
 using TerbinLibrary.Id;
 using TerbinLibrary.Memory;
 using TerbinLibrary.Serialize;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using TerbinLibrary.Communication.Packets;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -284,7 +284,7 @@ public class TerbinCommunicator : IDisposable
             if (_pendingRequests.TryRemove(pId, out var removedTcs))
             {
                 var timeoutHeader = new Header(pIdRequest: pId, pOrderRequest: TerbinProtocol.ORDER_SINGLE, pStatus: CodeStatus.OverMaximumTime);
-                var timeoutPacket = new PacketRequest(pHead: timeoutHeader);
+                var timeoutPacket = new PacketRequest(pHead: timeoutHeader, (byte[]?)null, (byte[]?)null);
                 removedTcs.Tcs.TrySetResult(timeoutPacket);
                 removedTcs.Cts.Dispose();
             }
