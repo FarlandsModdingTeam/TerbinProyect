@@ -105,14 +105,16 @@ public enum CodeTerbinProtocol : byte
     // La realidad esque CodeTerbinProtocol solo deberia contener lo minimo para el protocolo \
     // y el resto de cosas las deberia hacer el propio usuario, si se lo gestiona mal no es mi culpa.
 
-    // Si puede ayudar a ahorrarte fuciones.
-    // C.R.U.D for you: 
+    [Obsolete("Create yourself")]
     Create = TerbinCRUD.Create,
+    [Obsolete("Create yourself")]
     Read = TerbinCRUD.Read,
+    [Obsolete("Create yourself")]
     Update = TerbinCRUD.Update,
+    [Obsolete("Create yourself")]
     Deleted = TerbinCRUD.Deleted,
 }
-
+[Obsolete("Create yourself")]
 public enum TerbinCRUD : byte
 {
     Create = 6,
