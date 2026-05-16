@@ -54,7 +54,7 @@ public static class TerbinExecutableHelper
                 if (method.GetCustomAttribute<ObsoleteAttribute>(inherit: false) != null)
                 {
                     var old = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.ForegroundColor = ConsoleColor.DarkYellow;
                     Console.WriteLine($"Warning: {method.Name} is Obsolete");
                     Console.ForegroundColor = old;
                 }
