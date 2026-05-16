@@ -1,11 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Memory;
 
 namespace TerbinLibrary.Execution;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayusculas = publica.
+  empieza: minusculas = privada.
+ */
+
 
 public static class TerbinExecutableHelper
 {
@@ -38,6 +50,14 @@ public static class TerbinExecutableHelper
             {
                 var attrs = method.GetCustomAttributes<T>(inherit: false);
                 if (!attrs.Any()) continue;
+
+                if (method.GetCustomAttribute<ObsoleteAttribute>(inherit: false) != null)
+                {
+                    var old = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine($"Warning: {method.Name} is Obsolete");
+                    Console.ForegroundColor = old;
+                }
 
                 var parameters = method.GetParameters();
                 if (!IsFirmParameters(parameters))
