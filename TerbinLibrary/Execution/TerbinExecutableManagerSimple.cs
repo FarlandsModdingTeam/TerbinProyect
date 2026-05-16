@@ -81,7 +81,7 @@ public sealed class ExecutableDispatcherSimple : IExecutableDispatcher
 
     public void RegisterFromAssembly(Assembly pAssembly)
     {
-        TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutableAttribute, ExecutableDispatcherSimple>(pAssembly, this);
+        TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutable_ObsoleteAttribute, ExecutableDispatcherSimple>(pAssembly, this);
     }
 }
 

@@ -73,7 +73,7 @@ public class Worker : BackgroundService
     }
 
 
-    [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]
+    [TerbinExecutable_Obsolete((byte)CodeTerbinProtocol.Stop)]
     public static async Task<InfoResponse?> Stop(Header pHead, byte[] pParameters)
     {
         _ = Task.Run(async () =>

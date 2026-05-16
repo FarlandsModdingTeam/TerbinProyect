@@ -110,7 +110,7 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
 
     public void RegisterFromAssembly(Assembly pAssembly)
     {
-        TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutableCompoundAttribute, ExecutableDispatcher>(pAssembly, this);
+        TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutableAttribute, ExecutableDispatcher>(pAssembly, this);
     }
 }
 

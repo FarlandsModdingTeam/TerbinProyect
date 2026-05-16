@@ -33,9 +33,9 @@ public interface IExecutableDispatcher
 }
 
 
-
+[Obsolete]
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class TerbinExecutableAttribute(byte pAction) : Attribute, IExecutableAttribute
+public sealed class TerbinExecutable_ObsoleteAttribute(byte pAction) : Attribute, IExecutableAttribute
 {
     public byte[] Action { get; } = new byte[] { pAction };
     public int Leght => Action.Length;
@@ -43,7 +43,7 @@ public sealed class TerbinExecutableAttribute(byte pAction) : Attribute, IExecut
 }
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class TerbinExecutableCompoundAttribute(params byte[] pAction) : Attribute, IExecutableAttribute
+public sealed class TerbinExecutableAttribute(params byte[] pAction) : Attribute, IExecutableAttribute
 {
     public byte[] Action { get; } = pAction;
     public int Leght => Action.Length;

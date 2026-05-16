@@ -27,7 +27,7 @@ namespace TerbinService.Services;
 
 internal static class ServiceInstances
 {
-    [TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Instances)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Instances)]
     public static async Task<InfoResponse?> CreateInstance(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)
@@ -69,7 +69,7 @@ internal static class ServiceInstances
         };
     }
 
-    [TerbinExecutableCompound((byte)CodeTerbinProtocol.Read, (byte)CodeSubServices.Instances)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Read, (byte)CodeSubServices.Instances)]
     public static async Task<InfoResponse?> ReadInstance(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)
