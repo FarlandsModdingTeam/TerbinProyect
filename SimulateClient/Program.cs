@@ -15,9 +15,18 @@ using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.Protocol;
 
+// TODO: No cambiarle el nombre al descargar.
+// TODO: Antes de instalar ver si dentro tiene una carpeta llamada Plugins.
+// TODO: Los Manifest esten protegidos anti Multihilo.
+// TODO: Manifest de Plugin guarde si requiere BepInEx.
+// TODO: InstallByInstace y InstallByPath
 
+#if true
 
+Console.WriteLine($"SimulateClient esta desactivado.");
+Console.WriteLine($"Ponga en false el if para activarlo.");
 
+#else
 var communicator = new TerbinCommunicator(false);
 TerbinExecutor.Register(Assembly.GetExecutingAssembly());
 communicator.OnRecive += TerbinExecutableManagerSimple.DispatchAsync;
@@ -32,13 +41,9 @@ else
     return;
 }
 
+
 await installMod();
 
-// TODO: No cambiarle el nombre al descargar.
-// TODO: Antes de instalar ver si dentro tiene una carpeta llamada Plugins.
-// TODO: Los Manifest esten protegidos anti Multihilo.
-// TODO: Manifest de Plugin guarde si requiere BepInEx.
-// TODO: InstallByInstace y InstallByPath
 async Task installMod()
 {
     string? nameInstace, pathInstaces, pathInstace, pathFarlands;
@@ -353,3 +358,5 @@ async Task manuallity()
 //        return InfoResponse.CreateSucces(pHead.IdRequest);
 //    }
 //}
+
+#endif
