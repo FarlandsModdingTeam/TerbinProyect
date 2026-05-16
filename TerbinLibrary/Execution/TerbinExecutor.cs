@@ -24,12 +24,12 @@ public static class TerbinExecutor
 
     public static void RegisterInternal()
     {
-        TerbinExecutableManagerSimple.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+        //TerbinExecutableManagerSimple.RegisterFromAssembly(Assembly.GetExecutingAssembly());
         TerbinExecutableManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
     public static void Register(Assembly pAssembly)
     {
-        TerbinExecutableManagerSimple.RegisterFromAssembly(pAssembly);
+        //TerbinExecutableManagerSimple.RegisterFromAssembly(pAssembly);
         TerbinExecutableManager.RegisterFromAssembly(pAssembly);
     }
 
@@ -39,7 +39,7 @@ public static class TerbinExecutor
     //    return capR;
     //}
 
-    [TerbinExecutable_Obsolete((byte)CodeTerbinProtocol.Load)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Load)]
     public static async Task<InfoResponse?> Load(Header pHead, byte[] pParameters)
     {
         if (pHead.OrderRequest > 0)
@@ -55,7 +55,7 @@ public static class TerbinExecutor
     }
 
 
-    [TerbinExecutable_Obsolete((byte)CodeTerbinProtocol.Solicit)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Solicit)]
     public static async Task<InfoResponse?> Solicit(Header pHead, byte[] pParameters)
     {
         if (pHead.IdMemory == (byte)CodeTerbinMemory.New)
@@ -74,7 +74,7 @@ public static class TerbinExecutor
 
 
 
-    [TerbinExecutable_Obsolete((byte)CodeTerbinProtocol.Create)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
     public static async Task<InfoResponse?> Create(Header pHead, byte[] pParameters)
     {
         if (!ExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
@@ -83,7 +83,7 @@ public static class TerbinExecutor
         return r;
     }
 
-    [TerbinExecutable_Obsolete((byte)CodeTerbinProtocol.Read)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Read)]
     public static async Task<InfoResponse?> Read(Header pHead, byte[] pParameters)
     {
         if (!ExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
@@ -92,7 +92,7 @@ public static class TerbinExecutor
         return r;
     }
 
-    [TerbinExecutable_Obsolete((byte)CodeTerbinProtocol.Update)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Update)]
     public static async Task<InfoResponse?> Update(Header pHead, byte[] pParameters)
     {
         if (!ExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
@@ -101,7 +101,7 @@ public static class TerbinExecutor
         return r;
     }
 
-    [TerbinExecutable_Obsolete((byte)CodeTerbinProtocol.Deleted)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Deleted)]
     public static async Task<InfoResponse?> Deleted(Header pHead, byte[] pParameters)
     {
         if (!ExecutableDispatcher.TryGetEntity(pParameters, out var entity, out var memo))
@@ -113,7 +113,7 @@ public static class TerbinExecutor
 
 
 
-    [TerbinExecutable_Obsolete((byte)CodeTerbinProtocol.Prolong)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Prolong)]
     public static async Task<InfoResponse?> Prolong(Header pHead, byte[] pParameters)
     {
         ushort id = Serialineitor.Deserialize<ushort>(pParameters);
@@ -123,7 +123,7 @@ public static class TerbinExecutor
 
 
 
-    [TerbinExecutable_Obsolete((byte)CodeTerbinProtocol.Response)]
+    [TerbinExecutable((byte)CodeTerbinProtocol.Response)]
     public static async Task<InfoResponse?> Response(Header pHead, byte[] pParameters)
     {
         _communicator?.GiveResponse(new PacketRequest(pHead: pHead, [(byte)CodeTerbinProtocol.Response], pParameters));
