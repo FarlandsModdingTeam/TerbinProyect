@@ -30,7 +30,7 @@ namespace TerbinService.Services;
 
 internal static class ServicesPlugins
 {
-    [TerbinExecutable((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Plugin)]
+    [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Plugin)]
     public static async Task<InfoResponse?> InstallPluginService(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)

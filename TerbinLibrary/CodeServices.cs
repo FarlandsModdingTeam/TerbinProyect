@@ -48,6 +48,7 @@ public enum CodeSubServices : byte
     Rute_Antiguo_Obsoleto_MagincianPuto = 110,
 }
 
+[Obsolete]
 public enum TypeService : byte
 {
     Service = 1,

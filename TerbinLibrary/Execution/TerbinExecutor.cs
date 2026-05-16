@@ -73,7 +73,7 @@ public static class TerbinExecutor
     }
 
 
-
+    /*
     [TerbinExecutable((byte)CodeTerbinProtocol.Create)]
     public static async Task<InfoResponse?> Create(Header pHead, byte[] pParameters)
     {
@@ -109,7 +109,7 @@ public static class TerbinExecutor
         InfoResponse? r = await TerbinExecutableManager.DispatchAsync(pHead, memo, (byte)CodeTerbinProtocol.Deleted, entity);
         return r;
     }
-
+    */
 
 
 

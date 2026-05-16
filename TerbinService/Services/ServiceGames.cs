@@ -18,7 +18,7 @@ namespace TerbinService.Services;
 
 internal static class ServiceGames
 {
-    [TerbinExecutable((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Game)]
+    [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Game)]
     public static async Task<InfoResponse?> CloneGame(Header pHead, byte[] pParameters)
     {
         if (pParameters.Length <= 0)

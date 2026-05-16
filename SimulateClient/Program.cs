@@ -25,6 +25,7 @@ using TerbinLibrary.Protocol;
 
 Console.WriteLine($"SimulateClient esta desactivado.");
 Console.WriteLine($"Ponga en false el if para activarlo.");
+await pressAnyKeyToContinue();
 
 #else
 var communicator = new TerbinCommunicator(false);
@@ -150,12 +151,6 @@ async Task installMod()
     await pressAnyKeyToContinue();
 }
 
-async Task pressAnyKeyToContinue()
-{
-    Console.WriteLine($"[Client] Pulse cualquier tecla para continuar ...");
-    _ = Console.ReadLine();
-    await Task.Delay(500);
-}
 
 
 async Task manuallity()
@@ -360,3 +355,11 @@ async Task manuallity()
 //}
 
 #endif
+
+
+async Task pressAnyKeyToContinue()
+{
+    Console.WriteLine($"[Client] Pulse cualquier tecla para continuar ...");
+    _ = Console.ReadLine();
+    await Task.Delay(500);
+}

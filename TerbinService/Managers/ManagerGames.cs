@@ -4,6 +4,7 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Data;
 using TerbinLibrary.SteamFarlands;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.Useful;
 
 namespace TerbinService.Managers;
@@ -32,7 +33,7 @@ public static class ManagerGames
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.CrString("HandleCloneInInstanceWithProgress"));
+            e.PrintException("HandleCloneInInstanceWithProgress");
         }
 
     }

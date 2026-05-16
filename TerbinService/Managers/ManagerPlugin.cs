@@ -4,6 +4,7 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.Useful;
 using TerbinService.Services;
 
@@ -59,7 +60,7 @@ public static class ManagerPlugin
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.CrString("HandleInstallPluginWithProgress"));
+            e.PrintException("HandleInstallPluginWithProgress");
         }
     }
     public static async Task<StatusNetUtil?> SimpleInstallPlugin(
