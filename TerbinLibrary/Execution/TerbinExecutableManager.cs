@@ -6,6 +6,7 @@ using System.Text;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution.Collection;
 using TerbinLibrary.Memory;
+using TerbinLibrary.Protocol;
 using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;

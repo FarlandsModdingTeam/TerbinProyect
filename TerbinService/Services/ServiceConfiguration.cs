@@ -8,6 +8,7 @@ using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Extension;
 using static TerbinService.Managers.ManagerConfiguration;
+using TerbinLibrary.Protocol;
 
 namespace TerbinService.Services;
 /*

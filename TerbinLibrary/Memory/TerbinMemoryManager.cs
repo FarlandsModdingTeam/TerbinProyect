@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Id;
+using TerbinLibrary.Protocol;
 
 namespace TerbinLibrary.Memory;/*
  -- Variables:

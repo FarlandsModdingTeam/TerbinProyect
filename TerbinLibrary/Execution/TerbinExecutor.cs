@@ -6,6 +6,7 @@ using System.Text;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Memory;
+using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Execution;

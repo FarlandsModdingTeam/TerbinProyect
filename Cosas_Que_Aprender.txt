@@ -1,2 +1,8 @@
 - Linkq
 - unsafe
+- Operadores de bitwise (no se si hay más)
+	· "&" Separa los positivos
+	· "|" Combina
+	· "^" Invierte flag (no la entiendo)
+	· "~" Inverte
+

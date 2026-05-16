@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
+using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Communication.Packets;

@@ -9,8 +9,20 @@ using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
+using TerbinLibrary.Protocol;
 
 namespace TerbinService;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayusculas = publica.
+  empieza: minusculas = privada.
+ */
+
 
 internal partial class Template
 {

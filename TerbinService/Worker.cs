@@ -4,6 +4,7 @@ using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary;
 using TerbinLibrary.Execution;
+using TerbinLibrary.Protocol;
 
 namespace TerbinService;
 /*

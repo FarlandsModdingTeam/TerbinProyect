@@ -7,12 +7,12 @@ using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
-using TerbinLibrary;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Id;
 using TerbinLibrary.Memory;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Protocol;
 
 namespace TerbinLibrary.Communication;
 /*

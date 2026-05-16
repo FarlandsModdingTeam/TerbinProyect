@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Protocol;
 
 namespace TerbinLibrary.Memory;
 /*

@@ -6,7 +6,18 @@ using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution;
 
-namespace TerbinLibrary;
+namespace TerbinLibrary.Protocol;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayusculas = publica.
+  empieza: minusculas = privada.
+ */
+
 
 public class TerbinProtocol
 {
@@ -106,20 +117,12 @@ public enum CodeTerbinProtocol : byte
     // y el resto de cosas las deberia hacer el propio usuario, si se lo gestiona mal no es mi culpa.
 
     [Obsolete("Create yourself")]
-    Create = TerbinCRUD.Create,
-    [Obsolete("Create yourself")]
-    Read = TerbinCRUD.Read,
-    [Obsolete("Create yourself")]
-    Update = TerbinCRUD.Update,
-    [Obsolete("Create yourself")]
-    Deleted = TerbinCRUD.Deleted,
-}
-[Obsolete("Create yourself")]
-public enum TerbinCRUD : byte
-{
     Create = 6,
+    [Obsolete("Create yourself")]
     Read = 7,
+    [Obsolete("Create yourself")]
     Update = 8,
+    [Obsolete("Create yourself")]
     Deleted = 9,
 }
 
@@ -185,7 +188,6 @@ public enum CodeStatus : short
     ErrorGetPaylaodMemory = 571,
     ErrorReleaseMemory = 572,
 }
-
 
 
 

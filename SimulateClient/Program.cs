@@ -13,6 +13,7 @@ using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
+using TerbinLibrary.Protocol;
 
 
 

@@ -7,6 +7,17 @@ using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 
 namespace TerbinLibrary;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayusculas = publica.
+  empieza: minusculas = privada.
+ */
+
 
 // methods:
 public enum CodeServices : byte
@@ -42,6 +53,7 @@ public enum TypeService : byte
     Service = 1,
     SubService = 2,
 }
+
 
 public enum CodeInternalErrors : ushort
 {
