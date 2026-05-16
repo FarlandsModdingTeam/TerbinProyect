@@ -19,7 +19,7 @@ using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 var communicator = new TerbinCommunicator(false);
 TerbinExecutor.Register(Assembly.GetExecutingAssembly());
-communicator.OnRecive += TerbinExecutableManager.DispatchAsync;
+communicator.OnRecive += TerbinExecutableManagerSimple.DispatchAsync;
 
 if (await communicator.Connect())
 {

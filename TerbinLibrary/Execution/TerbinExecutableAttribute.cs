@@ -39,7 +39,7 @@ public sealed class TerbinExecutableAttribute(byte pAction) : Attribute, IExecut
 {
     public byte[] Action { get; } = new byte[] { pAction };
     public int Leght => Action.Length;
-    public Type Dispatcher => typeof(SimpleExecutableDispatcher);
+    public Type Dispatcher => typeof(ExecutableDispatcherSimple);
 }
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]

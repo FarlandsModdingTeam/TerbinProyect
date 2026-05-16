@@ -23,12 +23,12 @@ public static class TerbinExecutor
 
     public static void RegisterInternal()
     {
-        TerbinExecutableManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
+        TerbinExecutableManagerSimple.RegisterFromAssembly(Assembly.GetExecutingAssembly());
         TerbinExecutableManagerCompound.RegisterFromAssembly(Assembly.GetExecutingAssembly());
     }
     public static void Register(Assembly pAssembly)
     {
-        TerbinExecutableManager.RegisterFromAssembly(pAssembly);
+        TerbinExecutableManagerSimple.RegisterFromAssembly(pAssembly);
         TerbinExecutableManagerCompound.RegisterFromAssembly(pAssembly);
     }
 

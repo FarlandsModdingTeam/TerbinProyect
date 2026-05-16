@@ -59,7 +59,7 @@ public class Worker : BackgroundService
                 {
                     Communicator = communicator,
                 };
-                return await TerbinExecutableManager.DispatchAsync(pCapsule);
+                return await TerbinExecutableManagerSimple.DispatchAsync(pCapsule);
             };
             communicator.OnNewClientConnect += async () =>
             {

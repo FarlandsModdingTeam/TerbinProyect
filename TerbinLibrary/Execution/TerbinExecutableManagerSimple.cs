@@ -26,7 +26,7 @@ namespace TerbinLibrary.Execution;
 /// 
 /// </summary>
 [Obsolete]
-public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
+public sealed class ExecutableDispatcherSimple : IExecutableDispatcher
 {
     private readonly ConcurrentDictionary<byte, List<TerbinExecutableDelegate>> _handlers = new();
 
@@ -81,14 +81,14 @@ public sealed class SimpleExecutableDispatcher : IExecutableDispatcher
 
     public void RegisterFromAssembly(Assembly pAssembly)
     {
-        TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutableAttribute, SimpleExecutableDispatcher>(pAssembly, this);
+        TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutableAttribute, ExecutableDispatcherSimple>(pAssembly, this);
     }
 }
 
 [Obsolete]
-public static class TerbinExecutableManager
+public static class TerbinExecutableManagerSimple
 {
-    private static SimpleExecutableDispatcher _dispatcher = new();
+    private static ExecutableDispatcherSimple _dispatcher = new();
 
     public static void Register(IExecutableAttribute pAction, TerbinExecutableDelegate pHandler) =>
         _dispatcher.Register(pAction, pHandler);
