@@ -20,11 +20,13 @@ namespace TerbinLibrary.Serialize;
 
 public interface IStructSerializable
 {
+    // TODO: no tiene sentido que sea un ushort si un array es un tresCuartosInt.
     ushort GetSize();
     void WriteTo(Span<byte> pBuffer);
     void ReadFrom(ReadOnlySpan<byte> pBuffer);
 }
 
+// TODO: La parte estatica solo deberia contener Raw y no añadir largo.
 public class Serialineitor
 {
     private byte[] _content;
@@ -105,6 +107,7 @@ public class Serialineitor
 
     // ******************************( Parte Estatic )****************************** //
     // TODO: Que no dependa de los Buffers sino al reve.
+    // TODO: Solo deberia contener Raw y no añadir largo.
 
     public static byte[] SerializeStructConst<T>(T pStruct) where T : struct
     {
@@ -132,20 +135,20 @@ public class Serialineitor
     }
 
     
-    public static byte[] SerializeStruct<T>(T pStruct) where T : struct, IStructSerializable
+    public static byte[] SerializeStructRaw<T>(T pStruct) where T : struct, IStructSerializable
     {
         byte[] buffer = new byte[pStruct.GetSize()]; // sizeof(T) // unsafe
         pStruct.WriteTo(buffer);
         return buffer;
     }
-    public static T DeserializeStruct<T>(byte[] pBuffer) where T : struct, IStructSerializable
+    public static T DeserializeStructRaw<T>(byte[] pBuffer) where T : struct, IStructSerializable
     {
         T newStruct = new();
         newStruct.ReadFrom(pBuffer);
         return newStruct;
     }
 
-
+    [Obsolete("utilice Raw o Buffer")]
     public static byte[] SerializeArray<T>(T[] pArray)
         where T : unmanaged
     {
@@ -162,12 +165,14 @@ public class Serialineitor
         bytes.CopyTo(newArray.AsSpan()[pOffset..]);
         return newArray;
     }
+    [Obsolete("utilice Raw o Buffer")]
     public static T[] DeserializeArray<T>(byte[] pArray)
         where T : unmanaged
     {
         int offset = 0;
         return BufferReader.GetArray<T>(pArray, ref offset);
     }
+    [Obsolete("utilice Raw o Buffer")]
     public static T[] DeserializeArray<T>(ref byte[] pArray)
         where T : unmanaged
     {

@@ -29,7 +29,7 @@ public class StreamWriteStruct : StreamBytes
         if (pStruct.GetSize() > ushort.MaxValue)
             throw new ArgumentOutOfRangeException("(StreamWriteStruct>WriteAsycn): Struct large overflow ushort max");
 
-        byte[] buffer = Serialineitor.SerializeStruct<T>(pStruct);
+        byte[] buffer = Serialineitor.SerializeStructRaw<T>(pStruct);
 
         byte[] lengthPrefix = BitConverter.GetBytes((ushort)buffer.Length);
         try
@@ -61,7 +61,7 @@ public class StreamReadStruct : StreamBytes
         try
         {
             byte[] buffer = await base.ReadBytesAsycn(packetLength, pToken);
-            return Serialineitor.DeserializeStruct<T>(buffer);
+            return Serialineitor.DeserializeStructRaw<T>(buffer);
         }
         catch (Exception e)
         {

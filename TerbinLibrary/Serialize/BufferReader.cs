@@ -44,7 +44,7 @@ public class BufferReader
         where T : struct, IStructSerializable
     {
         ushort lenth = pStruct.GetSize();
-        T newStruct = Serialineitor.DeserializeStruct<T>(pBuffer[pOffset..(pOffset+lenth)].ToArray());
+        T newStruct = Serialineitor.DeserializeStructRaw<T>(pBuffer[pOffset..(pOffset+lenth)].ToArray());
         pOffset += lenth;
         return newStruct;
     }
@@ -74,7 +74,7 @@ public static class BufferReaderExtension
         where T : struct, IStructSerializable
     {
         var length = pStruct.GetSize();
-        T newStruct = Serialineitor.DeserializeStruct<T>(pBuffer[..length].ToArray());
+        T newStruct = Serialineitor.DeserializeStructRaw<T>(pBuffer[..length].ToArray());
         pBuffer = pBuffer[length..];
         return newStruct;
     }

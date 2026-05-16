@@ -55,7 +55,7 @@ public class BufferWriter
     public static void AddStruct<T>(Span<byte> pBuffer, ref int pOffset, T pStruct)
         where T : struct, IStructSerializable
     {
-        byte[] strucBytes = Serialineitor.SerializeStruct(pStruct);
+        byte[] strucBytes = Serialineitor.SerializeStructRaw(pStruct);
         strucBytes.CopyTo(pBuffer[pOffset..]);
         pOffset += strucBytes.Length;
     }
@@ -118,7 +118,7 @@ public static class BufferWriterExtension
     public static BufferErrorCode WriteStruct<T>(this ref Span<byte> pBuffer, T pStruct)
         where T : struct, IStructSerializable
     {
-        byte[] strucBytes = Serialineitor.SerializeStruct(pStruct);
+        byte[] strucBytes = Serialineitor.SerializeStructRaw(pStruct);
 
         if (pBuffer.Length < strucBytes.Length)
             return BufferErrorCode.BufferSmall;
