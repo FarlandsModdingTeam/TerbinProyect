@@ -26,7 +26,7 @@ namespace TerbinLibrary.Execution;
 /// <summary>
 /// 
 /// </summary>
-public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
+public sealed class ExecutableDispatcher : IExecutableDispatcher
 {
     // (byte action, byte subAction), ByteArrayKey
     // Es un object porque solo necesito el Has, al no poner ByteArrayKey me ahorro una conversion en TryGetValue.
@@ -110,13 +110,13 @@ public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
 
     public void RegisterFromAssembly(Assembly pAssembly)
     {
-        TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutableCompoundAttribute, CompoundExecutableDispatcher>(pAssembly, this);
+        TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutableCompoundAttribute, ExecutableDispatcher>(pAssembly, this);
     }
 }
 
-public static class TerbinExecutableManagerCompound
+public static class TerbinExecutableManager
 {
-    private static CompoundExecutableDispatcher _dispatcher = new();
+    private static ExecutableDispatcher _dispatcher = new();
 
     public static void Register(IExecutableAttribute pAction, TerbinExecutableDelegate pHandler) =>
         _dispatcher.Register(pAction, pHandler);

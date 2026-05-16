@@ -47,5 +47,5 @@ public sealed class TerbinExecutableCompoundAttribute(params byte[] pAction) : A
 {
     public byte[] Action { get; } = pAction;
     public int Leght => Action.Length;
-    public Type Dispatcher => typeof(CompoundExecutableDispatcher);
+    public Type Dispatcher => typeof(ExecutableDispatcher);
 }
