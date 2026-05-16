@@ -5,9 +5,10 @@ using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution.Collection;
+using TerbinLibrary.Memory;
 using TerbinLibrary.TerbinServiceHelper;
-using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
 
 
 namespace TerbinLibrary.Execution;
@@ -57,17 +58,33 @@ public sealed class CompoundExecutableDispatcher : IExecutableDispatcher
     {
         if (!_handlers.TryGetValue(pActions, out var handlers))
         {
+            Console.Warn("--(Print Has, handlres no encontrados)--");
             TSHelper.Debug.PrintHas(pActions);
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.SubActionNotFound);
+            var keys = _handlers.Keys;
+            TSHelper.Debug.PrintHas(keys.ToArray());
+            TSHelper.Debug.PrintAllHas(keys.ToArray());
+
+            TerbinMemoryHelper.TryReleaseMemory(pHead.IdMemory);
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ActionNotFound);
         }
 
         try
         {
+            if (pHead.Status == CodeStatus.CheckExecution)
+                return InfoResponse.CreateSucces(pHead.IdRequest);
+
+            if (pActions[0] == (byte)CodeTerbinProtocol.Response)
+            {
+                for (int i = 0; i < handlers.Count; i++)
+                    _ = handlers[i](pHead, pPayload);
+                return null; // Por si alguien hace el bruto.
+            }
+
             return await TerbinExecutableHelper.ExecutionList(handlers, pHead, pPayload);
         }
         catch (Exception e)
         {
-            Console.WriteLine(e.CrString("CompoundExecutableDispatcher>DispatchAsync"));
+            e.PrintException("CompoundExecutableDispatcher>DispatchAsync");
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionException);
         }
     }
