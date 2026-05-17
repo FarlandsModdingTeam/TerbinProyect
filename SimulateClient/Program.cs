@@ -62,7 +62,7 @@ async Task installMod()
 
 
     Console.Write($"-------( Start )---------\n" +
-        $"[Client] (Pon el nombre de la puñetera instancia cara alpargata)\n" +
+        $"[Client] (Pon el nombre de la tripodetica instancia cara alpargata)\n" +
         $"[Client] Action -> ");
    nameInstace = Console.ReadLine();
     if (nameInstace == null)
