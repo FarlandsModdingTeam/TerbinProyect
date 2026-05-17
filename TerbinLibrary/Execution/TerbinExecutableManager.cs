@@ -31,6 +31,7 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
 {
     // (byte action, byte subAction), ByteArrayKey
     // Es un object porque solo necesito el Has, al no poner ByteArrayKey me ahorro una conversion en TryGetValue.
+    // Recuerda utilizar un objeto que Implemente un algoritmo para que el HasCode sea igual en los array como el de IdArray.
     private readonly ConcurrentDictionary<object, List<TerbinExecutableDelegate>> _handlers = new();
 
     public void Register(IExecutableAttribute pSubAction, TerbinExecutableDelegate pHandler)

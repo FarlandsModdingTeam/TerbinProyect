@@ -5,6 +5,7 @@ using TerbinLibrary.Communication.Packets;
 using TerbinLibrary;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
 
 namespace TerbinService;
 /*
@@ -60,7 +61,7 @@ public class Worker : BackgroundService
                 {
                     Communicator = communicator,
                 };
-                return await TerbinExecutableManagerSimple.DispatchAsync(pCapsule);
+                return await TerbinExecutableManager.DispatchAsync(pCapsule.Head, pCapsule.Payload, pCapsule.ActionMethod);
             };
             communicator.OnNewClientConnect += async () =>
             {
@@ -69,7 +70,7 @@ public class Worker : BackgroundService
         }
         catch (Exception e)
         {
-            Console.WriteLine($"[Worker] Error-> {e.Message}");
+            e.PrintException("Worker>autoCreatePipe");
         }
     }
 

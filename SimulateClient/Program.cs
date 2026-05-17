@@ -30,13 +30,13 @@ await pressAnyKeyToContinue();
 #else
 var communicator = new TerbinCommunicator(false);
 TerbinExecutor.Register(Assembly.GetExecutingAssembly());
-communicator.OnRecive += async p => {
-
-    var r = await TerbinExecutableManager.DispatchAsync(p.Head, p.Payload, p.ActionMethod.To);
+communicator.OnRecive += async p =>
+{
     //CurrentConst.Value = new AmongInfoThreads
     //{
     //    Communicator = communicator,
     //};
+    return await TerbinExecutableManager.DispatchAsync(p.Head, p.Payload, p.ActionMethod);
 };
 
 if (await communicator.Connect())
@@ -74,9 +74,8 @@ async Task installMod()
 
     Console.WriteLine($"[Client] Get Ruta Instancias");
     s = new Serialineitor()
-                .Add((byte)CodeSubServices.Rute)
                 .AddArray(TerbinConfiguration.RUTE_INSTANCES.ToCharArray());
-    r = await communicator.Communicate((byte)CodeTerbinProtocol.Read, s.Serialize());
+    r = await communicator.Communicate([(byte)TerbinCRUD.Read, (byte)CodeSubServices.Rute], s.Serialize());
     Console.WriteLine($"[Client] 1 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (r.Head.Status != CodeStatus.Succes) return;
 
