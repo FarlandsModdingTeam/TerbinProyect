@@ -5,6 +5,7 @@ using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -39,7 +40,7 @@ public class StreamWriteStruct : StreamBytes
         }
         catch (Exception e)
         {
-            Console.WriteLine($"[StreamWriteStruct>WriteAsycn] ExceptionError-> {e.Message}");
+            e.PrintException("StreamWriteStruct>WriteAsycn");
             throw;
         }
     }
@@ -65,7 +66,7 @@ public class StreamReadStruct : StreamBytes
         }
         catch (Exception e)
         {
-            Console.WriteLine($"[StreamWriteStruct>ReadAsycn] ExceptionError-> {e.Message}");
+            e.PrintException("StreamWriteStruct>ReadAsycn");
             throw;
         }
     }

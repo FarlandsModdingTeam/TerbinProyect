@@ -13,6 +13,7 @@ using TerbinLibrary.Memory;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -379,7 +380,7 @@ public class TerbinCommunicator : IDisposable
             }
             catch (Exception e)
             {
-                Console.WriteLine($"[TerbinCommunicator>manageReceive] ExceptionError-> {e.Message}");
+                e.PrintException("TerbinCommunicator>manageReceive");
                 break;
             }
         }
@@ -407,7 +408,7 @@ public class TerbinCommunicator : IDisposable
             catch (Exception e)
             {
                 // TODO: Logger.
-                Console.WriteLine($"[TerbinCommunicator>manageSend] ExceptionError-> {e.Message}");
+                e.PrintException("TerbinCommunicator>manageSend");
                 break;
             }
             finally
