@@ -57,6 +57,18 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
             throw new OverflowException($"Actionre overflow byte max");
         this._actionMethod = pAction;
     }
+    public IdArray(params object[] pAction)
+    {
+        ArgumentNullException.ThrowIfNull(pAction);
+        if (pAction.Length > byte.MaxValue)
+            throw new OverflowException($"Actionre overflow byte max");
+
+        byte[] tmp = new byte[pAction.Length];
+        for (int i = 0; i < pAction.Length; i++)
+            if (pAction[i] is byte b)
+                tmp[i] = b;
+        this._actionMethod = tmp;
+    }
 
     public readonly override bool Equals(object? obj)
     {

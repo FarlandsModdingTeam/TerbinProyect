@@ -75,7 +75,7 @@ async Task installMod()
     Console.WriteLine($"[Client] Get Ruta Instancias");
     s = new Serialineitor()
                 .AddArray(TerbinConfiguration.RUTE_INSTANCES.ToCharArray());
-    r = await communicator.Communicate([(byte)TerbinCRUD.Read, (byte)CodeSubServices.Rute], s.Serialize());
+    r = await communicator.Communicate(new(TerbinCRUD.Read, CodeSubServices.Rute), s.Serialize());
     Console.WriteLine($"[Client] 1 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (r.Head.Status != CodeStatus.Succes) return;
 
@@ -86,9 +86,8 @@ async Task installMod()
 
     Console.WriteLine($"[Client] Get Ruta Farlsnds");
     s = new Serialineitor()
-                .Add((byte)CodeSubServices.Rute)
                 .AddArray(TerbinConfiguration.RUTE_FARLANDS.ToCharArray());
-    r = await communicator.Communicate((byte)CodeTerbinProtocol.Read, s.Serialize());
+    r = await communicator.Communicate(new(TerbinCRUD.Read, CodeSubServices.Rute), s.Serialize());
     Console.WriteLine($"[Client] 2 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (r.Head.Status != CodeStatus.Succes) return;
 
@@ -99,9 +98,8 @@ async Task installMod()
     //await pressAnyKeyToContinue();
     Console.WriteLine($"[Client] Creamos instancia");
     s = new Serialineitor()
-                .Add((byte)CodeSubServices.Instances)
                 .AddArray(nameInstace.ToCharArray());
-    r = await communicator.Communicate((byte)CodeTerbinProtocol.Create, s.Serialize());
+    r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Instances), s.Serialize());
     Console.WriteLine($"[Client] 3 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (r.Head.Status != CodeStatus.Succes) return;
 
@@ -109,10 +107,9 @@ async Task installMod()
     //await pressAnyKeyToContinue();
     Console.WriteLine($"[Client] Clonamos Farlands");
     s = new Serialineitor()
-                .Add((byte)CodeSubServices.Game)
                 .AddArray(nameInstace.ToCharArray())
                 .AddArray(pathFarlands.ToCharArray());
-    r = await communicator.Communicate((byte)CodeTerbinProtocol.Create, s.Serialize());
+    r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Game), s.Serialize());
     Console.WriteLine($"[Client] 4 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (r.Head.Status != CodeStatus.Succes) return;
 
@@ -120,11 +117,10 @@ async Task installMod()
     //await pressAnyKeyToContinue();
     Console.WriteLine($"[Client] Instalamos BepInEx");
     s = new Serialineitor()
-                .Add((byte)CodeSubServices.Plugin)
                 .AddArray(nameInstace.ToCharArray())
                 .AddArray(TerbinURLs.BepInEx.ToCharArray())
                 .Add(false);
-    r = await communicator.Communicate((byte)CodeTerbinProtocol.Create, s.Serialize());
+    r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Plugin), s.Serialize());
     Console.WriteLine($"[Client] 5 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (r.Head.Status != CodeStatus.Succes) return;
 
