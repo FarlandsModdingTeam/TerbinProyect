@@ -178,7 +178,7 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
         return false;
     }
 
-    // Esto ya esta inventado y se llama Linq, pero esa chulo hacerlo uno mismo.
+    // Esto ya esta inventado y se llama Linq, pero esta chulo hacerlo uno mismo.
     public bool Operate(Predicate<byte> pMonk, Func<byte, byte> pTransform)
     {
         for (int i = 0; i < _actionMethod.Length; i++)
