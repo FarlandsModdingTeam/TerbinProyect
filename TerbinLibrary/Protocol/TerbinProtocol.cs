@@ -116,14 +116,14 @@ public enum CodeTerbinProtocol : byte
     // La realidad esque CodeTerbinProtocol solo deberia contener lo minimo para el protocolo \
     // y el resto de cosas las deberia hacer el propio usuario, si se lo gestiona mal no es mi culpa.
 
-    //[Obsolete("Create yourself")]
-    //Create = 6,
-    //[Obsolete("Create yourself")]
-    //Read = 7,
-    //[Obsolete("Create yourself")]
-    //Update = 8,
-    //[Obsolete("Create yourself")]
-    //Deleted = 9,
+    [Obsolete("Create yourself or use TerbinLibrary.Protocol.TerbinCRUD", true)]
+    Create = 6,
+    [Obsolete("Create yourself or use TerbinLibrary.Protocol.TerbinCRUD", true)]
+    Read = 7,
+    [Obsolete("Create yourself or use TerbinLibrary.Protocol.TerbinCRUD", true)]
+    Update = 8,
+    [Obsolete("Create yourself or use TerbinLibrary.Protocol.TerbinCRUD", true)]
+    Deleted = 9,
 }
 
 // Creo que None y NotAsign es lo mismo.

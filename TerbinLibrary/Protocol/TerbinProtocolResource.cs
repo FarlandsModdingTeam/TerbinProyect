@@ -43,6 +43,9 @@ public class TerbinProtocolResource
 
 public enum TerbinCRUD : byte
 {
+    ReadAll = 250,
+    Duplicate = 251,
+
     Create = 252,
     Read = 253,
     Update = 254,
