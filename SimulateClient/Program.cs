@@ -56,7 +56,6 @@ async Task installMod()
 {
     string? nameInstace, pathInstaces, pathInstace, pathFarlands;
     char[] nameArray;
-    byte[] pld;
     PacketRequest r;
     Serialineitor s;
 
@@ -75,9 +74,9 @@ async Task installMod()
     Console.WriteLine($"[Client] Get Ruta Instancias");
     s = new Serialineitor()
                 .AddArray(TerbinConfiguration.RUTE_INSTANCES.ToCharArray());
-    r = await communicator.Communicate(new(TerbinCRUD.Read, CodeSubServices.Rute), s.Serialize());
+    r = await communicator.Communicate(new IdArray(TerbinCRUD.Read, CodeSubServices.Rute), s.Serialize());
     Console.WriteLine($"[Client] 1 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-    if (r.Head.Status != CodeStatus.Succes) return;
+    if (await isError(r.Head.Status)) return;
 
     ReadOnlySpan<byte> reader = r.Payload;
     pathInstaces = reader.ReadArray<char>().CrString();
@@ -89,7 +88,7 @@ async Task installMod()
                 .AddArray(TerbinConfiguration.RUTE_FARLANDS.ToCharArray());
     r = await communicator.Communicate(new(TerbinCRUD.Read, CodeSubServices.Rute), s.Serialize());
     Console.WriteLine($"[Client] 2 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-    if (r.Head.Status != CodeStatus.Succes) return;
+    if (await isError(r.Head.Status)) return;
 
     ReadOnlySpan<byte> reader1 = r.Payload;
     pathFarlands = reader1.ReadArray<char>().CrString();
@@ -101,7 +100,7 @@ async Task installMod()
                 .AddArray(nameInstace.ToCharArray());
     r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Instances), s.Serialize());
     Console.WriteLine($"[Client] 3 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-    if (r.Head.Status != CodeStatus.Succes) return;
+    if (await isError(r.Head.Status)) return;
 
 
     await pressAnyKeyToContinue();
@@ -111,7 +110,7 @@ async Task installMod()
                 .AddArray(pathFarlands.ToCharArray());
     r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Game), s.Serialize());
     Console.WriteLine($"[Client] 4 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-    if (r.Head.Status != CodeStatus.Succes) return;
+    if (await isError(r.Head.Status)) return;
 
 
     await pressAnyKeyToContinue();
@@ -122,7 +121,7 @@ async Task installMod()
                 .Add(false);
     r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Plugin), s.Serialize());
     Console.WriteLine($"[Client] 5 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-    if (r.Head.Status != CodeStatus.Succes) return;
+    if (await isError(r.Head.Status)) return;
 
 
     await pressAnyKeyToContinue();
@@ -133,7 +132,7 @@ async Task installMod()
                 .Add(true);
     r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Plugin), s.Serialize());
     Console.WriteLine($"[Client] 6 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-    if (r.Head.Status != CodeStatus.Succes) return;
+    if (await isError(r.Head.Status)) return;
 
 
     await pressAnyKeyToContinue();
@@ -144,10 +143,10 @@ async Task installMod()
                 .Add(true);
     r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Plugin), s.Serialize());
     Console.WriteLine($"[Client] 7 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-    if (r.Head.Status != CodeStatus.Succes) return;
+    if (await isError(r.Head.Status)) return;
 
 
-    Console.WriteLine($"[Client] 8 Final --");
+    Console.WriteLine($"[Client] 8 Final -----------------------------------------------------------");
     await pressAnyKeyToContinue();
 }
 
@@ -356,7 +355,16 @@ async Task manuallity()
 
 #endif
 
-
+async Task<bool> isError(CodeStatus pStatus)
+{
+    if (pStatus != CodeStatus.Succes)
+    {
+        Console.WriteLine($"Error: {pStatus}");
+        await pressAnyKeyToContinue();
+        return true;
+    }
+    return false;
+}
 async Task pressAnyKeyToContinue()
 {
     Console.WriteLine($"[Client] Pulse cualquier tecla para continuar ...");

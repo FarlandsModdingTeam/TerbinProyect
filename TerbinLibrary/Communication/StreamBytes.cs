@@ -57,10 +57,10 @@ public class StreamReadStruct : StreamBytes
         if (lengthBuffer.Length != 2)
             throw new InvalidOperationException($"(StreamReadStruct>ReadAsycn): Expected 2 bytes for length header, got {lengthBuffer.Length}");
 
-        ushort packetLength = BitConverter.ToUInt16(lengthBuffer, 0); // ToUInt16
-
         try
         {
+            ushort packetLength = BitConverter.ToUInt16(lengthBuffer, 0); // ToUInt16
+
             byte[] buffer = await base.ReadBytesAsycn(packetLength, pToken);
             return Serialineitor.DeserializeStructRaw<T>(buffer);
         }

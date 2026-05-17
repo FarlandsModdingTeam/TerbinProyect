@@ -32,7 +32,7 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
     // (byte action, byte subAction), ByteArrayKey
     // Es un object porque solo necesito el Has, al no poner ByteArrayKey me ahorro una conversion en TryGetValue.
     // Recuerda utilizar un objeto que Implemente un algoritmo para que el HasCode sea igual en los array como el de IdArray.
-    private readonly ConcurrentDictionary<object, List<TerbinExecutableDelegate>> _handlers = new();
+    private readonly ConcurrentDictionary<ByteArrayKey, List<TerbinExecutableDelegate>> _handlers = new();
 
     public void Register(IExecutableAttribute pSubAction, TerbinExecutableDelegate pHandler)
     {
@@ -40,7 +40,7 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
         if (pSubAction.Action.Length <= 0) throw new ArgumentException("No action.", nameof(pSubAction));
 
         // Es ahorrarme una linea ya escrita pero me da rabia, ¿Como me ahorro un Add?.
-        bool inHandlres = _handlers.TryGetValue(pSubAction.Action, out var listDelegates);
+        bool inHandlres = _handlers.TryGetValue((ByteArrayKey)pSubAction.Action, out var listDelegates);
         if (inHandlres)
 #pragma warning disable CS8602 // Desreferencia de una referencia posiblemente NULL.
             listDelegates.Add(pHandler);
@@ -54,17 +54,29 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
         }
     }
 
-    public bool Unregister(params byte[] pActions) => _handlers.TryRemove(pActions, out _);
+    public bool Unregister(ByteArrayKey pActions) => _handlers.TryRemove(pActions, out _);
 
-    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, params byte[] pActions)
+    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IdArray pActions)
     {
-        if (!_handlers.TryGetValue(pActions, out var handlers))
+        if (!_handlers.TryGetValue((ByteArrayKey)pActions, out var handlers))
         {
-            Console.Warn("--(Print Has, handlres no encontrados)--");
-            TSHelper.Debug.PrintHas(pActions);
+            Console.Warn("--(Printeando Has porque handlres no encontrados)--");
+            Console.Warn("Has de la accion");
+            TSHelper.Debug.PrintHasByT(pActions);
             var keys = _handlers.Keys;
-            TSHelper.Debug.PrintHas(keys.ToArray());
+            Console.Warn("PrintHas");
+            TSHelper.Debug.PrintHasByT(keys.ToArray());
+            Console.Warn("PrintAllHas");
             TSHelper.Debug.PrintAllHas(keys.ToArray());
+
+            Console.Warn("Exodia");
+            ByteArrayKey claveBuscada = (ByteArrayKey)pActions;
+            Console.WriteLine($"Buscando -> Hash: {claveBuscada.GetHashCode()} | Bytes: {string.Join("-", claveBuscada)}");
+
+            foreach (var kvp in _handlers)
+            {
+                Console.WriteLine($"En Diccionario -> Hash: {kvp.Key.GetHashCode()} | Bytes: {string.Join("-", kvp.Key)}");
+            }
 
             TerbinMemoryHelper.TryReleaseMemory(pHead.IdMemory);
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ActionNotFound);
@@ -126,7 +138,7 @@ public static class TerbinExecutableManager
     public static bool Unregister(params byte[] pActions) =>
         _dispatcher.Unregister(pActions);
 
-    public static async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, params byte[] pActions) =>
+    public static async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IdArray pActions) =>
         await _dispatcher.DispatchAsync(pHead, pPayload, pActions);
 
     public static void RegisterFromAssembly(Assembly pAssembly) =>

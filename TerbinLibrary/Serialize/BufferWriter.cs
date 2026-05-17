@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace TerbinLibrary.Serialize;
 /*

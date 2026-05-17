@@ -23,7 +23,7 @@ public readonly struct ByteArrayKey : IEnumerable<byte>, IEquatable<ByteArrayKey
 
     public ByteArrayKey(byte[] pData)
     {
-        _data = pData ?? throw new ArgumentNullException(nameof(pData));
+        _data = (byte[])pData.Clone() ?? throw new ArgumentNullException(nameof(pData));
     }
 
     public override bool Equals(object? obj)

@@ -53,7 +53,7 @@ public class TSHelper
         {
             Console.Log($"{pObj.GetType()}: {pObj.GetHashCode()}");
         }
-        public static void PrintHas<T>(T pObj) where T : notnull
+        public static void PrintHasByT<T>(T pObj) where T : notnull
         {
             Console.Log($"{pObj.GetType()}: {pObj.GetHashCode()}");
         }

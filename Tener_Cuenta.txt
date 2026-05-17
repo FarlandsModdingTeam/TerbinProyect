@@ -1,1 +1,3 @@
 - Al cambiar la direccion de las instancias hay que bloquear porque puedes estar haciendo cualquier cosa dentro
+
+- Evitar a toda costa direcciones absolutas y menos _Manifest no deberia tener direcciones absolutas.

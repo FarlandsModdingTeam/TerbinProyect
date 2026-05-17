@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Execution.Collection;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace TerbinLibrary.Communication.Packets;
 /*
@@ -65,8 +66,18 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
 
         byte[] tmp = new byte[pAction.Length];
         for (int i = 0; i < pAction.Length; i++)
+        {
             if (pAction[i] is byte b)
+            {
                 tmp[i] = b;
+            }
+            else if (pAction[i] != null && pAction[i].GetType().IsEnum)
+            {
+                // Convierte de manera segura cualquier enum subyacente a su valor numérico real
+                tmp[i] = Convert.ToByte(pAction[i]);
+            }
+            // Opcional: podrías añadir un else throw si quieres que falle explícitamente ante un tipo inválido.
+        }
         this._actionMethod = tmp;
     }
 
@@ -112,7 +123,12 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
         ActionMethod = pActionMethod;
     }
 
-    public readonly ushort GetSize() => (ushort)(_actionMethod.Length + 1);
+    public readonly ushort GetSize() => (ushort)((_actionMethod?.Length ?? 0) + 1);
+    //public readonly ushort GetSize()
+    //{
+    //    Console.Log($"Leng: {_actionMethod.Length} + 1 = {_actionMethod.Length+1}");
+    //    return (ushort)(_actionMethod.Length + 1);
+    //}
 
     public readonly void WriteTo(Span<byte> pBuffer)
     {
@@ -120,7 +136,7 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
             throw new OverflowException("Over Size Action Method");
         int offset = 0;
         pBuffer.Write<byte>(ref offset, (byte)_actionMethod.Length);
-        Span<byte> bytes = Serialineitor.SerializeArrayRaw<byte>(_actionMethod, _actionMethod.Length).AsSpan();
+        Span<byte> bytes = Serialineitor.SerializeArrayRaw<byte>(_actionMethod).AsSpan();
         bytes.CopyTo(pBuffer[offset..]);
     }
 
@@ -220,5 +236,7 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
 
     public static implicit operator IdArray(byte[] pData) => new IdArray(pData);
     public static implicit operator IdArray(ByteArrayKey pData) => new IdArray(pData);
+
+    public static implicit operator ByteArrayKey(IdArray pData) => new ByteArrayKey(pData);
     public static implicit operator byte[](IdArray pKey) => pKey._actionMethod;
 }

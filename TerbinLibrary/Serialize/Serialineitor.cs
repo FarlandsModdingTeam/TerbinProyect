@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace TerbinLibrary.Serialize;
 /*
@@ -26,7 +27,9 @@ public interface IStructSerializable
     void ReadFrom(ReadOnlySpan<byte> pBuffer);
 }
 
+// TODO: Abrir Minecraft si es mejor Raw o otra cosa.
 // TODO: La parte estatica solo deberia contener Raw y no añadir largo.
+// Los Raw no deberian avanzar offset.
 public class Serialineitor
 {
     private byte[] _content;
@@ -157,13 +160,11 @@ public class Serialineitor
         BufferWriter.AddArray<T>(newArray, ref offset, pArray);
         return newArray;
     }
-    public static byte[] SerializeArrayRaw<T>(T[] pArray, int pOffset = 0) // TODO: Un deserialize Raw.
+    public static byte[] SerializeArrayRaw<T>(T[] pArray)
         where T : unmanaged
     {
-        byte[] newArray = new byte[pArray.Length * Unsafe.SizeOf<T>()];
         Span<byte> bytes = MemoryMarshal.AsBytes(pArray.AsSpan());
-        bytes.CopyTo(newArray.AsSpan()[pOffset..]);
-        return newArray;
+        return bytes.ToArray();
     }
     [Obsolete("utilice Raw o Buffer")]
     public static T[] DeserializeArray<T>(byte[] pArray)
@@ -179,10 +180,11 @@ public class Serialineitor
         ReadOnlySpan<byte> buffer = pArray;
         return buffer.ReadArray<T>();
     }
-    public static T[] DeserializeArrayRaw<T>(ReadOnlySpan<byte> pArray, int pLenght = 0)
+    public static T[] DeserializeArrayRaw<T>(ReadOnlySpan<byte> pArray, int? pLenght = null)
         where T : unmanaged
     {
-        T[] newArray = MemoryMarshal.Cast<byte, T>(pArray[..pLenght]).ToArray();
+        pLenght ??= pArray.Length;
+        T[] newArray = MemoryMarshal.Cast<byte, T>(pArray[..pLenght.Value]).ToArray();
         return newArray;
     }
 
