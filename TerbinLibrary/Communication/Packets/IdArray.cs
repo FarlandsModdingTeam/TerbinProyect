@@ -146,12 +146,10 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
 
     public void CopyTo(Array pArray, int pIndex)
     {
-        if (pArray is null)
-            throw new ArgumentNullException(nameof(pArray));
+        ArgumentNullException.ThrowIfNull(pArray);
         if (pArray.Rank != 1)
             throw new ArgumentException("Array must be one-dimensional.", nameof(pArray));
-        if (pIndex < 0)
-            throw new ArgumentOutOfRangeException(nameof(pIndex));
+        ArgumentOutOfRangeException.ThrowIfNegative(pIndex);
         if (pArray.Length - pIndex < _actionMethod.Length)
             throw new ArgumentException("Destination array is not long enough.");
 
