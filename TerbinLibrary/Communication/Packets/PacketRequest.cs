@@ -32,21 +32,21 @@ public struct PacketRequest : IStructSerializable
     }
 
     public PacketRequest(Header? pHead = null)
-        : this (pHead, (byte[]?)null, (byte[]?)null)
+        : this (pHead, (IdArray?)null, (byte[]?)null)
     { }
-    public PacketRequest(
-        Header? pHead = null,
-        byte[]? pActionMethod = null,
-        byte[]? pPayload = null)
-        : this (pHead, new IdArray(pActionMethod ?? [(byte)CodeTerbinProtocol.Response]), pPayload)
-    { }
+    //public PacketRequest(
+    //    Header? pHead = null,
+    //    byte[]? pActionMethod = null,
+    //    byte[]? pPayload = null)
+    //    : this(pHead, new IdArray(pActionMethod ?? [(byte)CodeTerbinProtocol.Response]), pPayload)
+    //{ }
     public PacketRequest(
         Header? pHead = null,
         IdArray? pActionMethod = null,
         byte[]? pPayload = null)
     {
         Head = pHead ?? new Header();
-        ActionMethod = pActionMethod ?? new IdArray([(byte)CodeTerbinProtocol.Response]);
+        ActionMethod = pActionMethod ?? new IdArray(CodeTerbinProtocol.Response);
         Payload = pPayload ?? [];
     }
 
@@ -102,7 +102,7 @@ public struct PacketRequest : IStructSerializable
     {
         pHead.IdMemory = (byte)CodeTerbinMemory.NotAsign;
         pHead.OrderRequest = TerbinProtocol.ORDER_SINGLE;
-        return new PacketRequest(pHead, [(byte)CodeTerbinProtocol.Response], pPayload);
+        return new PacketRequest(pHead, new IdArray(CodeTerbinProtocol.Response), pPayload);
     }
 
     /*
