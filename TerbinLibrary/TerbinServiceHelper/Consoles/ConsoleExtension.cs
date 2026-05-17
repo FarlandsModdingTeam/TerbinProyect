@@ -34,6 +34,10 @@ public static class ConsoleExtension
         {
             Console.PrintLn(pMsg, ConsoleColor.Red);
         }
+        public static void Succes(string pMsg)
+        {
+            Console.PrintLn(pMsg, ConsoleColor.Green);
+        }
 
         public static void PrintLn(string pMsg, ConsoleColor pColor = ConsoleColor.White)
         {
