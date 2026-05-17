@@ -167,27 +167,40 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
 
     public bool Remove(byte pItem)
     {
-        return Operate(b => b == pItem, (b) => { return new byte(); });
-    }
-
-    public bool Operate(Predicate<byte> pMonk, Func<byte, byte?> pTransform)
-    {
+        //return Operate(b => b == pItem, _ => 0);
         for (int i = 0; i < _actionMethod.Length; i++)
         {
-            if (pMonk(_actionMethod[i]))
+            if (_actionMethod[i] == pItem)
             {
-                _actionMethod[i] = pTransform(_actionMethod[i]) ?? _actionMethod[i];
+                Array.Copy(_actionMethod, i + 1, _actionMethod, i, _actionMethod.Length - i - 1);
+                Array.Resize(ref _actionMethod, _actionMethod.Length - 1);
                 return true;
             }
         }
         return false;
     }
-    public void OperateInfinite(Predicate<byte> pMonk, Func<byte, byte?> pTransform)
+
+    // Esto ya esta inventado y se llama Linq, pero esa chulo hacerlo uno mismo.
+    public bool Operate(Predicate<byte> pMonk, Func<byte, byte> pTransform)
     {
         for (int i = 0; i < _actionMethod.Length; i++)
         {
-            if (pMonk(_actionMethod[i]))
-                _actionMethod[i] = pTransform(_actionMethod[i]) ?? _actionMethod[i];
+            byte item = _actionMethod[i];
+            if (pMonk(item))
+            {
+                _actionMethod[i] = pTransform(item);
+                return true;
+            }
+        }
+        return false;
+    }
+    public void OperateInfinite(Predicate<byte> pMonk, Func<byte, byte> pTransform)
+    {
+        for (int i = 0; i < _actionMethod.Length; i++)
+        {
+            byte item = _actionMethod[i];
+            if (pMonk(item))
+                _actionMethod[i] = pTransform(item);
         }
     }
 
