@@ -21,7 +21,7 @@ using TerbinLibrary.Protocol;
 // TODO: Manifest de Plugin guarde si requiere BepInEx.
 // TODO: InstallByInstace y InstallByPath
 
-#if true
+#if false
 
 Console.WriteLine($"SimulateClient esta desactivado.");
 Console.WriteLine($"Ponga en false el if para activarlo.");
@@ -30,7 +30,14 @@ await pressAnyKeyToContinue();
 #else
 var communicator = new TerbinCommunicator(false);
 TerbinExecutor.Register(Assembly.GetExecutingAssembly());
-communicator.OnRecive += TerbinExecutableManagerSimple.DispatchAsync;
+communicator.OnRecive += async p => {
+
+    var r = await TerbinExecutableManager.DispatchAsync(p.Head, p.Payload, p.ActionMethod.To);
+    //CurrentConst.Value = new AmongInfoThreads
+    //{
+    //    Communicator = communicator,
+    //};
+};
 
 if (await communicator.Connect())
 {

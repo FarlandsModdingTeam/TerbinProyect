@@ -105,8 +105,8 @@ public static class Util
         {
             pAction?.Invoke(p);
             byte[] pld = Serialineitor.Splice(restMethod, p.Serialize());
-            _ = pCommunicator.Send(new IdAction(method), pld);
-            _ = pCommunicator.Send(new IdAction((byte)CodeTerbinProtocol.Prolong), id);
+            _ = pCommunicator.Send(new IdArray(method), pld);
+            _ = pCommunicator.Send(new IdArray((byte)CodeTerbinProtocol.Prolong), id);
         });
     }
 }

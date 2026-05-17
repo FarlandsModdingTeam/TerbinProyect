@@ -167,7 +167,7 @@ public class TerbinCommunicator : IDisposable
         throw new NotImplementedException("=> CommunicateByInfoPacket <=");
     }
 
-    public async Task<PacketRequest> Communicate(IdAction pActionMethod, byte[] pPayload, CodeStatus pStatus = CodeStatus.Execute, ushort? pId = null)
+    public async Task<PacketRequest> Communicate(IdArray pActionMethod, byte[] pPayload, CodeStatus pStatus = CodeStatus.Execute, ushort? pId = null)
     {
         ushort id = pId ?? MiniID.NewS;
         PacketRequest? p = await send(pActionMethod, pPayload, pStatus, id);
@@ -179,19 +179,19 @@ public class TerbinCommunicator : IDisposable
         return reply;
     }
 
-    public async Task<PacketRequest?> Send(IdAction pActionMethod, byte[] pPayload, CodeStatus pStatus = CodeStatus.Execute, ushort? pId = null)
+    public async Task<PacketRequest?> Send(IdArray pActionMethod, byte[] pPayload, CodeStatus pStatus = CodeStatus.Execute, ushort? pId = null)
     {
         ushort id = pId ?? MiniID.NewS;
         return await send(pActionMethod, pPayload, pStatus, id);
     }
 
-    public async Task<PacketRequest?> SendBytes(IdAction pActionMethod,CodeStatus pStatus = CodeStatus.Execute, ushort? pId = null, params byte[] pPayload)
+    public async Task<PacketRequest?> SendBytes(IdArray pActionMethod,CodeStatus pStatus = CodeStatus.Execute, ushort? pId = null, params byte[] pPayload)
     {
         ushort id = pId ?? MiniID.NewS;
         return await send(pActionMethod, pPayload, pStatus, id);
     }
 
-    public async Task<PacketRequest?> send(IdAction pActionMethod, byte[] pPayload, CodeStatus pStatus, ushort pId)
+    public async Task<PacketRequest?> send(IdArray pActionMethod, byte[] pPayload, CodeStatus pStatus, ushort pId)
     {
         PacketRequest? error = null;
         if (pPayload.Length <= TerbinProtocol.MAX_PLD)
@@ -201,7 +201,7 @@ public class TerbinCommunicator : IDisposable
         return error; // Devuelve null si todo esta correcto.
     }
 
-    public async Task/*<TerbinErrorCode>*/ HandleSendSigle(IdAction pActionMethod, byte[] pPayload, ushort pIdRequest, CodeStatus pStatus)
+    public async Task/*<TerbinErrorCode>*/ HandleSendSigle(IdArray pActionMethod, byte[] pPayload, ushort pIdRequest, CodeStatus pStatus)
     {
         await addQueue(
             TerbinProtocol.ORDER_SINGLE,
@@ -213,7 +213,7 @@ public class TerbinCommunicator : IDisposable
         //return TerbinErrorCode.None;
     }
 
-    public async Task<PacketRequest?> HandleSendFragment(IdAction pActionMethod, byte[] pPayload, ushort pIdRequest, CodeStatus pStatus)
+    public async Task<PacketRequest?> HandleSendFragment(IdArray pActionMethod, byte[] pPayload, ushort pIdRequest, CodeStatus pStatus)
     {
         var check = await Communicate(pActionMethod, [], CodeStatus.CheckExecution);
         if (check.Head.Status != CodeStatus.Succes)
@@ -246,7 +246,7 @@ public class TerbinCommunicator : IDisposable
     public async Task<PacketRequest> SoliciteRequestMemory()
     {
         ushort idR = MiniID.NewS;
-        await addQueue(TerbinProtocol.ORDER_SINGLE, CodeStatus.Execute, new IdAction((byte)CodeTerbinProtocol.Solicit), (byte)CodeTerbinMemory.New, [], idR);
+        await addQueue(TerbinProtocol.ORDER_SINGLE, CodeStatus.Execute, new IdArray((byte)CodeTerbinProtocol.Solicit), (byte)CodeTerbinMemory.New, [], idR);
 
         var r = await recuperateReply(idR);
         return r;
@@ -262,7 +262,7 @@ public class TerbinCommunicator : IDisposable
         if (pPayload.Length >= TerbinProtocol.MAX_PLD)
             return false; // TODO: que false ni ostia, metele una excepcion.
 
-        await addQueue(pOrderRequest, CodeStatus.Execute, new IdAction((byte)CodeTerbinProtocol.Load), pIdMemory, pPayload, pIdRequest.Value);
+        await addQueue(pOrderRequest, CodeStatus.Execute, new IdArray((byte)CodeTerbinProtocol.Load), pIdMemory, pPayload, pIdRequest.Value);
         return true;
     }
 
@@ -339,7 +339,7 @@ public class TerbinCommunicator : IDisposable
     public async Task addQueue(
                 ushort pOrderRequest,
                 CodeStatus pStatus,
-                IdAction pActionMethod,
+                IdArray pActionMethod,
                 byte pIdMemory,
                 byte[] pSectionPayload,
                 ushort pIdRequest)

@@ -20,14 +20,14 @@ public struct InfoResponse
 {
     public ushort IdRequest { get => field; set => field = value; }
     public CodeStatus Status { get => field; set => field = value; }
-    public IdAction ActionMethod { get => field; set => field = value; }
+    public IdArray ActionMethod { get => field; set => field = value; }
     public byte[] Payload { get => field; set => field = value; }
 
     public InfoResponse()
     {
         IdRequest = TerbinProtocol.ORDER_SINGLE;
         Status = CodeStatus.NotAsign;
-        ActionMethod = new IdAction((byte)CodeTerbinProtocol.Response);
+        ActionMethod = new IdArray((byte)CodeTerbinProtocol.Response);
         Payload = [];
     }
 
