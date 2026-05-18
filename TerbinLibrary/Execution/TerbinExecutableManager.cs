@@ -33,6 +33,7 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
     // Es un object porque solo necesito el Has, al no poner ByteArrayKey me ahorro una conversion en TryGetValue.
     // Recuerda utilizar un objeto que Implemente un algoritmo para que el HasCode sea igual en los array como el de IdArray.
     private readonly ConcurrentDictionary<object, List<TerbinExecutableDelegate>> _handlers = new();
+    private readonly ConcurrentDictionary<object, CancellationTokenSource> _activeExecutions = new();
 
     // is a "const"
     private static readonly ByteArrayKey _RESPONSE = new((byte)CodeTerbinProtocol.Response);
@@ -140,14 +141,91 @@ public static class TerbinExecutableManager
     private static ExecutableDispatcher _dispatcher = new();
 
     public static void Register(IExecutableAttribute pAction, TerbinExecutableDelegate pHandler) =>
-        _dispatcher.Register(pAction, pHandler);
+           _dispatcher.Register(pAction, pHandler);
 
     public static bool Unregister(IEquatable<IEnumerable<byte>> pActions) =>
-        _dispatcher.Unregister(pActions);
+           _dispatcher.Unregister(pActions);
 
     public static async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IEquatable<IEnumerable<byte>> pActions) =>
-        await _dispatcher.DispatchAsync(pHead, pPayload, pActions);
+                          await _dispatcher.DispatchAsync(pHead, pPayload, pActions);
 
     public static void RegisterFromAssembly(Assembly pAssembly) =>
-        _dispatcher.RegisterFromAssembly(pAssembly);
+           _dispatcher.RegisterFromAssembly(pAssembly);
+}
+
+public sealed class ExecutableDispatcher_23 : IExecutableDispatcher
+{
+    private readonly ConcurrentDictionary<object, List<TerbinExecutableDelegate>> _handlers = new();
+
+    // NUEVO: Diccionario para guardar los tokens de cancelación en base al IdRequest.
+    // Cambia 'int' por el tipo real de pHead.IdRequest (ej. uint, long, string)
+    private readonly ConcurrentDictionary<int, CancellationTokenSource> _activeExecutions = new();
+
+    private static readonly ByteArrayKey _RESPONSE = new((byte)CodeTerbinProtocol.Response);
+
+    // ... (Register y Unregister se quedan igual) ...
+
+    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IEquatable<IEnumerable<byte>> pActions)
+    {
+        // === LÓGICA DE CANCELACIÓN ===
+        if (pHead.Status == CodeStatus.Cancel)
+        {
+            // Intentamos sacar el Source asociado a esta petición y cancelarlo
+            if (_activeExecutions.TryRemove(pHead.IdRequest, out var cts))
+            {
+                cts.Cancel();
+                return InfoResponse.CreateSucces(pHead.IdRequest); // O el estado que designes para "Cancelado OK"
+            }
+            return null; // O un InfoResponse indicando que no se encontró la tarea
+        }
+
+        if (!_handlers.TryGetValue(pActions, out var handlers))
+        {
+            // ... (Tu código actual de advertencias y ActionNotFound) ...
+            TerbinMemoryHelper.TryReleaseMemory(pHead.IdMemory);
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ActionNotFound);
+        }
+
+        try
+        {
+            if (pHead.Status == CodeStatus.CheckExecution)
+                return InfoResponse.CreateSucces(pHead.IdRequest);
+
+            if (pActions.Equals(_RESPONSE))
+            {
+                for (int i = 0; i < handlers.Count; i++)
+                    _ = handlers[i](pHead, pPayload, CancellationToken.None);
+                return null;
+            }
+
+            // === LÓGICA DE EJECUCIÓN CON TOKEN ===
+            using var cts = new CancellationTokenSource();
+
+            // Registramos la tarea activa
+            _activeExecutions.TryAdd(pHead.IdRequest, cts);
+
+            try
+            {
+                // Pasamos el token hacia ExecutionList
+                return await TerbinExecutableHelper.ExecutionList(handlers, pHead, pPayload, cts.Token);
+            }
+            finally
+            {
+                // Asegurarnos de limpiar el diccionario cuando la tarea termine (éxito, error o cancelación)
+                _activeExecutions.TryRemove(pHead.IdRequest, out _);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // Opcional: Manejar específicamente si la tarea lanza que fue cancelada internamente
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.Cancel);
+        }
+        catch (Exception e)
+        {
+            e.PrintException("CompoundExecutableDispatcher>DispatchAsync");
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionException);
+        }
+    }
+
+    // ... (El resto de la clase se queda igual) ...
 }

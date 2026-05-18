@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Communication.Packets;
@@ -14,4 +15,4 @@ public interface ITerbinExecutableDelegateNonStatic
 
 }
 
-public delegate Task<InfoResponse?> TerbinExecutableDelegate(Header pHead, byte[] pParameters);
+public delegate Task<InfoResponse?> TerbinExecutableDelegate(Header pHead, byte[] pParameters, CancellationToken pToken);
