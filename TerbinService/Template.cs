@@ -23,7 +23,6 @@ namespace TerbinService;
   empieza: minusculas = privada.
  */
 
-
 internal partial class Template
 {
     //[TerbinExecutableCompound((byte)CodeTerbinProtocol.Create, (byte)CodeSubServices.Game)]
