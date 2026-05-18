@@ -32,7 +32,10 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
     // (byte action, byte subAction), ByteArrayKey
     // Es un object porque solo necesito el Has, al no poner ByteArrayKey me ahorro una conversion en TryGetValue.
     // Recuerda utilizar un objeto que Implemente un algoritmo para que el HasCode sea igual en los array como el de IdArray.
-    private readonly ConcurrentDictionary<ByteArrayKey, List<TerbinExecutableDelegate>> _handlers = new();
+    private readonly ConcurrentDictionary<object, List<TerbinExecutableDelegate>> _handlers = new();
+
+    // is a "const"
+    private static readonly ByteArrayKey _RESPONSE = new((byte)CodeTerbinProtocol.Response);
 
     public void Register(IExecutableAttribute pSubAction, TerbinExecutableDelegate pHandler)
     {
@@ -54,11 +57,11 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
         }
     }
 
-    public bool Unregister(ByteArrayKey pActions) => _handlers.TryRemove(pActions, out _);
+    public bool Unregister(IEquatable<IEnumerable<byte>> pActions) => _handlers.TryRemove(pActions, out _);
 
-    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IdArray pActions)
+    public async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IEquatable<IEnumerable<byte>> pActions)
     {
-        if (!_handlers.TryGetValue((ByteArrayKey)pActions, out var handlers))
+        if (!_handlers.TryGetValue(pActions, out var handlers))
         {
             Console.Warn("--(Printeando Has porque handlres no encontrados)--");
             Console.Warn("Has de la accion");
@@ -84,10 +87,14 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
 
         try
         {
-            if (pHead.Status == CodeStatus.CheckExecution)
+            if (pHead.Status == CodeStatus.Execute) // <- Evitamos hacer todas comprobaciones.
+            { /* La gracia esque nunca se compruebe Execute para que sea la predeterminada.*/ }
+            else if (pHead.Status == CodeStatus.CheckExecution)
                 return InfoResponse.CreateSucces(pHead.IdRequest);
+            else if (pHead.Status == CodeStatus.Cancel)
+                return null; // TODO: el sistema.
 
-            if (pActions[0] == (byte)CodeTerbinProtocol.Response)
+            if (pActions.Equals(_RESPONSE))
             {
                 for (int i = 0; i < handlers.Count; i++)
                     _ = handlers[i](pHead, pPayload);
@@ -135,10 +142,10 @@ public static class TerbinExecutableManager
     public static void Register(IExecutableAttribute pAction, TerbinExecutableDelegate pHandler) =>
         _dispatcher.Register(pAction, pHandler);
 
-    public static bool Unregister(params byte[] pActions) =>
+    public static bool Unregister(IEquatable<IEnumerable<byte>> pActions) =>
         _dispatcher.Unregister(pActions);
 
-    public static async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IdArray pActions) =>
+    public static async Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IEquatable<IEnumerable<byte>> pActions) =>
         await _dispatcher.DispatchAsync(pHead, pPayload, pActions);
 
     public static void RegisterFromAssembly(Assembly pAssembly) =>

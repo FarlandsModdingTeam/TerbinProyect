@@ -21,7 +21,7 @@ public readonly struct ByteArrayKey : IEnumerable<byte>, IEquatable<ByteArrayKey
 {
     private readonly byte[] _data;
 
-    public ByteArrayKey(byte[] pData)
+    public ByteArrayKey(params byte[] pData)
     {
         _data = (byte[])pData.Clone() ?? throw new ArgumentNullException(nameof(pData));
     }
