@@ -16,7 +16,7 @@ namespace TerbinLibrary.Communication.Packets;
  */
 
 
-public struct InfoResponse
+public struct InfoResponse : IInfo
 {
     public ushort IdRequest { get => field; set => field = value; }
     public CodeStatus Status { get => field; set => field = value; }
@@ -69,5 +69,15 @@ public struct InfoResponse
             Status = CodeStatus.Succes,
             Payload = pPLD,
         };
+    }
+
+    public void InfoSend(TerbinCommunicator pCommunicator)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<PacketRequest?> InfoSendAsync(TerbinCommunicator pCommunicator)
+    {
+        throw new NotImplementedException();
     }
 }
