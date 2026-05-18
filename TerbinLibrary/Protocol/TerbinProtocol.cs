@@ -21,8 +21,8 @@ namespace TerbinLibrary.Protocol;
 
 public class TerbinProtocol
 {
-    public const ushort MAX_PLD = 0xFFF; // ¡Vamos Miura!
-    public const ushort FRAGMENT_IN = 0xFFF; // 0xFFF
+    public const ushort MAX_PLD = 0xFFFD; // ¡Vamos Miura!
+    public const ushort FRAGMENT_IN = 0xFFFA; // 0xFFF
     public const double FRAGMENT_IN__MULTIPLICATE_INVERSE = 1.0D / FRAGMENT_IN;
 
     public const ushort ORDER_SINGLE = ushort.MinValue;
@@ -167,7 +167,7 @@ public enum CodeStatus : short
     NotFound = 404,
 
     ActionNotFound = 440,
-    [Obsolete(message: "Use ActionNotFound normal en su lugar (440)")]
+    [Obsolete(message: $"Use ActionNotFound normal en su lugar (440)")] // {(byte)ActionNotFound}
     SubActionNotFound = 441,
 
     ErrorGetEntity = 450,
@@ -179,8 +179,8 @@ public enum CodeStatus : short
 
     ExecutionException = 501,
     ErrorNotPayload = 502,
-    SerializeError = 503, // ¿?
-    AccesNullOrNotExist = 504, // ¿?
+    SerializeError = 503, // ¿mandar fuera?
+    AccesNullOrNotExist = 504, // ¿mandar fuera?
 
     OverMaximumTime = 550,
     OverMaximunPacket = 551,
