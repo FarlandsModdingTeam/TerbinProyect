@@ -29,6 +29,7 @@ public interface IExecutableDispatcher
     void Register(IExecutableAttribute pAttribute, TerbinExecutableDelegate pHandler);
     //Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload);
     //Task<InfoResponse?> DispatchAsync(PacketRequest pCapsule);
+    Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IEquatable<IEnumerable<byte>> pActions);
     void RegisterFromAssembly(Assembly pAssembly);
 }
 

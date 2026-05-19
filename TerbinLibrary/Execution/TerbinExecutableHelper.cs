@@ -81,13 +81,12 @@ public static class TerbinExecutableHelper
     }
 
 
-
-    public static async Task<InfoResponse?> ExecutionList(List<TerbinExecutableDelegate> pHandlers, Header pHead, byte[] pPayload, CancellationToken pToken)
+    public static async Task<InfoResponse?> ExecutionList(List<TerbinExecutableDelegate> pHandlers, Header pHead, byte[] pPayload, CancellationTokenSource pToken)
     {
         var pendignTask = new List<Task<InfoResponse?>>(pHandlers.Count);
         for (int i = 0; i < pHandlers.Count; i++)
         {
-            pendignTask.Add(pHandlers[i](pHead, pPayload, pToken));
+            pendignTask.Add(pHandlers[i](pHead, pPayload, pToken.Token));
         }
 
         while (pendignTask.Count > 0)
@@ -102,4 +101,5 @@ public static class TerbinExecutableHelper
         return null;
     }
     //.ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
+
 }

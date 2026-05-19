@@ -135,12 +135,12 @@ public enum CodeTerbinMemory : byte
     Undefined = 3, // Literaly
     ErrorRecuperate = 4,
 
-    Undefined4 = 4,
-    Undefined5 = 5,
-    Undefined6 = 6,
-    Undefined7 = 7,
-    Undefined8 = 8,
-    Undefined9 = 9,
+    PlaceHolder_Undefined4 = 4,
+    PlaceHolder_Undefined5 = 5,
+    PlaceHolder_Undefined6 = 6,
+    PlaceHolder_Undefined7 = 7,
+    PlaceHolder_Undefined8 = 8,
+    PlaceHolder_Undefined9 = 9,
 }
 
 /* -- Parecida a HTTP pero no la voy a seguir a raja tabla.
@@ -160,7 +160,8 @@ public enum CodeStatus : short
     ExecuteInternal = 301,
     Info = 302,
     CheckExecution = 303,
-    Cancel = 304,
+    CancelByRequest = 304,
+    CancelByAction = 305,
 
     ClientError = 400,
     BadRequest = 401,
@@ -169,8 +170,9 @@ public enum CodeStatus : short
     ActionNotFound = 440,
     [Obsolete(message: $"Use ActionNotFound normal en su lugar (440)")] // {(byte)ActionNotFound}
     SubActionNotFound = 441,
+    ActionNotInitiated = 442,
 
-    ErrorGetEntity = 450,
+    AccessDenied = 450,
 
     ErrorSoliciteMemory = 470,
     AlreadyExistsPetition = 471,
