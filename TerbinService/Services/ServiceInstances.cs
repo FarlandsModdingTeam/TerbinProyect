@@ -29,7 +29,7 @@ namespace TerbinService.Services;
 internal static class ServiceInstances
 {
     [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Instances)]
-    public static async Task<InfoResponse?> CreateInstance(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> CreateInstance(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
@@ -48,7 +48,7 @@ internal static class ServiceInstances
     }
 
     [TerbinExecutable((byte)CodeServices.ReadAllInstances)]
-    public static async Task<InfoResponse?> GetAllInstances(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> GetAllInstances(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         List<string> instances = ManagerManifest.GetIndex();
         Serialineitor s = new();
@@ -71,7 +71,7 @@ internal static class ServiceInstances
     }
 
     [TerbinExecutable((byte)TerbinCRUD.Read, (byte)CodeSubServices.Instances)]
-    public static async Task<InfoResponse?> ReadInstance(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> ReadInstance(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
