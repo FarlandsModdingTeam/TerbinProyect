@@ -4,6 +4,7 @@ using System.Text;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace TerbinService.Managers;
 /*
@@ -27,6 +28,7 @@ public static class ManagerConfiguration
     public static event Action<string, string>? OnChangeConfig;
 
     private static object _lockPredeterminated = new();
+    //private static object _lockSetGet = new();
 
     public static string? GetConfg(string pKey)
     {
@@ -37,7 +39,8 @@ public static class ManagerConfiguration
         if (r == null)
         {
             setPredeterminatedConfig();
-            r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
+            //lock (_lockSetGet)
+                r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
             if (r == null)
                 return null;
         }
@@ -67,7 +70,9 @@ public static class ManagerConfiguration
 
         data[pKey] = pData;
 
-        var result = JSonUtil.Save(KEY, JSON, data);
+        CodeAcessJSonSave result;
+        //lock (_lockSetGet)
+            result = JSonUtil.Save(KEY, JSON, data);
         _ = Task.Run(async () =>
         {
             await Task.Delay(100);
