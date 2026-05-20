@@ -40,14 +40,16 @@ public static class TerbinExecutor
     //}
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Load)]
-    public static async Task<InfoResponse?> Load(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Load(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pHead.OrderRequest > 0)
         {
+            if (pToken.IsCancellationRequested) return null;
             TerbinMemoryManager.Store(pHead.IdMemory, pHead.OrderRequest, pParameters);
         }
         else if (pHead.OrderRequest == 0)
         {
+            if (pToken.IsCancellationRequested) return null;
             TerbinMemoryManager.OverwriteStore(pHead.IdMemory, 1, pParameters);
         }
 
@@ -56,10 +58,11 @@ public static class TerbinExecutor
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Solicit)]
-    public static async Task<InfoResponse?> Solicit(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Solicit(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pHead.IdMemory == (byte)CodeTerbinMemory.New)
         {
+            if (pToken.IsCancellationRequested) return null;
             byte id = TerbinMemoryManager.GetFreeStore();
             return new InfoResponse
             {
@@ -114,19 +117,21 @@ public static class TerbinExecutor
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Prolong)]
-    public static async Task<InfoResponse?> Prolong(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Prolong(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         ushort id = Serialineitor.Deserialize<ushort>(pParameters);
-        _communicator?.GiveProlong(id);
+        if (!pToken.IsCancellationRequested)
+            _communicator?.GiveProlong(id);
         return null;
     }
 
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Response)]
-    public static async Task<InfoResponse?> Response(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Response(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
-        _communicator?.GiveResponse(new PacketRequest(pHead: pHead, [(byte)CodeTerbinProtocol.Response], pParameters));
+        if (pToken.IsCancellationRequested) return null;
+        _communicator?.GiveResponse(new PacketRequest(pHead: pHead, new IdArray((byte)CodeTerbinProtocol.Response), pParameters));
         return null;
     }
 }

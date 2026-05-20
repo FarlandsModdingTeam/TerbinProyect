@@ -7,13 +7,15 @@ using System.Net.NetworkInformation;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
+using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Id;
 using TerbinLibrary.Memory;
-using TerbinLibrary.Serialize;
-using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TerbinLibrary.Communication;
 /*
@@ -285,7 +287,7 @@ public class TerbinCommunicator : IDisposable
             if (_pendingRequests.TryRemove(pId, out var removedTcs))
             {
                 var timeoutHeader = new Header(pIdRequest: pId, pOrderRequest: TerbinProtocol.ORDER_SINGLE, pStatus: CodeStatus.OverMaximumTime);
-                var timeoutPacket = new PacketRequest(pHead: timeoutHeader, (byte[]?)null, (byte[]?)null);
+                var timeoutPacket = new PacketRequest(pHead: timeoutHeader, (IdArray?)null, (byte[]?)null);
                 removedTcs.Tcs.TrySetResult(timeoutPacket);
                 removedTcs.Cts.Dispose();
             }
@@ -299,6 +301,7 @@ public class TerbinCommunicator : IDisposable
         if (_onRecive == null)
             return;
 
+        Console.Warn($"Packet: {pCapsule}");
         if (TerbinMemoryHelper.TryGetMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
         {
             var error = (r == TerbinErrorCode.MemoryReleaseFailed) ? CodeStatus.ErrorReleaseMemory : CodeStatus.ErrorGetPaylaodMemory;
@@ -358,6 +361,7 @@ public class TerbinCommunicator : IDisposable
     }
     public async Task addQueue(PacketRequest pCapsule)
     {
+        Console.Log($"Packet: {pCapsule}");
         _queue.Enqueue(pCapsule);
         _signal.Release();
     }
@@ -370,6 +374,7 @@ public class TerbinCommunicator : IDisposable
             try
             {
                 PacketRequest r = await _reader.ReadAsycn<PacketRequest>(_stopToken);
+                Console.Log($"Packet: {r}");
                 if (_stopToken.IsCancellationRequested)
                     break;
                 _ = handleReceive(r);
@@ -398,6 +403,7 @@ public class TerbinCommunicator : IDisposable
 
                 if (_stopToken.IsCancellationRequested)
                     break;
+                Console.Log($"Packet: {data}");
                 await _writer.WriteAsycn<PacketRequest>(data, _stopToken);
             }
             catch (EndOfStreamException)

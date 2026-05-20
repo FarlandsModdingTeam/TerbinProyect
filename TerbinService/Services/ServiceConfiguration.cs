@@ -30,7 +30,7 @@ namespace TerbinService.Services;
 internal static class ServiceConfiguration
 {
     [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Rute)]
-    public static async Task<InfoResponse?> UpdateRute(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> UpdateRute(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
@@ -54,7 +54,7 @@ internal static class ServiceConfiguration
     }
 
     [TerbinExecutable((byte)TerbinCRUD.Read, (byte)CodeSubServices.Rute)]
-    public static async Task<InfoResponse?> ReadRute(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> ReadRute(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         byte[] pld;
         string keyRute = new(Serialineitor.DeserializeArray<char>(ref pParameters));

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Execution.Collection;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
+using TerbinLibrary.Useful;
 
 namespace TerbinLibrary.Communication.Packets;
 /*
@@ -230,6 +232,20 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
         }
     }
 
+    public override string ToString()
+    {
+        bool isLockedByOther = false;
+        //if (Monitor.IsEntered(_lock))
+        //    isLockedByOther = false;
+        //else
+        //{
+        //    if (Monitor.TryEnter(_lock))
+        //        Monitor.Exit(_lock);
+        //    else
+        //        isLockedByOther = true;
+        //}
+        return $"(Action: [{Util.DebugTerbinLibrary.ArrayToString(_actionMethod)}], IsLocked: {isLockedByOther})";
+    }
 
     public static bool operator ==(IdArray pLeft, IdArray pRight) => pLeft.Equals(pRight);
     public static bool operator !=(IdArray pLeft, IdArray pRight) => !pLeft.Equals(pRight);

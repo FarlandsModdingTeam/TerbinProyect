@@ -33,6 +33,7 @@ public sealed class ExecutableDispatcherSimple : IExecutableDispatcher
 
     public void Register(IExecutableAttribute pAction, TerbinExecutableDelegate pHandler)
     {
+        throw new NotImplementedException("Its just not work");
         if (pHandler == null) throw new ArgumentNullException(nameof(pHandler));
         if (pAction.Action.Length <= 0) throw new ArgumentException("No action.", nameof(pAction));
 
@@ -51,6 +52,7 @@ public sealed class ExecutableDispatcherSimple : IExecutableDispatcher
 
     public async Task<InfoResponse?> DispatchAsync(PacketRequest pCapsule)
     {
+        throw new NotImplementedException("Its just not work");
         if (!_handlers.TryGetValue(pCapsule.ActionMethod[0], out var handlers))
         {
             TerbinMemoryHelper.TryReleaseMemory(pCapsule.Head.IdMemory);
@@ -66,12 +68,12 @@ public sealed class ExecutableDispatcherSimple : IExecutableDispatcher
             {
                 for (int i = 0; i < handlers.Count; i++)
                 {
-                    _ = handlers[i](pCapsule.Head, pCapsule.Payload);
+                    //_ = handlers[i](pCapsule.Head, pCapsule.Payload);
                 }
                 return null; // Por si alguien hace el bruto.
             }
 
-            return await TerbinExecutableHelper.ExecutionList(handlers, pCapsule.Head, pCapsule.Payload);
+            //return await TerbinExecutableHelper.ExecutionList(handlers, pCapsule.Head, pCapsule.Payload);
         }
         catch (Exception e)
         {
@@ -83,6 +85,11 @@ public sealed class ExecutableDispatcherSimple : IExecutableDispatcher
     public void RegisterFromAssembly(Assembly pAssembly)
     {
         TerbinExecutableHelper.RegisterFromAssembly<TerbinExecutable_ObsoleteAttribute, ExecutableDispatcherSimple>(pAssembly, this);
+    }
+
+    public Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IEquatable<IEnumerable<byte>> pActions)
+    {
+        throw new NotImplementedException("Its just not work");
     }
 }
 

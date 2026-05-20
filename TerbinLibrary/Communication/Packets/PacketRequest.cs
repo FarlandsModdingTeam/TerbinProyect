@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.Useful;
 
 namespace TerbinLibrary.Communication.Packets;
 /*
@@ -27,7 +28,7 @@ public struct PacketRequest : IStructSerializable
     public PacketRequest()
     {
         Head = new Header();
-        ActionMethod = new IdArray([(byte)CodeTerbinProtocol.Response]);
+        ActionMethod = new IdArray((byte)CodeTerbinProtocol.Response);
         Payload = [];
     }
 
@@ -46,7 +47,7 @@ public struct PacketRequest : IStructSerializable
         byte[]? pPayload = null)
     {
         Head = pHead ?? new Header();
-        ActionMethod = pActionMethod ?? new IdArray(CodeTerbinProtocol.Response);
+        ActionMethod = pActionMethod ?? new IdArray((byte)CodeTerbinProtocol.Response);
         Payload = pPayload ?? [];
     }
 
@@ -102,7 +103,7 @@ public struct PacketRequest : IStructSerializable
     {
         pHead.IdMemory = (byte)CodeTerbinMemory.NotAsign;
         pHead.OrderRequest = TerbinProtocol.ORDER_SINGLE;
-        return new PacketRequest(pHead, new IdArray(CodeTerbinProtocol.Response), pPayload);
+        return new PacketRequest(pHead, new IdArray((byte)CodeTerbinProtocol.Response), pPayload);
     }
 
     /*
@@ -113,6 +114,11 @@ public struct PacketRequest : IStructSerializable
         else
             return new PacketRequest();
     }*/
+
+    public override string ToString()
+    {
+        return $"(Head: {Head}, ActionMethod: {ActionMethod}, Payload: {Util.DebugTerbinLibrary.ArrayToString(Payload)})";
+    }
 }
 
 

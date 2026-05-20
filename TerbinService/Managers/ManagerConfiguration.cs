@@ -76,7 +76,7 @@ public static class ManagerConfiguration
         return result;
     }
 
-    // TODO: Tener ruta predeterminada para ambos.
+
     private static void setPredeterminatedConfig()
     {
         lock (_lockPredeterminated)

@@ -44,4 +44,9 @@ public struct Header // la memoria es constante es unmanaged.
         Status = pStatus;
         IdMemory = pIdMemory;
     }
+
+    public override string ToString()
+    {
+        return $"(IdRequest: {IdRequest}, OrderRequest: {OrderRequest}, Status: {Status}, IdMemory: {IdMemory})";
+    }
 }

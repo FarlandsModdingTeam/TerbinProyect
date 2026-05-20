@@ -19,7 +19,7 @@ namespace TerbinService.Services;
 internal static class ServiceGames
 {
     [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Game)]
-    public static async Task<InfoResponse?> CloneGame(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> CloneGame(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);

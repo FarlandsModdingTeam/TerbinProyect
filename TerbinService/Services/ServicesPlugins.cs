@@ -31,7 +31,7 @@ namespace TerbinService.Services;
 internal static class ServicesPlugins
 {
     [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Plugin)]
-    public static async Task<InfoResponse?> InstallPluginService(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> InstallPluginService(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);

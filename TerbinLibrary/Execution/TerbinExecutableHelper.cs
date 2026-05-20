@@ -25,9 +25,10 @@ public static class TerbinExecutableHelper
     {
         return
         (
-            pParameters.Length == 2 &&
+            pParameters.Length == 3 &&
             pParameters[0].ParameterType == typeof(Header) &&
-            pParameters[1].ParameterType == typeof(byte[])
+            pParameters[1].ParameterType == typeof(byte[]) &&
+            pParameters[2].ParameterType == typeof(CancellationToken)
         );
     }
 
@@ -66,25 +67,26 @@ public static class TerbinExecutableHelper
                 if (!IsFirmReturn(method))
                     continue;
 
-                var del = (Func<Header, byte[], Task<InfoResponse?>>)Delegate.CreateDelegate(
-                    typeof(Func<Header, byte[], Task<InfoResponse?>>), method);
+                //var del = (Func<Header, byte[], Task<InfoResponse?>>)Delegate.CreateDelegate(
+                //    typeof(Func<Header, byte[], Task<InfoResponse?>>), method);
+                var del = (Func<Header, byte[], CancellationToken, Task<InfoResponse?>>)Delegate.CreateDelegate(
+                    typeof(Func<Header, byte[], CancellationToken, Task<InfoResponse?>>), method);
 
                 foreach (var attr in attrs)
                 {
-                    pExecutor.Register(attr, (h, b) => del(h, b));
+                    pExecutor.Register(attr, (h, b, ct) => del(h, b, ct));
                 }
             }
         }
     }
 
 
-
-    public static async Task<InfoResponse?> ExecutionList(List<TerbinExecutableDelegate> pHandlers, Header pHead, byte[] pPayload)
+    public static async Task<InfoResponse?> ExecutionList(List<TerbinExecutableDelegate> pHandlers, Header pHead, byte[] pPayload, CancellationTokenSource pToken)
     {
         var pendignTask = new List<Task<InfoResponse?>>(pHandlers.Count);
         for (int i = 0; i < pHandlers.Count; i++)
         {
-            pendignTask.Add(pHandlers[i](pHead, pPayload));
+            pendignTask.Add(pHandlers[i](pHead, pPayload, pToken.Token));
         }
 
         while (pendignTask.Count > 0)
@@ -97,6 +99,7 @@ public static class TerbinExecutableHelper
                 return result;
         }
         return null;
-        //.ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
     }
+    //.ConfigureAwait(false); // Para no cortar ejecucion al intentar terminar.
+
 }

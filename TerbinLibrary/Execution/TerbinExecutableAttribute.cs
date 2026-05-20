@@ -29,6 +29,7 @@ public interface IExecutableDispatcher
     void Register(IExecutableAttribute pAttribute, TerbinExecutableDelegate pHandler);
     //Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload);
     //Task<InfoResponse?> DispatchAsync(PacketRequest pCapsule);
+    Task<InfoResponse?> DispatchAsync(Header pHead, byte[] pPayload, IEquatable<IEnumerable<byte>> pActions);
     void RegisterFromAssembly(Assembly pAssembly);
 }
 
@@ -43,9 +44,35 @@ public sealed class TerbinExecutable_ObsoleteAttribute(byte pAction) : Attribute
 }
 
 [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
-public sealed class TerbinExecutableAttribute(params byte[] pAction) : Attribute, IExecutableAttribute
+public sealed class TerbinExecutableAttribute : Attribute, IExecutableAttribute
 {
-    public byte[] Action { get; } = pAction;
+    public byte[] Action { get; }
     public int Leght => Action.Length;
     public Type Dispatcher => typeof(ExecutableDispatcher);
+
+    public TerbinExecutableAttribute(params byte[] pAction)
+    {
+        this.Action = pAction;
+    }
+
+    public TerbinExecutableAttribute(params object[] pAction)
+    {
+        ArgumentNullException.ThrowIfNull(pAction);
+        if (pAction.Length > byte.MaxValue)
+            throw new OverflowException($"Actionre overflow byte max");
+
+        byte[] tmp = new byte[pAction.Length];
+        for (int i = 0; i < pAction.Length; i++)
+        {
+            if (pAction[i] is byte b)
+            {
+                tmp[i] = b;
+            }
+            else if (pAction[i] != null && pAction[i].GetType().IsEnum)
+            {
+                tmp[i] = Convert.ToByte(pAction[i]);
+            }
+        }
+        this.Action = tmp;
+    }
 }
