@@ -24,8 +24,11 @@ namespace TerbinService.Services;
 
 // TODO: Guardar y gestionar:
 // ├─ Proton Instalado
+// ├─ Al cambiar la ruta toca mover todo.
 // ├─ Temporal de Proton
 // └─ Steam Instalado
+
+// TODO: Las instancias no deberia ser una ruta, deberias cambiar su posicion desde el propio servicio que se encarge de mover toda la carpeta.
 
 internal static class ServiceConfiguration
 {
