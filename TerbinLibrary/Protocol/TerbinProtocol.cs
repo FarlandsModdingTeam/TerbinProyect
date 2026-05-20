@@ -30,7 +30,7 @@ public class TerbinProtocol
     public const ushort FIRST_PACKET = 1;
     public const ushort FINAL_PACKET = ushort.MaxValue;
 
-    public const byte MAXIMUS_RESPONSE_TIME = 32;
+    public const byte MAXIMUS_RESPONSE_TIME = 16;
 
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;

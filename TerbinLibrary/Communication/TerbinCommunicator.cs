@@ -285,7 +285,7 @@ public class TerbinCommunicator : IDisposable
             if (_pendingRequests.TryRemove(pId, out var removedTcs))
             {
                 var timeoutHeader = new Header(pIdRequest: pId, pOrderRequest: TerbinProtocol.ORDER_SINGLE, pStatus: CodeStatus.OverMaximumTime);
-                var timeoutPacket = new PacketRequest(pHead: timeoutHeader, (byte[]?)null, (byte[]?)null);
+                var timeoutPacket = new PacketRequest(pHead: timeoutHeader, (IdArray?)null, (byte[]?)null);
                 removedTcs.Tcs.TrySetResult(timeoutPacket);
                 removedTcs.Cts.Dispose();
             }

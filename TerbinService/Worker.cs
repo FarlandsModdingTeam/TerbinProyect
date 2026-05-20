@@ -6,6 +6,7 @@ using TerbinLibrary;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace TerbinService;
 /*
@@ -57,6 +58,7 @@ public class Worker : BackgroundService
             TerbinExecutor.Register(Assembly.GetExecutingAssembly());
             communicator.OnRecive += async (pCapsule) =>
             {
+                Console.Log($"Packet: {pCapsule}");
                 CurrentConst.Value = new AmongInfoThreads
                 {
                     Communicator = communicator,

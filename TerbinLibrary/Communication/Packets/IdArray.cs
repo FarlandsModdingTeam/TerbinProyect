@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Execution.Collection;
@@ -230,6 +231,26 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
         }
     }
 
+    public override string ToString()
+    {
+        bool isLockedByOther = false;
+        if (Monitor.IsEntered(_lock))
+            isLockedByOther = false;
+        else
+        {
+            if (Monitor.TryEnter(_lock))
+                Monitor.Exit(_lock);
+            else
+                isLockedByOther = true;
+        }
+
+        string data = "";
+        for (int i = 0; i < _actionMethod.Length; i++)
+        {
+            data += _actionMethod[i] + ",";
+        }
+        return $"([{data}], IsLocked: {isLockedByOther})";
+    }
 
     public static bool operator ==(IdArray pLeft, IdArray pRight) => pLeft.Equals(pRight);
     public static bool operator !=(IdArray pLeft, IdArray pRight) => !pLeft.Equals(pRight);

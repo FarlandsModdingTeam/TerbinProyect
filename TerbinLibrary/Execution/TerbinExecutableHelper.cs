@@ -25,7 +25,7 @@ public static class TerbinExecutableHelper
     {
         return
         (
-            pParameters.Length == 2 &&
+            pParameters.Length == 3 &&
             pParameters[0].ParameterType == typeof(Header) &&
             pParameters[1].ParameterType == typeof(byte[]) &&
             pParameters[2].ParameterType == typeof(CancellationToken)
