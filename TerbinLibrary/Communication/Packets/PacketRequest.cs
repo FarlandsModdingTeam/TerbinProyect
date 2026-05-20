@@ -4,6 +4,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.Useful;
 
 namespace TerbinLibrary.Communication.Packets;
 /*
@@ -116,7 +117,7 @@ public struct PacketRequest : IStructSerializable
 
     public override string ToString()
     {
-        return $"({Head}, {ActionMethod}, {Payload})";
+        return $"(Head: {Head}, ActionMethod: {ActionMethod}, Payload: {Util.DebugTerbinLibrary.ArrayToString(Payload)})";
     }
 }
 

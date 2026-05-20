@@ -109,4 +109,35 @@ public static class Util
             _ = pCommunicator.Send(new IdArray((byte)CodeTerbinProtocol.Prolong), id);
         });
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    public class DebugTerbinLibrary
+    {
+        public static string ArrayToString<T>(params T[] pArray)
+        {
+            string data = "";
+            for (int i = 0; i < pArray.Length; i++)
+            {
+                data += pArray[i];
+                if ((i + 1) < pArray.Length)
+                    data += ",";
+            }
+            return data;
+        }
+    }
 }
