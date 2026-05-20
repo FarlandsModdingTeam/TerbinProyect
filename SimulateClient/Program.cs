@@ -21,7 +21,7 @@ using TerbinLibrary.Protocol;
 // TODO: Manifest de Plugin guarde si requiere BepInEx.
 // TODO: InstallByInstace y InstallByPath
 
-#if true
+#if false
 
 Console.WriteLine($"SimulateClient esta desactivado.");
 Console.WriteLine($"Ponga en false el if para activarlo.");
