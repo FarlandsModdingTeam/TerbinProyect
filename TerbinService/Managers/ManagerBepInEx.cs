@@ -17,7 +17,7 @@ using TerbinLibrary.Protocol;
 
 namespace TerbinService.Managers;
 
-public class BepInExManager
+public class ManagerBepInEx
 {
 #if false
     [TerbinExecutable((byte)CodeServices.InstallBepInEx)]

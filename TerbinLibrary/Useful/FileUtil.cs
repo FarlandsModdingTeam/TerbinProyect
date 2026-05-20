@@ -24,7 +24,7 @@ public enum StatusFileUtil : sbyte
 
 public static class FileUtil
 {
-    private const ushort _falseSizeFolder = 0xFFFF;
+    //  private const ushort _falseSizeFolder = 0xFFFF;
 
     // Son los unicos que el tamaño no es por el peso de los archivos en bytes.
 
@@ -102,7 +102,7 @@ public static class FileUtil
     }
 
     // TODO: metodo que le dar una direccion y un DirectoryHandwritten y te lo borra.
-    // └─Luego borra directorios vacios, solo vacios.
+    // └─Luego borra directorios vacios, solo vacios!.
 
     public static List<string>? GetAllFiles(string pDir)
     {
@@ -152,13 +152,11 @@ public static class FileUtil
         return count;
     }
 
-    public static (long? maxFiles, long? maxDir) GetSizeDir(string pDir)
+    public static (long? files, long? direc) GetSizeDir(string pDir)
     {
         long? countFiles = GetCountFiles(pDir);
         long? countDir = GetCountDirectories(pDir);
         return (countFiles, countDir);
     }
-
-
 
 }

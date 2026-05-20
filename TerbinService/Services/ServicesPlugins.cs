@@ -50,10 +50,10 @@ internal static class ServicesPlugins
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExit));
         if (requierBepInEx)
         {
-            if (!BepInExManager.CheckInstallBepInEx(pathInstance))
+            if (!ManagerBepInEx.CheckInstallBepInEx(pathInstance))
                 return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.BepInExNotInstall));
             //pathPlugin = MakePathPluginByInstance(pathInstance);
-            pathPlugin = BepInExManager.GetBepInExFolderPlugin(pathInstance);
+            pathPlugin = ManagerBepInEx.GetBepInExFolderPlugin(pathInstance);
         }
         else
         {
