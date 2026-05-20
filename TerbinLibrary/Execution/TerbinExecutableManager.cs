@@ -69,6 +69,9 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
     {
         if (!_handlers.TryGetValue(pActions, out var handlers))
         {
+            if (pActions.Equals(_RESPONSE))
+                throw new NotImplementedException("Response!, You must implement 'Response'");
+
             TerbinMemoryHelper.TryReleaseMemory(pHead.IdMemory);
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ActionNotFound);
         }
