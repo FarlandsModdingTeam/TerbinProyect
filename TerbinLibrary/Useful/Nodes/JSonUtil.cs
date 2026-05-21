@@ -67,7 +67,7 @@ public class JSonUtil
         }
     }
 
-    public static T? Acess<T>(string pKeyDir, string pFile) where T : class
+    public static async Task<T?> AcessAsync<T>(string pKeyDir, string pFile) where T : class
     {
         string? dir = getDir(pKeyDir);
         if (dir == null)
@@ -78,24 +78,24 @@ public class JSonUtil
         string routeComplete = Path.Combine(dir, fileName);
         if (!File.Exists(routeComplete)) return null;
 
-        string json = File.ReadAllText(routeComplete);
+        string json = await File.ReadAllTextAsync(routeComplete);
 
         return JsonConvert.DeserializeObject<T>(json);
     }
-    public static T? AcessDirect<T>(string pDir, string pFile) where T : class
+    public static async Task<T?> AcessDirect<T>(string pDir, string pFile) where T : class
     {
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(pDir, fileName);
         if (!File.Exists(routeComplete)) return null;
 
-        string json = File.ReadAllText(routeComplete);
+        string json = await File.ReadAllTextAsync(routeComplete);
 
         return JsonConvert.DeserializeObject<T>(json);
     }
 
 
-    public static CodeAcessJSonSave Save<T>(string pKeyDir, string pFile, T pContent) where T : class
+    public static async Task<CodeAcessJSonSave> SaveAsync<T>(string pKeyDir, string pFile, T pContent) where T : class
     {
         string? dir = getDir(pKeyDir);
         if (dir == null)
@@ -110,12 +110,12 @@ public class JSonUtil
         string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
         if (json == null) return CodeAcessJSonSave.ErrorSerialize;
 
-        File.WriteAllText(routeComplete, json);
+        await File.WriteAllTextAsync(routeComplete, json);
         return CodeAcessJSonSave.Succes;
     }
 
 
-    public static CodeAcessJSonSave SaveDirect<T>(string pDir, string pFile, T pContent) where T : class
+    public static async Task<CodeAcessJSonSave> SaveDirectAsync<T>(string pDir, string pFile, T pContent) where T : class
     {
         string fileName = getFileName(pFile);
 
@@ -126,7 +126,7 @@ public class JSonUtil
         string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
         if (json == null) return CodeAcessJSonSave.ErrorSerialize;
 
-        File.WriteAllText(routeComplete, json);
+        await File.WriteAllTextAsync(routeComplete, json);
         return CodeAcessJSonSave.Succes;
     }
 
@@ -162,24 +162,24 @@ public class JSonUtil
     /// <summary>
     /// Carga un JSON, ejecuta las modificaciones dadas y lo guarda automáticamente.
     /// </summary>
-    public static CodeAcessJSonSave Update<T>(string pKeyDir, string pFile, Action<T> updateAction) where T : class, new()
+    public static async Task<CodeAcessJSonSave> UpdateAsync<T>(string pKeyDir, string pFile, Action<T> updateAction) where T : class, new()
     {
-        T data = Acess<T>(pKeyDir, pFile) ?? new T();
+        T data = await AcessAsync<T>(pKeyDir, pFile) ?? new T();
 
         updateAction(data);
 
-        return Save(pKeyDir, pFile, data);
+        return await SaveAsync(pKeyDir, pFile, data);
     }
 
     /// <summary>
     /// Carga un JSON, ejecuta las modificaciones dadas y lo guarda automáticamente.
     /// </summary>
-    public static CodeAcessJSonSave UpdateDirect<T>(string pDir, string pFile, Action<T> updateAction) where T : class, new()
+    public static async Task<CodeAcessJSonSave> UpdateDirectAsync<T>(string pDir, string pFile, Action<T> updateAction) where T : class, new()
     {
-        T data = AcessDirect<T>(pDir, pFile) ?? new T();
+        T data = await AcessDirect<T>(pDir, pFile) ?? new T();
 
         updateAction(data);
 
-        return SaveDirect(pDir, pFile, data);
+        return await SaveDirectAsync(pDir, pFile, data);
     }
 }
