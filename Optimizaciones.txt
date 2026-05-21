@@ -1,0 +1,3 @@
+- Configuracion tenga un objeto compartido entre hilos con la configuracion actual.
+- File y Directory en asincrono O hilo por accion.
+- 

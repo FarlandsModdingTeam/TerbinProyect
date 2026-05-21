@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Configuration;
+using TerbinService.Data.References;
 
 namespace TerbinService.Managers;
 
@@ -20,17 +21,37 @@ public static class Maneger
         public static async Task<Guid?> Store(string pPathPlugin)
         {
             string nameFile = Path.GetFileName(pPathPlugin);
-            string? pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
             string namePlugin;
+            Guid id;
 
             if (await ExistByFile(nameFile)) return null;
 
-            nameFile = Manager.Node.GetNameByFile(pPathPlugin);
+            namePlugin = Manager.Node.GetNameByFile(pPathPlugin);
+            id = Guid.NewGuid();
 
-
+            var reference = new ReferencePluginStore
+            {
+                Name = namePlugin,
+                Guid = $"{id}:N",
+                File = nameFile,
+            };
 
         }
 
+        private static async ValueTask<bool> savePlugin(string pPathPlugin)
+        {
+            string? pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
+            if (pathStorage is null) return false;
+
+            File.Move(pPathPlugin, pathStorage);
+
+            return true;
+        }
+
+        private static async Task registerPlugin(ReferencePluginStore pReference)
+        {
+
+        }
 
         public static async Task<bool> ExistByFile(string pFile)
         {
