@@ -21,118 +21,121 @@ namespace TerbinService.Managers;
  */
 
 
-public static class ManagerManifest
+public static partial class Manager
 {
-
-    private const string _INSTANCES = ".IndexInstances.json";
-
-    public static bool UpdateIndex(string pName)
+    public static class Manifest
     {
-        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
-        if (dir == null)
-            return false;
+        private const string _INSTANCES = ".IndexInstances.json";
 
-        JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Add(pName); });
-        return true;
-    }
-    public static bool DeleteIndex(string pName)
-    {
-        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
-        if (dir == null)
-            return false;
-
-        JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Remove(pName); });
-        return true;
-    }
-
-
-    public static List<string> GetIndex()
-    {
-        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
-        if (dir == null)
-            return new List<string>();
-        return JSonUtil.AcessDirect<List<string>>(dir, _INSTANCES) ?? new List<string>();
-    }
-
-
-
-    public static void CreatePredeterminated(string pName)
-    {
-        string? dirInfo = ManagerInstances.MakePathFolderInformation(pName);
-        if (dirInfo == null)
-            return;
-        DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
-        directoryInfo.Attributes |= FileAttributes.Hidden;
-        CreatePredeterminatedInstance(pName, dirInfo);
-    }
-
-    public static void CreatePredeterminatedInstance(string pName, string pDir)
-    {
-        var manifest = new InstanceManifest
+        public static bool UpdateIndex(string pName)
         {
-            Name = pName,
-            Version = TerbinLibrary.SteamFarlands.ManagerFarlands.GetVersion(),
-            Plugins = []
-        };
-        JSonUtil.SaveDirect(pDir, TerbinServiceConst.MANIFEST_INSTANCE, manifest);
-    }
+            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            if (dir == null)
+                return false;
 
-
-    public static bool UpdateInstace(string pName, Action<InstanceManifest> updateAction)
-    {
-        var pathInstance = ManagerInstances.MakePathFolder(pName);
-        if (pathInstance == null)
-            return false;
-
-        return UpdateInstace(pName, pathInstance, updateAction);
-    }
-
-    public static bool UpdateInstace(string pName, string pPathInstance, Action<InstanceManifest> updateAction)
-    {
-        var pathInformation = ManagerInstances.MakePathFolderInformation(pName);
-        if (pathInformation is null)
-            return false;
-
-        JSonUtil.UpdateDirect<InstanceManifest>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
-        return true;
-    }
-
-
-    public static void HandleAddPlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
-    {
-        var information = ManagerInstances.MakePathFolderInformation(pNameInstace);
-        if (information is null)
-            throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
-
-        Guid g = Guid.NewGuid();
-        string name = $"{g:N}";
-        string file = $"{g:N}.json";
-        string pathManifest = Path.Combine(information, $"{g:N}.json");
-
-        var manifest = new PluginManifest
+            JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Add(pName); });
+            return true;
+        }
+        public static bool DeleteIndex(string pName)
         {
-            Name = name,
-            Content = pHandwritten,
-        };
-        JSonUtil.SaveDirect(information, file, manifest);
+            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            if (dir == null)
+                return false;
 
-        var reference = new ReferencePlugin
+            JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Remove(pName); });
+            return true;
+        }
+
+
+        public static List<string> GetIndex()
         {
-            Name = name,
-            GUID = name,
-            Path = pathManifest,
-        };
-
-        ManagerManifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
-    }
+            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            if (dir == null)
+                return new List<string>();
+            return JSonUtil.AcessDirect<List<string>>(dir, _INSTANCES) ?? new List<string>();
+        }
 
 
-    public static void WriteHandwritten(string pPath, DirectoryHandwritten? pJson)
-    {
-        if (pJson == null)
-            return;
 
-        pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE, TerbinServiceConst.HANDWRITTEN);
-        File.WriteAllText(pPath, pJson.ToJson());
+        public static void CreatePredeterminated(string pName)
+        {
+            string? dirInfo = Manager.Instances.MakePathFolderInformation(pName);
+            if (dirInfo == null)
+                return;
+            DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
+            directoryInfo.Attributes |= FileAttributes.Hidden;
+            CreatePredeterminatedInstance(pName, dirInfo);
+        }
+
+        public static void CreatePredeterminatedInstance(string pName, string pDir)
+        {
+            var manifest = new InstanceManifest
+            {
+                Name = pName,
+                Version = TerbinLibrary.SteamFarlands.ManagerFarlands.GetVersion(),
+                Plugins = []
+            };
+            JSonUtil.SaveDirect(pDir, TerbinServiceConst.MANIFEST_INSTANCE, manifest);
+        }
+
+
+        public static bool UpdateInstace(string pName, Action<InstanceManifest> updateAction)
+        {
+            var pathInstance = Manager.Instances.MakePathFolder(pName);
+            if (pathInstance == null)
+                return false;
+
+            return UpdateInstace(pName, pathInstance, updateAction);
+        }
+
+        public static bool UpdateInstace(string pName, string pPathInstance, Action<InstanceManifest> updateAction)
+        {
+            var pathInformation = Manager.Instances.MakePathFolderInformation(pName);
+            if (pathInformation is null)
+                return false;
+
+            JSonUtil.UpdateDirect<InstanceManifest>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
+            return true;
+        }
+
+
+        public static void HandleAddPlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
+        {
+            var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
+            if (information is null)
+                throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
+
+            Guid g = Guid.NewGuid();
+            string name = $"{g:N}";
+            string file = $"{g:N}.json";
+            string pathManifest = Path.Combine(information, $"{g:N}.json");
+
+            var manifest = new PluginManifest
+            {
+                Name = name,
+                Content = pHandwritten,
+            };
+            JSonUtil.SaveDirect(information, file, manifest);
+
+            var reference = new ReferencePlugin
+            {
+                Name = name,
+                GUID = name,
+                Path = pathManifest,
+            };
+
+            Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+        }
+
+
+        public static void WriteHandwritten(string pPath, DirectoryHandwritten? pJson)
+        {
+            if (pJson == null)
+                return;
+
+            pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE, TerbinServiceConst.HANDWRITTEN);
+            File.WriteAllText(pPath, pJson.ToJson());
+        }
+
     }
 }

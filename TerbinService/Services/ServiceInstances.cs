@@ -7,7 +7,6 @@ using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Serialize;
 using TerbinService.Managers;
-using static TerbinService.Managers.ManagerInstances;
 using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
@@ -37,7 +36,7 @@ internal static class ServiceInstances
         ReadOnlySpan<byte> reader = pParameters;
         var name = reader.ReadArray<char>().CrString();
 
-        NewInstance(name);
+        Manager.Instances.NewInstance(name);
 
         return new InfoResponse
         {
@@ -50,7 +49,7 @@ internal static class ServiceInstances
     [TerbinExecutable((byte)TerbinCRUD.ReadAll, (byte)CodeSubServices.Instances)]
     public static async Task<InfoResponse?> GetAllInstances(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
-        List<string> instances = ManagerManifest.GetIndex();
+        List<string> instances = Manager.Manifest.GetIndex();
         Serialineitor s = new();
 
         if (instances.Count <= 0)
@@ -79,7 +78,7 @@ internal static class ServiceInstances
         ReadOnlySpan<byte> reader = pParameters;
         var name = reader.ReadArray<char>().CrString();
 
-        var manifest = GetStringManifest(name);
+        var manifest = Manager.Instances.GetStringManifest(name);
         if (manifest is null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExistOrConfigError));
 

@@ -17,7 +17,7 @@ using TerbinLibrary.Protocol;
 
 namespace TerbinService.Managers;
 
-public class ManagerBepInEx
+public partial class Manager
 {
 #if false
     [TerbinExecutable((byte)CodeServices.InstallBepInEx)]
@@ -54,74 +54,77 @@ public class ManagerBepInEx
         };
     }
 #endif
-
-    [Obsolete]
-    public static async Task HandleInstallBepInExWithProgress(byte pIdMemory, string pDir)
+    public static class BepInEx
     {
-        IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
-        {
-            var Content = p.ToArray();
-            _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
-            Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
-        });
-        try
-        {
-            StatusNetUtil? r = await HandleInstallBepInEx(TerbinURLs.BepInEx, progressBarr);
-            if (r is null) throw new Exception("TODO: informar de que BepInEx ya esta instalado");
-            if (r != StatusNetUtil.Succes)
-            {
-                CodeInternalErrors error = r switch
-                {
-                    StatusNetUtil.ExceptionOnExtractZip => CodeInternalErrors.ZipExtractException,
-                    StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
-                    _ => CodeInternalErrors.ZipExtractError
-                };
-                throw new Exception($"TODO: informar de {error}");
 
-                // Prototipo del funcionamiento de Info
-                AmongInfoThreads info = Worker.CurrentConst.Value;
-                byte[] pld = new Serialineitor()
-                    .Add(TypeService.Service)
-                    .Add(CodeServices.Dowload)
-                    .Add(error)
-                    .Serialize();
-                _ = info.Communicator.Send(new((byte)CodeTerbinProtocol.ExceptionAlert), pld);
+        [Obsolete]
+        public static async Task HandleInstallBepInExWithProgress(byte pIdMemory, string pDir)
+        {
+            IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
+            {
+                var Content = p.ToArray();
+                _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
+                Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
+            });
+            try
+            {
+                StatusNetUtil? r = await HandleInstallBepInEx(TerbinURLs.BepInEx, progressBarr);
+                if (r is null) throw new Exception("TODO: informar de que BepInEx ya esta instalado");
+                if (r != StatusNetUtil.Succes)
+                {
+                    CodeInternalErrors error = r switch
+                    {
+                        StatusNetUtil.ExceptionOnExtractZip => CodeInternalErrors.ZipExtractException,
+                        StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
+                        _ => CodeInternalErrors.ZipExtractError
+                    };
+                    throw new Exception($"TODO: informar de {error}");
+
+                    // Prototipo del funcionamiento de Info
+                    AmongInfoThreads info = Worker.CurrentConst.Value;
+                    byte[] pld = new Serialineitor()
+                        .Add(TypeService.Service)
+                        .Add(CodeServices.Dowload)
+                        .Add(error)
+                        .Serialize();
+                    _ = info.Communicator.Send(new((byte)CodeTerbinProtocol.ExceptionAlert), pld);
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.CrString("HandleInstallBepInExWithProgress"));
             }
         }
-        catch (Exception e)
+
+        public static async Task<StatusNetUtil?> HandleInstallBepInEx(string pDir, IProgress<TerbinInfoProgrss>? pProgress = default)
         {
-            Console.WriteLine(e.CrString("HandleInstallBepInExWithProgress"));
+            StatusNetUtil r = StatusNetUtil.Succes;
+            if (CheckInstallBepInEx(pDir)) return null;
+            r = await NetUtil.InstallZip(TerbinURLs.BepInEx, pDir, pProgress);
+            return r;
         }
-    }
 
-    public static async Task<StatusNetUtil?> HandleInstallBepInEx(string pDir, IProgress<TerbinInfoProgrss>? pProgress = default)
-    {
-        StatusNetUtil r = StatusNetUtil.Succes;
-        if (CheckInstallBepInEx(pDir)) return null;
-        r = await NetUtil.InstallZip(TerbinURLs.BepInEx, pDir, pProgress);
-        return r;
-    }
-
-    public static bool CheckInstallBepInEx(string pDir)
-    {
-        string bep = Path.Combine(pDir, "BepInEx");
-        return Directory.Exists(bep);
-    }
+        public static bool CheckInstallBepInEx(string pDir)
+        {
+            string bep = Path.Combine(pDir, "BepInEx");
+            return Directory.Exists(bep);
+        }
 
 
-    public static string GetBepInExFolderPlugin(string pPathInstance) // BepInEx/plugins/
-    {
-        string pathBepInExFolder;
-        string pathPlugins;
+        public static string GetBepInExFolderPlugin(string pPathInstance) // BepInEx/plugins/
+        {
+            string pathBepInExFolder;
+            string pathPlugins;
 
-        pathBepInExFolder = Path.Combine(pPathInstance, "BepInEx");
-        if (!Directory.Exists(pathBepInExFolder))
-            Directory.CreateDirectory(pathBepInExFolder);
+            pathBepInExFolder = Path.Combine(pPathInstance, "BepInEx");
+            if (!Directory.Exists(pathBepInExFolder))
+                Directory.CreateDirectory(pathBepInExFolder);
 
-        pathPlugins = Path.Combine(pathBepInExFolder, "plugins");
-        if (!Directory.Exists(pathPlugins))
-            Directory.CreateDirectory(pathPlugins);
+            pathPlugins = Path.Combine(pathBepInExFolder, "plugins");
+            if (!Directory.Exists(pathPlugins))
+                Directory.CreateDirectory(pathPlugins);
 
-        return pathPlugins;
+            return pathPlugins;
+        }
     }
 }

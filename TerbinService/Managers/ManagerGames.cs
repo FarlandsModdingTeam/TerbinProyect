@@ -20,49 +20,53 @@ namespace TerbinService.Managers;
  */
 
 
-public static class ManagerGames
+public static partial class Manager
 {
-    public static async Task HandleCloneInInstanceWithProgress(string pName, byte pIdMemoryGame, string pDirGame)
+    public static class Games
     {
-        IProgress<TerbinInfoProgrss> progressBarr = Util.CreateProgessBarrForMemory(Worker.CurrentConst.Value.Communicator, pIdMemoryGame, p => {
-            Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
-        });
-        try
+
+        public static async Task HandleCloneInInstanceWithProgress(string pName, byte pIdMemoryGame, string pDirGame)
         {
-            await HandleCloneInInstance(pName, pIdMemoryGame, pDirGame, progressBarr);
+            IProgress<TerbinInfoProgrss> progressBarr = Util.CreateProgessBarrForMemory(Worker.CurrentConst.Value.Communicator, pIdMemoryGame, p => {
+                Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
+            });
+            try
+            {
+                await HandleCloneInInstance(pName, pIdMemoryGame, pDirGame, progressBarr);
+            }
+            catch (Exception e)
+            {
+                e.PrintException("HandleCloneInInstanceWithProgress");
+            }
+
         }
-        catch (Exception e)
+
+        public static async Task HandleCloneInInstance(string pName, byte pIdMemoryGame, string pDirGame, IProgress<TerbinInfoProgrss> pProgrss = default)
         {
-            e.PrintException("HandleCloneInInstanceWithProgress");
+            var dirInstace = Manager.Instances.MakePathFolder(pName);
+            if (dirInstace == null)
+                return;
+
+            if (!Manager.Instances.IsInstance(dirInstace))
+                throw new Exception("TODO: Informar que NO existe la instancia O el manifiesto");
+
+            var (status, json) = await FileUtil.CloneDirectory(pDirGame, dirInstace, true, pProgrss);
+
+            if (status != StatusFileUtil.Succes) // si es Succes, json no es null
+                throw new Exception("TODO: Informar de que farlands no se ah podido clonar");
+
+            ManagerManifest.WriteHandwritten(dirInstace, json);
+
+
+            var exes = FileUtil.GetAllExeFiles(dirInstace);
+            if (exes is null)
+                return;
+
+            ManagerManifest.UpdateInstace(pName, dirInstace, manifest =>
+            {
+                manifest.Executable = exes[0];
+            });
         }
 
     }
-
-    public static async Task HandleCloneInInstance(string pName, byte pIdMemoryGame, string pDirGame, IProgress<TerbinInfoProgrss> pProgrss = default)
-    {
-        var dirInstace = ManagerInstances.MakePathFolder(pName);
-        if (dirInstace == null)
-            return;
-
-        if (!ManagerInstances.IsInstance(dirInstace))
-            throw new Exception("TODO: Informar que NO existe la instancia O el manifiesto");
-
-        var (status, json) = await FileUtil.CloneDirectory(pDirGame, dirInstace, true, pProgrss);
-
-        if (status != StatusFileUtil.Succes) // si es Succes, json no es null
-            throw new Exception("TODO: Informar de que farlands no se ah podido clonar");
-
-        ManagerManifest.WriteHandwritten(dirInstace, json);
-
-
-        var exes = FileUtil.GetAllExeFiles(dirInstace);
-        if (exes is null)
-            return;
-
-        ManagerManifest.UpdateInstace(pName, dirInstace, manifest =>
-        {
-            manifest.Executable = exes[0];
-        });
-    }
-
 }

@@ -4,13 +4,15 @@ using System.Text;
 
 namespace TerbinService.Managers;
 
-public static class ManegerStoragePlugin
+public static class Maneger
 {
-    // TerbinConfiguration
-
-    public static async Task<string> Store(string pPathPlugin)
+    public static class StoragePlugin
     {
-        throw new NotImplementedException("Ñe");
-    }
+        // TerbinConfiguration
 
+        public static async Task<string> Store(string pPathPlugin)
+        {
+            throw new NotImplementedException("Ñe");
+        }
+    }
 }

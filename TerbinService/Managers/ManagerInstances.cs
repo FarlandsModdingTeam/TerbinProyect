@@ -18,91 +18,94 @@ namespace TerbinService.Managers;
  */
 
 
-public static class ManagerInstances
+public static partial class Manager
 {
-    public static bool NewInstance(string pName)
+    public static class Instances
     {
-        var dirInstace = MakePathFolder(pName);
-        if (dirInstace == null)
-            return false;
-
-        if (Directory.Exists(dirInstace))
+        public static bool NewInstance(string pName)
         {
-            if (Directory.EnumerateFileSystemEntries(dirInstace).Any())
-                throw new Exception("TODO: Preguntar si quiere sobreescribir");
+            var dirInstace = MakePathFolder(pName);
+            if (dirInstace == null)
+                return false;
+
+            if (Directory.Exists(dirInstace))
+            {
+                if (Directory.EnumerateFileSystemEntries(dirInstace).Any())
+                    throw new Exception("TODO: Preguntar si quiere sobreescribir");
+            }
+            else
+            {
+                Directory.CreateDirectory(dirInstace);
+            }
+
+
+            ManagerManifest.CreatePredeterminated(pName);
+
+            ManagerManifest.UpdateIndex(pName);
+            return true;
         }
-        else
+        public static bool IsInstance(string pDir)
         {
-            Directory.CreateDirectory(dirInstace);
+            string information;
+            string manifest;
+
+            information = Path.Combine(pDir, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
+
+            if (!Directory.Exists(information)) return false;
+
+            manifest = Path.Combine(information, TerbinServiceConst.MANIFEST_INSTANCE);
+
+            return File.Exists(manifest);
+        }
+        public static string? GetStringManifest(string pName)
+        {
+            string? dir = MakePathFolder(pName);
+            if (dir == null)
+                return null;
+
+            string file = Path.Combine(dir, pName);
+            if (!File.Exists(file))
+                return null;
+
+            return File.ReadAllText(file);
         }
 
+        public static InstanceManifest? GetManifest(string pName)
+        {
+            string? dir = MakePathFolder(pName);
+            if (dir == null)
+                return null;
 
-        ManagerManifest.CreatePredeterminated(pName);
+            return JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
+        }
 
-        ManagerManifest.UpdateIndex(pName);
-        return true;
-    }
-    public static bool IsInstance(string pDir)
-    {
-        string information;
-        string manifest;
+        public static string? MakePathFolderInformation(string pName)
+        {
+            var dir = MakePathFolder(pName);
+            if (dir == null)
+                return null;
 
-        information = Path.Combine(pDir, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
+            return Path.Combine(dir, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
+        }
 
-        if (!Directory.Exists(information)) return false;
+        public static string? CreatePathFolder(string pName)
+        {
+            var dir = MakePathFolder(pName);
+            if (dir == null)
+                return null;
 
-        manifest = Path.Combine(information, TerbinServiceConst.MANIFEST_INSTANCE);
+            if (!Directory.Exists(dir))
+                Directory.CreateDirectory(dir);
 
-        return File.Exists(manifest);
-    }
-    public static string? GetStringManifest(string pName)
-    {
-        string? dir = MakePathFolder(pName);
-        if (dir == null)
-            return null;
+            return dir;
+        }
+        public static string? MakePathFolder(string pName)
+        {
+            var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            if (dir == null)
+                return null;
 
-        string file = Path.Combine(dir, pName);
-        if (!File.Exists(file))
-            return null;
-
-        return File.ReadAllText(file);
-    }
-
-    public static InstanceManifest? GetManifest(string pName)
-    {
-        string? dir = MakePathFolder(pName);
-        if (dir == null)
-            return null;
-
-        return JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
-    }
-
-    public static string? MakePathFolderInformation(string pName)
-    {
-        var dir = MakePathFolder(pName);
-        if (dir == null)
-            return null;
-
-        return Path.Combine(dir, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
-    }
-
-    public static string? CreatePathFolder(string pName)
-    {
-        var dir = MakePathFolder(pName);
-        if (dir == null)
-            return null;
-
-        if (!Directory.Exists(dir))
-            Directory.CreateDirectory(dir);
-
-        return dir;
-    }
-    public static string? MakePathFolder(string pName)
-    {
-        var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
-        if (dir == null)
-            return null;
-
-        return Path.Combine(dir, pName);
+            return Path.Combine(dir, pName);
+        }
     }
 }

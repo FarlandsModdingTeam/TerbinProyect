@@ -8,7 +8,6 @@ using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Extension;
-using static TerbinService.Managers.ManagerPlugin;
 using TerbinService.Managers;
 using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
@@ -45,15 +44,15 @@ internal static class ServicesPlugins
 
         string? pathInstance;
         string pathPlugin;
-        pathInstance = ManagerInstances.MakePathFolder(name);
+        pathInstance = Manager.Instances.MakePathFolder(name);
         if (pathInstance is null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExit));
         if (requierBepInEx)
         {
-            if (!ManagerBepInEx.CheckInstallBepInEx(pathInstance))
+            if (!Manager.BepInEx.CheckInstallBepInEx(pathInstance))
                 return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.BepInExNotInstall));
             //pathPlugin = MakePathPluginByInstance(pathInstance);
-            pathPlugin = ManagerBepInEx.GetBepInExFolderPlugin(pathInstance);
+            pathPlugin = Manager.BepInEx.GetBepInExFolderPlugin(pathInstance);
         }
         else
         {
@@ -76,7 +75,7 @@ internal static class ServicesPlugins
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         byte memoryExtract = rId.Payload[0];
 
-        _ = HandleInstallPluginWithProgress(name, memoryDownload, memoryExtract, pathPlugin, urlPlugin);
+        _ = Manager.Plugin.HandleInstallPluginWithProgress(name, memoryDownload, memoryExtract, pathPlugin, urlPlugin);
 
         return new InfoResponse
         {

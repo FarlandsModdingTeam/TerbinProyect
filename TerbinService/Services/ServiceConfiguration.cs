@@ -4,11 +4,11 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution;
+using TerbinLibrary.Extension;
+using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Useful;
-using TerbinLibrary.Extension;
-using static TerbinService.Managers.ManagerConfiguration;
-using TerbinLibrary.Protocol;
+using TerbinService.Managers;
 
 namespace TerbinService.Services;
 /*
@@ -45,7 +45,7 @@ internal static class ServiceConfiguration
         if (newRute == null)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
-        var result = SetConfig(keyRute, newRute);
+        var result = Manager.Configuration.SetConfig(keyRute, newRute);
         pHead.Status = result switch
         {
             CodeAcessJSonSave.Succes => CodeStatus.Succes,
@@ -65,7 +65,7 @@ internal static class ServiceConfiguration
         {
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
         }
-        if (GetConfg(keyRute) is var rute && rute != null)
+        if (Manager.Configuration.GetConfg(keyRute) is var rute && rute != null)
         {
             pld = Serialineitor.SerializeArray<char>(rute.ToCharArray());
             pHead.Status = CodeStatus.Succes;
