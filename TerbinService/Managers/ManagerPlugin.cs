@@ -105,7 +105,7 @@ public static class ManagerPlugin
     public static async Task DowloadOne
         (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
     {
-
+        
     }
 
     public static async Task InstallOne

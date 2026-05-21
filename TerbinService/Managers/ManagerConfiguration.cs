@@ -87,11 +87,13 @@ public static class ManagerConfiguration
         lock (_lockPredeterminated)
         {
             var data = new Dictionary<string, string>();
-            string? dirFarlands = TerbinLibrary.SteamFarlands.ManagerFarlands.GetRuteSteamFarlands();
+            string? dirFarlands = ManagerFarlands.GetRuteSteamFarlands();
             if (dirFarlands != null)
                 data.Add(TerbinConfiguration.RUTE_FARLANDS, dirFarlands);
 
             data.Add(TerbinConfiguration.RUTE_INSTANCES, MakePathInstances());
+
+            data.Add(TerbinConfiguration.RUTE_STORAGE_PLUGINS, MakePathStorage());
 
             JSonUtil.Set(KEY, FOLDER);
             JSonUtil.Save(KEY, JSON, data);
@@ -102,8 +104,9 @@ public static class ManagerConfiguration
     {
         return pKey switch
         {
-            TerbinConfiguration.RUTE_FARLANDS => TerbinLibrary.SteamFarlands.ManagerFarlands.GetRuteSteamFarlands(),
+            TerbinConfiguration.RUTE_FARLANDS => ManagerFarlands.GetRuteSteamFarlands(),
             TerbinConfiguration.RUTE_INSTANCES => MakePathInstances(),
+            TerbinConfiguration.RUTE_STORAGE_PLUGINS => MakePathStorage(),
 
             _ => null
         };
@@ -113,6 +116,12 @@ public static class ManagerConfiguration
     {
         string d = GetPathDocument();
         return Path.Combine(d, "TerbinInstaces");
+    }
+
+    public static string MakePathStorage()
+    {
+        string d = GetPathDocument();
+        return Path.Combine(d, "TerbinStorage");
     }
 
 
