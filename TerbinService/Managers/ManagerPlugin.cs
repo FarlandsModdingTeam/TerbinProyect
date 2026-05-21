@@ -157,17 +157,5 @@ public static partial class Manager
                 Directory.CreateDirectory(pathPlugin);
             return pathPlugin;
         }
-
-        public static string MakeNameByFile(string pFile)
-        {
-            if (string.IsNullOrWhiteSpace(pFile))
-                return string.Empty;
-
-            string fileName = Path.GetFileNameWithoutExtension(pFile);
-
-            fileName = fileName.Replace('_', ' ').Replace('-', ' ');
-
-            return string.Join(' ', fileName.Split(' ', StringSplitOptions.RemoveEmptyEntries));
-        }
     }
 }
