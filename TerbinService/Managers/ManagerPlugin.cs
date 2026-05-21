@@ -95,7 +95,7 @@ public static partial class Manager
 
             var (status, json) = await NetUtil.InstallZipWithProgress(pUrl, pPathPlugin, pProgressZip, pProgressDowload);
 
-            ManagerManifest.HandleAddPlugin(pNameInstace, json);
+            Manager.Manifest.HandleAddPlugin(pNameInstace, json);
 
             return status;
         }

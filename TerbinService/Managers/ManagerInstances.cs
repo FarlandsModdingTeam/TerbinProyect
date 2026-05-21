@@ -39,9 +39,9 @@ public static partial class Manager
             }
 
 
-            ManagerManifest.CreatePredeterminated(pName);
+            Manager.Manifest.CreatePredeterminated(pName);
 
-            ManagerManifest.UpdateIndex(pName);
+            Manager.Manifest.UpdateIndex(pName);
             return true;
         }
         public static bool IsInstance(string pDir)
@@ -101,7 +101,7 @@ public static partial class Manager
         }
         public static string? MakePathFolder(string pName)
         {
-            var dir = ManagerConfiguration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
                 return null;
 

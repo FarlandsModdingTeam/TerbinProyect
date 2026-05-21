@@ -55,14 +55,14 @@ public static partial class Manager
             if (status != StatusFileUtil.Succes) // si es Succes, json no es null
                 throw new Exception("TODO: Informar de que farlands no se ah podido clonar");
 
-            ManagerManifest.WriteHandwritten(dirInstace, json);
+            Manager.Manifest.WriteHandwritten(dirInstace, json);
 
 
             var exes = FileUtil.GetAllExeFiles(dirInstace);
             if (exes is null)
                 return;
 
-            ManagerManifest.UpdateInstace(pName, dirInstace, manifest =>
+            Manager.Manifest.UpdateInstace(pName, dirInstace, manifest =>
             {
                 manifest.Executable = exes[0];
             });
