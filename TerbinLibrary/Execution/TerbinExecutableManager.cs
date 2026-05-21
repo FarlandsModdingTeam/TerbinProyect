@@ -95,7 +95,7 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
                 return null; // Por si alguien hace el bruto.
             }
 
-            if (_activeExecutionsByAction.TryRemove(pActions, out var cts))
+            if (_activeExecutionsByAction.TryGetValue(pActions, out var cts))
                 return await TerbinExecutableHelper.ExecutionList(handlers, pHead, pPayload, cts);
             else
                 throw new Exception("CancellationTokenNotFound");

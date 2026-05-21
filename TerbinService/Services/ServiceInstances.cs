@@ -47,7 +47,7 @@ internal static class ServiceInstances
         };
     }
 
-    [TerbinExecutable((byte)CodeServices.ReadAllInstances)]
+    [TerbinExecutable((byte)TerbinCRUD.ReadAll, (byte)CodeSubServices.Instances)]
     public static async Task<InfoResponse?> GetAllInstances(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         List<string> instances = ManagerManifest.GetIndex();

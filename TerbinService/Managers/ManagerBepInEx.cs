@@ -82,7 +82,7 @@ public class ManagerBepInEx
                 AmongInfoThreads info = Worker.CurrentConst.Value;
                 byte[] pld = new Serialineitor()
                     .Add(TypeService.Service)
-                    .Add(CodeServices.InstallBepInEx)
+                    .Add(CodeServices.Dowload)
                     .Add(error)
                     .Serialize();
                 _ = info.Communicator.Send(new((byte)CodeTerbinProtocol.ExceptionAlert), pld);

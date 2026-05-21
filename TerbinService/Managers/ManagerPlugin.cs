@@ -23,6 +23,8 @@ namespace TerbinService.Managers;
 
 public static class ManagerPlugin
 {
+
+
     public static async Task HandleInstallPluginWithProgress(string pNameInstace, byte pIdDownload, byte pIdExtract, string pPathPlugin, string pUrl)
     {
         IProgress<TerbinInfoProgrss> progressBarrDownload = new Progress<TerbinInfoProgrss>(p =>
@@ -52,7 +54,7 @@ public static class ManagerPlugin
                 AmongInfoThreads info = Worker.CurrentConst.Value;
                 byte[] pld = new Serialineitor()
                     .Add(TypeService.Service)
-                    .Add(CodeServices.InstallBepInEx)
+                    .Add(CodeServices.Dowload)
                     .Add(error)
                     .Serialize();
                 _ = info.Communicator.Send(new((byte)CodeTerbinProtocol.ExceptionAlert), pld);
@@ -63,6 +65,7 @@ public static class ManagerPlugin
             e.PrintException("HandleInstallPluginWithProgress");
         }
     }
+    [Obsolete]
     public static async Task<StatusNetUtil?> SimpleInstallPlugin(
         string pNameInstance,
         string pUrl,
@@ -78,7 +81,7 @@ public static class ManagerPlugin
         r = await HandleInstallPlugin(pNameInstance, pUrl, pathInstance, pProgressExtract, pProgressDownload);
         return r;
     }
-
+    [Obsolete]
     public static async Task<StatusNetUtil> HandleInstallPlugin(
                                             string pNameInstace,
                                             string pUrl,
@@ -99,6 +102,23 @@ public static class ManagerPlugin
 
 
 
+    public static async Task DowloadOne
+        (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+    {
+
+    }
+
+    public static async Task InstallOne
+        (Guid pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+    {
+
+    }
+
+
+
+
+
+
     public static string? MakePathPluginByName(string pNameInstance)
     {
         string? pathInstance;
@@ -111,6 +131,7 @@ public static class ManagerPlugin
             Directory.CreateDirectory(pathPlugin);
         return pathPlugin;
     }
+
     public static string MakePathPluginByInstance(string pPathInstance)
     {
         string pathPlugin;
@@ -119,7 +140,6 @@ public static class ManagerPlugin
             Directory.CreateDirectory(pathPlugin);
         return pathPlugin;
     }
-
 
     public static string MakeNameByFile(string pFile)
     {

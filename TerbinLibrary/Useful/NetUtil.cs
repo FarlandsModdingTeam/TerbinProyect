@@ -88,6 +88,7 @@ public static class NetUtil
         return result;
     }
 
+    [Obsolete]
     public static async Task<(StatusNetUtil status, DirectoryHandwritten? json)> InstallZipWithProgress(
                                             string pUrl,
                                             string pDestination,

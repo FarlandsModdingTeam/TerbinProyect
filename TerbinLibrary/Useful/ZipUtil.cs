@@ -8,6 +8,7 @@ namespace TerbinLibrary.Useful;
 
 public class ZipUtil
 {
+    [Obsolete]
     public static async Task<DirectoryHandwritten> ExtractWithProgressAndReportAsync(
                             string pSourceZipPath,
                             string pDestinationDirectory,

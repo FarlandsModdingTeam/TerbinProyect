@@ -108,7 +108,7 @@ async Task installMod()
     s = new Serialineitor()
                 .AddArray(nameInstace.ToCharArray())
                 .AddArray(pathFarlands.ToCharArray());
-    r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Game), s.Serialize());
+    r = await communicator.Communicate(new(TerbinCRUD.Duplicate, CodeSubServices.Game), s.Serialize());
     Console.WriteLine($"[Client] 4 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (await isError(r.Head.Status)) return;
 
@@ -119,7 +119,7 @@ async Task installMod()
                 .AddArray(nameInstace.ToCharArray())
                 .AddArray(TerbinURLs.BepInEx.ToCharArray())
                 .Add(false);
-    r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Plugin), s.Serialize());
+    r = await communicator.Communicate(new(CodeServices.Install, CodeSubServices.Plugin), s.Serialize());
     Console.WriteLine($"[Client] 5 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (await isError(r.Head.Status)) return;
 
@@ -130,7 +130,7 @@ async Task installMod()
                 .AddArray(nameInstace.ToCharArray())
                 .AddArray(TerbinURLs.MOD_EXPLORER.ToCharArray())
                 .Add(true);
-    r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Plugin), s.Serialize());
+    r = await communicator.Communicate(new(CodeServices.Install, CodeSubServices.Plugin), s.Serialize());
     Console.WriteLine($"[Client] 6 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (await isError(r.Head.Status)) return;
 
@@ -141,7 +141,7 @@ async Task installMod()
                 .AddArray(nameInstace.ToCharArray())
                 .AddArray(TerbinURLs.MOD_FCM.ToCharArray())
                 .Add(true);
-    r = await communicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Plugin), s.Serialize());
+    r = await communicator.Communicate(new(CodeServices.Install, CodeSubServices.Plugin), s.Serialize());
     Console.WriteLine($"[Client] 7 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
     if (await isError(r.Head.Status)) return;
 
@@ -239,7 +239,7 @@ async Task manuallity()
             var r = await communicator.Communicate(new(input), menssage);
 
             Console.WriteLine($"[Client] R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-            if (input == (byte)CodeServices.InstallBepInEx && r.Head.Status == CodeStatus.Succes)
+            if (input == (byte)CodeServices.Dowload && r.Head.Status == CodeStatus.Succes)
             {
                 ReadOnlySpan<byte> w = r.Payload;
                 byte id = w.Read<byte>();

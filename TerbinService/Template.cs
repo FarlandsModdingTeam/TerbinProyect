@@ -27,7 +27,7 @@ namespace TerbinService;
 internal partial class Template
 {
     // [TerbinExecutable(CodeServices.WIP_NewService)]
-    public static async Task<InfoResponse?> TemplateMethod(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> TemplateMethod(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         // Comprobaciones.
         if (pParameters.Length <= 0)

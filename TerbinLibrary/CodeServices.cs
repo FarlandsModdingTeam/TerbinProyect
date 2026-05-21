@@ -4,7 +4,7 @@ using System.Text;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Serialize;
-using TerbinLibrary.Useful;
+using TerbinLibrary.Protocol;
 
 namespace TerbinLibrary;
 /*
@@ -25,13 +25,14 @@ public enum CodeServices : byte
     Info = 10,
     Alert = 11,
 
-    InstallBepInEx = 12,
+    Execute = 12,
+    Dowload = 13,
+    Install = 14,
 
-    Plugin_Tests = 20,
-
-    ReadAllInstances = 30,
-
-    WIP_NewService = 255,
+    //InstallBepInEx = 12,
+    //Plugin_Tests = 20,
+    //ReadAllInstances = 30,
+    //WIP_NewService = 255,
 }
 
 public enum CodeSubServices : byte

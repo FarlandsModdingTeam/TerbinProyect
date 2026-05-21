@@ -30,8 +30,8 @@ namespace TerbinService.Services;
 
 internal static class ServicesPlugins
 {
-    [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Plugin)]
-    public static async Task<InfoResponse?> InstallPluginService(Header pHead, byte[] pParameters, CancellationToken pToken)
+    [TerbinExecutable((byte)CodeServices.Install, (byte)CodeSubServices.Plugin)]
+    public static async Task<InfoResponse?> InstallPlugin(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
@@ -86,6 +86,30 @@ internal static class ServicesPlugins
                         .Add(memoryDownload)
                         .Add(memoryExtract)
                         .Add(sizePlugin.Value)
+                        .Serialize(),
+        };
+    }
+
+
+    [TerbinExecutable((byte)CodeServices.Dowload, (byte)CodeSubServices.Plugin)]
+    public static async Task<InfoResponse?> DowloadPlugin(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        AmongInfoThreads info = Worker.CurrentConst.Value;
+
+        ReadOnlySpan<byte> reader = pParameters;
+        string urlPlugin = reader.ReadArray<char>().CrString();
+        bool requierBepInEx = reader.Read<bool>();
+
+
+        return new InfoResponse
+        {
+            IdRequest = pHead.IdRequest,
+            Status = CodeStatus.Succes,
+            Payload = new Serialineitor()
+                        .Add('a')
                         .Serialize(),
         };
     }

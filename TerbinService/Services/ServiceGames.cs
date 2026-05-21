@@ -50,4 +50,38 @@ internal static class ServiceGames
                         .Serialize(),
         };
     }
+
+
+    [TerbinExecutable((byte)CodeServices.Execute, (byte)CodeSubServices.Game)]
+    public static async Task<InfoResponse?> ExecuteGame(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        ReadOnlySpan<byte> buffer = pParameters;
+        string nameInstance = buffer.ReadArray<char>().CrString();
+        string dirGame = buffer.ReadArray<char>().CrString();
+
+        var sizes = ManagerNode.GetSizeDir(dirGame);
+        if (sizes.maxFiles == null || sizes.maxDir == null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
+
+        var rId = await Worker.CurrentConst.Value.Communicator.SoliciteRequestMemory();
+        if (rId.Head.Status != CodeStatus.Succes)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
+        byte id = rId.Payload[0];
+
+        _ = HandleCloneInInstanceWithProgress(nameInstance, id, dirGame);
+
+        return new InfoResponse
+        {
+            IdRequest = pHead.IdRequest,
+            Status = CodeStatus.Succes,
+            Payload = new Serialineitor()
+                        .Add(id)
+                        .Add(sizes.maxFiles.Value)
+                        .Add(sizes.maxDir.Value)
+                        .Serialize(),
+        };
+    }
 }
