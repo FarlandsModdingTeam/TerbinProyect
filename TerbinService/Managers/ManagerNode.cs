@@ -68,5 +68,22 @@ public static partial class Manager
                 manifest.Executable = exes[0];
             });
         }
+
+
+
+        public static string GetNameByFile(string pFile)
+        {
+            if (string.IsNullOrWhiteSpace(pFile))
+                return string.Empty;
+
+            string fileName = Path.GetFileNameWithoutExtension(pFile);
+            return ClearNameByFile(fileName);
+        }
+
+        public static string ClearNameByFile(string pFileNameWithoutExtension)
+        {
+            pFileNameWithoutExtension = pFileNameWithoutExtension.Replace('_', ' ').Replace('-', ' ');
+            return string.Join(' ', pFileNameWithoutExtension.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+        }
     }
 }
