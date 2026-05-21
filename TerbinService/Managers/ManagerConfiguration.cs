@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful.Nodes;
@@ -19,10 +20,12 @@ namespace TerbinService.Managers;
  */
 
 
-public static partial class Manager
+internal static partial class Manager
 {
-    public static class Configuration
+    internal static class Configuration
     {
+        private static AsyncLocal<Dictionary<string, string>> _currentConfig = new AsyncLocal<Dictionary<string, string>>();
+
         private const string FOLDER = "config/";
         private const string JSON = "config.json";
         private const string KEY = "Config";
@@ -30,19 +33,26 @@ public static partial class Manager
         public static event Action<string, string>? OnChangeConfig;
 
         private static object _lockPredeterminated = new();
-        //private static object _lockSetGet = new();
+        private static object _lockSetGet = new();
 
-        public static string? GetConfg(string pKey)
+        public static async Task<string?> GetConfg(string pKey)
+        {
+            if (_currentConfig.Value.TryGetValue(pKey, out string? value))
+                return value;
+            else
+                return await GetConfigFile(pKey);
+        }
+
+        public static async Task<string?> GetConfigFile(string pKey)
         {
             if (JSonUtil.Get(KEY) == null)
                 JSonUtil.Set(KEY, FOLDER);
 
-            var r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
+            var r = await JSonUtil.AcessAsync<Dictionary<string, string>>(KEY, JSON);
             if (r == null)
             {
-                setPredeterminatedConfig();
-                //lock (_lockSetGet)
-                r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
+                await setPredeterminatedConfig();
+                r = await JSonUtil.AcessAsync<Dictionary<string, string>>(KEY, JSON);
                 if (r == null)
                     return null;
             }
@@ -51,18 +61,22 @@ public static partial class Manager
                 return value;
             else
             {
-                string? pre = GetPredeterminated(pKey);
+                string? pre = await GetPredeterminated(pKey);
                 if (pre is null) return null;
                 r.Add(pKey, pre);
-                JSonUtil.Save(KEY, JSON, r);
+                await JSonUtil.SaveAsync(KEY, JSON, r);
                 return pre;
             }
         }
 
-        public static CodeAcessJSonSave SetConfig(string pKey, string pData)
+        //public static async Task<CodeAcessJSonSave> SetConfig(string pKey, string pData)
+        //{
+        //}
+
+        private static async Task<CodeAcessJSonSave> setConfigFile(string pKey, string pData)
         {
             Dictionary<string, string> data;
-            if (JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON) is var r && r != null)
+            if (await JSonUtil.AcessAsync<Dictionary<string, string>>(KEY, JSON) is var r && r != null)
                 data = r;
             else
             {
@@ -74,7 +88,7 @@ public static partial class Manager
 
             CodeAcessJSonSave result;
             //lock (_lockSetGet)
-            result = JSonUtil.Save(KEY, JSON, data);
+            result = await JSonUtil.SaveAsync(KEY, JSON, data);
             _ = Task.Run(async () =>
             {
                 await Task.Delay(100);
@@ -83,8 +97,7 @@ public static partial class Manager
             return result;
         }
 
-
-        private static void setPredeterminatedConfig()
+        private static async Task setPredeterminatedConfig()
         {
             lock (_lockPredeterminated)
             {
@@ -98,11 +111,11 @@ public static partial class Manager
                 data.Add(TerbinConfiguration.RUTE_STORAGE_PLUGINS, MakePathStorage());
 
                 JSonUtil.Set(KEY, FOLDER);
-                JSonUtil.Save(KEY, JSON, data);
+                JSonUtil.SaveAsync(KEY, JSON, data);
             }
         }
 
-        public static string? GetPredeterminated(string pKey)
+        public static async Task<string?> GetPredeterminated(string pKey)
         {
             return pKey switch
             {

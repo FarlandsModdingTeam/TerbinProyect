@@ -18,13 +18,13 @@ namespace TerbinService.Managers;
  */
 
 
-public static partial class Manager
+internal static partial class Manager
 {
-    public static class Instances
+    internal static class Instances
     {
-        public static bool NewInstance(string pName)
+        public static async Task<bool> NewInstance(string pName)
         {
-            var dirInstace = MakePathFolder(pName);
+            var dirInstace = await MakePathFolder(pName);
             if (dirInstace == null)
                 return false;
 
@@ -39,9 +39,9 @@ public static partial class Manager
             }
 
 
-            Manager.Manifest.CreatePredeterminated(pName);
+            await Manager.Manifest.CreatePredeterminated(pName);
 
-            Manager.Manifest.UpdateIndex(pName);
+            await Manager.Manifest.UpdateIndex(pName);
             return true;
         }
         public static bool IsInstance(string pDir)
@@ -57,9 +57,9 @@ public static partial class Manager
 
             return File.Exists(manifest);
         }
-        public static string? GetStringManifest(string pName)
+        public static async Task<string?> GetStringManifest(string pName)
         {
-            string? dir = MakePathFolder(pName);
+            string? dir = await MakePathFolder(pName);
             if (dir == null)
                 return null;
 
@@ -70,27 +70,27 @@ public static partial class Manager
             return File.ReadAllText(file);
         }
 
-        public static InstanceManifest? GetManifest(string pName)
+        public static async Task<InstanceManifest?> GetManifest(string pName)
         {
-            string? dir = MakePathFolder(pName);
+            string? dir = await MakePathFolder(pName);
             if (dir == null)
                 return null;
 
-            return JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
+            return await JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
         }
 
-        public static string? MakePathFolderInformation(string pName)
+        public static async Task<string?> MakePathFolderInformation(string pName)
         {
-            var dir = MakePathFolder(pName);
+            var dir = await MakePathFolder(pName);
             if (dir == null)
                 return null;
 
             return Path.Combine(dir, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
         }
 
-        public static string? CreatePathFolder(string pName)
+        public static async Task<string?> CreatePathFolder(string pName)
         {
-            var dir = MakePathFolder(pName);
+            var dir = await MakePathFolder(pName);
             if (dir == null)
                 return null;
 
@@ -99,9 +99,9 @@ public static partial class Manager
 
             return dir;
         }
-        public static string? MakePathFolder(string pName)
+        public static async Task<string?> MakePathFolder(string pName)
         {
-            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            var dir = await Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
                 return null;
 

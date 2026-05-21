@@ -7,6 +7,7 @@ using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data;
 using TerbinService.Data.Manifests;
+using TerbinService.Data.References;
 using TerbinService.Services;
 
 namespace TerbinService.Managers;
@@ -22,53 +23,53 @@ namespace TerbinService.Managers;
  */
 
 
-public static partial class Manager
+internal static partial class Manager
 {
-    public static class Manifest
+    internal static class Manifest
     {
         private const string _INSTANCES = ".IndexInstances.json";
 
-        public static bool UpdateIndex(string pName)
+        public static async Task<bool> UpdateIndex(string pName)
         {
-            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            var dir = await Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
                 return false;
 
-            JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Add(pName); });
+            await JSonUtil.UpdateDirectAsync<List<string>>(dir, _INSTANCES, ii => { ii.Add(pName); });
             return true;
         }
-        public static bool DeleteIndex(string pName)
+        public static async Task<bool> DeleteIndex(string pName)
         {
-            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            var dir = await Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
                 return false;
 
-            JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Remove(pName); });
+            await JSonUtil.UpdateDirectAsync<List<string>>(dir, _INSTANCES, ii => { ii.Remove(pName); });
             return true;
         }
 
 
-        public static List<string> GetIndex()
+        public static async Task<List<string>> GetIndex()
         {
-            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            var dir = await Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
                 return new List<string>();
-            return JSonUtil.AcessDirect<List<string>>(dir, _INSTANCES) ?? new List<string>();
+            return await JSonUtil.AcessDirect<List<string>>(dir, _INSTANCES) ?? new List<string>();
         }
 
 
 
-        public static void CreatePredeterminated(string pName)
+        public static async Task CreatePredeterminated(string pName)
         {
-            string? dirInfo = Manager.Instances.MakePathFolderInformation(pName);
+            string? dirInfo = await Manager.Instances.MakePathFolderInformation(pName);
             if (dirInfo == null)
                 return;
             DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
             directoryInfo.Attributes |= FileAttributes.Hidden;
-            CreatePredeterminatedInstance(pName, dirInfo);
+            await CreatePredeterminatedInstance(pName, dirInfo);
         }
 
-        public static void CreatePredeterminatedInstance(string pName, string pDir)
+        public static async Task CreatePredeterminatedInstance(string pName, string pDir)
         {
             var manifest = new InstanceManifest
             {
@@ -76,33 +77,33 @@ public static partial class Manager
                 Version = TerbinLibrary.SteamFarlands.ManagerFarlands.GetVersion(),
                 Plugins = []
             };
-            JSonUtil.SaveDirect(pDir, TerbinServiceConst.MANIFEST_INSTANCE, manifest);
+            await JSonUtil.SaveDirectAsync(pDir, TerbinServiceConst.MANIFEST_INSTANCE, manifest);
         }
 
 
-        public static bool UpdateInstace(string pName, Action<InstanceManifest> updateAction)
+        public static async Task<bool> UpdateInstace(string pName, Action<InstanceManifest> updateAction)
         {
-            var pathInstance = Manager.Instances.MakePathFolder(pName);
+            var pathInstance = await Manager.Instances.MakePathFolder(pName);
             if (pathInstance == null)
                 return false;
 
-            return UpdateInstace(pName, pathInstance, updateAction);
+            return await UpdateInstace(pName, pathInstance, updateAction);
         }
 
-        public static bool UpdateInstace(string pName, string pPathInstance, Action<InstanceManifest> updateAction)
+        public static async Task<bool> UpdateInstace(string pName, string pPathInstance, Action<InstanceManifest> updateAction)
         {
-            var pathInformation = Manager.Instances.MakePathFolderInformation(pName);
+            var pathInformation = await Manager.Instances.MakePathFolderInformation(pName);
             if (pathInformation is null)
                 return false;
 
-            JSonUtil.UpdateDirect<InstanceManifest>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
+            await JSonUtil.UpdateDirectAsync<InstanceManifest>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
             return true;
         }
 
 
-        public static void HandleAddPlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
+        public static async Task HandleAddPlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
         {
-            var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
+            var information = await Manager.Instances.MakePathFolderInformation(pNameInstace);
             if (information is null)
                 throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
 
@@ -116,7 +117,7 @@ public static partial class Manager
                 Name = name,
                 Content = pHandwritten,
             };
-            JSonUtil.SaveDirect(information, file, manifest);
+            await JSonUtil.SaveDirectAsync(information, file, manifest);
 
             var reference = new ReferencePlugin
             {
@@ -125,17 +126,17 @@ public static partial class Manager
                 Path = pathManifest,
             };
 
-            Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+            await Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
         }
 
 
-        public static void WriteHandwritten(string pPath, DirectoryHandwritten? pJson)
+        public static async Task WriteHandwritten(string pPath, DirectoryHandwritten? pJson)
         {
             if (pJson == null)
                 return;
 
             pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE, TerbinServiceConst.HANDWRITTEN);
-            File.WriteAllText(pPath, pJson.ToJson());
+            await File.WriteAllTextAsync(pPath, pJson.ToJson());
         }
 
     }

@@ -19,9 +19,9 @@ namespace TerbinService.Managers;
  */
 
 
-public static partial class Manager
+internal static partial class Manager
 {
-    public static class Node
+    internal static class Node
     {
         public static async Task<Task<(StatusFileUtil status, DirectoryHandwritten? json)>?>
                     HandleCloneGame(string pDirSource, string pDirTarjet, IProgress<TerbinInfoProgrss> pProgrss = default)

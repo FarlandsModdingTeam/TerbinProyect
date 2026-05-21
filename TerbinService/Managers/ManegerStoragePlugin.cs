@@ -5,9 +5,9 @@ using TerbinLibrary.Configuration;
 
 namespace TerbinService.Managers;
 
-public static class Maneger
+internal static class Maneger
 {
-    public static class StoragePlugin
+    internal static class StoragePlugin
     {
         // TerbinConfiguration
         // TerbinServiceConst.MANIFEST_STORAGE

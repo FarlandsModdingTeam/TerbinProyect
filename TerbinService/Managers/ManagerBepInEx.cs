@@ -18,7 +18,7 @@ using TerbinLibrary.Useful.NetWork;
 
 namespace TerbinService.Managers;
 
-public partial class Manager
+internal partial class Manager
 {
 #if false
     [TerbinExecutable((byte)CodeServices.InstallBepInEx)]

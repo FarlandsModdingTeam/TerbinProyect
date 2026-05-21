@@ -21,9 +21,9 @@ namespace TerbinService.Managers;
  */
 
 
-public static partial class Manager
+internal static partial class Manager
 {
-    public static class Games
+    internal static class Games
     {
 
         public static async Task HandleCloneInInstanceWithProgress(string pName, byte pIdMemoryGame, string pDirGame)
