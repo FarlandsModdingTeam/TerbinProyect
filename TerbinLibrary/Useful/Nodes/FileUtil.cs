@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Data;
 
-namespace TerbinLibrary.Useful;
+namespace TerbinLibrary.Useful.Nodes;
 /*
  -- Variables:
   empieza: _ = es privada NO local.

@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Configuration;
-using TerbinLibrary.Useful;
-using TerbinService.Data;
+using TerbinLibrary.Useful.Nodes;
+using TerbinService.Data.Manifests;
 
 namespace TerbinService.Managers;
 /*

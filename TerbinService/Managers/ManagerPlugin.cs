@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary;
+using TerbinLibrary.Data;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.Useful;
+using TerbinLibrary.Useful.NetWork;
 using TerbinService.Services;
 
 namespace TerbinService.Managers;
@@ -105,6 +107,21 @@ public static partial class Manager
         public static async Task DowloadOne
             (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
+
+
+            string tmp = "";
+
+            if (!Directory.Exists(pDestination))
+                Directory.CreateDirectory(pDestination);//return(StatusNetUtil.DestinationInvalid, null);
+
+            if (await NetUtil.DownloadAny(pUrl, pProgress) is var r && r.status == StatusNetUtil.Succes)
+            {
+                tmp = r.tempFilePath;
+            }
+            else
+            {
+
+            }
 
         }
 

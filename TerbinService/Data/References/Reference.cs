@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TerbinService.Data;
+namespace TerbinService.Data.References;
 
 /// <summary>
 /// Es la referencia del mod en el Json (¿que json?, El del Index).
@@ -12,11 +12,4 @@ public class Reference
     public string? Name;
     public string? GUID;
     public string? manifestUrl;
-}
-
-public class ReferencePlugin
-{
-    public string? Name;
-    public string? GUID;
-    public string? Path;
 }

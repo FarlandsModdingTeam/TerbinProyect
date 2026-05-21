@@ -4,7 +4,7 @@ using System.IO.Compression;
 using System.Text;
 using TerbinLibrary.Data;
 
-namespace TerbinLibrary.Useful;
+namespace TerbinLibrary.Useful.Nodes;
 
 public class ZipUtil
 {
@@ -66,6 +66,7 @@ public class ZipUtil
 
         return handwritten;
     }
+
 
     public static async Task<DirectoryHandwritten> ExtractWithProgress(
                                     string pSourceZipPath,

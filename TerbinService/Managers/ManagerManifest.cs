@@ -4,8 +4,9 @@ using System.Text;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
 using TerbinLibrary.SteamFarlands;
-using TerbinLibrary.Useful;
+using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data;
+using TerbinService.Data.Manifests;
 using TerbinService.Services;
 
 namespace TerbinService.Managers;

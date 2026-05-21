@@ -7,7 +7,7 @@ using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
-using TerbinLibrary.Useful;
+using TerbinLibrary.Useful.Nodes;
 using TerbinService.Managers;
 
 namespace TerbinService.Services;

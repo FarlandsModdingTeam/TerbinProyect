@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Data;
+using TerbinService.Data.References;
 
-namespace TerbinService.Data;
+namespace TerbinService.Data.Manifests;
 
-public interface IManifest
+internal interface IManifest
 {
     string? GetId();
 }
@@ -14,7 +15,7 @@ public interface IManifest
 /// ______( Manifiesto de la instancia )______<br />
 /// - Contiene información sobre la instancia, como su nombre, versión y mods instalados.
 /// </summary>
-public class InstanceManifest : IManifest
+internal class InstanceManifest : IManifest
 {
     public string? Name { get; set; }
     public string? Version { get; set; }
@@ -27,7 +28,7 @@ public class InstanceManifest : IManifest
     }
 }
 [Obsolete]
-public class ModManifest : IManifest
+internal class ModManifest : IManifest
 {
     public string? Name { get; set; }
     public string? Owner { get; set; }
@@ -38,7 +39,7 @@ public class ModManifest : IManifest
         return Name + ":" + Owner;
     }
 }
-public class PluginManifest : IManifest
+internal class PluginManifest : IManifest
 {
     public string? Name { get; set; }
     public string? Owner { get; set; }

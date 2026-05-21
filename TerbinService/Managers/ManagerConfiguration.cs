@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.SteamFarlands;
-using TerbinLibrary.Useful;
+using TerbinLibrary.Useful.Nodes;
 using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace TerbinService.Managers;

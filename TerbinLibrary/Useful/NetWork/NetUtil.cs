@@ -4,8 +4,9 @@ using System.Text;
 using System.Net;
 using System.IO.Compression;
 using TerbinLibrary.Data;
+using TerbinLibrary.Useful.Nodes;
 
-namespace TerbinLibrary.Useful;
+namespace TerbinLibrary.Useful.NetWork;
 /*
  -- Variables:
   empieza: _ = es privada NO local.
@@ -87,6 +88,7 @@ public static class NetUtil
 
         return result;
     }
+
 
     [Obsolete]
     public static async Task<(StatusNetUtil status, DirectoryHandwritten? json)> InstallZipWithProgress(

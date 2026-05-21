@@ -7,7 +7,7 @@ using System.Numerics;
 using System.Resources;
 using TerbinLibrary.Extension;
 
-namespace TerbinLibrary.Useful;
+namespace TerbinLibrary.Useful.Nodes;
 /*
  -- Variables:
   empieza: _ = es privada NO local.
