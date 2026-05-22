@@ -9,7 +9,7 @@ using TerbinService.Data.References;
 
 namespace TerbinService.Managers;
 
-public static class Maneger
+public static partial class Manager
 {
     public static class StoragePlugin
     {

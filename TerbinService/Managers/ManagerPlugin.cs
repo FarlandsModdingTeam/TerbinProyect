@@ -107,22 +107,28 @@ public static partial class Manager
         public static async Task DowloadOne
             (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-
-
-            string tmp = "";
-
-            if (!Directory.Exists(pDestination))
-                Directory.CreateDirectory(pDestination);//return(StatusNetUtil.DestinationInvalid, null);
-
-            if (await NetUtil.DownloadAny(pUrl, pProgress) is var r && r.status == StatusNetUtil.Succes)
+            if (await NetUtil.DownloadAny(pUrl, pProgress) is var r && r.status != StatusNetUtil.Succes)
             {
-                tmp = r.tempFilePath;
-            }
-            else
-            {
-
+                return;   
             }
 
+            Guid? id = null;
+            string nameFile = NetUtil.GetFileName(pUrl);
+            if (!pCancellationToken.IsCancellationRequested)
+                id = await Manager.StoragePlugin.Store(r.tempFilePath, nameFile, false).ConfigureAwait(false);
+            try
+            {
+                File.Delete(r.tempFilePath);
+            }
+            catch
+            {
+                // TODO
+            }
+            finally
+            {
+                if (pCancellationToken.IsCancellationRequested && id is not null)
+                    await Manager.StoragePlugin.Eliminate($"{id:N}").ConfigureAwait(false);
+            }
         }
 
         public static async Task InstallOne
