@@ -15,7 +15,7 @@ internal interface IManifest
 /// ______( Manifiesto de la instancia )______<br />
 /// - Contiene información sobre la instancia, como su nombre, versión y mods instalados.
 /// </summary>
-internal class InstanceManifest : IManifest
+public class InstanceManifest : IManifest
 {
     public string? Name { get; set; }
     public string? Version { get; set; }
@@ -28,7 +28,7 @@ internal class InstanceManifest : IManifest
     }
 }
 [Obsolete]
-internal class ModManifest : IManifest
+public class ModManifest : IManifest
 {
     public string? Name { get; set; }
     public string? Owner { get; set; }
@@ -39,7 +39,7 @@ internal class ModManifest : IManifest
         return Name + ":" + Owner;
     }
 }
-internal class PluginManifest : IManifest
+public class PluginManifest : IManifest
 {
     public string? Name { get; set; }
     public string? Owner { get; set; }

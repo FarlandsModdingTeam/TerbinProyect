@@ -7,6 +7,7 @@ using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data;
 using TerbinService.Data.Manifests;
+using TerbinService.Data.References;
 using TerbinService.Services;
 
 namespace TerbinService.Managers;
