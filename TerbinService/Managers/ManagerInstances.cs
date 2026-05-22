@@ -38,7 +38,6 @@ public static partial class Manager
                 Directory.CreateDirectory(dirInstace);
             }
 
-
             Manager.Manifest.CreatePredeterminated(pName);
 
             Manager.Manifest.UpdateIndex(pName);

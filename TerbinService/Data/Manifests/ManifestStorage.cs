@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinService.Data.References;
 
 namespace TerbinService.Data.Manifests;
 
-internal class ManifestStorage : IManifest
+public class ManifestStorage : IManifest
 {
     public string? Game;
     public string? Guid;
 
+    public List<ReferencePluginStore>? References;
+
     public string? GetId()
     {
-        throw new NotImplementedException();
+        return Guid;
     }
 }
