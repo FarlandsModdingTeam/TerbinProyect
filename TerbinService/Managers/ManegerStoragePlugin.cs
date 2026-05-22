@@ -29,7 +29,7 @@ public static class Maneger
             string namePlugin;
             Guid id;
 
-            if (await ExistByFile(nameFile).ConfigureAwait(false)) return null;
+            if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
 
             namePlugin = Manager.Node.GetNameByFile(pPathPlugin);
             id = Guid.NewGuid();
@@ -141,7 +141,7 @@ public static class Maneger
         }
 
 
-        public static async Task<bool> ExistByFile(string pFile)
+        public static async Task<bool> ExistsByFile(string pFile)
         {
             string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
             if (path is null) return false;
@@ -155,18 +155,14 @@ public static class Maneger
             return r.Length > 0;
         }
 
-        public static async Task<bool> Exist(string pId)
+        public static async Task<bool> Exists(string pId)
         {
-            string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (path is null) return false;
+            var references = await GetAll().ConfigureAwait(false);
+            if (references is null) return false;
 
-            var man = JSonUtil.AcessDirect<ManifestStorage>(path, TerbinServiceConst.MANIFEST_STORAGE);
-            if (man is null) return false;
-            if (man.References is null) return false;
-
-            for (int i = 0; i < man.References.Count; i++)
+            for (int i = 0; i < references.Count; i++)
             {
-                if (man.References[i].Id == pId)
+                if (references[i].Id == pId)
                     return true;
             }
             return false;
@@ -174,19 +170,33 @@ public static class Maneger
 
         public static async Task<ReferencePluginStore?> Get(string pId)
         {
+            var references = await GetAll().ConfigureAwait(false);
+            if (references is null) return null;
+
+            for (int i = 0; i < references.Count; i++)
+            {
+                if (references[i].Id == pId)
+                    return references[i];
+            }
+            return null;
+        }
+        public static async Task<List<ReferencePluginStore>?> GetAll()
+        {
+            var man = await getManifest().ConfigureAwait(false);
+            if (man is null) return null;
+            return man.References;
+        }
+
+
+        private static async ValueTask<ManifestStorage?> getManifest()
+        {
             string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
             if (path is null) return null;
 
             var man = JSonUtil.AcessDirect<ManifestStorage>(path, TerbinServiceConst.MANIFEST_STORAGE);
-            if (man is null) return null;
-            if (man.References is null) return null;
+            //if (man is null) return null;
 
-            for (int i = 0; i < man.References.Count; i++)
-            {
-                if (man.References[i].Id == pId)
-                    return man.References[i];
-            }
-            return null;
+            return man;
         }
 
 

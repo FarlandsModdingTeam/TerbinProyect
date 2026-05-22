@@ -33,6 +33,8 @@ public enum CodeAcessJSonSave : sbyte
     Succes = 1,
 }
 
+
+// TODO: Hacer los Acces y Saves con patrón Try.
 public class JSonUtil
 {
     private static Dictionary<string, string> _places = new Dictionary<string, string>();
