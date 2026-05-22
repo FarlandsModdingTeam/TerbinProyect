@@ -36,6 +36,7 @@ public static partial class Manager
                 return false;
 
             JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Add(pName); });
+            FileUtil.Hide(dir, _INSTANCES);
             return true;
         }
         public static bool DeleteIndex(string pName)
@@ -45,6 +46,7 @@ public static partial class Manager
                 return false;
 
             JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Remove(pName); });
+            FileUtil.Hide(dir, _INSTANCES);
             return true;
         }
 

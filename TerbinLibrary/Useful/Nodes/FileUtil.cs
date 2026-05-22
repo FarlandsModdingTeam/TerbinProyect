@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Versioning;
 using System.Text;
 using TerbinLibrary.Data;
 
@@ -22,7 +23,7 @@ public enum StatusFileUtil : sbyte
     InvalidSource = 2,
 }
 
-public static class FileUtil
+public static class FileUtil // : File
 {
     //  private const ushort _falseSizeFolder = 0xFFFF;
 
@@ -103,6 +104,16 @@ public static class FileUtil
 
     // TODO: metodo que le dar una direccion y un DirectoryHandwritten y te lo borra.
     // └─Luego borra directorios vacios, solo vacios!.
+
+
+    // [SupportedOSPlatform("windows")]
+    public static void Hide(string pDir, string pFileName)
+    {
+        // TODO: Comrpobar si es linux para no forzar.
+        string filePath = Path.Combine(pDir, pFileName);
+        if (File.Exists(filePath))
+            File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.Hidden);
+    }
 
     public static List<string>? GetAllFiles(string pDir)
     {
