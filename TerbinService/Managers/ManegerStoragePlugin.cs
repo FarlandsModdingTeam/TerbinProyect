@@ -16,14 +16,14 @@ public static class Maneger
         // TerbinConfiguration
         // TerbinServiceConst.MANIFEST_STORAGE
 
-        public static async ValueTask<Guid?> Store(string pPathPlugin, string pNameFile)
+        public static async ValueTask<Guid?> Store(string pPathPlugin, string pNameFile, bool pDuplicate = false)
         {
             string newPath = Path.Combine(Path.GetDirectoryName(pPathPlugin) ?? string.Empty, pNameFile);
             File.Move(pPathPlugin, newPath);
 
-            return await Store(newPath);
+            return await Store(newPath, pDuplicate);
         }
-        public static async ValueTask<Guid?> Store(string pPathPlugin)
+        public static async ValueTask<Guid?> Store(string pPathPlugin, bool pDuplicate = false)
         {
             string nameFile = Path.GetFileName(pPathPlugin);
             string namePlugin;
@@ -41,8 +41,16 @@ public static class Maneger
                 FileName = nameFile,
             };
 
-            if (!await savePlugin(pPathPlugin).ConfigureAwait(false))
-                return null;
+            if (pDuplicate)
+            {
+                if (!await savePluginDuplicate(pPathPlugin).ConfigureAwait(false))
+                    return null;
+            }
+            else
+            {
+                if (!await savePlugin(pPathPlugin).ConfigureAwait(false))
+                    return null;
+            }
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
             {
@@ -79,6 +87,34 @@ public static class Maneger
             destination = Path.Combine(pathStorage, Path.GetFileName(pPathPlugin));
 
             File.Move(pPathPlugin, destination);
+
+            return true;
+        }
+        private static async ValueTask<bool> savePluginDuplicate(string pPathPlugin)
+        {
+            string? pathStorage;
+            string destination;
+
+            pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
+            if (pathStorage is null) return false;
+
+            destination = Path.Combine(pathStorage, Path.GetFileName(pPathPlugin));
+
+            File.Copy(pPathPlugin, destination);
+
+            return true;
+        }
+        private static async ValueTask<bool> savePlugin(string pPathPlugin, Action<string, string> pOperate)
+        {
+            string? pathStorage;
+            string destination;
+
+            pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
+            if (pathStorage is null) return false;
+
+            destination = Path.Combine(pathStorage, Path.GetFileName(pPathPlugin));
+
+            pOperate(pPathPlugin, destination);
 
             return true;
         }

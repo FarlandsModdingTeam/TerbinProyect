@@ -40,6 +40,7 @@ public enum CodeSubServices : byte
     Game = 10,
 
     Plugin = 20,
+    PluginStorage = 21,
 
     Instances = 30,
 
