@@ -320,5 +320,19 @@ public static class NetUtil
     {
         return pResponse.Content.ReadAsStreamAsync(pCancellationToken);
     }
+
+
+    public static string GetFileName(string pUrl)
+    {
+        string rute;
+        Uri uri = new Uri(pUrl);
+
+        if (pUrl.EndsWith('/'))
+            rute = uri.AbsolutePath.TrimEnd('/');
+        else
+            rute = uri.AbsolutePath;
+
+        return Path.GetFileName(rute);
+    }
 }
 
