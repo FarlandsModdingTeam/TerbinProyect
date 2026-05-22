@@ -131,13 +131,12 @@ public static partial class Manager
             }
         }
 
+
         public static async Task InstallOne
             (Guid pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
 
         }
-
-
 
 
 

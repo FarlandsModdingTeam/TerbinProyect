@@ -6,15 +6,19 @@ using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
 using TerbinService.Data.References;
+using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Managers;
 
 public static partial class Manager
 {
+    // No esta protegido el ExistsByFile y el guardar como uno.
     public static class StoragePlugin
     {
         // TerbinConfiguration
         // TerbinServiceConst.MANIFEST_STORAGE
+        private static readonly SemaphoreSlim _semaphoreOperate = new(1, 1);
+        private static readonly SemaphoreSlim _semaphoreManifest = new(1, 1);
 
         public static async ValueTask<Guid?> Store(string pPathPlugin, string pNameFile, bool pDuplicate = false)
         {
@@ -29,7 +33,6 @@ public static partial class Manager
             string namePlugin;
             Guid id;
 
-            if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
 
             namePlugin = Manager.Node.GetNameByFile(pPathPlugin);
             id = Guid.NewGuid();
@@ -41,20 +44,21 @@ public static partial class Manager
                 FileName = nameFile,
             };
 
+            if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null; 
             if (pDuplicate)
             {
-                if (!await savePluginDuplicate(pPathPlugin).ConfigureAwait(false))
+                if (!await operatePlugin(pPathPlugin, (p, d) => { File.Copy(p, d); }).ConfigureAwait(false))
                     return null;
             }
             else
             {
-                if (!await savePlugin(pPathPlugin).ConfigureAwait(false))
+                if (!await operatePlugin(pPathPlugin, (p, d) => { File.Move(p, d); }).ConfigureAwait(false))
                     return null;
             }
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
             {
-                await removePlugin(nameFile).ConfigureAwait(false);
+                await operatePlugin(nameFile, (p, d) => { File.Delete(d); }).ConfigureAwait(false);
                 return null;
             }
 
@@ -68,7 +72,7 @@ public static partial class Manager
             if (plugin.Name is null) return null;
             if (plugin.Id is null) return null;
 
-            if (!await removePlugin(plugin.Name))
+            if (!await operatePlugin(plugin.Name, (p, d) => { File.Delete(d); }).ConfigureAwait(false))
                 return false;
 
             if (!await unregisterPlugin(plugin.Id).ConfigureAwait(false))
@@ -76,78 +80,53 @@ public static partial class Manager
             return true;
         }
 
-        private static async ValueTask<bool> savePlugin(string pPathPlugin)
-        {
-            string? pathStorage;
-            string destination;
-            
-            pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (pathStorage is null) return false;
-
-            destination = Path.Combine(pathStorage, Path.GetFileName(pPathPlugin));
-
-            File.Move(pPathPlugin, destination);
-
-            return true;
-        }
-        private static async ValueTask<bool> savePluginDuplicate(string pPathPlugin)
+        private static async ValueTask<bool> operatePlugin(string pPathPlugin, Action<string, string> pOperate)
         {
             string? pathStorage;
             string destination;
 
-            pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (pathStorage is null) return false;
+            await _semaphoreOperate.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
+                if (pathStorage is null) return false;
 
-            destination = Path.Combine(pathStorage, Path.GetFileName(pPathPlugin));
+                destination = Path.Combine(pathStorage, Path.GetFileName(pPathPlugin));
 
-            File.Copy(pPathPlugin, destination);
+                pOperate(pPathPlugin, destination);
 
+            }
+            finally
+            {
+                _semaphoreOperate.Release();
+            }
             return true;
         }
-        private static async ValueTask<bool> savePlugin(string pPathPlugin, Action<string, string> pOperate)
-        {
-            string? pathStorage;
-            string destination;
 
-            pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (pathStorage is null) return false;
-
-            destination = Path.Combine(pathStorage, Path.GetFileName(pPathPlugin));
-
-            pOperate(pPathPlugin, destination);
-
-            return true;
-        }
 
         private static async ValueTask<bool> registerPlugin(ReferencePluginStore pReference)
         {
-            string? pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (pathStorage == null)
-                return false;
+            CodeAcessJSonSave r;
+            await _semaphoreManifest.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                string? pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
+                if (pathStorage == null)
+                    return false;
 
-            var r = JSonUtil.UpdateDirect<ManifestStorage>(
-                pathStorage,
-                TerbinServiceConst.MANIFEST_STORAGE,
-                ii => { ii.References?.Add(pReference); }
-            );
+                r = JSonUtil.UpdateDirect<ManifestStorage>(
+                    pathStorage,
+                    TerbinServiceConst.MANIFEST_STORAGE,
+                    ii => { ii.References?.Add(pReference); }
+                );
+            }
+            finally
+            {
+                _semaphoreManifest.Release();
+            }
 
             return r == CodeAcessJSonSave.Succes;
         }
-        private static async ValueTask<bool> removePlugin(string pFileName)
-        {
-            string? pathStorage;
-            string destination;
-
-            pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (pathStorage is null) return false;
-
-            destination = Path.Combine(pathStorage, Path.GetFileName(pFileName));
-
-            File.Delete(destination);
-
-            return true;
-        }
-
         private static async ValueTask<bool> unregisterPlugin(ReferencePluginStore pReference)
         {
             if (pReference.Id is null)
@@ -156,23 +135,32 @@ public static partial class Manager
         }
         private static async ValueTask<bool> unregisterPlugin(string pId)
         {
-            string? pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (pathStorage == null)
-                return false;
+            CodeAcessJSonSave r;
+            await _semaphoreManifest.WaitAsync().ConfigureAwait(false);
+            try
+            {
+                string? pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
+                if (pathStorage == null)
+                    return false;
 
-            var r = JSonUtil.UpdateDirect<ManifestStorage>(
-                pathStorage,
-                TerbinServiceConst.MANIFEST_STORAGE,
-                ii => {
-                    if (ii.References is null) return;
-                    for (int i = 0; i < ii.References.Count; i++)
+                r = JSonUtil.UpdateDirect<ManifestStorage>(
+                    pathStorage,
+                    TerbinServiceConst.MANIFEST_STORAGE,
+                    ii =>
                     {
-                        if (ii.References[i].Id == pId)
-                            ii.References.RemoveAt(i);
+                        if (ii.References is null) return;
+                        for (int i = 0; i < ii.References.Count; i++)
+                        {
+                            if (ii.References[i].Id == pId)
+                                ii.References.RemoveAt(i);
+                        }
                     }
-                }
-            );
-
+                );
+            }
+            finally
+            {
+                _semaphoreManifest.Release();
+            }
             return r == CodeAcessJSonSave.Succes;
         }
 
