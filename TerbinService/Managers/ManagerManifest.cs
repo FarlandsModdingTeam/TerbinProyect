@@ -106,7 +106,35 @@ public static partial class Manager
         public static void HandleAddPlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
         {
             var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
-            if (information is null)
+            if (string.IsNullOrEmpty(information))
+                throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
+
+            Guid g = Guid.NewGuid();
+            string name = $"{g:N}";
+            string file = $"{g:N}.json";
+            string pathManifest = Path.Combine(information, $"{g:N}.json");
+
+            var manifest = new PluginManifest
+            {
+                Name = name,
+                Content = pHandwritten,
+            };
+            JSonUtil.SaveDirect(information, file, manifest);
+
+            var reference = new ReferencePlugin
+            {
+                Name = name,
+                GUID = name,
+                Path = pathManifest,
+            };
+
+            Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+        }
+        public static void HandleRemovePlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
+        {
+            throw new NotImplementedException("Ñe");
+            var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
+            if (string.IsNullOrEmpty(information))
                 throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
 
             Guid g = Guid.NewGuid();

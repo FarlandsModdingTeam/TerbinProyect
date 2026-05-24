@@ -167,7 +167,7 @@ public static partial class Manager
             var result = await ZipUtil.ExtractWithProgress(pathPlugin, pathInstance, pProgress, true, pCancellationToken).ConfigureAwait(false);
 
             if (pCancellationToken.IsCancellationRequested)
-                throw new Exception("TODO: Desinstalar.");
+                FileUtil.DeleteFromHandwritten(pathInstance, result);
 
             Manager.Manifest.HandleAddPlugin(pInstance, result);
 
@@ -178,7 +178,23 @@ public static partial class Manager
         }
 
 
+        public static async Task<Status> UnistallOne()
+        {
+            throw new NotImplementedException("TODO");
+        }
+        public static async Task<Status> RemoveOne()
+        {
+            throw new NotImplementedException("TODO");
+        }
 
+        public static async Task<Status> GetOne()
+        {
+            throw new NotImplementedException("TODO");
+        }
+        public static async Task<Status> GetAll()
+        {
+            throw new NotImplementedException("TODO");
+        }
 
         public static string? MakePathPluginByName(string pNameInstance)
         {
