@@ -106,11 +106,11 @@ public static partial class Manager
 
 
 
-        public static async Task<bool> DowloadOne
+        public static async Task<Status> DowloadOne
             (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             if (await NetUtil.DownloadAny(pUrl, pProgress) is var r && r.status != StatusNetUtil.Succes)
-                return false;   
+                return Status.ErrorOnDowload;   
 
             Guid? id = null;
             string nameFile = NetUtil.GetFileName(pUrl);
@@ -122,36 +122,47 @@ public static partial class Manager
             }
             catch
             {
-                return false;
+                return Status.ExceptionOnDeteledTmp;
             }
             finally
             {
                 if (pCancellationToken.IsCancellationRequested && id is not null)
                     await Manager.StoragePlugin.Eliminate($"{id:N}").ConfigureAwait(false);
             }
-            return true;
+            if (pCancellationToken.IsCancellationRequested)
+                return Status.IsCancelled;
+            return Status.Succes;
         }
 
-
-        public static async Task<bool> InstallOne
+        public static async Task<Status> InstallOne
             (Guid pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             string? pathInstance = Manager.Instances.MakePathFolder(pInstance);
             if (string.IsNullOrEmpty(pathInstance))
-                return false;
+                return Status.ErrorGetPathInstance;
 
-            var reference = await Manager.StoragePlugin.Get($"{pPlugin:N}");
+            var reference = await Manager.StoragePlugin.Get($"{pPlugin:N}").ConfigureAwait(false);
             if (reference?.FileName == null)
-                return false;
+                return Status.ErrorGetPlugin;
 
             string? pathPlugin = Manager.StoragePlugin.MakePathPlugin(reference.FileName);
             if (string.IsNullOrEmpty(pathPlugin))
-                return false;
+                return Status.ErrorGetPathPlugin;
 
-            var result = await ZipUtil.ExtractWithProgress(pathPlugin, pathInstance, pProgress, true, pCancellationToken);
+            if (pCancellationToken.IsCancellationRequested)
+                return Status.IsCancelled;
+
+            var result = await ZipUtil.ExtractWithProgress(pathPlugin, pathInstance, pProgress, true, pCancellationToken).ConfigureAwait(false);
+
+            if (pCancellationToken.IsCancellationRequested)
+                throw new Exception("TODO: Desinstalar.");
 
             Manager.Manifest.HandleAddPlugin(pInstance, result);
-            return true;
+
+            if (pCancellationToken.IsCancellationRequested)
+                throw new Exception("TODO: Desinstalar completo.");
+
+            return Status.Succes;
         }
 
 
@@ -177,6 +188,22 @@ public static partial class Manager
             if (!Directory.Exists(pathPlugin))
                 Directory.CreateDirectory(pathPlugin);
             return pathPlugin;
+        }
+
+
+
+        public enum Status : sbyte
+        {
+            ExceptionOnDeteledTmp = -1,
+
+            IsCancelled = 0,
+            Succes = 1,
+
+            ErrorGetPathInstance = 3,
+            ErrorGetPlugin = 4,
+            ErrorGetPathPlugin = 5,
+            ErrorOnDowload = 6,
+            ErrroDeletedTmp = 7,
         }
     }
 }
