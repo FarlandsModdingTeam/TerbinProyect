@@ -474,7 +474,9 @@ public enum TerbinErrorCode : ushort
     NotImplementedYet = 9999
 }
 
-public enum AppError : int
+
+
+public enum AppError : long
 {
     None = 0, // Operación exitosa
 
