@@ -98,14 +98,11 @@ public static class Util
         if (pMethod.Length <= 0)
             throw new OverflowException($"¡No Action send!");
 
-        byte method = pMethod[0];
-        byte[] restMethod = pMethod[1..];
         byte[] id = Serialineitor.Serialize(pIdRequest);
         return new Progress<TerbinInfoProgrss>(p =>
         {
             pAction?.Invoke(p);
-            byte[] pld = Serialineitor.Splice(restMethod, p.Serialize());
-            _ = pCommunicator.Send(new IdArray(method), pld);
+            _ = pCommunicator.Send(new IdArray(pMethod), p.Serialize());
             _ = pCommunicator.Send(new IdArray((byte)CodeTerbinProtocol.Prolong), id);
         });
     }
