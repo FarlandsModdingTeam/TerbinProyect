@@ -78,13 +78,14 @@ public class Worker : BackgroundService
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]
-    public static async Task<InfoResponse?> Stop(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Stop(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         _ = Task.Run(async () =>
         {
             await Task.Delay(100);
 
             Console.WriteLine("[Worker] Execution stoped");
+            if (pToken.IsCancellationRequested) return;
             _appLifetime?.StopApplication();
             Cts?.Cancel();
         });
