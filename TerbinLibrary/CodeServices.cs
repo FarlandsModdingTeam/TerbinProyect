@@ -35,6 +35,22 @@ public enum CodeServices : byte
     //WIP_NewService = 255,
 }
 
+public enum CodeServicesSection : byte
+{
+    Game = 10,
+
+    Plugin = 20,
+    PluginStorage = 21,
+
+    Instances = 30,
+
+    FCM = 40,
+
+    Rute = 50,
+    Rute_Antiguo_Obsoleto_MagincianPuto = 110,
+}
+
+[Obsolete("User CodeServicesSection instead")]
 public enum CodeSubServices : byte
 {
     Game = 10,
@@ -48,6 +64,12 @@ public enum CodeSubServices : byte
 
     Rute = 50,
     Rute_Antiguo_Obsoleto_MagincianPuto = 110,
+}
+
+public enum CodeServicesClient : byte
+{
+    SetMaxProgress = 10,
+    SetBarProgress = 11,
 }
 
 [Obsolete]
