@@ -215,7 +215,7 @@ public static partial class Manager
         private static async ValueTask<ManifestStorage?> getManifest()
         {
             string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (path is null) return null;
+            if (string.IsNullOrEmpty(path)) return null;
 
             var man = JSonUtil.AcessDirect<ManifestStorage>(path, TerbinServiceConst.MANIFEST_STORAGE);
             //if (man is null) return null;
@@ -223,6 +223,13 @@ public static partial class Manager
             return man;
         }
 
+        public static string? MakePathPlugin(string pName)
+        {
+            string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
+            if (string.IsNullOrEmpty(path)) return null;
+
+            return Path.Combine(path, pName);
+        }
 
         // TODO: Un TryGetVersion, A partir del nombre del archivo intentar detectar un patron de versionado.
     }

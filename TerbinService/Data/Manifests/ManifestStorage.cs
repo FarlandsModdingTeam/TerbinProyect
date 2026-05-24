@@ -7,6 +7,7 @@ namespace TerbinService.Data.Manifests;
 
 public class ManifestStorage : IManifest
 {
+    public string? Name;
     public string? Game;
     public string? Guid;
 
