@@ -50,13 +50,7 @@ public static partial class Manager
             if (r.TryGetValue(pKey, out string? value))
                 return value;
             else
-            {
-                string? pre = GetPredeterminated(pKey);
-                if (pre is null) return null;
-                r.Add(pKey, pre);
-                JSonUtil.Save(KEY, JSON, r);
-                return pre;
-            }
+                return getPredeterminatedAndSave(pKey, r);
         }
 
         public static CodeAcessJSonSave SetConfig(string pKey, string pData)
@@ -100,6 +94,21 @@ public static partial class Manager
                 JSonUtil.Set(KEY, FOLDER);
                 JSonUtil.Save(KEY, JSON, data);
             }
+        }
+
+        public static string? GetPredeterminatedAndSave(string pKey)
+        {
+            var r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
+            if (r == null) return null;
+            return getPredeterminatedAndSave(pKey, r);
+        }
+        private static string? getPredeterminatedAndSave(string pKey, Dictionary<string, string> pContent)
+        {
+            string? pre = GetPredeterminated(pKey);
+            if (string.IsNullOrEmpty(pre)) return null;
+            pContent.Add(pKey, pre);
+            JSonUtil.Save(KEY, JSON, pContent);
+            return pre;
         }
 
         public static string? GetPredeterminated(string pKey)
