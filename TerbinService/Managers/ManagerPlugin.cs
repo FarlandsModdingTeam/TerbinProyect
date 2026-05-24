@@ -8,6 +8,7 @@ using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.NetWork;
+using TerbinLibrary.Useful.Nodes;
 using TerbinService.Services;
 
 namespace TerbinService.Managers;
@@ -83,6 +84,7 @@ public static partial class Manager
             r = await HandleInstallPlugin(pNameInstance, pUrl, pathInstance, pProgressExtract, pProgressDownload);
             return r;
         }
+
         [Obsolete]
         public static async Task<StatusNetUtil> HandleInstallPlugin(
                                                 string pNameInstace,
@@ -104,13 +106,11 @@ public static partial class Manager
 
 
 
-        public static async Task DowloadOne
+        public static async Task<bool> DowloadOne
             (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             if (await NetUtil.DownloadAny(pUrl, pProgress) is var r && r.status != StatusNetUtil.Succes)
-            {
-                return;   
-            }
+                return false;   
 
             Guid? id = null;
             string nameFile = NetUtil.GetFileName(pUrl);
@@ -122,20 +122,36 @@ public static partial class Manager
             }
             catch
             {
-                // TODO
+                return false;
             }
             finally
             {
                 if (pCancellationToken.IsCancellationRequested && id is not null)
                     await Manager.StoragePlugin.Eliminate($"{id:N}").ConfigureAwait(false);
             }
+            return true;
         }
 
 
-        public static async Task InstallOne
+        public static async Task<bool> InstallOne
             (Guid pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
+            string? pathInstance = Manager.Instances.MakePathFolder(pInstance);
+            if (string.IsNullOrEmpty(pathInstance))
+                return false;
 
+            var reference = await Manager.StoragePlugin.Get($"{pPlugin:N}");
+            if (reference?.FileName == null)
+                return false;
+
+            string? pathPlugin = Manager.StoragePlugin.MakePathPlugin(reference.FileName);
+            if (string.IsNullOrEmpty(pathPlugin))
+                return false;
+
+            var result = await ZipUtil.ExtractWithProgress(pathPlugin, pathInstance, pProgress, true, pCancellationToken);
+
+            Manager.Manifest.HandleAddPlugin(pInstance, result);
+            return true;
         }
 
 
