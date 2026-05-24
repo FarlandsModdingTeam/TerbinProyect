@@ -104,7 +104,18 @@ public static partial class Manager
             return status;
         }
 
+        public static async Task<Status> HandleInstallPlugin(string pPlugin, string pInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
+        {
+            var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
 
+            return await InstallOne(pPlugin, pInstance, progress, pCancellationToken);
+        }
+        public static async Task<Status> HandleDowloadPlugin(string pUrl, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
+        {
+            var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
+
+            return await DowloadOne(pUrl, progress, pCancellationToken);
+        }
 
         public static async Task<Status> DowloadOne
             (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
@@ -135,13 +146,13 @@ public static partial class Manager
         }
 
         public static async Task<Status> InstallOne
-            (Guid pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+            (string pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             string? pathInstance = Manager.Instances.MakePathFolder(pInstance);
             if (string.IsNullOrEmpty(pathInstance))
                 return Status.ErrorGetPathInstance;
 
-            var reference = await Manager.StoragePlugin.Get($"{pPlugin:N}").ConfigureAwait(false);
+            var reference = await Manager.StoragePlugin.Get(pPlugin).ConfigureAwait(false);
             if (reference?.FileName == null)
                 return Status.ErrorGetPlugin;
 
