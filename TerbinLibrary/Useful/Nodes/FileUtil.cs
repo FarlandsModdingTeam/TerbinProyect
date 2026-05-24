@@ -102,14 +102,43 @@ public static class FileUtil // : File
         return (StatusFileUtil.Succes, handwritten);
     }
 
-    // TODO: metodo que le dar una direccion y un DirectoryHandwritten y te lo borra.
-    // └─Luego borra directorios vacios, solo vacios!.
+    public static StatusFileUtil DeleteFromHandwritten(string pDir, DirectoryHandwritten pHandwritten)
+    {
+        if (!Directory.Exists(pDir))
+            return StatusFileUtil.InvalidSource;
+
+        // Borrar todos los archivos listados
+        foreach (string file in pHandwritten.Files)
+        {
+            string destFile = Path.Combine(pDir, file);
+            if (File.Exists(destFile))
+                File.Delete(destFile);
+        }
+
+        // Borrar directorios vacíos (de más profundos a más superficiales)
+        // Al ordenar por longitud descendente, procesamos "A/B/C" antes que "A/B"
+        var orderedDirectories = pHandwritten.Directories.OrderByDescending(d => d.Length).ToList();
+
+        foreach (string dir in orderedDirectories)
+        {
+            string destSub = Path.Combine(pDir, dir);
+
+            if (Directory.Exists(destSub))
+            {
+                if (!Directory.EnumerateFileSystemEntries(destSub).Any())
+                    Directory.Delete(destSub, false); // NO borrado recursivo
+            }
+        }
+
+        return StatusFileUtil.Succes;
+    }
 
 
-    // [SupportedOSPlatform("windows")]
     public static void Hide(string pDir, string pFileName)
     {
-        // TODO: Comrpobar si es linux para no forzar.
+        if (!OperatingSystem.IsWindows())
+            return;
+
         string filePath = Path.Combine(pDir, pFileName);
         if (File.Exists(filePath))
             File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.Hidden);
