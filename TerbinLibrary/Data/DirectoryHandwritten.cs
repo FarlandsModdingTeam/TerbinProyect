@@ -14,6 +14,7 @@ public class DirectoryHandwritten
 
     public string ToJson(JsonSerializerOptions options) => JsonSerializer.Serialize(this, options);
     public string ToJson() => JsonSerializer.Serialize(this, _options);
+    public long GetSize() => (long)Directories.Count + (long)Files.Count;
 
     [JsonIgnore]
     private static JsonSerializerOptions _options = new JsonSerializerOptions { WriteIndented = true };

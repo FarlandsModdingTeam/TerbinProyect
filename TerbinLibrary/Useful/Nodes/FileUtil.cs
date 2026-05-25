@@ -30,7 +30,6 @@ public static class FileUtil // : File
     // Son los unicos que el tamaño no es por el peso de los archivos en bytes.
 
     // PaVerano:
-    // TODO: 
     // (Permitira actualizar farlands borrando solo el contenido marcado del json y volver a clonar actualizar de version la instancia)
     public static async Task<(StatusFileUtil status, DirectoryHandwritten? json)> CloneDirectory(
                                             string pSourceDir,
@@ -102,25 +101,33 @@ public static class FileUtil // : File
         return (StatusFileUtil.Succes, handwritten);
     }
 
-    public static StatusFileUtil DeleteFromHandwritten(string pDir, DirectoryHandwritten pHandwritten)
+    public static StatusFileUtil DeleteFromHandwritten(string pDir, DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
     {
         if (!Directory.Exists(pDir))
             return StatusFileUtil.InvalidSource;
 
-        // Borrar todos los archivos listados
-        foreach (string file in pHandwritten.Files)
+        int previus = -1;
+        double? inverse;
+
+        inverse = (pProgress != null) ? Util.GetInverse(pHandwritten.Files.Count) : null;
+        for (int i = 0; i < pHandwritten.Files.Count; i++)
         {
+            string file = pHandwritten.Files[i];
             string destFile = Path.Combine(pDir, file);
             if (File.Exists(destFile))
                 File.Delete(destFile);
+
+            Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         // Borrar directorios vacíos (de más profundos a más superficiales)
         // Al ordenar por longitud descendente, procesamos "A/B/C" antes que "A/B"
         var orderedDirectories = pHandwritten.Directories.OrderByDescending(d => d.Length).ToList();
 
-        foreach (string dir in orderedDirectories)
+        inverse = (pProgress != null) ? Util.GetInverse(orderedDirectories.Count) : null;
+        for (int i = 0; i < orderedDirectories.Count; i++)
         {
+            string dir = orderedDirectories[i];
             string destSub = Path.Combine(pDir, dir);
 
             if (Directory.Exists(destSub))
@@ -128,11 +135,14 @@ public static class FileUtil // : File
                 if (!Directory.EnumerateFileSystemEntries(destSub).Any())
                     Directory.Delete(destSub, false); // NO borrado recursivo
             }
+            Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
+
+        if (pProgress != null)
+            Util.ReportProgressPercent(100, previus, true, pProgress);
 
         return StatusFileUtil.Succes;
     }
-
 
     public static void Hide(string pDir, string pFileName)
     {
