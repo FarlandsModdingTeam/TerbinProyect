@@ -72,6 +72,15 @@ public enum CodeServicesClient : byte
     SetBarProgress = 11,
 }
 
+public enum CodeManifestError : byte
+{
+    NotAccesName = 2,
+    NotAccesId = 3,
+    NotAccesIdLocal = 4,
+    NotAccesPath = 5,
+}
+
+
 [Obsolete]
 public enum TypeService : byte
 {

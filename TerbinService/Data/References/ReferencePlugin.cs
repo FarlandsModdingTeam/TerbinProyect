@@ -8,6 +8,7 @@ namespace TerbinService.Data.References;
 public class ReferencePlugin
 {
     public string? Name;
-    public string? GUID;
+    public string? Id;
+    public string? IdLocal;
     public string? Path;
 }

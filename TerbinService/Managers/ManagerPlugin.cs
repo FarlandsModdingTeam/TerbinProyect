@@ -10,6 +10,7 @@ using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.NetWork;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Services;
+using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Managers;
 /*
@@ -100,7 +101,7 @@ public static partial class Manager
 
             var (status, json) = await NetUtil.InstallZipWithProgress(pUrl, pPathPlugin, pProgressZip, pProgressDowload);
 
-            Manager.Manifest.HandleAddPlugin(pNameInstace, json);
+            //Manager.Manifest.HandleAddPlugin(pNameInstace, json);
 
             return status;
         }
@@ -146,6 +147,13 @@ public static partial class Manager
             return Status.Succes;
         }
 
+        public static async Task<Status> DeletedOne
+            (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+        {
+            throw new NotImplementedException("TODO");
+        }
+
+
         public static async Task<Status> InstallOne
             (string pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
@@ -169,7 +177,10 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 FileUtil.DeleteFromHandwritten(pathInstance, result);
 
-            Manager.Manifest.HandleAddPlugin(pInstance, result);
+            Manager.Manifest.HandleAddPlugin
+                (reference.Id ?? $"CodeManifestError:{CodeManifestError.NotAccesId}",
+                reference.Name ?? $"CodeManifestError:{CodeManifestError.NotAccesName}",
+                pInstance, result);
 
             if (pCancellationToken.IsCancellationRequested)
                 throw new Exception("TODO: Desinstalar completo.");
@@ -177,15 +188,16 @@ public static partial class Manager
             return Status.Succes;
         }
 
+        public static async Task<Status> UnistallOne
+            (string pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+        {
+            var reference = await Manager.StoragePlugin.Get(pPlugin).ConfigureAwait(false);
+            if (reference?.FileName == null)
+                return Status.ErrorGetPlugin;
 
-        public static async Task<Status> UnistallOne()
-        {
-            throw new NotImplementedException("TODO");
         }
-        public static async Task<Status> RemoveOne()
-        {
-            throw new NotImplementedException("TODO");
-        }
+
+
 
         public static async Task<Status> GetOne()
         {
@@ -195,6 +207,7 @@ public static partial class Manager
         {
             throw new NotImplementedException("TODO");
         }
+
 
         public static string? MakePathPluginByName(string pNameInstance)
         {

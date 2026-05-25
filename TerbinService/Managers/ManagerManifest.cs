@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Configuration;
@@ -103,29 +104,37 @@ public static partial class Manager
         }
 
 
-        public static void HandleAddPlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
+        public static void HandleAddPlugin(Guid pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
+        {
+            HandleAddPlugin($"{pGuid:N}", pNamePlugin, pNameInstace, pHandwritten);
+        }
+        public static void HandleAddPlugin(string pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
         {
             var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
             if (string.IsNullOrEmpty(information))
                 throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
 
-            Guid g = Guid.NewGuid();
-            string name = $"{g:N}";
-            string file = $"{g:N}.json";
-            string pathManifest = Path.Combine(information, $"{g:N}.json");
+            string local = $"{Guid.NewGuid:N}";
+            string name = pNamePlugin;
+            string file = local;
+
+            string pathRelativeManifest = MakePathRelativeManifest(information, file, pNameInstace);
 
             var manifest = new PluginManifest
             {
                 Name = name,
-                Content = pHandwritten,
+                Id = pGuid,
+                IdLocal = local,
+                HandWritten = pHandwritten,
             };
             JSonUtil.SaveDirect(information, file, manifest);
 
             var reference = new ReferencePlugin
             {
                 Name = name,
-                GUID = name,
-                Path = pathManifest,
+                Id = name,
+                IdLocal = local,
+                Path = pathRelativeManifest,
             };
 
             Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
@@ -145,18 +154,29 @@ public static partial class Manager
             var manifest = new PluginManifest
             {
                 Name = name,
-                Content = pHandwritten,
+                HandWritten = pHandwritten,
             };
             JSonUtil.SaveDirect(information, file, manifest);
 
             var reference = new ReferencePlugin
             {
                 Name = name,
-                GUID = name,
+                Id = name,
                 Path = pathManifest,
             };
 
             Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+        }
+
+
+        public static string MakePathRelativeManifest(string pPathInformation, string pFile, string pNameInstace)
+        {
+            string pathManifest = Path.Combine(pPathInformation, pFile);
+            var instance = Manager.Instances.MakePathFolder(pNameInstace);
+            if (string.IsNullOrEmpty(instance))
+                throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
+            string pathRelativeManifest = Path.GetRelativePath(instance, pathManifest);
+            return pathRelativeManifest;
         }
 
 
