@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
@@ -17,7 +18,7 @@ namespace TerbinService.Managers;
   empieza: minusculas = privada.
  */
 
-
+// TODO: Controlar que por cada instancia solo pueda tocar un hilo a la vez.
 public static partial class Manager
 {
     public static class Instances
@@ -105,6 +106,34 @@ public static partial class Manager
                 return null;
 
             return Path.Combine(dir, pName);
+        }
+
+        public static bool ExistInIndex(string pName)
+        {
+            List<string> index = Manager.Manifest.GetIndex();
+            string? mani = index.FirstOrDefault(manifest => manifest == pName);
+            return !string.IsNullOrEmpty(mani);
+        }
+        public static bool? ExistInPhisic(string pName)
+        {
+            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            if (string.IsNullOrEmpty(dir))
+                return null;
+
+            if (!Directory.Exists(dir))
+                return null;
+
+            var all = Directory.EnumerateDirectories(dir, "*", SearchOption.TopDirectoryOnly);
+            if (all == null)
+                return false;
+
+            return all.Contains(pName);
+        }
+
+
+        public static Task InstallPlugin()
+        {
+            throw new NotImplementedException();
         }
     }
 }

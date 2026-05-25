@@ -12,6 +12,9 @@ public class DirectoryHandwritten
     public List<string> Directories { get; set; } = new();
     public List<string> Files { get; set; } = new();
 
+    [JsonIgnore]
+    public string? Root { get; set; }
+
     public string ToJson(JsonSerializerOptions options) => JsonSerializer.Serialize(this, options);
     public string ToJson() => JsonSerializer.Serialize(this, _options);
     public long GetSize() => (long)Directories.Count + (long)Files.Count;

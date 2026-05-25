@@ -116,7 +116,7 @@ public static partial class Manager
 
             string local = $"{Guid.NewGuid:N}";
             string name = pNamePlugin;
-            string file = local;
+            string file = $"{name}_{local}.json";
 
             string pathRelativeManifest = MakePathRelativeManifest(information, file, pNameInstace);
 

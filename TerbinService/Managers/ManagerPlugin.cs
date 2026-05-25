@@ -9,6 +9,7 @@ using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.NetWork;
 using TerbinLibrary.Useful.Nodes;
+using TerbinService.Data.Manifests;
 using TerbinService.Services;
 using static TerbinService.Managers.Manager;
 
@@ -27,9 +28,10 @@ namespace TerbinService.Managers;
 
 public static partial class Manager
 {
+    [Obsolete]
     public static class Plugin
     {
-        [Obsolete]
+        [Obsolete("", true)]
         public static async Task HandleInstallPluginWithProgress(string pNameInstace, byte pIdDownload, byte pIdExtract, string pPathPlugin, string pUrl)
         {
             IProgress<TerbinInfoProgrss> progressBarrDownload = new Progress<TerbinInfoProgrss>(p =>
@@ -70,7 +72,7 @@ public static partial class Manager
                 e.PrintException("HandleInstallPluginWithProgress");
             }
         }
-        [Obsolete]
+        [Obsolete("", true)]
         public static async Task<StatusNetUtil?> SimpleInstallPlugin(
             string pNameInstance,
             string pUrl,
@@ -87,7 +89,7 @@ public static partial class Manager
             return r;
         }
 
-        [Obsolete]
+        [Obsolete("", true)]
         public static async Task<StatusNetUtil> HandleInstallPlugin(
                                                 string pNameInstace,
                                                 string pUrl,
@@ -105,6 +107,8 @@ public static partial class Manager
 
             return status;
         }
+
+
 
         public static async Task<Status> HandleInstallPlugin(string pPlugin, string pInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
         {
@@ -172,6 +176,7 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
+            // TODO: Desviar a Manager.Instance
             var result = await ZipUtil.ExtractWithProgress(pathPlugin, pathInstance, pProgress, true, pCancellationToken).ConfigureAwait(false);
 
             if (pCancellationToken.IsCancellationRequested)
@@ -191,17 +196,35 @@ public static partial class Manager
         public static async Task<Status> UnistallOne
             (string pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
+            throw new NotImplementedException("TODO");
             var reference = await Manager.StoragePlugin.Get(pPlugin).ConfigureAwait(false);
             if (reference?.FileName == null)
                 return Status.ErrorGetPlugin;
+
 
         }
 
 
 
-        public static async Task<Status> GetOne()
+        public static async Task<(Status status, PluginManifest?)> GetOne(string pPlugin, string pInstance, CancellationToken pCancellationToken = default)
         {
-            throw new NotImplementedException("TODO");
+            var manifest = Manager.Instances.GetManifest(pInstance);
+            if (manifest == null)
+                return (Status.InstanceNotExist, null);
+
+            var information = Manager.Instances.MakePathFolderInformation(pInstance);
+            if (manifest == null)
+                return (Status.InformationNotExist, null);
+
+            for (int i = 0; i < manifest.Plugins.Count; i++)
+            {
+                var refe = manifest.Plugins[i];
+                if (refe.IdLocal == pPlugin)
+                {
+                    refe.Path
+                    return (Status.Succes, );
+                }
+            }
         }
         public static async Task<Status> GetAll()
         {
@@ -244,7 +267,8 @@ public static partial class Manager
             ErrorGetPlugin = 4,
             ErrorGetPathPlugin = 5,
             ErrorOnDowload = 6,
-            ErrroDeletedTmp = 7,
+            InstanceNotExist = 7,
+            InformationNotExist = 8,
         }
     }
 }

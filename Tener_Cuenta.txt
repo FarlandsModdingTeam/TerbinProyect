@@ -2,3 +2,4 @@
 - Cuando te bloqueas por que otro cliente esta haciendo X cosa tiene que poder avisarte y asociarte a los progresos del otro.
 - Evitar a toda costa direcciones absolutas y menos _Manifest no deberia tener direcciones absolutas.
 - Al Instalar un ModPack primero descargar todo y luego instalar todo porque es más optimo ya no me acuerdo porque.
+- Puedes registrar dos veces un mismo mod por instancia pero fisicamente se sobre escribiran
