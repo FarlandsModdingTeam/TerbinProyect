@@ -226,8 +226,8 @@ public static partial class Manager
             Status result = r switch
             {
                 StatusFileUtil.Succes => Status.Succes,
-                // TODO: Resto de errores, Ñe Ñe Ñe
-
+                StatusFileUtil.IsCancelled => Status.IsCancelled,
+                StatusFileUtil.InvalidSource => Status.InstanceNotExist,
 
                 _ => Status.GenericError,
             };
