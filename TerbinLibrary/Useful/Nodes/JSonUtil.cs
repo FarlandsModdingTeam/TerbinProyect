@@ -84,6 +84,12 @@ public class JSonUtil
 
         return JsonConvert.DeserializeObject<T>(json);
     }
+    public static T? AcessDirect<T>(string pPath) where T : class
+    {
+        string dir = Path.GetDirectoryName(pPath) ?? throw new Exception("Not Acces to Path");
+        string file = Path.GetFileName(pPath);
+        return AcessDirect<T>(dir, file);
+    }
     public static T? AcessDirect<T>(string pDir, string pFile) where T : class
     {
         string fileName = getFileName(pFile);

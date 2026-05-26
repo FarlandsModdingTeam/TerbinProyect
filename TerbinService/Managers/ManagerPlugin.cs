@@ -28,7 +28,6 @@ namespace TerbinService.Managers;
 
 public static partial class Manager
 {
-    [Obsolete]
     public static class Plugin
     {
         [Obsolete("", true)]
@@ -206,14 +205,14 @@ public static partial class Manager
 
 
 
-        public static async Task<(Status status, PluginManifest?)> GetOne(string pPlugin, string pInstance, CancellationToken pCancellationToken = default)
+        public static async Task<(Status status, PluginManifest? manifest)> GetOne(string pPlugin, string pInstance, CancellationToken pCancellationToken = default)
         {
             var manifest = Manager.Instances.GetManifest(pInstance);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
             var information = Manager.Instances.MakePathFolderInformation(pInstance);
-            if (manifest == null)
+            if (information == null)
                 return (Status.InformationNotExist, null);
 
             for (int i = 0; i < manifest.Plugins.Count; i++)
@@ -221,14 +220,47 @@ public static partial class Manager
                 var refe = manifest.Plugins[i];
                 if (refe.IdLocal == pPlugin)
                 {
-                    refe.Path
-                    return (Status.Succes, );
+                    if (refe.Path == null) continue;
+
+                    string pathJson = Path.IsPathFullyQualified(refe.Path)
+                        ? refe.Path
+                        : Path.Combine(information, refe.Path);
+
+                    PluginManifest? man = JSonUtil.AcessDirect<PluginManifest>(pathJson);
+                    if (man == null)
+                        return (Status.ManifestNotExit, null);
+                    return (Status.Succes, man);
                 }
             }
+            return (Status.NotFound, null);
         }
-        public static async Task<Status> GetAll()
+        public static async Task<(Status status, List<PluginManifest>? manifests)> GetAll(string pInstance)
         {
-            throw new NotImplementedException("TODO");
+            var manifest = Manager.Instances.GetManifest(pInstance);
+            if (manifest == null)
+                return (Status.InstanceNotExist, null);
+
+            var information = Manager.Instances.MakePathFolderInformation(pInstance);
+            if (information == null)
+                return (Status.InformationNotExist, null);
+
+            List<PluginManifest> manis = new();
+
+            for (int i = 0; i < manifest.Plugins.Count; i++)
+            {
+                var refe = manifest.Plugins[i];
+                if (refe.Path == null) continue;
+
+                string pathJson = Path.IsPathFullyQualified(refe.Path)
+                    ? refe.Path
+                    : Path.Combine(information, refe.Path);
+
+                PluginManifest? man = JSonUtil.AcessDirect<PluginManifest>(pathJson);
+
+                if (man == null) continue;
+                manis.Add(man);
+            }
+            return (Status.Succes, manis);
         }
 
 
@@ -269,6 +301,9 @@ public static partial class Manager
             ErrorOnDowload = 6,
             InstanceNotExist = 7,
             InformationNotExist = 8,
+            ManifestNotExit = 9,
+
+            NotFound = 10,
         }
     }
 }
