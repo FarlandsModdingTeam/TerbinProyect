@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Runtime.Versioning;
 using System.Text;
@@ -21,6 +22,10 @@ public enum StatusFileUtil : sbyte
     Succes = 1,
 
     InvalidSource = 2,
+    InvalidFiles = 3,
+    InvalidDirectorys = 4,
+    InvalidHandwritten = 5,
+    InvalidRoot = 6,
 }
 
 public static class FileUtil // : File
@@ -47,7 +52,7 @@ public static class FileUtil // : File
 
         allFiles = GetAllFiles(pSourceDir);
         if (allFiles is null)
-            return (StatusFileUtil.InvalidSource, null);
+            return (StatusFileUtil.InvalidFiles, null);
 
         if (!Directory.Exists(pDestinationDir))
             Directory.CreateDirectory(pDestinationDir);
@@ -101,19 +106,23 @@ public static class FileUtil // : File
         return (StatusFileUtil.Succes, handwritten);
     }
 
-    public static StatusFileUtil DeleteFromHandwritten(string pDir, DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
+    
+    // TODO: Hacerla asincrona.
+    public static StatusFileUtil DeleteFromHandwritten(DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
     {
-        if (!Directory.Exists(pDir))
-            return StatusFileUtil.InvalidSource;
-
         int previus = -1;
         double? inverse;
+        string? root = pHandwritten.Root;
 
         inverse = (pProgress != null) ? Util.GetInverse(pHandwritten.Files.Count) : null;
         for (int i = 0; i < pHandwritten.Files.Count; i++)
         {
             string file = pHandwritten.Files[i];
-            string destFile = Path.Combine(pDir, file);
+            string destFile =
+                Path.IsPathFullyQualified(file) ? file
+                : (root != null) ? Path.Combine(root, file) 
+                : throw new NullReferenceException("Try acces Root null in path Handwritten relative");
+
             if (File.Exists(destFile))
                 File.Delete(destFile);
 
@@ -128,7 +137,10 @@ public static class FileUtil // : File
         for (int i = 0; i < orderedDirectories.Count; i++)
         {
             string dir = orderedDirectories[i];
-            string destSub = Path.Combine(pDir, dir);
+            string destSub =
+                Path.IsPathFullyQualified(dir) ? dir
+                : (root != null) ? Path.Combine(root, dir)
+                : throw new NullReferenceException("Try acces Root null in path Handwritten relative");
 
             if (Directory.Exists(destSub))
             {
