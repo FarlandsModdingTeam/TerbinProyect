@@ -11,7 +11,6 @@ using TerbinLibrary.Useful.NetWork;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
 using TerbinService.Services;
-using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Managers;
 /*
