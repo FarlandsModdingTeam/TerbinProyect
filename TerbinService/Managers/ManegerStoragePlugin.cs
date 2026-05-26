@@ -7,6 +7,7 @@ using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
 using TerbinService.Data.References;
 using static TerbinService.Managers.Manager;
+using static TerbinService.Managers.Manager.Plugin;
 
 namespace TerbinService.Managers;
 
@@ -65,12 +66,15 @@ public static partial class Manager
             return id;
         }
 
-        public static async ValueTask<bool?> Eliminate(string pId)
+        public static async ValueTask<bool?> Eliminate(string pId, CancellationToken pCancellationToken = default)
         {
             var plugin = await Get(pId).ConfigureAwait(false);
             if (plugin is null) return null;
             if (plugin.Name is null) return null;
             if (plugin.Id is null) return null;
+
+            if (pCancellationToken.IsCancellationRequested)
+                return null;
 
             if (!await operatePlugin(plugin.Name, (p, d) => { File.Delete(d); }).ConfigureAwait(false))
                 return false;

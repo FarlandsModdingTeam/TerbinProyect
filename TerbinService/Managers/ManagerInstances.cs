@@ -149,6 +149,8 @@ public static partial class Manager
             await instanceLock.WaitAsync(pCancellationToken).ConfigureAwait(false);
             try
             {
+                if (pCancellationToken.IsCancellationRequested)
+                    return null;
                 var result = await ZipUtil.ExtractWithProgress(pPathPlugin, pathInstance, pProgress, pOverwrite, pCancellationToken).ConfigureAwait(false);
                 return result;
             }
@@ -170,6 +172,8 @@ public static partial class Manager
             await instanceLock.WaitAsync(pCancellationToken).ConfigureAwait(false);
             try
             {
+                if (pCancellationToken.IsCancellationRequested)
+                    return StatusFileUtil.IsCancelled;
                 var result = FileUtil.DeleteFromHandwritten(pathInstance, pPlugin, pProgress);
                 return result;
             }

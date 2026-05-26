@@ -19,6 +19,7 @@ namespace TerbinLibrary.Useful.Nodes;
 
 public enum StatusFileUtil : sbyte
 {
+    IsCancelled = 0,
     Succes = 1,
 
     InvalidSource = 2,

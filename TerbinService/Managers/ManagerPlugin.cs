@@ -150,10 +150,18 @@ public static partial class Manager
             return Status.Succes;
         }
 
+        
         public static async Task<Status> DeletedOne
-            (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+            (string pId, CancellationToken pCancellationToken = default)
         {
-            throw new NotImplementedException("TODO");
+            bool? r = await Manager.StoragePlugin.Eliminate(pId);
+            Status result = r switch
+            {
+                null => Status.NotFound,
+                true => Status.Succes,
+                false => Status.GenericError
+            };
+            return result;
         }
 
 
@@ -192,21 +200,48 @@ public static partial class Manager
             return Status.Succes;
         }
 
+
+        public static async Task<Status> HandleUnistallOne
+            (string pPlugin, string pNameInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
+        {
+            var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
+
+            return await UnistallOne(pPlugin, pNameInstance, progress, pCancellationToken);
+        }
+
         public static async Task<Status> UnistallOne
             (string pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            throw new NotImplementedException("TODO");
-            var reference = await Manager.StoragePlugin.Get(pPlugin).ConfigureAwait(false);
-            if (reference?.FileName == null)
-                return Status.ErrorGetPlugin;
+            var (status, manifest) = await GetOne(pPlugin, pNameInstance, pCancellationToken);
+
+            if (status != Status.Succes)
+                return status;
+
+            if (manifest?.HandWritten == null)
+                return Status.ManifestNotExit;
+
+            if (pCancellationToken.IsCancellationRequested)
+                return Status.IsCancelled;
+
+            StatusFileUtil r = await Manager.Instances.UnistallPlugin(manifest.HandWritten, pNameInstance, pProgress, pCancellationToken);
+            Status result = r switch
+            {
+                StatusFileUtil.Succes => Status.Succes,
+                // TODO: Resto de errores, Ñe Ñe Ñe
 
 
+                _ => Status.GenericError,
+            };
+            return result;
         }
 
 
-
+        // TODO: Mover a Instance.
         public static async Task<(Status status, PluginManifest? manifest)> GetOne(string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
         {
+            if (pCancellationToken.IsCancellationRequested)
+                return (Status.IsCancelled, null);
+
             var manifest = Manager.Instances.GetManifest(pNameInstance);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
@@ -217,6 +252,9 @@ public static partial class Manager
 
             for (int i = 0; i < manifest.Plugins.Count; i++)
             {
+                if (pCancellationToken.IsCancellationRequested)
+                    return (Status.IsCancelled, null);
+
                 var refe = manifest.Plugins[i];
                 if (refe.IdLocal == pPlugin)
                 {
@@ -234,8 +272,12 @@ public static partial class Manager
             }
             return (Status.NotFound, null);
         }
-        public static async Task<(Status status, List<PluginManifest>? manifests)> GetAll(string pNameInstance)
+        // TODO: Mover a Instance.
+        public static async Task<(Status status, List<PluginManifest>? manifests)> GetAll(string pNameInstance, CancellationToken pCancellationToken = default)
         {
+            if (pCancellationToken.IsCancellationRequested)
+                return (Status.IsCancelled, null);
+
             var manifest = Manager.Instances.GetManifest(pNameInstance);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
@@ -248,6 +290,9 @@ public static partial class Manager
 
             for (int i = 0; i < manifest.Plugins.Count; i++)
             {
+                if (pCancellationToken.IsCancellationRequested)
+                    return (Status.IsCancelled, null);
+
                 var refe = manifest.Plugins[i];
                 if (refe.Path == null) continue;
 
@@ -295,6 +340,7 @@ public static partial class Manager
             IsCancelled = 0,
             Succes = 1,
 
+            GenericError = 2,
             ErrorGetPathInstance = 3,
             ErrorGetPlugin = 4,
             ErrorGetPathPlugin = 5,
