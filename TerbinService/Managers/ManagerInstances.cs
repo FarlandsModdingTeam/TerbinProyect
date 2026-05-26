@@ -1,10 +1,15 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
 using TerbinLibrary.Configuration;
+using TerbinLibrary.Data;
+using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
+using static TerbinService.Managers.Manager;
+using static TerbinService.Managers.Manager.Plugin;
 
 namespace TerbinService.Managers;
 /*
@@ -23,6 +28,9 @@ public static partial class Manager
 {
     public static class Instances
     {
+        private static readonly ConcurrentDictionary<string, SemaphoreSlim> _instanceLocks = new(StringComparer.OrdinalIgnoreCase);
+
+
         public static bool NewInstance(string pName)
         {
             var dirInstace = MakePathFolder(pName);
@@ -131,9 +139,44 @@ public static partial class Manager
         }
 
 
-        public static Task InstallPlugin()
+        public static async Task<DirectoryHandwritten?> InstallPlugin(string pPathPlugin, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            throw new NotImplementedException();
+            string? pathInstance = Manager.Instances.MakePathFolder(pNameInstance);
+            if (string.IsNullOrEmpty(pathInstance))
+                return null;
+
+            SemaphoreSlim instanceLock = _instanceLocks.GetOrAdd(pNameInstance, _ => new SemaphoreSlim(1, 1));
+            await instanceLock.WaitAsync(pCancellationToken).ConfigureAwait(false);
+            try
+            {
+                var result = await ZipUtil.ExtractWithProgress(pPathPlugin, pathInstance, pProgress, pOverwrite, pCancellationToken).ConfigureAwait(false);
+                return result;
+            }
+            finally
+            {
+                instanceLock.Release();
+            }
+        }
+
+        public static async Task<StatusFileUtil> UnistallPlugin(DirectoryHandwritten pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+        {
+            //ArgumentNullException.ThrowIfNull(pPlugin.Root, "Root is not asing, need root in DirectoryHandwritten");
+
+            string? pathInstance = Manager.Instances.MakePathFolder(pNameInstance);
+            if (string.IsNullOrEmpty(pathInstance))
+                return StatusFileUtil.InvalidSource;
+
+            SemaphoreSlim instanceLock = _instanceLocks.GetOrAdd(pNameInstance, _ => new SemaphoreSlim(1, 1));
+            await instanceLock.WaitAsync(pCancellationToken).ConfigureAwait(false);
+            try
+            {
+                var result = FileUtil.DeleteFromHandwritten(pathInstance, pPlugin, pProgress);
+                return result;
+            }
+            finally
+            {
+                instanceLock.Release();
+            }
         }
     }
 }
