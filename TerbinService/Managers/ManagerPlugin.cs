@@ -158,9 +158,9 @@ public static partial class Manager
 
 
         public static async Task<Status> InstallOne
-            (string pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+            (string pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            string? pathInstance = Manager.Instances.MakePathFolder(pInstance);
+            string? pathInstance = Manager.Instances.MakePathFolder(pNameInstance);
             if (string.IsNullOrEmpty(pathInstance))
                 return Status.ErrorGetPathInstance;
 
@@ -184,7 +184,7 @@ public static partial class Manager
             Manager.Manifest.HandleAddPlugin
                 (reference.Id ?? $"CodeManifestError:{CodeManifestError.NotAccesId}",
                 reference.Name ?? $"CodeManifestError:{CodeManifestError.NotAccesName}",
-                pInstance, result);
+                pNameInstance, result);
 
             if (pCancellationToken.IsCancellationRequested)
                 throw new Exception("TODO: Desinstalar completo.");
@@ -193,7 +193,7 @@ public static partial class Manager
         }
 
         public static async Task<Status> UnistallOne
-            (string pPlugin, string pInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+            (string pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             throw new NotImplementedException("TODO");
             var reference = await Manager.StoragePlugin.Get(pPlugin).ConfigureAwait(false);
@@ -205,13 +205,13 @@ public static partial class Manager
 
 
 
-        public static async Task<(Status status, PluginManifest? manifest)> GetOne(string pPlugin, string pInstance, CancellationToken pCancellationToken = default)
+        public static async Task<(Status status, PluginManifest? manifest)> GetOne(string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
         {
-            var manifest = Manager.Instances.GetManifest(pInstance);
+            var manifest = Manager.Instances.GetManifest(pNameInstance);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
-            var information = Manager.Instances.MakePathFolderInformation(pInstance);
+            var information = Manager.Instances.MakePathFolderInformation(pNameInstance);
             if (information == null)
                 return (Status.InformationNotExist, null);
 
@@ -234,13 +234,13 @@ public static partial class Manager
             }
             return (Status.NotFound, null);
         }
-        public static async Task<(Status status, List<PluginManifest>? manifests)> GetAll(string pInstance)
+        public static async Task<(Status status, List<PluginManifest>? manifests)> GetAll(string pNameInstance)
         {
-            var manifest = Manager.Instances.GetManifest(pInstance);
+            var manifest = Manager.Instances.GetManifest(pNameInstance);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
-            var information = Manager.Instances.MakePathFolderInformation(pInstance);
+            var information = Manager.Instances.MakePathFolderInformation(pNameInstance);
             if (information == null)
                 return (Status.InformationNotExist, null);
 
