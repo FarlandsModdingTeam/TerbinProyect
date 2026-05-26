@@ -92,6 +92,8 @@ public static class Util
             _ = pCommunicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, p.Serialize());
         });
     }
+
+    // Prolongar cuando actulizamos el progreso no es la mejor solucion pero si para salir del paso (TODO:).
     public static IProgress<TerbinInfoProgrss> CreateProgessBarr(
         TerbinCommunicator pCommunicator, ushort pIdRequest, Action<TerbinInfoProgrss>? pAction = default, params byte[] pMethod)
     {
