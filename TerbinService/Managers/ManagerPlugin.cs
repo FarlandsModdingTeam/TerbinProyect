@@ -107,13 +107,7 @@ public static partial class Manager
         }
 
 
-
-        public static async Task<Status> HandleInstallPlugin(string pPlugin, string pInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
-        {
-            var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
-
-            return await InstallOne(pPlugin, pInstance, progress, pCancellationToken);
-        }
+        //-----------------( Dowload/Deleted )-----------------//
         public static async Task<Status> HandleDowloadPlugin(string pUrl, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
         {
             var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
@@ -164,13 +158,17 @@ public static partial class Manager
         }
 
 
+        //-----------------( Install/Unistall )-----------------//
+        public static async Task<Status> HandleInstallPlugin(string pPlugin, string pInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
+        {
+            var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
+
+            return await InstallOne(pPlugin, pInstance, progress, pCancellationToken);
+        }
+
         public static async Task<Status> InstallOne
             (string pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            string? pathInstance = Manager.Instances.MakePathFolder(pNameInstance);
-            if (string.IsNullOrEmpty(pathInstance))
-                return Status.ErrorGetPathInstance;
-
             var reference = await Manager.StoragePlugin.Get(pPlugin).ConfigureAwait(false);
             if (reference?.FileName == null)
                 return Status.ErrorGetPlugin;
@@ -182,11 +180,14 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            // TODO: Desviar a Manager.Instance
-            var result = await ZipUtil.ExtractWithProgress(pathPlugin, pathInstance, pProgress, true, pCancellationToken).ConfigureAwait(false);
+            var result = await Manager.Instances.InstallPlugin(pathPlugin, pNameInstance, true, pProgress, pCancellationToken).ConfigureAwait(false);
 
             if (pCancellationToken.IsCancellationRequested)
-                FileUtil.DeleteFromHandwritten(pathInstance, result);
+            {
+                if (result != null)
+                    await Manager.Instances.UnistallPlugin(result, pNameInstance, pCancellationToken: CancellationToken.None);
+                return Status.IsCancelled;
+            }
 
             Manager.Manifest.HandleAddPlugin
                 (reference.Id ?? $"CodeManifestError:{CodeManifestError.NotAccesId}",
@@ -194,7 +195,11 @@ public static partial class Manager
                 pNameInstance, result);
 
             if (pCancellationToken.IsCancellationRequested)
-                throw new Exception("TODO: Desinstalar completo.");
+            {
+                if (result != null)
+                    await Manager.Instances.UnistallPlugin(result, pNameInstance, pCancellationToken: CancellationToken.None);
+                throw new Exception("TODO: Desregistrar.");
+            }
 
             return Status.Succes;
         }
@@ -234,7 +239,7 @@ public static partial class Manager
             return result;
         }
 
-
+        //-----------------( Gets )-----------------//
         // TODO: Mover a Instance.
         public static async Task<(Status status, PluginManifest? manifest)> GetOne(string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
         {
