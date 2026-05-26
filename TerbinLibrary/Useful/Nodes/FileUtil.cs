@@ -106,7 +106,12 @@ public static class FileUtil // : File
         return (StatusFileUtil.Succes, handwritten);
     }
 
-    
+    public static StatusFileUtil DeleteFromHandwritten(string pDir, DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
+    {
+        pHandwritten.Root = pDir;
+        return DeleteFromHandwritten(pHandwritten, pProgress);
+    }
+
     // TODO: Hacerla asincrona.
     // TODO: Que no salte excepcion.
     public static StatusFileUtil DeleteFromHandwritten(DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
