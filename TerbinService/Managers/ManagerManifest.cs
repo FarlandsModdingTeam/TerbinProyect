@@ -141,7 +141,7 @@ public static partial class Manager
             Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
             return Status.Succes;
         }
-        public static Status HandleRemovePlugin(string pIdLocal, string pNameInstace, bool pRemoveFile = false)
+        public static Status HandleRemovePlugin(string pIdLocal, string pNameInstace)
         {
             var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
             if (string.IsNullOrEmpty(information))
@@ -159,7 +159,7 @@ public static partial class Manager
             if (reference != null)
             {
                 string pathManifest = Path.Combine(information, makeNameFieldPlugin(reference.Name, reference.IdLocal));
-                if (pRemoveFile && File.Exists(pathManifest))
+                if (File.Exists(pathManifest))
                     File.Delete(pathManifest);
                 return Status.Succes;
             }
@@ -169,9 +169,9 @@ public static partial class Manager
 
         private static string makeNameFieldPlugin(string? pName, string? pGUID)
         {
-            string guid = "";
-            if (pName == null || pGUID == null)
-                guid = $"{Guid.NewGuid:N}";
+            string guid = ""; 
+            if (pName == null)
+                guid = pGUID ?? $"{Guid.NewGuid:N}";
             pName ??= $"E:{CodeManifestError.NotAccesName}::{guid}";
             pGUID ??= $"E:{CodeManifestError.NotAccesIdLocal}::{guid}";
             return $"{pName}_{pGUID}.json";
