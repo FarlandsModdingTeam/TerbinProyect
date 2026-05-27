@@ -450,20 +450,100 @@ public static partial class Manager
         /// </summary>
         public enum Status : sbyte
         {
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// Ocurrió una excepción al intentar eliminar un archivo temporal.<br />
+            /// ___________________( English )___________________<br />
+            /// An exception occurred while attempting to delete a temporary file.<br />
+            /// </summary>
             ExceptionOnDeteledTmp = -1,
 
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// La operación fue cancelada por el usuario o el token de cancelación.<br />
+            /// ___________________( English )___________________<br />
+            /// The operation was cancelled by the user or the cancellation token.<br />
+            /// </summary>
             IsCancelled = 0,
+
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// La operación se completó con éxito sin inconvenientes.<br />
+            /// ___________________( English )___________________<br />
+            /// The operation completed successfully without issues.<br />
+            /// </summary>
             Succes = 1,
 
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// Ocurrió un error genérico o no especificado durante el proceso.<br />
+            /// ___________________( English )___________________<br />
+            /// A generic or unspecified error occurred during the process.<br />
+            /// </summary>
             GenericError = 2,
+
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// Ocurrió un error al intentar obtener o resolver la ruta de la instancia.<br />
+            /// ___________________( English )___________________<br />
+            /// An error occurred while trying to obtain or resolve the instance path.<br />
+            /// </summary>
             ErrorGetPathInstance = 3,
+
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// Ocurrió un error al recuperar la información del plugin desde el almacenamiento.<br />
+            /// ___________________( English )___________________<br />
+            /// An error occurred while retrieving the plugin information from storage.<br />
+            /// </summary>
             ErrorGetPlugin = 4,
+
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// Error al tratar de generar u obtener la ruta física del plugin.<br />
+            /// ___________________( English )___________________<br />
+            /// Error when trying to generate or retrieve the physical path of the plugin.<br />
+            /// </summary>
             ErrorGetPathPlugin = 5,
+
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// Se produjo un fallo en la red o servidor durante la descarga del plugin.<br />
+            /// ___________________( English )___________________<br />
+            /// A network or server failure occurred during the plugin download.<br />
+            /// </summary>
             ErrorOnDowload = 6,
+
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// La instancia indicada o solicitada no existe o no figura configurada en el sistema.<br />
+            /// ___________________( English )___________________<br />
+            /// The specified or requested instance does not exist or is not configured in the system.<br />
+            /// </summary>
             InstanceNotExist = 7,
+
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// No se pudo localizar la carpeta o los datos de información requeridos de la instancia.<br />
+            /// ___________________( English )___________________<br />
+            /// The required information folder or data of the instance could not be located.<br />
+            /// </summary>
             InformationNotExist = 8,
+
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// El archivo de manifiesto no existe, no es accesible o no puedo ser construido.<br />
+            /// ___________________( English )___________________<br />
+            /// The manifest file does not exist, is not accessible, or could not be constructed.<br />
+            /// </summary>
             ManifestNotExit = 9,
 
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// El recurso, archivo o elemento buscado no ha sido encontrado.<br />
+            /// ___________________( English )___________________<br />
+            /// The required resource, file, or item has not been found.<br />
+            /// </summary>
             NotFound = 10,
         }
     }
