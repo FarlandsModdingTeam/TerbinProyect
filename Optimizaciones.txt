@@ -22,3 +22,4 @@ Haz la Documentacion Lo mas completa tieneindo en cuenta que la quiero es Castel
 Para parametros y parecidos hazlo en formato:
 Es: Bla bla bla <br />Es: Bla bla bla.
 Haz la documentacion lo mas completa posible
+Y Ignora lo que este marcado como obsoleto.

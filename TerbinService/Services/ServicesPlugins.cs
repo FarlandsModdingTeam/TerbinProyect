@@ -75,7 +75,8 @@ internal static class ServicesPlugins
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         byte memoryExtract = rId.Payload[0];
 
-        _ = Manager.Plugin.HandleInstallPluginWithProgress(name, memoryDownload, memoryExtract, pathPlugin, urlPlugin);
+        //_ = Manager.Plugin.HandleInstallPluginWithProgress(name, memoryDownload, memoryExtract, pathPlugin, urlPlugin);
+        throw new Exception("Manager.Plugin.HandleInstallPluginWithProgress no ejecutable");
 
         return new InfoResponse
         {

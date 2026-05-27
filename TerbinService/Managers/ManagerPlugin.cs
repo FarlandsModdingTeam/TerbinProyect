@@ -213,6 +213,23 @@ public static partial class Manager
             return await UnistallOne(pPlugin, pNameInstance, progress, pCancellationToken);
         }
 
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Desinstala un plugin de una instancia específica.<br />
+        /// Recupera el manifiesto del plugin y ejecuta el proceso de desinstalación.<br />
+        /// Notas: Puede devolver un estado de error si el manifiesto no existe o la operación es cancelada.<br />
+        /// Tips: Asegúrate de proporcionar un nombre de instancia válido para evitar errores de tipo 'InstanceNotExist'.<br />
+        /// ___________________( English )___________________<br />
+        /// Uninstalls a plugin from a specific instance.<br />
+        /// Retrieves the plugin manifest and executes the uninstallation process.<br />
+        /// Notes: It can return an error status if the manifest does not exist or the operation is cancelled.<br />
+        /// Tips: Make sure to provide a valid instance name to avoid 'InstanceNotExist' errors.<br />
+        /// </summary>
+        /// <param name="pPlugin">Es: Identificador o nombre del plugin a desinstalar.<br />En: Identifier or name of the plugin to uninstall.</param>
+        /// <param name="pNameInstance">Es: Nombre de la instancia de la cual se desinstalará el plugin.<br />En: Name of the instance from which the plugin will be uninstalled.</param>
+        /// <param name="pProgress">Es: Proveedor de progreso opcional para reportar el avance de la desinstalación.<br />En: Optional progress provider to report the uninstallation progress.</param>
+        /// <param name="pCancellationToken">Es: Token para monitorear las solicitudes de cancelación.<br />En: Token to monitor for cancellation requests.</param>
+        /// <returns>Es: El estado final de la operación de desinstalación.<br />En: The final status of the uninstallation operation.</returns>
         public static async Task<Status> UnistallOne
             (string pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
