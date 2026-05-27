@@ -190,8 +190,8 @@ public static partial class Manager
             }
 
             Manager.Manifest.HandleAddPlugin
-                (reference.Id ?? $"CodeManifestError:{CodeManifestError.NotAccesId}",
-                reference.Name ?? $"CodeManifestError:{CodeManifestError.NotAccesName}",
+                (reference.Id ?? $"E:{CodeManifestError.NotAccesId}",
+                reference.Name ?? $"E:{CodeManifestError.NotAccesName}",
                 pNameInstance, result);
 
             if (pCancellationToken.IsCancellationRequested)

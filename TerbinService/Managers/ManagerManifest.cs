@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
 using TerbinLibrary.SteamFarlands;
@@ -104,19 +105,19 @@ public static partial class Manager
         }
 
 
-        public static void HandleAddPlugin(Guid pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
+        public static Status HandleAddPlugin(Guid pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
         {
-            HandleAddPlugin($"{pGuid:N}", pNamePlugin, pNameInstace, pHandwritten);
+            return HandleAddPlugin($"{pGuid:N}", pNamePlugin, pNameInstace, pHandwritten);
         }
-        public static void HandleAddPlugin(string pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
+        public static Status HandleAddPlugin(string pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
         {
             var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
             if (string.IsNullOrEmpty(information))
-                throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
+                return Status.ErrorGetManifest;
 
             string local = $"{Guid.NewGuid:N}";
             string name = pNamePlugin;
-            string file = $"{name}_{local}.json";
+            string file = makeNameFieldPlugin(name, local);
 
             string pathRelativeManifest = MakePathRelativeManifest(information, file, pNameInstace);
 
@@ -138,34 +139,42 @@ public static partial class Manager
             };
 
             Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+            return Status.Succes;
         }
-        public static void HandleRemovePlugin(string pNameInstace, DirectoryHandwritten? pHandwritten)
+        public static Status HandleRemovePlugin(string pIdLocal, string pNameInstace, bool pRemoveFile = false)
         {
-            throw new NotImplementedException("Ñe");
             var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
             if (string.IsNullOrEmpty(information))
-                throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
+                return Status.ErrorGetManifest;
 
-            Guid g = Guid.NewGuid();
-            string name = $"{g:N}";
-            string file = $"{g:N}.json";
-            string pathManifest = Path.Combine(information, $"{g:N}.json");
+            ReferencePlugin? reference = null;
 
-            var manifest = new PluginManifest
+            Manager.Manifest.UpdateInstace(pNameInstace, m =>
             {
-                Name = name,
-                HandWritten = pHandwritten,
-            };
-            JSonUtil.SaveDirect(information, file, manifest);
+                reference = m.Plugins.FirstOrDefault(p => p.IdLocal == pIdLocal);
+                if (reference != null)
+                    m.Plugins.Remove(reference);
+            });
 
-            var reference = new ReferencePlugin
+            if (reference != null)
             {
-                Name = name,
-                Id = name,
-                Path = pathManifest,
-            };
+                string pathManifest = Path.Combine(information, makeNameFieldPlugin(reference.Name, reference.IdLocal));
+                if (pRemoveFile && File.Exists(pathManifest))
+                    File.Delete(pathManifest);
+                return Status.Succes;
+            }
+            return Status.ErrorGetReference;
+        }
 
-            Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+
+        private static string makeNameFieldPlugin(string? pName, string? pGUID)
+        {
+            string guid = "";
+            if (pName == null || pGUID == null)
+                guid = $"{Guid.NewGuid:N}";
+            pName ??= $"E:{CodeManifestError.NotAccesName}::{guid}";
+            pGUID ??= $"E:{CodeManifestError.NotAccesIdLocal}::{guid}";
+            return $"{pName}_{pGUID}.json";
         }
 
 
@@ -189,5 +198,18 @@ public static partial class Manager
             File.WriteAllText(pPath, pJson.ToJson());
         }
 
+
+
+
+
+        public enum Status : byte
+        {
+            IsCancelled = 0,
+            Succes = 1,
+
+            GenericError = 2,
+            ErrorGetManifest = 3,
+            ErrorGetReference = 4,
+        }
     }
 }
