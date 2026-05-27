@@ -180,7 +180,7 @@ public static partial class Manager
         /// <param name="pNameInstace">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <param name="pHandwritten">Es: Datos escritos a mano del directorio. <br />En: Handwritten data of the directory.</param>
         /// <returns>Es: El estado de la operación. <br />En: The status of the operation.</returns>
-        public static Status HandleAddPlugin(Guid pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
+        public static (Status status, string local) HandleAddPlugin(Guid pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
         {
             return HandleAddPlugin($"{pGuid:N}", pNamePlugin, pNameInstace, pHandwritten);
         }
@@ -196,11 +196,11 @@ public static partial class Manager
         /// <param name="pNameInstace">Es: El nombre de la instancia de destino. <br />En: The name of the target instance.</param>
         /// <param name="pHandwritten">Es: Datos escritos a mano u opcionales del directorio. <br />En: Handwritten or optional directory data.</param>
         /// <returns>Es: El resultado de la operación (ej. Éxito, Error al obtener manifiesto). <br />En: The result of the operation (e.g., Success, Error getting manifest).</returns>
-        public static Status HandleAddPlugin(string pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
+        public static (Status status, string local) HandleAddPlugin(string pGuid, string pNamePlugin, string pNameInstace, DirectoryHandwritten? pHandwritten)
         {
             var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
             if (string.IsNullOrEmpty(information))
-                return Status.ErrorGetManifest;
+                return (Status.ErrorGetManifest, "");
 
             string local = $"{Guid.NewGuid:N}";
             string name = pNamePlugin;
@@ -215,7 +215,10 @@ public static partial class Manager
                 IdLocal = local,
                 HandWritten = pHandwritten,
             };
-            JSonUtil.SaveDirect(information, file, manifest);
+            var r = JSonUtil.SaveDirect(information, file, manifest);
+
+            if (r != CodeAcessJSonSave.Succes)
+                return (Status.ErrorOnSaveManifest, "");
 
             var reference = new ReferencePlugin
             {
@@ -226,7 +229,7 @@ public static partial class Manager
             };
 
             Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
-            return Status.Succes;
+            return (Status.Succes, local);
         }
         
         /// <summary>
@@ -373,6 +376,8 @@ public static partial class Manager
             /// Error reading or getting the reference.<br />
             /// </summary>
             ErrorGetReference = 4,
+
+            ErrorOnSaveManifest = 5,
         }
     }
 }

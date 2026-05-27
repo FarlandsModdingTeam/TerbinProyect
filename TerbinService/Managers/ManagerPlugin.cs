@@ -174,36 +174,45 @@ public static partial class Manager
         public static async Task<Status> InstallOne
             (string pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            var reference = await Manager.StoragePlugin.Get(pPlugin).ConfigureAwait(false);
+            var reference = await StoragePlugin.Get(pPlugin).ConfigureAwait(false);
             if (reference?.FileName == null)
                 return Status.ErrorGetPlugin;
 
-            string? pathPlugin = Manager.StoragePlugin.MakePathPlugin(reference.FileName);
+            string? pathPlugin = StoragePlugin.MakePathPlugin(reference.FileName);
             if (string.IsNullOrEmpty(pathPlugin))
                 return Status.ErrorGetPathPlugin;
 
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            var result = await Manager.Instances.InstallPlugin(pathPlugin, pNameInstance, true, pProgress, pCancellationToken).ConfigureAwait(false);
+            var result = await Instances.InstallPlugin(pathPlugin, pNameInstance, true, pProgress, pCancellationToken).ConfigureAwait(false);
 
             if (pCancellationToken.IsCancellationRequested)
             {
                 if (result != null)
-                    await Manager.Instances.UnistallPlugin(result, pNameInstance, pCancellationToken: CancellationToken.None);
+                    await Instances.UnistallPlugin(result, pNameInstance, pCancellationToken: CancellationToken.None);
                 return Status.IsCancelled;
             }
 
-            Manager.Manifest.HandleAddPlugin
+            var (status, local) = Manifest.HandleAddPlugin
                 (reference.Id ?? $"E:{CodeManifestError.NotAccesId}",
                 reference.Name ?? $"E:{CodeManifestError.NotAccesName}",
                 pNameInstance, result);
 
+            if (status != Manifest.Status.Succes)
+                return status switch
+                {
+                    Manifest.Status.ErrorGetManifest => Status.ErrorGetManifest,
+                    Manifest.Status.ErrorOnSaveManifest => Status.ErrorOnSaveManifest,
+                    _ => Status.GenericError,
+                };
+
             if (pCancellationToken.IsCancellationRequested)
             {
                 if (result != null)
-                    await Manager.Instances.UnistallPlugin(result, pNameInstance, pCancellationToken: CancellationToken.None);
-                throw new Exception("TODO: Desregistrar.");
+                    await Instances.UnistallPlugin(result, pNameInstance, pCancellationToken: CancellationToken.None);
+                Manifest.HandleRemovePlugin(local, pNameInstance);
+                return Status.IsCancelled;
             }
 
             return Status.Succes;
@@ -297,7 +306,8 @@ public static partial class Manager
         /// <param name="pCancellationToken">Es: Token de la operación.<br />En: Operation token.</param>
         /// <returns>Es: Tupla con estado de operación y el manifiesto si se encontró.<br />En: Tuple with the operation status and the manifest if found.</returns>
         // TODO: Mover a Instance.
-        public static async Task<(Status status, PluginManifest? manifest)> GetOne(string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
+        public static async Task<(Status status, PluginManifest? manifest)> GetOne
+            (string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
         {
             if (pCancellationToken.IsCancellationRequested)
                 return (Status.IsCancelled, null);
@@ -545,6 +555,16 @@ public static partial class Manager
             /// The required resource, file, or item has not been found.<br />
             /// </summary>
             NotFound = 10,
+
+            /// <summary>
+            /// ___________________( Español )___________________<br />
+            /// Error al obtener el manifiesto.<br />
+            /// ___________________( English )___________________<br />
+            /// Error reading or getting the manifest.<br />
+            /// </summary>
+            ErrorGetManifest = 11,
+
+            ErrorOnSaveManifest = 12,
         }
     }
 }
