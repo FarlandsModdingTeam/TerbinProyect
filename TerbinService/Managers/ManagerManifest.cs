@@ -185,6 +185,8 @@ public static partial class Manager
             return HandleAddPlugin($"{pGuid:N}", pNamePlugin, pNameInstace, pHandwritten);
         }
         
+
+        // TODO: Actualizar Documentacion.
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Gestiona la adición de un plugin a una instancia definiendo el GUID como cadena.<br />
