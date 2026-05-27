@@ -38,6 +38,20 @@ public enum CodeAcessJSonSave : sbyte
 public class JSonUtil
 {
     private static Dictionary<string, string> _places = new Dictionary<string, string>();
+    private static Dictionary<string, object> _fileLocks = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+    private static object getFileLock(string pFilePath)
+    {
+        lock (_fileLocks)
+        {
+            if (!_fileLocks.TryGetValue(pFilePath, out var fileLock))
+            {
+                fileLock = new object();
+                _fileLocks[pFilePath] = fileLock;
+            }
+            return fileLock;
+        }
+    }
 
     public static string? Get(string pKeyDir)
     {
@@ -78,11 +92,15 @@ public class JSonUtil
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(dir, fileName);
-        if (!File.Exists(routeComplete)) return null;
 
-        string json = File.ReadAllText(routeComplete);
+        lock (getFileLock(routeComplete))
+        {
+            if (!File.Exists(routeComplete)) return null;
 
-        return JsonConvert.DeserializeObject<T>(json);
+            string json = File.ReadAllText(routeComplete);
+
+            return JsonConvert.DeserializeObject<T>(json);
+        }
     }
     public static T? AcessDirect<T>(string pPath) where T : class
     {
@@ -95,11 +113,15 @@ public class JSonUtil
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(pDir, fileName);
-        if (!File.Exists(routeComplete)) return null;
 
-        string json = File.ReadAllText(routeComplete);
+        lock (getFileLock(routeComplete))
+        {
+            if (!File.Exists(routeComplete)) return null;
 
-        return JsonConvert.DeserializeObject<T>(json);
+            string json = File.ReadAllText(routeComplete);
+
+            return JsonConvert.DeserializeObject<T>(json);
+        }
     }
 
 
@@ -112,14 +134,18 @@ public class JSonUtil
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(dir, fileName);
-        if (!File.Exists(routeComplete))
-            Directory.CreateDirectory(dir);
 
-        string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
-        if (json == null) return CodeAcessJSonSave.ErrorSerialize;
+        lock (getFileLock(routeComplete))
+        {
+            if (!File.Exists(routeComplete))
+                Directory.CreateDirectory(dir);
 
-        File.WriteAllText(routeComplete, json);
-        return CodeAcessJSonSave.Succes;
+            string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
+            if (json == null) return CodeAcessJSonSave.ErrorSerialize;
+
+            File.WriteAllText(routeComplete, json);
+            return CodeAcessJSonSave.Succes;
+        }
     }
 
 
@@ -128,14 +154,18 @@ public class JSonUtil
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(pDir, fileName);
-        if (!File.Exists(routeComplete))
-            Directory.CreateDirectory(pDir);
 
-        string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
-        if (json == null) return CodeAcessJSonSave.ErrorSerialize;
+        lock (getFileLock(routeComplete))
+        {
+            if (!File.Exists(routeComplete))
+                Directory.CreateDirectory(pDir);
 
-        File.WriteAllText(routeComplete, json);
-        return CodeAcessJSonSave.Succes;
+            string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
+            if (json == null) return CodeAcessJSonSave.ErrorSerialize;
+
+            File.WriteAllText(routeComplete, json);
+            return CodeAcessJSonSave.Succes;
+        }
     }
 
     private static string? getDir(string pKeyDir)
