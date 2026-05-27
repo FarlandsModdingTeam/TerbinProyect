@@ -30,6 +30,23 @@ public static partial class Manager
     public static class Plugin
     {
         //-----------------( Dowload/Deleted )-----------------//
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Maneja la descarga de un plugin usando su URL.<br />
+        /// Crea una barra de progreso y luego procede con la descarga.<br />
+        /// Notas: Envía la información de progreso mediante un comunicador.<br />
+        /// Tips: Asegúrate de que el idRequest sea único para cada solicitud.<br />
+        /// ___________________( English )___________________<br />
+        /// Handles the downloading of a plugin using its URL.<br />
+        /// Creates a progress bar and then proceeds with the download.<br />
+        /// Notes: Sends progress information via a communicator.<br />
+        /// Tips: Ensure that idRequest is unique for each request.<br />
+        /// </summary>
+        /// <param name="pUrl">Es: URL desde donde se descargará el plugin.<br />En: URL from where the plugin will be downloaded.</param>
+        /// <param name="pIdRequest">Es: Identificador de la solicitud para el progreso.<br />En: Request identifier for progress tracking.</param>
+        /// <param name="pCancellationToken">Es: Token para monitorear las solicitudes de cancelación.<br />En: Token to monitor for cancellation requests.</param>
+        /// <param name="pMethod">Es: Parámetros opcionales para la creación del progreso.<br />En: Optional parameters for progress creation.</param>
+        /// <returns>Es: El estado de la operación de descarga.<br />En: The status of the download operation.</returns>
         public static async Task<Status> HandleDowloadPlugin(string pUrl, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
         {
             var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
@@ -37,6 +54,22 @@ public static partial class Manager
             return await DowloadOne(pUrl, progress, pCancellationToken);
         }
 
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Realiza la descarga de un plugin.<br />
+        /// Descarga el archivo de la URL dada, lo guarda en el almacenador y borra el archivo temporal.<br />
+        /// Notas: Si se cancela, se elimina el archivo descargado.<br />
+        /// Tips: Puede fallar si la URL es incorrecta o no hay acceso a internet.<br />
+        /// ___________________( English )___________________<br />
+        /// Performs the download of a plugin.<br />
+        /// Downloads the file from the given URL, stores it in storage, and deletes the temp file.<br />
+        /// Notes: If cancelled, the downloaded file is eliminated.<br />
+        /// Tips: Can fail if the URL is invalid or there's no internet access.<br />
+        /// </summary>
+        /// <param name="pUrl">Es: URL de descarga del plugin.<br />En: Download URL of the plugin.</param>
+        /// <param name="pProgress">Es: Proveedor de progreso de la descarga.<br />En: Download progress provider.</param>
+        /// <param name="pCancellationToken">Es: Token de cancelación.<br />En: Cancellation token.</param>
+        /// <returns>Es: El estado tras la descarga.<br />En: The status after downloading.</returns>
         public static async Task<Status> DowloadOne
             (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
@@ -66,6 +99,21 @@ public static partial class Manager
         }
 
         
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Elimina un plugin guardado en el gestor de almacenamiento.<br />
+        /// Utiliza el identificador asociado al plugin para removerlo por completo del sistema.<br />
+        /// Notas: El proceso es definitivo y elimina el archivo físico si se encuenta.<br />
+        /// Tips: Asegúrate de que el ID pertenezca a un plugin que ciertamente deba ser eliminado.<br />
+        /// ___________________( English )___________________<br />
+        /// Deletes a plugin saved in the storage manager.<br />
+        /// Uses the identifier associated with the plugin to completely remove it from the system.<br />
+        /// Notes: The process is final and deletes the physical file if found.<br />
+        /// Tips: Make sure the ID belongs to a plugin that certainly should be deleted.<br />
+        /// </summary>
+        /// <param name="pId">Es: Identificador único del plugin a eliminar.<br />En: Unique identifier of the plugin to delete.</param>
+        /// <param name="pCancellationToken">Es: Token para monitorear las solicitudes de cancelación.<br />En: Token to monitor for cancellation requests.</param>
+        /// <returns>Es: El resultado de la operación de borrado.<br />En: The result of the deletion operation.</returns>
         public static async Task<Status> DeletedOne
             (string pId, CancellationToken pCancellationToken = default)
         {
@@ -81,6 +129,24 @@ public static partial class Manager
 
 
         //-----------------( Install/Unistall )-----------------//
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Maneja la inicialización del proceso de instalación de un plugin para una instancia.<br />
+        /// Prepara la barra de progreso usando el comunicador configurado y procede con la instalación.<br />
+        /// Notas: Intercepta las credenciales de comunicación según el worker actual.<br />
+        /// Tips: Ideal para ser llamado directamente desde los handlers de red o IPC.<br />
+        /// ___________________( English )___________________<br />
+        /// Handles the initialization of the plugin installation process for an instance.<br />
+        /// Prepares the progress bar using the configured communicator and proceeds with the installation.<br />
+        /// Notes: Intercepts communication credentials according to the current worker.<br />
+        /// Tips: Ideal to be called directly from network or IPC handlers.<br />
+        /// </summary>
+        /// <param name="pPlugin">Es: El nombre o identificador del plugin.<br />En: The name or identifier of the plugin.</param>
+        /// <param name="pInstance">Es: El nombre de la instancia en la que instalar.<br />En: The name of the instance where to install.</param>
+        /// <param name="pIdRequest">Es: Id de la solicitud que origina esta acción.<br />En: Request Id that originated this action.</param>
+        /// <param name="pCancellationToken">Es: Token para monitorear las solicitudes de cancelación.<br />En: Token to monitor for cancellation requests.</param>
+        /// <param name="pMethod">Es: Parámetros de progreso adicionales.<br />En: Additional progress parameters.</param>
+        /// <returns>Es: Estado resultante de la operación.<br />En: Resulting status of the operation.</returns>
         public static async Task<Status> HandleInstallPlugin(string pPlugin, string pInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
         {
             var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
@@ -88,6 +154,23 @@ public static partial class Manager
             return await InstallOne(pPlugin, pInstance, progress, pCancellationToken);
         }
 
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Realiza la instalación de un plugin previamente almacenado en una instancia específica.<br />
+        /// Extrae la referencia del plugin, calcula su ruta e invoca la instalación física. Si algo falla o se cancela, se intenta revertir los cambios.<br />
+        /// Notas: Actualiza el manifiesto de la instancia si la instalación es satisfactoria.<br />
+        /// Tips: Verifica que el plugin ya haya sido descargado y figure en el Storage.<br />
+        /// ___________________( English )___________________<br />
+        /// Performs the installation of a previously stored plugin in a specific instance.<br />
+        /// Extracts the plugin reference, calculates its path, and invokes physical installation. If something fails or is canceled, changes are rolled back.<br />
+        /// Notes: Updates the instance manifest if installation is successful.<br />
+        /// Tips: Verify that the plugin has already been downloaded and is in Storage.<br />
+        /// </summary>
+        /// <param name="pPlugin">Es: Identificador del plugin dentro del almacenamiento.<br />En: Identifier of the plugin within the storage.</param>
+        /// <param name="pNameInstance">Es: Nombre de la instancia objetivo.<br />En: Target instance name.</param>
+        /// <param name="pProgress">Es: Rastreador de progreso para la operación.<br />En: Progress tracker for the operation.</param>
+        /// <param name="pCancellationToken">Es: Token para cancelar la instalación.<br />En: Token to cancel the installation.</param>
+        /// <returns>Es: Estado de la operación tras intentar la instalación.<br />En: Status of the operation after attempting the installation.</returns>
         public static async Task<Status> InstallOne
             (string pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
@@ -127,6 +210,24 @@ public static partial class Manager
         }
 
 
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Maneja el proceso de desinstalación creando la interfaz de progreso y llamando al método subyacente.<br />
+        /// Enlaza el proceso de cancelación y el tracker al Worker actual.<br />
+        /// Notas: Usa el comunicador disponible en Worker.CurrentConst.<br />
+        /// Tips: Evita llamadas concurrentes sobre el mismo plugin y la misma instancia para evitar bloqueos.<br />
+        /// ___________________( English )___________________<br />
+        /// Handles the uninstallation process by creating the progress UI and calling the underlying method.<br />
+        /// Binds the cancellation process and the tracker to the current Worker.<br />
+        /// Notes: Uses the communicator available in Worker.CurrentConst.<br />
+        /// Tips: Avoid concurrent calls on the same plugin and the same instance to prevent deadlocks.<br />
+        /// </summary>
+        /// <param name="pPlugin">Es: ID o nombre del plugin.<br />En: Plugin ID or name.</param>
+        /// <param name="pNameInstance">Es: Nombre de la instancia principal.<br />En: Name of the main instance.</param>
+        /// <param name="pIdRequest">Es: Identificador de la petición.<br />En: Request identifier.</param>
+        /// <param name="pCancellationToken">Es: Token de cancelación.<br />En: Cancellation token.</param>
+        /// <param name="pMethod">Es: Métodos para la creación del progreso en array binario.<br />En: Methods for progress creation in binary array.</param>
+        /// <returns>Es: El estado de la desinstalación.<br />En: The status of the uninstallation.</returns>
         public static async Task<Status> HandleUnistallOne
             (string pPlugin, string pNameInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
         {
@@ -179,6 +280,22 @@ public static partial class Manager
         }
 
         //-----------------( Gets )-----------------//
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Obtiene el manifiesto de un plugin en particular instalado en una instancia.<br />
+        /// Busca la información JSON local del plugin correspondiente.<br />
+        /// Notas: Combina rutas relativas y absolutas según corresponda, y comprueba que existan manifiestos.<br />
+        /// Tips: Útil para validar el estado de un plugin antes de desinstalar o inicializar.<br />
+        /// ___________________( English )___________________<br />
+        /// Gets the manifest of a particular plugin installed in an instance.<br />
+        /// Searches for the corresponding plugin's local JSON information.<br />
+        /// Notes: Combines relative and absolute paths as appropriate, and checks if manifests exist.<br />
+        /// Tips: Useful for validating a plugin's state before uninstalling or initializing.<br />
+        /// </summary>
+        /// <param name="pPlugin">Es: Identificador local del plugin a consultar.<br />En: Local identifier of the plugin to check.</param>
+        /// <param name="pNameInstance">Es: La instancia asignada a revisar.<br />En: The assigned instance to review.</param>
+        /// <param name="pCancellationToken">Es: Token de la operación.<br />En: Operation token.</param>
+        /// <returns>Es: Tupla con estado de operación y el manifiesto si se encontró.<br />En: Tuple with the operation status and the manifest if found.</returns>
         // TODO: Mover a Instance.
         public static async Task<(Status status, PluginManifest? manifest)> GetOne(string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
         {
@@ -215,6 +332,22 @@ public static partial class Manager
             }
             return (Status.NotFound, null);
         }
+        
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Recopila todos los manifiestos de los plugins pertenecientes a una sola instancia.<br />
+        /// Itera la carpeta de plugins y carga los archivos manifiesto disponibles.<br />
+        /// Notas: Puede regresar una lista vacía si la instancia no tiene plugins.<br />
+        /// Tips: Las rutas absolutas y relativas serán manejadas en automático.<br />
+        /// ___________________( English )___________________<br />
+        /// Collects all plugin manifests belonging to a single instance.<br />
+        /// Iterates inside the plugins folder and loads available manifest files.<br />
+        /// Notes: Might return an empty list if the instance has no plugins.<br />
+        /// Tips: Absolute and relative paths will be managed automatically.<br />
+        /// </summary>
+        /// <param name="pNameInstance">Es: Nombre de la instancia a escanear.<br />En: Name of the instance to scan.</param>
+        /// <param name="pCancellationToken">Es: Token de cancelación de la iteración.<br />En: Iteration cancellation token.</param>
+        /// <returns>Es: Tupla con el estado de la tarea y la lista de todos los manifiestos hallados.<br />En: Tuple containing the task status and the list of all found manifests.</returns>
         // TODO: Mover a Instance.
         public static async Task<(Status status, List<PluginManifest>? manifests)> GetAll(string pNameInstance, CancellationToken pCancellationToken = default)
         {
@@ -252,6 +385,20 @@ public static partial class Manager
         }
 
 
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Crea internamente la ruta de la carpeta de plugins para una instancia en caso de no existir o la recupera.<br />
+        /// Busca por nombre de instancia y construye el path en función a BePinEx.<br />
+        /// Notas: Si la carpeta de la instancia no existe, devuelve nulo.<br />
+        /// Tips: Puede generar una nueva carpeta de plugin en el disco local de ser necesario.<br />
+        /// ___________________( English )___________________<br />
+        /// Internally creates the plugin folder path for an instance in case it doesn't exist, or retrieves it.<br />
+        /// Searches by instance name and builds the path based on BePinEx.<br />
+        /// Notes: If the instance folder does not exist, it returns null.<br />
+        /// Tips: Can generate a new plugin directory on the local disk if deemed necessary.<br />
+        /// </summary>
+        /// <param name="pNameInstance">Es: Nombre base de la instancia.<br />En: Base name of the instance.</param>
+        /// <returns>Es: Ruta absoluta de la carpeta de plugins de la instancia o nulo.<br />En: Absolute path for the instance's plugins folder or null.</returns>
         public static string? MakePathPluginByName(string pNameInstance)
         {
             string? pathInstance;
@@ -265,6 +412,20 @@ public static partial class Manager
             return pathPlugin;
         }
 
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Construye internamente y verifica la ruta de plugins usando el path explícito de la instancia.<br />
+        /// Si la carpeta base para BePinEx no existe, esta se generará.<br />
+        /// Notas: Esta sobrecarga obvia la búsqueda de la instancia mediante nombre asumiéndose ya resuelto.<br />
+        /// Tips: Útil al enviar llamadas locales ya procesadas para evitar refactorización extra.<br />
+        /// ___________________( English )___________________<br />
+        /// Internally constructs and verifies the plugins path using the explicit instance path.<br />
+        /// If the base BePinEx folder doesn't exist, it will be generated.<br />
+        /// Notes: This overload bypasses instance name resolution, assuming it has already been resolved.<br />
+        /// Tips: Useful when sending already processed local calls to avoid extra refactoring.<br />
+        /// </summary>
+        /// <param name="pPathInstance">Es: Ruta directa hacia la instancia.<br />En: Direct path towards the instance.</param>
+        /// <returns>Es: Ruta final a la carpeta de plugins.<br />En: Final path to the plugins folder.</returns>
         public static string MakePathPluginByInstance(string pPathInstance)
         {
             string pathPlugin;
@@ -275,7 +436,18 @@ public static partial class Manager
         }
 
 
-
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Enumerador de códigos de estado de operaciones de los plugins.<br />
+        /// Contiene todos los retornos posibles de resoluciones correctas o errores de proceso.<br />
+        /// Notas: Utiliza tipos base sbyte para un menor consumo en memoria y serialización.<br />
+        /// Tips: Verifica Succes (1) para validaciones rápidas.<br />
+        /// ___________________( English )___________________<br />
+        /// Status codes enumerator for plugin operations.<br />
+        /// Contains all possible returns of proper resolutions or process failures.<br />
+        /// Notes: Uses an sbyte base type for lower memory footprint and serialization overhead.<br />
+        /// Tips: Check for Succes (1) for fast validations.<br />
+        /// </summary>
         public enum Status : sbyte
         {
             ExceptionOnDeteledTmp = -1,
