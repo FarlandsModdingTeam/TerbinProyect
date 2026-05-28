@@ -81,7 +81,7 @@ public static class ManagerFarlands
     }
 
 
-    public static string? GetVersion()
+    public static string GetVersion()
     {
         return "0.0.9";
     }

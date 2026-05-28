@@ -69,5 +69,11 @@ public static partial class Manager
             });
         }
 
+
+
+        public static string GetVersion()
+        {
+            return ManagerFarlands.GetVersion();
+        }
     }
 }

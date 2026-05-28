@@ -123,7 +123,7 @@ public static partial class Manager
             var manifest = new InstanceManifest
             {
                 Name = pName,
-                Version = TerbinLibrary.SteamFarlands.ManagerFarlands.GetVersion(),
+                Version = Games.GetVersion(),
                 Plugins = []
             };
             JSonUtil.SaveDirect(pDir, TerbinServiceConst.MANIFEST_INSTANCE, manifest);

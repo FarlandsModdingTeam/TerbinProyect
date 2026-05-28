@@ -57,7 +57,7 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la nueva instancia a crear. <br />En: The name of the new instance to create.</param>
         /// <returns>Es: <c>true</c> si se creó con éxito, de lo contrario <c>false</c>. <br />En: <c>true</c> if created successfully, otherwise <c>false</c>.</returns>
-        public static bool NewInstance(string pName)
+        public static bool NewInstance(string pName, bool pOverwrite)
         {
             var dirInstace = MakePathFolder(pName);
             if (dirInstace == null)
@@ -66,7 +66,11 @@ public static partial class Manager
             if (Directory.Exists(dirInstace))
             {
                 if (Directory.EnumerateFileSystemEntries(dirInstace).Any())
-                    throw new Exception("TODO: Preguntar si quiere sobreescribir");
+                {
+                    if (!pOverwrite)
+                        return false;
+                    // TODO: Sobre escribir.
+                }
             }
             else
             {

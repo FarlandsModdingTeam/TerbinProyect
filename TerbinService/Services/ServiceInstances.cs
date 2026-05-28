@@ -36,7 +36,7 @@ internal static class ServiceInstances
         ReadOnlySpan<byte> reader = pParameters;
         var name = reader.ReadArray<char>().CrString();
 
-        Manager.Instances.NewInstance(name);
+        Manager.Instances.NewInstance(name, false);
 
         return new InfoResponse
         {
