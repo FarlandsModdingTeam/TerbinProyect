@@ -258,14 +258,13 @@ public static partial class Manager
                     m.Plugins.Remove(reference);
             });
 
-            if (reference != null)
-            {
-                string pathManifest = Path.Combine(information, makeNameFieldPlugin(reference.Name, reference.IdLocal));
-                if (File.Exists(pathManifest))
-                    File.Delete(pathManifest);
-                return Status.Succes;
-            }
-            return Status.ErrorGetReference;
+            if (reference == null)
+                return Status.ErrorGetReference;
+
+            string pathManifest = Path.Combine(information, makeNameFieldPlugin(reference.Name, reference.IdLocal));
+            if (File.Exists(pathManifest))
+                File.Delete(pathManifest);
+            return Status.Succes;
         }
 
 

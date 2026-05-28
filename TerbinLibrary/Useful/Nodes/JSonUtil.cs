@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Resources;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TerbinLibrary.Extension;
 
 namespace TerbinLibrary.Useful.Nodes;
@@ -39,6 +41,11 @@ public class JSonUtil
 {
     private static Dictionary<string, string> _places = new Dictionary<string, string>();
     private static Dictionary<string, object> _fileLocks = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+
+    private static readonly JsonSerializerSettings _settings = new()
+    {
+        NullValueHandling = NullValueHandling.Ignore
+    };
 
     private static object getFileLock(string pFilePath)
     {
@@ -140,7 +147,7 @@ public class JSonUtil
             if (!File.Exists(routeComplete))
                 Directory.CreateDirectory(dir);
 
-            string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(pContent, Formatting.Indented, _settings);
             if (json == null) return CodeAcessJSonSave.ErrorSerialize;
 
             File.WriteAllText(routeComplete, json);
@@ -160,7 +167,7 @@ public class JSonUtil
             if (!File.Exists(routeComplete))
                 Directory.CreateDirectory(pDir);
 
-            string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
+            string json = JsonConvert.SerializeObject(pContent, Formatting.Indented, _settings);
             if (json == null) return CodeAcessJSonSave.ErrorSerialize;
 
             File.WriteAllText(routeComplete, json);
