@@ -76,18 +76,17 @@ public static partial class Manager
             var handwritten = Manager.Manifest.GetHandwritten(pathInstace);
 
             if (handwritten == null)
-                return Status.ErrorHandwritten;
+                return Status.ErrorGetHandwritten;
 
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
+            // Teoricamente DeleteFromHandwritten no puede fallar.
             var r = FileUtil.DeleteFromHandwritten(pathInstace, handwritten, pProgress);
 
-            // TODO: Comprobar el error del DeleteFromHandwritten.
-
-            Manager.Manifest.RemoveHandwritten(pathInstace);
-
-            // TODO: Comprobar el error del RemoveHandwritten.
+            bool removeHand = Manager.Manifest.RemoveHandwritten(pathInstace);
+            if (!removeHand)
+                return Status.ErrorRemoveHandwritten;
 
             return Status.Succes;
         }
@@ -115,6 +114,9 @@ public static partial class Manager
             ErrorNotIsInstance = 5,
             ErrorGameNotExes = 6,
             ErrorUpdateInstace = 7,
+
+            ErrorGetHandwritten = 8,
+            ErrorRemoveHandwritten = 9,
         }
     }
 }
