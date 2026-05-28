@@ -35,7 +35,7 @@ public static partial class Manager
         }
 
 
-        [TODO("Implementar cancelacion en CloneInInstance")]
+
         public static async Task<Status> CloneInInstance
             (string pPathDir, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
         {
@@ -46,12 +46,21 @@ public static partial class Manager
             if (!Manager.Instances.IsInstance(pathInstace))
                 return Status.ErrorNotIsInstance;
 
+            if (pCancellationToken.IsCancellationRequested)
+                return Status.IsCancelled;
+
             var (status, json) = await FileUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss);
             if (status != StatusFileUtil.Succes)
                 return Status.GenericError;
 
             Manager.Manifest.WriteHandwritten(pathInstace, json);
 
+            if (pCancellationToken.IsCancellationRequested)
+            {
+                await RemoveInInstance(pNameInstance, pCancellationToken: CancellationToken.None);
+                return Status.IsCancelled;
+            }
+                
             var exes = FileUtil.GetAllExeFiles(pathInstace);
             if (exes is null)
                 return Status.ErrorGameNotExes;
@@ -62,10 +71,17 @@ public static partial class Manager
             });
             if (!update)
                 return Status.ErrorUpdateInstace;
+
+            if (pCancellationToken.IsCancellationRequested)
+            {
+                await RemoveInInstance(pNameInstance, pCancellationToken: CancellationToken.None);
+                return Status.IsCancelled;
+            }
+
             return Status.Succes;
         }
 
-        [TODO("Implementar cancelacion en RemoveInInstance")]
+
         public static async Task<Status> RemoveInInstance
             (string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
@@ -90,9 +106,6 @@ public static partial class Manager
 
             return Status.Succes;
         }
-
-
-
 
 
 
