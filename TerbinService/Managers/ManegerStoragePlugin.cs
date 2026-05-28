@@ -152,7 +152,6 @@ public static partial class Manager
                     TerbinServiceConst.MANIFEST_STORAGE,
                     ii =>
                     {
-                        if (ii.References is null) return;
                         for (int i = 0; i < ii.References.Count; i++)
                         {
                             if (ii.References[i].Id == pId)

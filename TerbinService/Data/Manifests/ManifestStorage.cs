@@ -11,7 +11,7 @@ public class ManifestStorage : IManifest
     public string? Game;
     public string? Guid;
 
-    public List<ReferencePluginStore>? References;
+    public List<ReferencePluginStore> References = new();
 
     public string? GetId()
     {

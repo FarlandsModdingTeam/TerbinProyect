@@ -94,14 +94,14 @@ public static partial class Manager
         /// Notes: This is a fast and passive check on local files.<br />
         /// Tips: Useful for validations before assuming a random directory is an operational instance.<br />
         /// </summary>
-        /// <param name="pDir">Es: La ruta completa o relativa al directorio que se desea comprobar. <br />En: The full or relative path to the directory to check.</param>
+        /// <param name="pPath">Es: La ruta completa o relativa al directorio que se desea comprobar. <br />En: The full or relative path to the directory to check.</param>
         /// <returns>Es: <c>true</c> si el directorio es una instancia válida. <br />En: <c>true</c> if the directory is a valid instance.</returns>
-        public static bool IsInstance(string pDir)
+        public static bool IsInstance(string pPath)
         {
             string information;
             string manifest;
 
-            information = Path.Combine(pDir, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
+            information = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
 
             if (!Directory.Exists(information)) return false;
 
@@ -109,6 +109,12 @@ public static partial class Manager
 
             return File.Exists(manifest);
         }
+
+        public static bool Exist(string pName)
+        {
+            throw new NotImplementedException("TODO: Comprobar si en el index existe");
+        }
+
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Obtiene el contenido en formato texto (string) del manifiesto asociado a una instancia.<br />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 using TerbinLibrary;
 using TerbinLibrary.Data;
 using TerbinLibrary.SteamFarlands;
@@ -25,55 +26,95 @@ public static partial class Manager
 {
     public static class Games
     {
-
-        public static async Task HandleCloneInInstanceWithProgress(string pName, byte pIdMemoryGame, string pDirGame)
+        public static async Task<Status> HandleCloneInInstance
+            (string pPathDir, string pNameInstance, ushort pIdRequest, bool pOverwrite, CancellationToken pCancellationToken = default)
         {
-            IProgress<TerbinInfoProgrss> progressBarr = Util.CreateProgessBarrForMemory(Worker.CurrentConst.Value.Communicator, pIdMemoryGame, p => {
-                Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
-            });
-            try
-            {
-                await HandleCloneInInstance(pName, pIdMemoryGame, pDirGame, progressBarr);
-            }
-            catch (Exception e)
-            {
-                e.PrintException("HandleCloneInInstanceWithProgress");
-            }
+            var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest);
 
+            return await CloneInInstance(pPathDir, pNameInstance, pOverwrite, progress, pCancellationToken);
         }
 
-        public static async Task HandleCloneInInstance(string pName, byte pIdMemoryGame, string pDirGame, IProgress<TerbinInfoProgrss> pProgrss = default)
+
+        [TODO("Implementar cancelacion en CloneInInstance")]
+        public static async Task<Status> CloneInInstance
+            (string pPathDir, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
         {
-            var dirInstace = Manager.Instances.MakePathFolder(pName);
-            if (dirInstace == null)
-                return;
+            string? pathInstace = Instances.MakePathFolder(pNameInstance);
+            if (string.IsNullOrEmpty(pathInstace))
+                return Status.ErrorGetInstance;
 
-            if (!Manager.Instances.IsInstance(dirInstace))
-                throw new Exception("TODO: Informar que NO existe la instancia O el manifiesto");
+            if (!Manager.Instances.IsInstance(pathInstace))
+                return Status.ErrorNotIsInstance;
 
-            var (status, json) = await FileUtil.CloneDirectory(pDirGame, dirInstace, true, pProgrss);
+            var (status, json) = await FileUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss);
+            if (status != StatusFileUtil.Succes)
+                return Status.GenericError;
 
-            if (status != StatusFileUtil.Succes) // si es Succes, json no es null
-                throw new Exception("TODO: Informar de que farlands no se ah podido clonar");
+            Manager.Manifest.WriteHandwritten(pathInstace, json);
 
-            Manager.Manifest.WriteHandwritten(dirInstace, json);
-
-
-            var exes = FileUtil.GetAllExeFiles(dirInstace);
+            var exes = FileUtil.GetAllExeFiles(pathInstace);
             if (exes is null)
-                return;
+                return Status.ErrorGameNotExes;
 
-            Manager.Manifest.UpdateInstace(pName, dirInstace, manifest =>
+            var update = Manager.Manifest.UpdateInstace(pNameInstance, pathInstace, manifest =>
             {
                 manifest.Executable = exes[0];
             });
+            if (!update)
+                return Status.ErrorUpdateInstace;
+            return Status.Succes;
         }
+
+        [TODO("Implementar cancelacion en RemoveInInstance")]
+        public static async Task<Status> RemoveInInstance
+            (string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+        {
+            string? pathInstace = Instances.MakePathFolder(pNameInstance);
+            if (string.IsNullOrEmpty(pathInstace))
+                return Status.ErrorGetInstance;
+
+            var handwritten = Manager.Manifest.GetHandwritten(pathInstace);
+
+            if (handwritten == null)
+                return Status.ErrorHandwritten;
+
+            if (pCancellationToken.IsCancellationRequested)
+                return Status.IsCancelled;
+
+            var r = FileUtil.DeleteFromHandwritten(pathInstace, handwritten, pProgress);
+
+            // TODO: Comprobar el error del DeleteFromHandwritten.
+
+            Manager.Manifest.RemoveHandwritten(pathInstace);
+
+            // TODO: Comprobar el error del RemoveHandwritten.
+
+            return Status.Succes;
+        }
+
+
+
 
 
 
         public static string GetVersion()
         {
             return ManagerFarlands.GetVersion();
+        }
+
+        public enum Status : sbyte
+        {
+            GenericException = -1,
+
+            IsCancelled = 0,
+            Succes = 1,
+
+            GenericError = 2,
+            ErrorHandwritten = 3,
+            ErrorGetInstance = 4,
+            ErrorNotIsInstance = 5,
+            ErrorGameNotExes = 6,
+            ErrorUpdateInstace = 7,
         }
     }
 }

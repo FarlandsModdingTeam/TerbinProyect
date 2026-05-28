@@ -309,6 +309,16 @@ public static partial class Manager
         }
 
 
+        public static DirectoryHandwritten? GetHandwritten(string pPath)
+        {
+            if (!Manager.Instances.IsInstance(pPath))
+                return null;
+
+            pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
+
+            return JSonUtil.AcessDirect<DirectoryHandwritten>(pPath, TerbinServiceConst.HANDWRITTEN);
+        }
+
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Escribe el contenido manual o JSON proporcionado en la ruta específica.<br />
@@ -317,16 +327,31 @@ public static partial class Manager
         /// </summary>
         /// <param name="pPath">Es: Ruta base de la instancia. <br />En: Base path of the instance.</param>
         /// <param name="pJson">Es: Objeto de contenido manual a guardar. <br />En: Handwritten content object to save.</param>
-        public static void WriteHandwritten(string pPath, DirectoryHandwritten? pJson)
+        public static bool WriteHandwritten(string pPath, DirectoryHandwritten? pJson)
         {
             if (pJson == null)
-                return;
+                return false;
+            if (!Manager.Instances.IsInstance(pPath))
+                return false;
 
             pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE, TerbinServiceConst.HANDWRITTEN);
             File.WriteAllText(pPath, pJson.ToJson());
+            return true;
         }
 
 
+        public static bool RemoveHandwritten(string pPath)
+        {
+            if (!Manager.Instances.IsInstance(pPath))
+                return false;
+
+            pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE, TerbinServiceConst.HANDWRITTEN);
+            if (!File.Exists(pPath))
+                return false;
+
+            File.Delete(pPath);
+            return true;
+        }
 
 
 

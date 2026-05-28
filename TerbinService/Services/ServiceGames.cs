@@ -36,7 +36,7 @@ internal static class ServiceGames
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         byte id = rId.Payload[0];
 
-        _ = Manager.Games.HandleCloneInInstanceWithProgress(nameInstance, id, dirGame);
+        //_ = Manager.Games.HandleCloneInInstanceWithProgress(nameInstance, id, dirGame);
 
         return new InfoResponse
         {
@@ -70,7 +70,7 @@ internal static class ServiceGames
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         byte id = rId.Payload[0];
 
-        _ = Manager.Games.HandleCloneInInstanceWithProgress(nameInstance, id, dirGame);
+        //_ = Manager.Games.HandleCloneInInstanceWithProgress(nameInstance, id, dirGame);
 
         return new InfoResponse
         {

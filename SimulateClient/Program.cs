@@ -21,6 +21,8 @@ using TerbinLibrary.Protocol;
 // TODO: Manifest de Plugin guarde si requiere BepInEx.
 // TODO: InstallByInstace y InstallByPath
 
+// Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
+
 #if false
 
 Console.WriteLine($"SimulateClient esta desactivado.");

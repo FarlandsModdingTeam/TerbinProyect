@@ -115,6 +115,7 @@ public static class FileUtil // : File
 
     // TODO: Hacerla asincrona.
     // TODO: Que no salte excepcion.
+    [TODO("Hacer asincrono DeleteFromHandwritten")]
     public static StatusFileUtil DeleteFromHandwritten(DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
     {
         int previus = -1;
