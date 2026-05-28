@@ -1,0 +1,4 @@
+- Los manager no deben tener la necesidad de preguntar.
+- Los manager deben tener los necesario para comprobar y preguntar en servicios.
+- Optimizar los maximo posible (Pausado Hasta terminar TFG).
+
