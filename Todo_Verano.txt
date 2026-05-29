@@ -1,5 +1,3 @@
 -Mover TerbinProtocol (todo el tema de comunicacion) a un proyecto TerbinProtocol
-
 -TerbinExecutable que serialice a los parametros de la funcion
- 
- 
+-Una interfaz con su extension que haga un ToJson, Save, Access. De la propia clase al heredar.

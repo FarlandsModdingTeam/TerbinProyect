@@ -8,8 +8,6 @@ using TerbinLibrary.Data;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
-using static TerbinService.Managers.Manager;
-using static TerbinService.Managers.Manager.Plugin;
 
 namespace TerbinService.Managers;
 /*
@@ -23,7 +21,6 @@ namespace TerbinService.Managers;
   empieza: minusculas = privada.
  */
 
-// TODO: Controlar que por cada instancia solo pueda tocar un hilo a la vez.
 public static partial class Manager
 {
     /// <summary>
@@ -42,6 +39,7 @@ public static partial class Manager
     {
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _instanceLocks = new(StringComparer.OrdinalIgnoreCase);
 
+        private static readonly object _lockCreatingInstance = new();
 
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -63,23 +61,26 @@ public static partial class Manager
             if (dirInstace == null)
                 return false;
 
-            if (Directory.Exists(dirInstace))
+            lock (_lockCreatingInstance)
             {
-                if (Directory.EnumerateFileSystemEntries(dirInstace).Any())
+                if (Directory.Exists(dirInstace))
                 {
-                    if (!pOverwrite)
-                        return false;
-                    // TODO: Sobre escribir.
+                    if (Directory.EnumerateFileSystemEntries(dirInstace).Any())
+                    {
+                        if (!pOverwrite)
+                            return false;
+                        // TODO: Sobre escribir.
+                    }
                 }
-            }
-            else
-            {
-                Directory.CreateDirectory(dirInstace);
-            }
+                else
+                {
+                    Directory.CreateDirectory(dirInstace);
+                }
 
-            Manager.Manifest.CreatePredeterminated(pName);
+                Manager.Manifest.CreatePredeterminated(pName);
 
-            Manager.Manifest.UpdateIndex(pName);
+                Manager.Manifest.UpdateIndex(pName);
+            }
             return true;
         }
         /// <summary>
@@ -112,7 +113,17 @@ public static partial class Manager
 
         public static bool Exist(string pName)
         {
-            throw new NotImplementedException("TODO: Comprobar si en el index existe");
+            var instances = Manager.Manifest.GetIndex();
+            if (instances == null)
+                return false;
+
+            for (int i = 0; i < instances.Count; i++)
+            {
+                var instance = instances[i];
+                if (instance != null && instance == pName)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>
@@ -135,11 +146,12 @@ public static partial class Manager
             if (dir == null)
                 return null;
 
-            string file = Path.Combine(dir, pName);
-            if (!File.Exists(file))
+            var mani = JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
+
+            if (mani == null)
                 return null;
 
-            return File.ReadAllText(file);
+            return JSonUtil.ToJson(mani, Newtonsoft.Json.Formatting.None);
         }
 
         /// <summary>

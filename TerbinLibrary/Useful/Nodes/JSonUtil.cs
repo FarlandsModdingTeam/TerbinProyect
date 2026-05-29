@@ -192,18 +192,6 @@ public class JSonUtil
 
 
 
-
-    // ********************( Prototipos )******************** //
-
-    public string? this[string pKeyDir] // XD
-    {
-        get => Get(pKeyDir);
-        set
-        {
-            if (value != null) Set(pKeyDir, value);
-        }
-    }
-
     /// <summary>
     /// Carga un JSON, ejecuta las modificaciones dadas y lo guarda automáticamente.
     /// </summary>
@@ -226,5 +214,24 @@ public class JSonUtil
         updateAction(data);
 
         return SaveDirect(pDir, pFile, data);
+    }
+
+
+    // ********************( Prototipos )******************** //
+
+    public string? this[string pKeyDir] // XD
+    {
+        get => Get(pKeyDir);
+        set
+        {
+            if (value != null) Set(pKeyDir, value);
+        }
+    }
+
+    public static string ToJson<T>(T? pObj, Formatting? pFor = null, JsonSerializerSettings? pSettings = null)
+    {
+        pFor ??= Formatting.Indented;
+        pSettings ??= _settings;
+        return JsonConvert.SerializeObject(pObj, pFor.Value, pSettings);
     }
 }
