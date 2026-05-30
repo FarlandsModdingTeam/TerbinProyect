@@ -29,11 +29,12 @@ public static partial class Manager
 
         public static event Action<string, string>? OnChangeConfig;
 
-        private static object _lockPredeterminated = new();
-        //private static object _lockSetGet = new();
+        private static readonly Lock _lockPredeterminated = new();
+        private static readonly Lock _lockSetGet = new();
 
         public static string? GetConfg(string pKey)
         {
+            lock (_lockSetGet)
             if (JSonUtil.Get(KEY) == null)
                 JSonUtil.Set(KEY, FOLDER);
 
@@ -41,7 +42,6 @@ public static partial class Manager
             if (r == null)
             {
                 setPredeterminatedConfig();
-                //lock (_lockSetGet)
                 r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
                 if (r == null)
                     return null;
@@ -67,7 +67,6 @@ public static partial class Manager
             data[pKey] = pData;
 
             CodeAcessJSonSave result;
-            //lock (_lockSetGet)
             result = JSonUtil.Save(KEY, JSON, data);
             _ = Task.Run(async () =>
             {
@@ -91,7 +90,8 @@ public static partial class Manager
 
                 data.Add(TerbinConfiguration.RUTE_STORAGE_PLUGINS, MakePathStorage());
 
-                JSonUtil.Set(KEY, FOLDER);
+                lock (_lockSetGet)
+                    JSonUtil.Set(KEY, FOLDER);
                 JSonUtil.Save(KEY, JSON, data);
             }
         }

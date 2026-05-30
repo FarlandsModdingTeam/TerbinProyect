@@ -8,8 +8,8 @@ namespace TerbinLibrary.SteamFarlands;
 
 public static class SteamLocator
 {
-    // private static object _lockManifest = new();
-    // private static object _lockLibraryForders = new();
+    // private static Lock _lockManifest = new();
+    // private static Lock _lockLibraryForders = new();
 
     public static string? GetGamePath(int pAppId)
     {

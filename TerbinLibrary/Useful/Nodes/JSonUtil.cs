@@ -40,8 +40,8 @@ public enum CodeAcessJSonSave : sbyte
 // TODO: Hacer los Acces y Saves con patrón Try.
 public class JSonUtil
 {
-    private static ConcurrentDictionary<string, string> _places = new();
-    private static ConcurrentDictionary<string, object> _fileLocks = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, string> _places = new();
+    private static readonly ConcurrentDictionary<string, Lock> _fileLocks = new(StringComparer.OrdinalIgnoreCase);
 
     private static readonly JsonSerializerSettings _settings = new()
     {
@@ -54,7 +54,7 @@ public class JSonUtil
         {
             if (!_fileLocks.TryGetValue(pFilePath, out var fileLock))
             {
-                fileLock = new object();
+                fileLock = new Lock();
                 _fileLocks[pFilePath] = fileLock;
             }
             return fileLock;

@@ -39,7 +39,7 @@ public static partial class Manager
     {
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _instanceLocks = new(StringComparer.OrdinalIgnoreCase);
 
-        private static readonly object _lockCreatingInstance = new();
+        private static readonly Lock _lockCreatingInstance = new();
 
         /// <summary>
         /// ___________________( Español )___________________<br />

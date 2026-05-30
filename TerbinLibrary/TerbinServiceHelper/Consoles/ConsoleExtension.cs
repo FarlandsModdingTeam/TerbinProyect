@@ -17,7 +17,7 @@ namespace TerbinLibrary.TerbinServiceHelper.Consoles;
 
 public static class ConsoleExtension
 {
-    private static readonly object _lock = new();
+    private static readonly Lock _lock = new();
     extension(Console)
     {
         public static void Log(string pMsg)
@@ -65,7 +65,7 @@ public static class ConsoleExtension
 // Ñe ñe ñe
 public abstract class APrint
 {
-    private static readonly object _lock = new();
+    private static readonly Lock _lock = new();
     public static void Print(string pMsg, ConsoleColor pColor)
     {
         lock (_lock)

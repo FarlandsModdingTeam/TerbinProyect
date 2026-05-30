@@ -26,7 +26,7 @@ namespace TerbinLibrary.Communication.Packets;
 public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEnumerable<byte>, IEquatable<IdArray>, IEquatable<IEnumerable<byte>>
 {
     private byte[] _actionMethod;
-    private object _lock = new();
+    private readonly Lock _lock = new();
 
     public readonly int Count => _actionMethod.Length;
     public readonly bool IsReadOnly => false;
