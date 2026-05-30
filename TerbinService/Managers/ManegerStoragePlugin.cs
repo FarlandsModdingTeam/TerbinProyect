@@ -6,8 +6,6 @@ using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
 using TerbinService.Data.References;
-using static TerbinService.Managers.Manager;
-using static TerbinService.Managers.Manager.Plugin;
 
 namespace TerbinService.Managers;
 
@@ -21,12 +19,17 @@ public static partial class Manager
         private static readonly SemaphoreSlim _semaphoreOperate = new(1, 1);
         private static readonly SemaphoreSlim _semaphoreManifest = new(1, 1);
 
-        public static async ValueTask<Guid?> Store(string pPathPlugin, string pNameFile, bool pDuplicate = false)
+        private static readonly Lock _lockRename = new();
+
+        public static ValueTask<Guid?> Store(string pPathPlugin, string pNameFile, bool pDuplicate = false)
         {
             string newPath = Path.Combine(Path.GetDirectoryName(pPathPlugin) ?? string.Empty, pNameFile);
-            File.Move(pPathPlugin, newPath);
-
-            return await Store(newPath, pDuplicate);
+            lock (_lockRename)
+            {
+                File.Move(pPathPlugin, newPath);
+            }
+                
+            return Store(newPath, pDuplicate);
         }
         public static async ValueTask<Guid?> Store(string pPathPlugin, bool pDuplicate = false)
         {

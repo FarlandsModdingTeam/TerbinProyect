@@ -35,8 +35,8 @@ public static partial class Manager
         public static string? GetConfg(string pKey)
         {
             lock (_lockSetGet)
-            if (JSonUtil.Get(KEY) == null)
-                JSonUtil.Set(KEY, FOLDER);
+                if (JSonUtil.Get(KEY) == null)
+                    JSonUtil.Set(KEY, FOLDER);
 
             var r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
             if (r == null)
