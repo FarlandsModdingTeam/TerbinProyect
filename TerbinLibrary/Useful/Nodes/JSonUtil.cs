@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -39,8 +40,8 @@ public enum CodeAcessJSonSave : sbyte
 // TODO: Hacer los Acces y Saves con patrón Try.
 public class JSonUtil
 {
-    private static Dictionary<string, string> _places = new Dictionary<string, string>();
-    private static Dictionary<string, object> _fileLocks = new Dictionary<string, object>(StringComparer.OrdinalIgnoreCase);
+    private static ConcurrentDictionary<string, string> _places = new();
+    private static ConcurrentDictionary<string, object> _fileLocks = new(StringComparer.OrdinalIgnoreCase);
 
     private static readonly JsonSerializerSettings _settings = new()
     {
@@ -85,7 +86,7 @@ public class JSonUtil
         lock (_places)
         {
             if (_places.ContainsKey(pKeyDir))
-                return (CodeAcessJSonDel)_places.Remove(pKeyDir).ToSByte();
+                return (CodeAcessJSonDel)_places.TryRemove(pKeyDir, out _ ).ToSByte();
             return CodeAcessJSonDel.NotExistKey;
         }
     }
