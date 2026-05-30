@@ -6,6 +6,12 @@ using TerbinLibrary.Data;
 
 namespace TerbinLibrary.Useful.Nodes;
 
+/// <summary>
+/// ___________________( Español )___________________<br />
+/// Clase que contiene utilidades estáticas relacionadas con la manipulación y extracción de archivos ZIP.<br />
+/// ___________________( English )___________________<br />
+/// Class containing static utilities related to the manipulation and extraction of ZIP files.<br />
+/// </summary>
 public class ZipUtil
 {
     [Obsolete]
@@ -68,6 +74,20 @@ public class ZipUtil
     }
 
 
+    /// <summary>
+    /// ___________________( Español )___________________<br />
+    /// Extrae un archivo ZIP de manera asíncrona, genera un registro de extracción y reporta el progreso en porcentaje.<br />
+    /// Notas: Crea directorios automáticamente si no existen e implementa protecciones contra vulnerabilidades ZipSlip.<br />
+    /// ___________________( English )___________________<br />
+    /// Extracts a ZIP file asynchronously, generating an extraction record and reporting progress in percentage.<br />
+    /// Notes: Automatically creates directories if they do not exist and implements protections against ZipSlip vulnerabilities.<br />
+    /// </summary>
+    /// <param name="pSourceZipPath">Es: Ruta directa al archivo .zip origen. <br />En: Direct path to the source .zip file.</param>
+    /// <param name="pDestinationDirectory">Es: Directorio donde extraer el contenido. <br />En: Directory where the contents will be extracted.</param>
+    /// <param name="pProgress">Es: Objeto empleado para reportar el progreso global. <br />En: Object used to report global progress.</param>
+    /// <param name="pOverwrite">Es: Permiso para sobrescribir elementos duplicados. <br />En: Permission to overwrite duplicate items.</param>
+    /// <param name="pCancellationToken">Es: Token utilizado para cancelar el proceso en ejecución. <br />En: Token used to cancel the running process.</param>
+    /// <returns>Es: Un objeto DirectoryHandwritten con el registro. <br />En: A DirectoryHandwritten object containing the record.</returns>
     public static async Task<DirectoryHandwritten> ExtractWithProgress(
                                     string pSourceZipPath,
                                     string pDestinationDirectory,
