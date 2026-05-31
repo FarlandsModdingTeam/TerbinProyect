@@ -95,23 +95,6 @@ public static partial class Manager
 
         /// <summary>
         /// ___________________( Español )___________________<br />
-        /// Crea los archivos y directorios predeterminados para una instancia (ocultando el directorio de información).<br />
-        /// ___________________( English )___________________<br />
-        /// Creates the default files and directories for an instance (hiding the information directory).<br />
-        /// </summary>
-        /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
-        public static void CreatePredeterminated(string pName)
-        {
-            string? dirInfo = Manager.Instances.MakePathFolderInformation(pName);
-            if (dirInfo == null)
-                return;
-            DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
-            directoryInfo.Attributes |= FileAttributes.Hidden;
-            CreatePredeterminatedInstance(pName, dirInfo);
-        }
-
-        /// <summary>
-        /// ___________________( Español )___________________<br />
         /// Crea el manifiesto predeterminado para una instancia específica en el directorio dado.<br />
         /// ___________________( English )___________________<br />
         /// Creates the default manifest for a specific instance in the given directory.<br />

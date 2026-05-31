@@ -77,12 +77,33 @@ public static partial class Manager
                     Directory.CreateDirectory(dirInstace);
                 }
 
-                Manager.Manifest.CreatePredeterminated(pName);
+                Manager.Instances.CreatePredeterminated(pName, pOverwrite);
 
                 Manager.Manifest.UpdateIndex(pName);
             }
             return true;
         }
+
+
+
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Crea los archivos y directorios predeterminados para una instancia (ocultando el directorio de información).<br />
+        /// ___________________( English )___________________<br />
+        /// Creates the default files and directories for an instance (hiding the information directory).<br />
+        /// </summary>
+        /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
+        public static void CreatePredeterminated(string pName, bool pOverwrite)
+        {
+            string? dirInfo = Manager.Instances.MakePathFolderInformation(pName);
+            if (dirInfo == null)
+                return;
+            DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
+            FileUtil.Hide(dirInfo);
+            directoryInfo.Attributes |= FileAttributes.Hidden;
+            Manager.Manifest.CreatePredeterminatedInstance(pName, dirInfo);
+        }
+
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Verifica si un directorio específico corresponde a una instancia válida y estructurada.<br />
@@ -111,6 +132,7 @@ public static partial class Manager
             return File.Exists(manifest);
         }
 
+        // TODO: Documentacion.
         public static bool Exist(string pName)
         {
             var instances = Manager.Manifest.GetIndex();
