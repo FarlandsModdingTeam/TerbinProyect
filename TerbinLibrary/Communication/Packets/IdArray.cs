@@ -135,16 +135,14 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
         byte[] tmp = new byte[pAction.Length];
         for (int i = 0; i < pAction.Length; i++)
         {
-            if (pAction[i] is byte b)
+            try
             {
-                tmp[i] = b;
+                tmp[i] = pAction[i] != null ? Convert.ToByte(pAction[i]) : (byte)0;
             }
-            else if (pAction[i] != null && pAction[i].GetType().IsEnum)
+            catch (Exception ex) when (ex is InvalidCastException || ex is FormatException || ex is OverflowException)
             {
-                // Convierte de manera segura cualquier enum subyacente a su valor numérico real
-                tmp[i] = Convert.ToByte(pAction[i]);
+                throw new ArgumentException($"El elemento en el índice {i} ({pAction[i]?.GetType()}) no se puede convertir a byte.", nameof(pAction), ex);
             }
-            // Opcional: podrías añadir un else throw si quieres que falle explícitamente ante un tipo inválido.
         }
         this._actionMethod = tmp;
     }
