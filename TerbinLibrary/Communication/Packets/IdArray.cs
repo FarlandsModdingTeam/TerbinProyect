@@ -22,7 +22,6 @@ namespace TerbinLibrary.Communication.Packets;
  */
 
 
-[StructLayout(LayoutKind.Sequential)]
 /// <summary>
 /// ___________________( Español )___________________<br />
 /// Estructura que representa un arreglo de identificadores (bytes) utilizado para métodos de acción.<br />
@@ -35,10 +34,11 @@ namespace TerbinLibrary.Communication.Packets;
 /// Notes: It can throw exceptions if the array size exceeds 255 (byte max).<br />
 /// Tips: Easily integrates with serialization utilities.<br />
 /// </summary>
+[StructLayout(LayoutKind.Sequential)]
 public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEnumerable<byte>, IEquatable<IdArray>, IEquatable<IEnumerable<byte>>
 {
     private byte[] _actionMethod;
-    private readonly Lock _lock = new();
+    private readonly object _lock = new();
 
     /// <summary>
     /// ___________________( Español )___________________<br />
@@ -439,7 +439,7 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
     /// </summary>
     public override string ToString()
     {
-        bool isLockedByOther = false;
+        //bool isLockedByOther = false;
         //if (Monitor.IsEntered(_lock))
         //    isLockedByOther = false;
         //else
@@ -449,7 +449,7 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
         //    else
         //        isLockedByOther = true;
         //}
-        return $"(Action: [{Util.DebugTerbinLibrary.ArrayToString(_actionMethod)}], IsLocked: {isLockedByOther})";
+        return $"(Action: [{Util.DebugTerbinLibrary.ArrayToString(_actionMethod)}])";
     }
 
     /// <summary>

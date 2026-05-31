@@ -31,6 +31,7 @@ namespace TerbinLibrary;
         IBinaryIntegerParseAndFormatInfo<ThreeQuartersInt>
  */
 
+
 /// <summary>
 /// ___________________( Español )___________________<br />
 /// Representa un número entero no completamente estandar, optimizado para ocupar exactamente 3 bytes en memoria.<br />
