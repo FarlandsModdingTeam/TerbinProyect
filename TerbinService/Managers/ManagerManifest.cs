@@ -100,16 +100,19 @@ public static partial class Manager
         /// Creates the default manifest for a specific instance in the given directory.<br />
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
-        /// <param name="pDir">Es: Directorio donde se creará el manifiesto. <br />En: Directory where the manifest will be created.</param>
-        public static void CreatePredeterminatedInstance(string pName, string pDir)
+        /// <param name="pDirInfo">Es: Directorio donde se creará el manifiesto. <br />En: Directory where the manifest will be created.</param>
+        public static void CreatePredeterminatedInstance(string pName, string pDirInfo)
         {
-            var manifest = new InstanceManifest
+            InstanceManifest? manifest;
+            // manifest = JSonUtil.AcessDirect<InstanceManifest>(pDirInfo, TerbinServiceConst.MANIFEST_INSTANCE);
+
+            manifest = new InstanceManifest
             {
                 Name = pName,
                 Version = Games.GetVersion(),
                 Plugins = []
             };
-            JSonUtil.SaveDirect(pDir, TerbinServiceConst.MANIFEST_INSTANCE, manifest);
+            JSonUtil.SaveDirect(pDirInfo, TerbinServiceConst.MANIFEST_INSTANCE, manifest);
         }
 
 

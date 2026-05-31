@@ -61,21 +61,18 @@ public static partial class Manager
             if (dirInstace == null)
                 return false;
 
+            if (!pOverwrite)
+            {
+                if (Manager.Instances.Exist(pName))
+                    return false;
+            }
+
             lock (_lockCreatingInstance)
             {
                 if (Directory.Exists(dirInstace))
-                {
-                    if (Directory.EnumerateFileSystemEntries(dirInstace).Any())
-                    {
-                        if (!pOverwrite)
-                            return false;
-                        // TODO: Sobre escribir.
-                    }
-                }
+                    return false;
                 else
-                {
                     Directory.CreateDirectory(dirInstace);
-                }
 
                 Manager.Instances.CreatePredeterminated(pName, pOverwrite);
 
@@ -98,8 +95,12 @@ public static partial class Manager
             string? dirInfo = Manager.Instances.MakePathFolderInformation(pName);
             if (dirInfo == null)
                 return;
-            DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
-            directoryInfo.Attributes |= FileAttributes.Hidden;
+            DirectoryInfo directoryInfo;
+            if (!Directory.Exists(dirInfo))
+            {
+                directoryInfo = Directory.CreateDirectory(dirInfo);
+                directoryInfo.Attributes |= FileAttributes.Hidden;
+            }
             Manager.Manifest.CreatePredeterminatedInstance(pName, dirInfo);
         }
 
