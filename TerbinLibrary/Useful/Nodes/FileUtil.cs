@@ -229,6 +229,23 @@ public static class FileUtil // : File
             File.SetAttributes(filePath, File.GetAttributes(filePath) | FileAttributes.Hidden);
     }
 
+    public static void HandlePutDotHide(string pDir, string pFileName)
+    {
+        if (pFileName.StartsWith('.'))
+            return;
+
+        PutDotHide(pDir, pFileName);
+    }
+    public static void PutDotHide(string pDir, string pFileName) // (Linux)
+    {
+        string pathOldFile = Path.Combine(pDir, pFileName);
+        if (!File.Exists(pathOldFile))
+            return;
+
+        string pathFile = Path.Combine(pDir, string.Concat(".", pFileName));
+        File.Move(pathOldFile, pathFile); // Renombrar.
+    }
+
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Obtiene todas las rutas de archivos iterando recursivamente por el directorio principal y subdirectorios.<br />
