@@ -99,7 +99,6 @@ public static partial class Manager
             if (dirInfo == null)
                 return;
             DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
-            FileUtil.Hide(dirInfo);
             directoryInfo.Attributes |= FileAttributes.Hidden;
             Manager.Manifest.CreatePredeterminatedInstance(pName, dirInfo);
         }
