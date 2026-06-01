@@ -29,6 +29,23 @@ public static partial class Manager
 {
     public static class Plugin
     {
+        public const string ROOT = /*Game*/"/";
+        public static readonly string BEPINEX_PLUGINS = Path.Combine(ROOT, "BepInEx/plugins");
+        public static readonly string MELONLOADER_MODS = Path.Combine(ROOT, "Mods");
+
+        public static string Root
+        {
+            get => ROOT;
+        }
+        public static string BepInExPlugin
+        {
+            get => Path.Combine(ROOT);
+        }
+
+
+
+
+
         //-----------------( Dowload/Deleted )-----------------//
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -142,11 +159,11 @@ public static partial class Manager
         /// <param name="pCancellationToken">Es: Token para monitorear las solicitudes de cancelación.<br />En: Token to monitor for cancellation requests.</param>
         /// <param name="pMethod">Es: Parámetros de progreso adicionales.<br />En: Additional progress parameters.</param>
         /// <returns>Es: Estado resultante de la operación.<br />En: Resulting status of the operation.</returns>
-        public static async Task<Status> HandleInstallPlugin(string pPlugin, string pInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
+        public static async Task<Status> HandleInstallPlugin(string pPlugin, string pInstance, string pTarjetPath, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
         {
             var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
 
-            return await InstallOne(pPlugin, pInstance, progress, pCancellationToken);
+            return await InstallOne(pPlugin, pInstance, pTarjetPath, progress, pCancellationToken);
         }
 
         /// <summary>
@@ -167,7 +184,7 @@ public static partial class Manager
         /// <param name="pCancellationToken">Es: Token para cancelar la instalación.<br />En: Token to cancel the installation.</param>
         /// <returns>Es: Estado de la operación tras intentar la instalación.<br />En: Status of the operation after attempting the installation.</returns>
         public static async Task<Status> InstallOne
-            (string pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+            (string pPlugin, string pNameInstance, string pTarjetPath, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             var reference = await StoragePlugin.Get(pPlugin).ConfigureAwait(false);
             if (reference?.FileName == null)
@@ -180,7 +197,7 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            var result = await Instances.InstallPlugin(pathPlugin, pNameInstance, true, pProgress, pCancellationToken).ConfigureAwait(false);
+            var result = await Instances.InstallPlugin(pathPlugin, pNameInstance, pTarjetPath, true, pProgress, pCancellationToken).ConfigureAwait(false);
 
             if (pCancellationToken.IsCancellationRequested)
             {
@@ -192,6 +209,7 @@ public static partial class Manager
             var (status, local) = Manifest.HandleAddPlugin
                 (reference.Id ?? $"E:{CodeManifestError.NotAccesId}",
                 reference.Name ?? $"E:{CodeManifestError.NotAccesName}",
+                // TODO: detectar si vas ah instalar fuera
                 pNameInstance, result);
 
             if (status != Manifest.Status.Succes)
@@ -213,6 +231,8 @@ public static partial class Manager
             return Status.Succes;
         }
 
+
+        // TODO: Instalar en una carpeta especifica.
 
         /// <summary>
         /// ___________________( Español )___________________<br />

@@ -90,17 +90,24 @@ public static partial class Manager
         /// Creates the default files and directories for an instance (hiding the information directory).<br />
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
+        /// <param name="pOverwrite">Es: Indica si se deben sobrescribir los datos si la instancia ya existe. <br />En: Indicates whether to overwrite data if the instance already exists.</param>
         public static void CreatePredeterminated(string pName, bool pOverwrite)
         {
             string? dirInfo = Manager.Instances.MakePathFolderInformation(pName);
             if (dirInfo == null)
                 return;
-            DirectoryInfo directoryInfo;
-            if (!Directory.Exists(dirInfo))
+
+            if (Directory.Exists(dirInfo))
             {
-                directoryInfo = Directory.CreateDirectory(dirInfo);
-                directoryInfo.Attributes |= FileAttributes.Hidden;
+                if (!pOverwrite)
+                    return;
+
+                // TODO: Reiniciar Instancia.
             }
+
+            DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
+            directoryInfo.Attributes |= FileAttributes.Hidden;
+
             Manager.Manifest.CreatePredeterminatedInstance(pName, dirInfo);
         }
 
@@ -340,11 +347,11 @@ public static partial class Manager
         /// <param name="pProgress">Es: Proveedor iterativo del progreso del volcado. <br />En: Iterative progress provider for dumping process.</param>
         /// <param name="pCancellationToken">Es: Token para frenar en seco la instalación. <br />En: Token to halt the installation immediately.</param>
         /// <returns>Es: Un directorio estructurado (Handwritten) con su rastro o null. <br />En: A structured directory (Handwritten) trace or null.</returns>
-        public static async Task<DirectoryHandwritten?> InstallPlugin(string pPathPlugin, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+        public static async Task<DirectoryHandwritten?> InstallPlugin
+            (string pPathPlugin, string pNameInstance, string pTarjetPath, bool pOverwrite, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            string? pathInstance = Manager.Instances.MakePathFolder(pNameInstance);
-            if (string.IsNullOrEmpty(pathInstance))
-                return null;
+            if (!Directory.Exists(pTarjetPath))
+                Directory.CreateDirectory(pTarjetPath);
 
             SemaphoreSlim instanceLock = _instanceLocks.GetOrAdd(pNameInstance, _ => new SemaphoreSlim(1, 1));
             await instanceLock.WaitAsync(pCancellationToken).ConfigureAwait(false);
@@ -352,7 +359,7 @@ public static partial class Manager
             {
                 if (pCancellationToken.IsCancellationRequested)
                     return null;
-                var result = await ZipUtil.ExtractWithProgress(pPathPlugin, pathInstance, pProgress, pOverwrite, pCancellationToken).ConfigureAwait(false);
+                var result = await ZipUtil.ExtractWithProgress(pPathPlugin, pTarjetPath, pProgress, pOverwrite, pCancellationToken).ConfigureAwait(false);
                 return result;
             }
             finally
@@ -378,7 +385,8 @@ public static partial class Manager
         /// <param name="pProgress">Es: Manejador de notificaciones visuales/backend de progreso. <br />En: Visual or backend notification handler for progress ticks.</param>
         /// <param name="pCancellationToken">Es: Token cancelatorio. <br />En: Cancellation token.</param>
         /// <returns>Es: Un enum indicando el estado final de la limpieza. <br />En: An enum noting the cleanup ending status.</returns>
-        public static async Task<StatusFileUtil> UnistallPlugin(DirectoryHandwritten pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+        public static async Task<StatusFileUtil> UnistallPlugin
+            (DirectoryHandwritten pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             //ArgumentNullException.ThrowIfNull(pPlugin.Root, "Root is not asing, need root in DirectoryHandwritten");
 

@@ -11,6 +11,8 @@ namespace TerbinService.Managers;
 
 public static partial class Manager
 {
+    // TODO: Actualizar plugin.
+
     // No esta protegido el ExistsByFile y el guardar como uno.
     /// <summary>
     /// ___________________( Español )___________________<br />
