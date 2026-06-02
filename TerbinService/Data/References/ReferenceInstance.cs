@@ -4,10 +4,9 @@ using System.Text;
 
 namespace TerbinService.Data.References;
 
-public class ReferencePlugin
+public class ReferenceInstance
 {
     public string? Name;
-    public string? Id;
-    public string? IdLocal;
+    public bool? OutSide;
     public string? Path;
 }

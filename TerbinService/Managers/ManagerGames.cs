@@ -83,9 +83,7 @@ public static partial class Manager
         public static async Task<Status> CloneInInstance
             (string pPathDir, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
         {
-            string? pathInstace = Instances.MakePathFolder(pNameInstance);
-            if (string.IsNullOrEmpty(pathInstace))
-                return Status.ErrorGetInstance;
+            string pathInstace = Instances.MakePathFolder(pNameInstance);
 
             if (!Manager.Instances.IsInstance(pathInstace))
                 return Status.ErrorNotIsInstance;
@@ -165,9 +163,7 @@ public static partial class Manager
         public static async Task<Status> RemoveInInstance
             (string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            string? pathInstace = Instances.MakePathFolder(pNameInstance);
-            if (string.IsNullOrEmpty(pathInstace))
-                return Status.ErrorGetInstance;
+            string pathInstace = Instances.MakePathFolder(pNameInstance);
 
             var handwritten = Manager.Manifest.GetHandwritten(pathInstace);
 

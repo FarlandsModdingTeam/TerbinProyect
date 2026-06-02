@@ -36,6 +36,10 @@ public enum CodeAcessJSonSave : sbyte
     Succes = 1,
 }
 
+/*
+ Recuerdo que por X razon no podia utilizar System.Text.Json pero no recuerdo.
+ */
+
 
 // TODO: Hacer los Acces y Saves con patrón Try.
 public class JSonUtil

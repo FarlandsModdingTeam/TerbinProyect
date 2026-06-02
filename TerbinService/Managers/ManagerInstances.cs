@@ -57,9 +57,7 @@ public static partial class Manager
         /// <returns>Es: <c>true</c> si se creó con éxito, de lo contrario <c>false</c>. <br />En: <c>true</c> if created successfully, otherwise <c>false</c>.</returns>
         public static bool NewInstance(string pName, bool pOverwrite)
         {
-            var dirInstace = MakePathFolder(pName);
-            if (dirInstace == null)
-                return false;
+            string dirInstace = Manager.Instances.MakePathFolder(pName);
 
             if (!pOverwrite)
             {
@@ -93,9 +91,7 @@ public static partial class Manager
         /// <param name="pOverwrite">Es: Indica si se deben sobrescribir los datos si la instancia ya existe. <br />En: Indicates whether to overwrite data if the instance already exists.</param>
         public static void CreatePredeterminated(string pName, bool pOverwrite)
         {
-            string? dirInfo = Manager.Instances.MakePathFolderInformation(pName);
-            if (dirInfo == null)
-                return;
+            string dirInfo = Manager.Instances.MakePathFolderInformation(pName);
 
             if (Directory.Exists(dirInfo))
             {
@@ -171,11 +167,9 @@ public static partial class Manager
         /// <returns>Es: El contenido del manifiesto como string, o null si falla. <br />En: The manifest content as a string, or null on failure.</returns>
         public static string? GetStringManifest(string pName)
         {
-            string? dir = MakePathFolder(pName);
-            if (dir == null)
-                return null;
+            string dir = Manager.Instances.MakePathFolder(pName);
 
-            var mani = JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
+            var mani = JSonUtil.AcessDirect<ManifestInstance>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
 
             if (mani == null)
                 return null;
@@ -186,24 +180,22 @@ public static partial class Manager
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Obtiene el objeto deseseriaizado del manifiesto de la instancia solicitada.<br />
-        /// Utiliza librerías JSON locales para convertir el archivo a un objeto <see cref="InstanceManifest"/>.<br />
+        /// Utiliza librerías JSON locales para convertir el archivo a un objeto <see cref="ManifestInstance"/>.<br />
         /// Notas: Retorna <c>null</c> si la instancia no tiene un directorio válido o si ocurre un fallo al deserializar.<br />
         /// Tips: Recomendado si necesitas leer las propiedades y operar lógicamente con la configuración de la instancia.<br />
         /// ___________________( English )___________________<br />
         /// Gets the deserialized manifest object for the requested instance.<br />
-        /// Uses local JSON libraries to convert the file to an <see cref="InstanceManifest"/> object.<br />
+        /// Uses local JSON libraries to convert the file to an <see cref="ManifestInstance"/> object.<br />
         /// Notes: Returns <c>null</c> if the instance lacks a valid directory or if deserialization fails.<br />
         /// Tips: Recommended if you need to read properties and act logically upon the instance configuration.<br />
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: Objeto del manifiesto o null. <br />En: Manifest object or null.</returns>
-        public static InstanceManifest? GetManifest(string pName)
+        public static ManifestInstance? GetManifest(string pName)
         {
-            string? dir = MakePathFolder(pName);
-            if (dir == null)
-                return null;
+            string dir = Manager.Instances.MakePathFolder(pName);
 
-            return JSonUtil.AcessDirect<InstanceManifest>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
+            return JSonUtil.AcessDirect<ManifestInstance>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
         }
 
         /// <summary>
@@ -220,11 +212,9 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: Ruta a la carpeta de información o null. <br />En: Path to the information folder or null.</returns>
-        public static string? MakePathFolderInformation(string pName)
+        public static string MakePathFolderInformation(string pName)
         {
-            var dir = MakePathFolder(pName);
-            if (dir == null)
-                return null;
+            string dir = Manager.Instances.MakePathFolder(pName);
 
             return Path.Combine(dir, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
         }
@@ -243,17 +233,24 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: Ruta del directorio raíz de la instancia creado/verificado. <br />En: Instance root directory path created/verified.</returns>
-        public static string? CreatePathFolder(string pName)
+        public static string CreatePathFolder(string pName)
         {
-            var dir = MakePathFolder(pName);
-            if (dir == null)
-                return null;
+            string dir = Manager.Instances.MakePathFolder(pName);
 
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
 
             return dir;
         }
+
+
+        public static string? GetPathFolder(string pName)
+        {
+            if (!Manager.Instances.Exist(pName))
+                return null;
+            return Manager.Instances.MakePathFolder(pName);
+        }
+
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Construye la ruta en disco base en donde se debería ubicar una determinada instancia.<br />
@@ -268,11 +265,11 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia a enrutar. <br />En: The name of the instance to route.</param>
         /// <returns>Es: La ruta resultante a la instancia o null si no se halla configuración. <br />En: Resulting path to the instance or null if config is absent.</returns>
-        public static string? MakePathFolder(string pName)
+        public static string MakePathFolder(string pName)
         {
             var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
-                return null;
+                throw new Exception($"The key TerbinConfiguration.RUTE_INSTANCES is not defined: ({TerbinConfiguration.RUTE_INSTANCES})");
 
             return Path.Combine(dir, pName);
         }
@@ -390,9 +387,7 @@ public static partial class Manager
         {
             //ArgumentNullException.ThrowIfNull(pPlugin.Root, "Root is not asing, need root in DirectoryHandwritten");
 
-            string? pathInstance = Manager.Instances.MakePathFolder(pNameInstance);
-            if (string.IsNullOrEmpty(pathInstance))
-                return StatusFileUtil.InvalidSource;
+            string pathInstance = Manager.Instances.MakePathFolder(pNameInstance);
 
             SemaphoreSlim instanceLock = _instanceLocks.GetOrAdd(pNameInstance, _ => new SemaphoreSlim(1, 1));
             await instanceLock.WaitAsync(pCancellationToken).ConfigureAwait(false);

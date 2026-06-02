@@ -133,6 +133,7 @@ public static class FileUtil // : File
         return (StatusFileUtil.Succes, handwritten);
     }
 
+
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Borra archivos y directorios registrados en la estructura, actualizando su raíz.<br />
@@ -149,6 +150,7 @@ public static class FileUtil // : File
         return DeleteFromHandwritten(pHandwritten, pProgress);
     }
 
+    // Teoricamente DeleteFromHandwritten no puede fallar, Raro.
     // TODO: Hacerla asincrona.
     // TODO: Que no salte excepcion.
     /// <summary>

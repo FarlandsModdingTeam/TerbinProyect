@@ -103,10 +103,10 @@ public static partial class Manager
         /// <param name="pDirInfo">Es: Directorio donde se creará el manifiesto. <br />En: Directory where the manifest will be created.</param>
         public static void CreatePredeterminatedInstance(string pName, string pDirInfo)
         {
-            InstanceManifest? manifest;
+            ManifestInstance? manifest;
             // manifest = JSonUtil.AcessDirect<InstanceManifest>(pDirInfo, TerbinServiceConst.MANIFEST_INSTANCE);
 
-            manifest = new InstanceManifest
+            manifest = new ManifestInstance
             {
                 Name = pName,
                 Version = Games.GetVersion(),
@@ -125,7 +125,7 @@ public static partial class Manager
         /// <param name="pName">Es: Nombre de la instancia. <br />En: Name of the instance.</param>
         /// <param name="updateAction">Es: Acción a realizar sobre el manifiesto. <br />En: Action to perform on the manifest.</param>
         /// <returns>Es: Verdadero si la ruta es válida y se puede actualizar. <br />En: True if the path is valid and can be updated.</returns>
-        public static bool UpdateInstace(string pName, Action<InstanceManifest> updateAction)
+        public static bool UpdateInstace(string pName, Action<ManifestInstance> updateAction)
         {
             var pathInstance = Manager.Instances.MakePathFolder(pName);
             if (pathInstance == null)
@@ -144,13 +144,13 @@ public static partial class Manager
         /// <param name="pPathInstance">Es: Ruta directa a la instancia. <br />En: Direct path to the instance.</param>
         /// <param name="updateAction">Es: Acción a realizar sobre el manifiesto. <br />En: Action to perform on the manifest.</param>
         /// <returns>Es: Verdadero si se encuentra la información y se actualiza. <br />En: True if information is found and updated.</returns>
-        public static bool UpdateInstace(string pName, string pPathInstance, Action<InstanceManifest> updateAction)
+        public static bool UpdateInstace(string pName, string pPathInstance, Action<ManifestInstance> updateAction)
         {
             var pathInformation = Manager.Instances.MakePathFolderInformation(pName);
             if (pathInformation is null)
                 return false;
 
-            JSonUtil.UpdateDirect<InstanceManifest>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
+            JSonUtil.UpdateDirect<ManifestInstance>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
             return true;
         }
 
@@ -196,7 +196,7 @@ public static partial class Manager
 
             string pathRelativeManifest = MakePathRelativeManifest(information, file, pNameInstace);
 
-            var manifest = new PluginManifest
+            var manifest = new ManifestPlugin
             {
                 Name = name,
                 Id = pGuid,
@@ -268,7 +268,7 @@ public static partial class Manager
         {
             string guid = ""; 
             if (pName == null)
-                guid = pGUID ?? $"{Guid.NewGuid:N}";
+                guid = pGUID ?? $"{DateAndTime.Now}";
             pName ??= $"E:{CodeManifestError.NotAccesName}::{guid}";
             pGUID ??= $"E:{CodeManifestError.NotAccesIdLocal}::{guid}";
             return $"{pName}_{pGUID}.json";
@@ -288,9 +288,7 @@ public static partial class Manager
         public static string MakePathRelativeManifest(string pPathInformation, string pFile, string pNameInstace)
         {
             string pathManifest = Path.Combine(pPathInformation, pFile);
-            var instance = Manager.Instances.MakePathFolder(pNameInstace);
-            if (string.IsNullOrEmpty(instance))
-                throw new Exception("TODO: informar de que no se pudo conseguir la information en manifest");
+            string instance = Manager.Instances.MakePathFolder(pNameInstace);
             string pathRelativeManifest = Path.GetRelativePath(instance, pathManifest);
             return pathRelativeManifest;
         }
@@ -298,9 +296,6 @@ public static partial class Manager
 
         public static DirectoryHandwritten? GetHandwritten(string pPath)
         {
-            if (!Manager.Instances.IsInstance(pPath))
-                return null;
-
             pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
 
             return JSonUtil.AcessDirect<DirectoryHandwritten>(pPath, TerbinServiceConst.HANDWRITTEN);
@@ -329,9 +324,6 @@ public static partial class Manager
 
         public static bool RemoveHandwritten(string pPath)
         {
-            if (!Manager.Instances.IsInstance(pPath))
-                return false;
-
             pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE, TerbinServiceConst.HANDWRITTEN);
             if (!File.Exists(pPath))
                 return false;

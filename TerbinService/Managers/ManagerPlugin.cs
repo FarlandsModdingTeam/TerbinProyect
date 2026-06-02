@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary;
+using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
@@ -232,7 +233,22 @@ public static partial class Manager
         }
 
 
-        // TODO: Instalar en una carpeta especifica.
+        public static bool? InInstance(string pName, string pTarjet)
+        {
+            string pathInstance = Manager.Instances.MakePathFolder(pName);
+
+            string basePath = Path.GetFullPath(pathInstance);
+            string targetPath = Path.GetFullPath(pTarjet);
+
+            if (!basePath.EndsWith(Path.DirectorySeparatorChar))
+                basePath += Path.DirectorySeparatorChar;
+
+            StringComparison comparasion = OperatingSystem.IsWindows()
+                                            ? StringComparison.OrdinalIgnoreCase
+                                            : StringComparison.Ordinal;
+
+            return targetPath.StartsWith(basePath, comparasion);
+        }
 
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -320,7 +336,7 @@ public static partial class Manager
         /// <param name="pNameInstance">Es: La instancia asignada a revisar.<br />En: The assigned instance to review.</param>
         /// <param name="pCancellationToken">Es: Token de la operación.<br />En: Operation token.</param>
         /// <returns>Es: Tupla con estado de operación y el manifiesto si se encontró.<br />En: Tuple with the operation status and the manifest if found.</returns>
-        public static async Task<(Status status, PluginManifest? manifest)> GetOne
+        public static async Task<(Status status, ManifestPlugin? manifest)> GetOne
             (string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
         {
             if (pCancellationToken.IsCancellationRequested)
@@ -348,7 +364,7 @@ public static partial class Manager
                         ? refe.Path
                         : Path.Combine(information, refe.Path);
 
-                    PluginManifest? man = JSonUtil.AcessDirect<PluginManifest>(pathJson);
+                    ManifestPlugin? man = JSonUtil.AcessDirect<ManifestPlugin>(pathJson);
                     if (man == null)
                         return (Status.ManifestNotExit, null);
                     return (Status.Succes, man);
@@ -372,7 +388,7 @@ public static partial class Manager
         /// <param name="pNameInstance">Es: Nombre de la instancia a escanear.<br />En: Name of the instance to scan.</param>
         /// <param name="pCancellationToken">Es: Token de cancelación de la iteración.<br />En: Iteration cancellation token.</param>
         /// <returns>Es: Tupla con el estado de la tarea y la lista de todos los manifiestos hallados.<br />En: Tuple containing the task status and the list of all found manifests.</returns>
-        public static async Task<(Status status, List<PluginManifest>? manifests)> GetAll(string pNameInstance, CancellationToken pCancellationToken = default)
+        public static async Task<(Status status, List<ManifestPlugin>? manifests)> GetAll(string pNameInstance, CancellationToken pCancellationToken = default)
         {
             if (pCancellationToken.IsCancellationRequested)
                 return (Status.IsCancelled, null);
@@ -385,7 +401,7 @@ public static partial class Manager
             if (information == null)
                 return (Status.InformationNotExist, null);
 
-            List<PluginManifest> manis = new();
+            List<ManifestPlugin> manis = new();
 
             for (int i = 0; i < manifest.Plugins.Count; i++)
             {
@@ -399,7 +415,7 @@ public static partial class Manager
                     ? refe.Path
                     : Path.Combine(information, refe.Path);
 
-                PluginManifest? man = JSonUtil.AcessDirect<PluginManifest>(pathJson);
+                ManifestPlugin? man = JSonUtil.AcessDirect<ManifestPlugin>(pathJson);
 
                 if (man == null) continue;
                 manis.Add(man);
