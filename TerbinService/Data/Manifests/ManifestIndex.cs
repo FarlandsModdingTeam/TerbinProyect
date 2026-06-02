@@ -7,5 +7,5 @@ namespace TerbinService.Data.Manifests;
 
 public class ManifestIndex
 {
-    List<ReferenceInstance> Instances = new();
+    public List<ReferenceInstance> Instances = new();
 }

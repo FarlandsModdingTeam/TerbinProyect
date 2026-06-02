@@ -138,14 +138,12 @@ public static partial class Manager
         // TODO: Documentacion.
         public static bool Exist(string pName)
         {
-            var instances = Manager.Manifest.GetIndex();
-            if (instances == null)
-                return false;
+            ManifestIndex index = Manager.Manifest.GetIndex();
 
-            for (int i = 0; i < instances.Count; i++)
+            for (int i = 0; i < index.Instances.Count; i++)
             {
-                var instance = instances[i];
-                if (instance != null && instance == pName)
+                var instance = index.Instances[i];
+                if (instance != null && instance.Name == pName)
                     return true;
             }
             return false;
@@ -290,8 +288,8 @@ public static partial class Manager
         /// <returns>Es: <c>true</c> si existe en el índice. <br />En: <c>true</c> if it exists within the index.</returns>
         public static bool ExistInIndex(string pName)
         {
-            List<string> index = Manager.Manifest.GetIndex();
-            string? mani = index.FirstOrDefault(manifest => manifest == pName);
+            var instances = Manager.Manifest.GetIndex().Instances;
+            string? mani = instances?.FirstOrDefault(manifest => manifest.Name == pName)?.Name;
             return !string.IsNullOrEmpty(mani);
         }
 

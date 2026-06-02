@@ -19,6 +19,8 @@ namespace TerbinService.Managers;
  */
 
 
+
+// TODO: Que el json no sea un Dictionary<string, string>, sino un objeto que dentro tenga el Diccionario.
 public static partial class Manager
 {
     public static class Configuration
