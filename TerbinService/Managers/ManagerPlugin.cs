@@ -234,7 +234,6 @@ public static partial class Manager
             return Status.Succes;
         }
 
-
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Maneja el proceso de desinstalación creando la interfaz de progreso y llamando al método subyacente.<br />
