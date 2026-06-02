@@ -83,12 +83,12 @@ public static partial class Manager
         /// Retrieves the list of instances registered in the index.<br />
         /// </summary>
         /// <returns>Es: Una lista con los nombres de las instancias. <br />En: A list containing the instance names.</returns>
-        public static List<string> GetIndex()
+        public static ManifestIndex GetIndex()
         {
             var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
-                return new List<string>();
-            return JSonUtil.AcessDirect<List<string>>(dir, _INSTANCES) ?? new List<string>();
+                return new ManifestIndex();
+            return JSonUtil.AcessDirect<ManifestIndex>(dir, _INSTANCES) ?? new ManifestIndex();
         }
 
 
@@ -146,9 +146,7 @@ public static partial class Manager
         /// <returns>Es: Verdadero si se encuentra la información y se actualiza. <br />En: True if information is found and updated.</returns>
         public static bool UpdateInstace(string pName, string pPathInstance, Action<ManifestInstance> updateAction)
         {
-            var pathInformation = Manager.Instances.MakePathFolderInformation(pName);
-            if (pathInformation is null)
-                return false;
+            string pathInformation = Manager.Instances.MakePathFolderInformation(pName);
 
             JSonUtil.UpdateDirect<ManifestInstance>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
             return true;
@@ -186,9 +184,7 @@ public static partial class Manager
         /// <returns>Es: El resultado de la operación (ej. Éxito, Error al obtener manifiesto). <br />En: The result of the operation (e.g., Success, Error getting manifest).</returns>
         public static (Status status, string local) HandleAddPlugin(string pGuid, string pNamePlugin, string pNameInstace, bool pOutSideIntence, DirectoryHandwritten? pHandwritten)
         {
-            var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
-            if (string.IsNullOrEmpty(information))
-                return (Status.ErrorGetManifest, "");
+            string information = Manager.Instances.MakePathFolderInformation(pNameInstace);
 
             string local = $"{Guid.NewGuid:N}";
             string name = pNamePlugin;
@@ -232,9 +228,7 @@ public static partial class Manager
         /// <returns>Es: El estado de la eliminación. <br />En: The status of the removal.</returns>
         public static Status HandleRemovePlugin(string pIdLocal, string pNameInstace)
         {
-            var information = Manager.Instances.MakePathFolderInformation(pNameInstace);
-            if (string.IsNullOrEmpty(information))
-                return Status.ErrorGetManifest;
+            string information = Manager.Instances.MakePathFolderInformation(pNameInstace);
 
             ReferencePlugin? reference = null;
 

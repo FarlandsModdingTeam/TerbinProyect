@@ -346,9 +346,7 @@ public static partial class Manager
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
-            var information = Manager.Instances.MakePathFolderInformation(pNameInstance);
-            if (information == null)
-                return (Status.InformationNotExist, null);
+            string information = Manager.Instances.MakePathFolderInformation(pNameInstance);
 
             for (int i = 0; i < manifest.Plugins.Count; i++)
             {
@@ -397,9 +395,7 @@ public static partial class Manager
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
-            var information = Manager.Instances.MakePathFolderInformation(pNameInstance);
-            if (information == null)
-                return (Status.InformationNotExist, null);
+            string information = Manager.Instances.MakePathFolderInformation(pNameInstance);
 
             List<ManifestPlugin> manis = new();
 
