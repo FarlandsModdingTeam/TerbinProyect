@@ -98,7 +98,7 @@ public static partial class Manager
                 if (!pOverwrite)
                     return;
 
-                // TODO: Reiniciar Instancia.
+                throw new NotImplementedException("TODO: Reiniciar Instancia.");
             }
 
             DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
