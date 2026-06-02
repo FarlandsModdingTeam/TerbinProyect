@@ -198,7 +198,8 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            var result = await Instances.InstallPlugin(pathPlugin, pNameInstance, pTarjetPath, true, pProgress, pCancellationToken).ConfigureAwait(false);
+            var result = await Instances.InstallPlugin
+                (pathPlugin, pNameInstance, pTarjetPath, true, pProgress, pCancellationToken).ConfigureAwait(false);
 
             if (pCancellationToken.IsCancellationRequested)
             {
@@ -207,11 +208,12 @@ public static partial class Manager
                 return Status.IsCancelled;
             }
 
+            string id = reference.Id ?? $"E:{CodeManifestError.NotAccesId}";
+            string namePlugin = reference.Name ?? $"E:{CodeManifestError.NotAccesName}";
+            bool inInstance = InInstance(pNameInstance, pTarjetPath);
+
             var (status, local) = Manifest.HandleAddPlugin
-                (reference.Id ?? $"E:{CodeManifestError.NotAccesId}",
-                reference.Name ?? $"E:{CodeManifestError.NotAccesName}",
-                // TODO: detectar si vas ah instalar fuera
-                pNameInstance, result);
+                (id, namePlugin, pNameInstance, inInstance, result);
 
             if (status != Manifest.Status.Succes)
                 return status switch
@@ -233,7 +235,7 @@ public static partial class Manager
         }
 
 
-        public static bool? InInstance(string pName, string pTarjet)
+        public static bool InInstance(string pName, string pTarjet)
         {
             string pathInstance = Manager.Instances.MakePathFolder(pName);
 
