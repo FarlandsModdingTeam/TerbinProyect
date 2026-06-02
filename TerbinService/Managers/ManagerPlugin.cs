@@ -235,23 +235,6 @@ public static partial class Manager
         }
 
 
-        public static bool InInstance(string pName, string pTarjet)
-        {
-            string pathInstance = Manager.Instances.MakePathFolder(pName);
-
-            string basePath = Path.GetFullPath(pathInstance);
-            string targetPath = Path.GetFullPath(pTarjet);
-
-            if (!basePath.EndsWith(Path.DirectorySeparatorChar))
-                basePath += Path.DirectorySeparatorChar;
-
-            StringComparison comparasion = OperatingSystem.IsWindows()
-                                            ? StringComparison.OrdinalIgnoreCase
-                                            : StringComparison.Ordinal;
-
-            return targetPath.StartsWith(basePath, comparasion);
-        }
-
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Maneja el proceso de desinstalación creando la interfaz de progreso y llamando al método subyacente.<br />
@@ -421,6 +404,25 @@ public static partial class Manager
             return (Status.Succes, manis);
         }
 
+
+
+        // TODO: Documentacion.
+        public static bool InInstance(string pName, string pTarjet)
+        {
+            string pathInstance = Manager.Instances.MakePathFolder(pName);
+
+            string basePath = Path.GetFullPath(pathInstance);
+            string targetPath = Path.GetFullPath(pTarjet);
+
+            if (!basePath.EndsWith(Path.DirectorySeparatorChar))
+                basePath += Path.DirectorySeparatorChar;
+
+            StringComparison comparasion = OperatingSystem.IsWindows()
+                                            ? StringComparison.OrdinalIgnoreCase
+                                            : StringComparison.Ordinal;
+
+            return targetPath.StartsWith(basePath, comparasion);
+        }
 
         /// <summary>
         /// ___________________( Español )___________________<br />
