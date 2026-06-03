@@ -110,8 +110,7 @@ public enum CodeInternalErrors : ushort
 
     // Instances = 300,
     InstaceGetSizeError = 301,
-    InstaceNotExistOrConfigError = 302,
-    InstaceNotExit = 303,
+    InstaceNotExist = 302,
 
     // FCM = 400,
 
