@@ -6,6 +6,7 @@ using System.Text;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
+using static System.Collections.Specialized.BitVector32;
 
 namespace TerbinLibrary.Serialize;
 /*
@@ -467,7 +468,38 @@ public class Serialineitor
     }
 
 
-    
+    public static byte[] ConvertToByte(params object[] pData)
+    {
+        ArgumentNullException.ThrowIfNull(pData);
+        //if (pData.Length > byte.MaxValue)
+        //    throw new OverflowException($"Actionre overflow byte max");
+
+        byte[] tmp = new byte[pData.Length];
+        for (int i = 0; i < pData.Length; i++)
+        {
+            object item = pData[i];
+            if (item is byte b)
+            {
+                tmp[i] = b;
+            }
+            else if (item is null)
+            {
+                tmp[i] = 0;
+            }
+            else
+            {
+                try
+                {
+                    tmp[i] = Convert.ToByte(item);
+                }
+                catch (Exception ex) when (ex is InvalidCastException or FormatException or OverflowException)
+                {
+                    throw new ArgumentException($"The element in the index {i} ({item.GetType()}) it cannot be converted to byte.", nameof(pData), ex);
+                }
+            }
+        }
+        return tmp;
+    }
 }
 
 
