@@ -74,7 +74,7 @@ public static partial class Manager
 
                 Manager.Instances.CreatePredeterminated(pName, pOverwrite);
 
-                Manager.Manifest.RegisterNewInstance(pName);
+                Manager.Index.RegisterNewInstance(pName);
             }
             return true;
         }
@@ -275,7 +275,7 @@ public static partial class Manager
         /// <returns>Es: <c>true</c> si existe en el índice. <br />En: <c>true</c> if it exists within the index.</returns>
         public static bool ExistInIndex(string pName)
         {
-            ManifestIndex index = Manager.Manifest.GetIndex();
+            ManifestIndex index = Manager.Index.GetIndex();
             for (int i = 0; i < index.Instances.Count; i++)
             {
                 var instance = index.Instances[i];
