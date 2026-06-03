@@ -326,11 +326,11 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return (Status.IsCancelled, null);
 
-            var manifest = Manager.Instances.GetManifest(pNameInstance);
+            var manifest = Manager.Instances.GetManifestByName(pNameInstance);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
-            string information = Manager.Instances.MakePathFolderInformation(pNameInstance);
+            string information = Manager.Instances.MakePathFolderInformationByName(pNameInstance);
 
             for (int i = 0; i < manifest.Plugins.Count; i++)
             {
@@ -375,11 +375,11 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return (Status.IsCancelled, null);
 
-            var manifest = Manager.Instances.GetManifest(pNameInstance);
+            var manifest = Manager.Instances.GetManifestByName(pNameInstance);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
-            string information = Manager.Instances.MakePathFolderInformation(pNameInstance);
+            string information = Manager.Instances.MakePathFolderInformationByName(pNameInstance);
 
             List<ManifestPlugin> manis = new();
 

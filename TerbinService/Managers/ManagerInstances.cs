@@ -59,11 +59,8 @@ public static partial class Manager
         {
             string dirInstace = Manager.Instances.MakePathFolder(pName);
 
-            if (!pOverwrite)
-            {
-                if (Manager.Instances.ExistInIndex(pName))
-                    return false;
-            }
+            if (!pOverwrite && Manager.Instances.ExistInIndex(pName))
+                return false;
 
             lock (_lockCreatingInstance)
             {
@@ -91,7 +88,7 @@ public static partial class Manager
         /// <param name="pOverwrite">Es: Indica si se deben sobrescribir los datos si la instancia ya existe. <br />En: Indicates whether to overwrite data if the instance already exists.</param>
         public static void CreatePredeterminated(string pName, bool pOverwrite)
         {
-            string dirInfo = Manager.Instances.MakePathFolderInformation(pName);
+            string dirInfo = Manager.Instances.MakePathFolderInformationByName(pName);
 
             if (Directory.Exists(dirInfo))
             {
@@ -135,7 +132,7 @@ public static partial class Manager
             return File.Exists(manifest);
         }
 
-
+        // TODO: Doc Actualizar.
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Obtiene el contenido en formato texto (string) del manifiesto asociado a una instancia.<br />
@@ -150,7 +147,7 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: El contenido del manifiesto como string, o null si falla. <br />En: The manifest content as a string, or null on failure.</returns>
-        public static string? GetStringManifest(string pName)
+        public static string? GetStringManifestByName(string pName)
         {
             string dir = Manager.Instances.MakePathFolder(pName);
 
@@ -162,6 +159,18 @@ public static partial class Manager
             return JSonUtil.ToJson(mani, Newtonsoft.Json.Formatting.None);
         }
 
+        // TODO: Doc.
+        public static string? GetStringManifestByPath(string pPath)
+        {
+            var mani = JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
+
+            if (mani == null)
+                return null;
+
+            return JSonUtil.ToJson(mani, Newtonsoft.Json.Formatting.None);
+        }
+
+        // TODO: Doc Actualizar.
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Obtiene el objeto deseseriaizado del manifiesto de la instancia solicitada.<br />
@@ -176,13 +185,18 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: Objeto del manifiesto o null. <br />En: Manifest object or null.</returns>
-        public static ManifestInstance? GetManifest(string pName)
+        public static ManifestInstance? GetManifestByName(string pName)
         {
             string dir = Manager.Instances.MakePathFolder(pName);
 
-            return JSonUtil.AcessDirect<ManifestInstance>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
+            return GetManifestByPath(dir);
         }
 
+        // TODO: Doc.
+        public static ManifestInstance? GetManifestByPath(string pPath) =>
+             JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
+        
+        // TODO: Doc Actualizar.
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Construye y retorna la ruta de la carpeta de información para una instancia dada.<br />
@@ -197,12 +211,17 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: Ruta a la carpeta de información o null. <br />En: Path to the information folder or null.</returns>
-        public static string MakePathFolderInformation(string pName)
+        public static string MakePathFolderInformationByName(string pName)
         {
             string dir = Manager.Instances.MakePathFolder(pName);
 
-            return Path.Combine(dir, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
+            return MakePathFolderInformationByPath(dir);
         }
+
+        // TODO: Doc.
+        public static string MakePathFolderInformationByPath(string pPath) =>
+             Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE);
+        
 
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -229,6 +248,7 @@ public static partial class Manager
         }
 
 
+        // TODO: Doc.
         public static string? GetPathFolder(string pName)
         {
             if (!Manager.Instances.ExistInIndex(pName))
@@ -236,6 +256,7 @@ public static partial class Manager
             return Manager.Instances.MakePathFolder(pName);
         }
 
+        // TODO: Doc Actualizar.
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Construye la ruta en disco base en donde se debería ubicar una determinada instancia.<br />
@@ -256,8 +277,12 @@ public static partial class Manager
             if (dir == null)
                 throw new Exception($"The key TerbinConfiguration.RUTE_INSTANCES is not defined: ({TerbinConfiguration.RUTE_INSTANCES})");
 
-            return Path.Combine(dir, pName);
+            return MakePathFolder(pName, dir);
         }
+
+        // TODO: Doc.
+        public static string MakePathFolder(string pName, string pPath) =>
+            Path.Combine(pPath, pName);
 
         /// <summary>
         /// ___________________( Español )___________________<br />

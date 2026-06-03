@@ -88,7 +88,7 @@ public static partial class Manager
         /// <returns>Es: Verdadero si se encuentra la información y se actualiza. <br />En: True if information is found and updated.</returns>
         public static bool UpdateInstace(string pName, string pPathInstance, Action<ManifestInstance> updateAction)
         {
-            string pathInformation = Manager.Instances.MakePathFolderInformation(pName);
+            string pathInformation = Manager.Instances.MakePathFolderInformationByName(pName);
 
             JSonUtil.UpdateDirect<ManifestInstance>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
             return true;
@@ -126,7 +126,7 @@ public static partial class Manager
         /// <returns>Es: El resultado de la operación (ej. Éxito, Error al obtener manifiesto). <br />En: The result of the operation (e.g., Success, Error getting manifest).</returns>
         public static (Status status, string local) HandleAddPlugin(string pGuid, string pNamePlugin, string pNameInstace, bool pOutSideIntence, DirectoryHandwritten? pHandwritten)
         {
-            string information = Manager.Instances.MakePathFolderInformation(pNameInstace);
+            string information = Manager.Instances.MakePathFolderInformationByName(pNameInstace);
 
             string local = $"{Guid.NewGuid:N}";
             string name = pNamePlugin;
@@ -170,7 +170,7 @@ public static partial class Manager
         /// <returns>Es: El estado de la eliminación. <br />En: The status of the removal.</returns>
         public static Status HandleRemovePlugin(string pIdLocal, string pNameInstace)
         {
-            string information = Manager.Instances.MakePathFolderInformation(pNameInstace);
+            string information = Manager.Instances.MakePathFolderInformationByName(pNameInstace);
 
             ReferencePlugin? reference = null;
 
