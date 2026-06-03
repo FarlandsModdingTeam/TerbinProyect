@@ -9,7 +9,24 @@ using TerbinLibrary.Serialize;
 
 namespace TerbinService.Data.References;
 
-public class ReferenceInstance : IStructSerializable
+public class ReferenceInstance 
+{
+    public string? Name;
+    public bool? OutSide;
+    public string? Path;
+
+    public static explicit operator ReferenceInstance(ReferenceInstanceSerilizable pData)
+    {
+        return new ReferenceInstance
+        {
+            Name = pData.Name,
+            OutSide = pData.OutSide,
+            Path = pData.Path,
+        };
+    }
+}
+
+public struct ReferenceInstanceSerilizable : IStructSerializable
 {
     public string? Name;
     public bool? OutSide;
@@ -32,5 +49,16 @@ public class ReferenceInstance : IStructSerializable
         pBuffer.WriteArray<char>(ref offset, Name?.ToCharArray() ?? "null".ToCharArray());
         pBuffer.Write<bool>(ref offset, OutSide ?? false); // TODO: Solucionar que pueda pasar un dato incorrecto.
         pBuffer.WriteArray<char>(ref offset, Path?.ToCharArray() ?? "null".ToCharArray());
+    }
+
+
+    public static explicit operator ReferenceInstanceSerilizable(ReferenceInstance pData)
+    {
+        return new ReferenceInstanceSerilizable
+        {
+            Name = pData.Name,
+            OutSide = pData.OutSide,
+            Path = pData.Path,
+        };
     }
 }
