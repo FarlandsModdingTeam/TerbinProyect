@@ -154,11 +154,16 @@ public enum CodeStatus : short
 {
     NotAsign = -1,
 
+    Info = 100,
+    Alert = 101,
+    Exception = 102,
+    IsCancelled = 103,
+
     Succes = 200,
 
     Execute = 300, // Hace mucha falta.
     ExecuteInternal = 301,
-    Info = 302,
+    // 302
     CheckExecution = 303,
     CancelByRequest = 304,
     CancelByAction = 305,
