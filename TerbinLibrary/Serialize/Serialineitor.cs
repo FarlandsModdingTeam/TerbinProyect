@@ -468,7 +468,7 @@ public class Serialineitor
     }
 
 
-    public static byte[] ConvertToByte(params object[] pData)
+    public static byte[] CastToByte(params object[] pData)
     {
         ArgumentNullException.ThrowIfNull(pData);
 

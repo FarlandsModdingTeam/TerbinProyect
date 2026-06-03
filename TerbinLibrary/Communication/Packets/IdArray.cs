@@ -131,7 +131,7 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
         if (pAction?.Length > byte.MaxValue)
             throw new OverflowException($"Actionre overflow byte max");
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
-        this._actionMethod = Serialineitor.ConvertToByte(pAction); // Peta adentro.
+        this._actionMethod = Serialineitor.CastToByte(pAction); // Peta adentro.
 #pragma warning restore CS8604 // Posible argumento de referencia nulo
     }
 

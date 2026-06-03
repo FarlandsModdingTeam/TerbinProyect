@@ -61,7 +61,7 @@ public sealed class TerbinExecutableAttribute : Attribute, IExecutableAttribute
         if (pAction?.Length > byte.MaxValue)
             throw new OverflowException($"Actionre overflow byte max");
 #pragma warning disable CS8604 // Posible argumento de referencia nulo
-        this.Action = Serialineitor.ConvertToByte(pAction); // Peta adentro.
+        this.Action = Serialineitor.CastToByte(pAction); // Peta adentro.
 #pragma warning restore CS8604 // Posible argumento de referencia nulo
     }
 }
