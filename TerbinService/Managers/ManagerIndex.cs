@@ -82,6 +82,9 @@ public partial class Manager
             return true;
         }
 
+        public static List<ReferenceInstance> GetAllInstances() =>
+            Manager.Index.GetIndex().Instances ?? new();
+        
 
         /// <summary>
         /// ___________________( Español )___________________<br />
