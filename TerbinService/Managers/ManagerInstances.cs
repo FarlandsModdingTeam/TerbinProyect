@@ -21,6 +21,8 @@ namespace TerbinService.Managers;
   empieza: minusculas = privada.
  */
 
+// TODO: NewInstance no tiene CancellationToken
+
 public static partial class Manager
 {
     /// <summary>
