@@ -57,6 +57,9 @@ public struct PacketRequest : IStructSerializable
     /// </summary>
     public byte[] Payload;
 
+    public readonly bool IsSucces => Head.IsSucces;
+
+
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Inicializa una nueva instancia de <see cref="PacketRequest"/> con valores predeterminados.<br />
@@ -117,21 +120,7 @@ public struct PacketRequest : IStructSerializable
     /// </summary>
     /// <returns>Es: Cantidad total de bytes. <br />En: Total amount of bytes.</returns>
     public readonly ushort GetSize() => (ushort)(8 + TerbinProtocol.LENGTH_ARRAY + (Payload?.Length ?? 0) + ActionMethod.GetSize());
-    
-    /// <summary>
-    /// ___________________( Español )___________________<br />
-    /// Escribe el paquete completo en un búfer o Span (Span) de destino.<br />
-    /// ___________________( English )___________________<br />
-    /// Writes the complete packet into a target buffer or Span.<br />
-    /// </summary>
-    /// <param name="pBuffer">Es: Span de bytes destino donde se volcará la información. <br />En: Target bytes Span where the info gets written.</param>
-    public void WriteTo(Span<byte> pBuffer)
-    {
-        int offset = 0;
-        pBuffer.Write<Header>(ref offset, Head);
-        pBuffer.WriteStruct<IdArray>(ref offset, ActionMethod);
-        pBuffer.WriteArray<byte>(ref offset, Payload);
-    }
+
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Puebla este paquete a partir de un Span de solo lectura (ReadOnlySpan).<br />
@@ -145,6 +134,21 @@ public struct PacketRequest : IStructSerializable
         Head = pBuffer.Read<Header>(ref offset);
         ActionMethod = pBuffer.ReadStruct<IdArray>(ref offset);
         Payload = pBuffer.ReadArray<byte>(ref offset);
+    }
+
+    /// <summary>
+    /// ___________________( Español )___________________<br />
+    /// Escribe el paquete completo en un búfer o Span (Span) de destino.<br />
+    /// ___________________( English )___________________<br />
+    /// Writes the complete packet into a target buffer or Span.<br />
+    /// </summary>
+    /// <param name="pBuffer">Es: Span de bytes destino donde se volcará la información. <br />En: Target bytes Span where the info gets written.</param>
+    public void WriteTo(Span<byte> pBuffer)
+    {
+        int offset = 0;
+        pBuffer.Write<Header>(ref offset, Head);
+        pBuffer.WriteStruct<IdArray>(ref offset, ActionMethod);
+        pBuffer.WriteArray<byte>(ref offset, Payload);
     }
 
 

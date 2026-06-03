@@ -65,6 +65,8 @@ public struct Header // la memoria es constante es unmanaged.
     /// </summary>
     public byte IdMemory;
 
+    public readonly bool IsSucces => Status == CodeStatus.Succes;
+
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Inicializa una nueva instancia de <see cref="Header"/> con sus valores internos por defecto.<br />

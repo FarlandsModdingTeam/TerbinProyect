@@ -150,6 +150,15 @@ public struct InfoResponse //: IInfo
         };
     }
 
+    public static InfoResponse CreateCancelled(ushort pIdRequest)
+    {
+        return new InfoResponse
+        {
+            IdRequest = pIdRequest,
+            Status = CodeStatus.IsCancelled,
+        };
+    }
+
     /*
     public void InfoSend(TerbinCommunicator pCommunicator)
     {
