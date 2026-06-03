@@ -104,7 +104,7 @@ public static partial class Manager
             DirectoryInfo directoryInfo = Directory.CreateDirectory(dirInfo);
             directoryInfo.Attributes |= FileAttributes.Hidden;
 
-            Manager.Manifest.CreatePredeterminatedInstance(pName, dirInfo);
+            Manager.Manifest.CreateInstance(pName, dirInfo);
         }
 
         /// <summary>

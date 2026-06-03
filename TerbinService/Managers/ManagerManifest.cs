@@ -120,7 +120,7 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <param name="pDirInfo">Es: Directorio donde se creará el manifiesto. <br />En: Directory where the manifest will be created.</param>
-        public static void CreatePredeterminatedInstance(string pName, string pDirInfo)
+        public static void CreateInstance(string pName, string pDirInfo)
         {
             ManifestInstance? manifest;
             // manifest = JSonUtil.AcessDirect<InstanceManifest>(pDirInfo, TerbinServiceConst.MANIFEST_INSTANCE);
