@@ -7,13 +7,40 @@ namespace TerbinService.Managers;
 
 public partial class Manager
 {
+    /// <summary>
+    /// ___________________( Español )___________________<br />
+    /// Gestiona el índice general de las referencias de instancias en el administrador.<br />
+    /// Proporciona utilidades para registrar, actualizar, eliminar y obtener el manifiesto de las instancias configuradas en el sistema.<br />
+    /// ___________________( English )___________________<br />
+    /// Manages the general index of instance references in the manager.<br />
+    /// Provides utilities to register, update, delete, and retrieve the manifest of configured instances in the system.<br />
+    /// </summary>
     public class Index
     {
         private const string _INSTANCES = ".IndexInstances.json";
 
-        // TODO: Doc.
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Crea una acción para eliminar una referencia de instancia del índice de manifiestos.<br />
+        /// Se utiliza en la actualización directa del índice mediante operaciones JSON.<br />
+        /// ___________________( English )___________________<br />
+        /// Creates an action to remove an instance reference from the manifest index.<br />
+        /// It is used in direct index updating via JSON operations.<br />
+        /// </summary>
+        /// <param name="pReference">Es: La referencia de instancia que se desea eliminar. <br />En: The instance reference to be removed.</param>
+        /// <returns>Es: Una acción que remueve la instancia dada. <br />En: An action that removes the given instance.</returns>
         private static Action<ManifestIndex> deletedInInstance(ReferenceInstance pReference) => ii => { ii.Instances.Remove(pReference); };
-        // TODO: Doc.
+
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Crea una acción para añadir una referencia de instancia al índice de manifiestos.<br />
+        /// Se utiliza en la actualización directa del índice mediante operaciones JSON.<br />
+        /// ___________________( English )___________________<br />
+        /// Creates an action to add an instance reference to the manifest index.<br />
+        /// It is used in direct index updating via JSON operations.<br />
+        /// </summary>
+        /// <param name="pReference">Es: La referencia de instancia que se desea añadir. <br />En: The instance reference to be added.</param>
+        /// <returns>Es: Una acción que agrega la instancia dada. <br />En: An action that adds the given instance.</returns>
         private static Action<ManifestIndex> addInInstance(ReferenceInstance pReference) => ii => { ii.Instances.Add(pReference); };
 
 
@@ -73,8 +100,21 @@ public partial class Manager
 
 
 
-        // TODO: Documentacion.
-        public static ReferenceInstance RegisterNewInstance(string pName, string? pPath = null, bool pOutSide = false)
+        /// <summary>
+        /// ___________________( Español )___________________<br />
+        /// Registra una nueva instancia en el administrador.<br />
+        /// Crea una referencia para la instancia y actualiza el índice general para reflejar la adición.<br />
+        /// Notas: Si no se proporciona una ruta, se generará una automáticamente basada en el nombre.<br />
+        /// ___________________( English )___________________<br />
+        /// Registers a new instance in the manager.<br />
+        /// Creates a reference for the instance and updates the general index to reflect the addition.<br />
+        /// Notes: If no path is provided, one will be generated automatically based on the name.<br />
+        /// </summary>
+        /// <param name="pName">Es: El nombre de la nueva instancia. <br />En: The name of the new instance.</param>
+        /// <param name="pPath">Es: La ruta opcional donde residirá la instancia. <br />En: The optional path where the instance will reside.</param>
+        /// <param name="pOutSide">Es: Indica si la instancia se encuentra fuera de la estructura predeterminada. <br />En: Indicates whether the instance is outside the default structure.</param>
+        /// <returns>Es: La referencia de la instancia creada. <br />En: The reference to the created instance.</returns>
+        public static ReferenceInstance RegisterInstance(string pName, string? pPath = null, bool pOutSide = false)
         {
             ReferenceInstance r = new()
             {
