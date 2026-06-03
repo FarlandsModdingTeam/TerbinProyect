@@ -61,7 +61,7 @@ public static partial class Manager
 
             if (!pOverwrite)
             {
-                if (Manager.Instances.Exist(pName))
+                if (Manager.Instances.ExistInIndex(pName))
                     return false;
             }
 
@@ -74,7 +74,7 @@ public static partial class Manager
 
                 Manager.Instances.CreatePredeterminated(pName, pOverwrite);
 
-                Manager.Manifest.UpdateIndex(pName);
+                Manager.Manifest.RegisterNewInstance(pName);
             }
             return true;
         }
@@ -135,19 +135,6 @@ public static partial class Manager
             return File.Exists(manifest);
         }
 
-        // TODO: Documentacion.
-        public static bool Exist(string pName)
-        {
-            ManifestIndex index = Manager.Manifest.GetIndex();
-
-            for (int i = 0; i < index.Instances.Count; i++)
-            {
-                var instance = index.Instances[i];
-                if (instance != null && instance.Name == pName)
-                    return true;
-            }
-            return false;
-        }
 
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -244,7 +231,7 @@ public static partial class Manager
 
         public static string? GetPathFolder(string pName)
         {
-            if (!Manager.Instances.Exist(pName))
+            if (!Manager.Instances.ExistInIndex(pName))
                 return null;
             return Manager.Instances.MakePathFolder(pName);
         }
@@ -288,10 +275,22 @@ public static partial class Manager
         /// <returns>Es: <c>true</c> si existe en el índice. <br />En: <c>true</c> if it exists within the index.</returns>
         public static bool ExistInIndex(string pName)
         {
-            var instances = Manager.Manifest.GetIndex().Instances;
-            string? mani = instances?.FirstOrDefault(manifest => manifest.Name == pName)?.Name;
-            return !string.IsNullOrEmpty(mani);
+            ManifestIndex index = Manager.Manifest.GetIndex();
+            for (int i = 0; i < index.Instances.Count; i++)
+            {
+                var instance = index.Instances[i];
+                if (instance != null && instance.Name == pName)
+                    return true;
+            }
+            return false;
         }
+
+        //public static bool Exist(string pName)
+        //{
+        //    var instances = Manager.Manifest.GetIndex().Instances;
+        //    string? mani = instances?.FirstOrDefault(manifest => manifest.Name == pName)?.Name;
+        //    return !string.IsNullOrEmpty(mani);
+        //}
 
         /// <summary>
         /// ___________________( Español )___________________<br />

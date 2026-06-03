@@ -37,6 +37,12 @@ public static partial class Manager
     {
         private const string _INSTANCES = ".IndexInstances.json";
 
+        // TODO: Doc.
+        private static Action<ManifestIndex> deletedInInstance(ReferenceInstance pReference) => ii => { ii.Instances.Remove(pReference); };
+        // TODO: Doc.
+        private static Action<ManifestIndex> addInInstance(ReferenceInstance pReference) => ii => { ii.Instances.Add(pReference); };
+
+
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Actualiza el índice de instancias añadiendo un nuevo nombre.<br />
@@ -45,13 +51,13 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia a agregar. <br />En: The name of the instance to add.</param>
         /// <returns>Es: Verdadero si se actualiza con éxito, falso en caso de error. <br />En: True if successfully updated, false on error.</returns>
-        public static bool UpdateIndex(string pName)
+        public static bool UpdateIndex(ReferenceInstance pReference)
         {
             var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
                 return false;
 
-            JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Add(pName); });
+            JSonUtil.UpdateDirect<ManifestIndex>(dir, _INSTANCES, addInInstance(pReference));
             FileUtil.Hide(dir, _INSTANCES);
             return true;
         }
@@ -64,13 +70,13 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia a eliminar. <br />En: The name of the instance to remove.</param>
         /// <returns>Es: Verdadero si se elimina con éxito, falso en caso de error. <br />En: True if successfully removed, false on error.</returns>
-        public static bool DeleteIndex(string pName)
+        public static bool DeleteIndex(ReferenceInstance pReference)
         {
             var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
                 return false;
 
-            JSonUtil.UpdateDirect<List<string>>(dir, _INSTANCES, ii => { ii.Remove(pName); });
+            JSonUtil.UpdateDirect<ManifestIndex>(dir, _INSTANCES, deletedInInstance(pReference));
             FileUtil.Hide(dir, _INSTANCES);
             return true;
         }
@@ -92,6 +98,19 @@ public static partial class Manager
         }
 
 
+
+        // TODO: Documentacion.
+        public static ReferenceInstance RegisterNewInstance(string pName, string? pPath = null, bool pOutSide = false)
+        {
+            ReferenceInstance r = new()
+            { 
+                Name = pName,
+                Path = pPath ?? Manager.Instances.MakePathFolder(pName),
+                OutSide = pOutSide,
+            };
+            Manager.Manifest.UpdateIndex(r);
+            return r;
+        }
 
         /// <summary>
         /// ___________________( Español )___________________<br />
