@@ -293,6 +293,7 @@ public class Serialineitor
         return newStruct;
     }
 
+    [TODO("Crear los 'Fast' para sustituir estos metodos")]
     [Obsolete("utilice Raw o Buffer")]
     public static byte[] SerializeArray<T>(T[] pArray)
         where T : unmanaged
@@ -316,6 +317,7 @@ public class Serialineitor
         Span<byte> bytes = MemoryMarshal.AsBytes(pArray.AsSpan());
         return bytes.ToArray();
     }
+    [TODO("Crear los 'Fast' para sustituir estos metodos")]
     [Obsolete("utilice Raw o Buffer")]
     public static T[] DeserializeArray<T>(byte[] pArray)
         where T : unmanaged
@@ -323,6 +325,7 @@ public class Serialineitor
         int offset = 0;
         return BufferReader.GetArray<T>(pArray, ref offset);
     }
+    [TODO("Crear los 'Fast' para sustituir estos metodos")]
     [Obsolete("utilice Raw o Buffer")]
     public static T[] DeserializeArray<T>(ref byte[] pArray)
         where T : unmanaged

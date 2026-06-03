@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
+using TerbinLibrary;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
 using TerbinLibrary.Useful;
@@ -37,6 +38,7 @@ public static partial class Manager
     /// Notes: Uses locking mechanisms (semaphores) to prevent race conditions during instance modifications.<br />
     /// Tips: Always ensure paths are well-formed before operating.<br />
     /// </summary>
+    [TODO("Permitir Actualizar")]
     public static class Instances
     {
         private static readonly ConcurrentDictionary<string, SemaphoreSlim> _instanceLocks = new(StringComparer.OrdinalIgnoreCase);
@@ -154,7 +156,6 @@ public static partial class Manager
             string dir = Manager.Instances.MakePathFolder(pName);
 
             var mani = JSonUtil.AcessDirect<ManifestInstance>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
-
             if (mani == null)
                 return null;
 
