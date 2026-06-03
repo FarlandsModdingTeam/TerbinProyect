@@ -1,14 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Reflection;
 using System.Text;
 
 namespace TerbinLibrary;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayusculas = publica.
+  empieza: minusculas = privada.
+ */
 
+
+
+[AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
 public class TODOAttribute : Attribute
 {
-    public string? Message { get; }
-    public bool? Exception { get; }
+    public string Message { get; }
+    public bool Exception { get; }
 
     public TODOAttribute(string pMsg) : this(pMsg, false)
     {
@@ -18,27 +32,65 @@ public class TODOAttribute : Attribute
     {
         this.Message = pMsg;
         this.Exception = pException;
+    }
 
-        if (pException)
+    public static void ChekAndPrint(Assembly pAssembly)
+    {
+        var flags = BindingFlags.Public | BindingFlags.NonPublic |
+                    BindingFlags.Static | BindingFlags.Instance |
+                    BindingFlags.DeclaredOnly;
+
+        bool throwExceptionAtEnd = false;
+        string exceptionDetails = "";
+
+        foreach (var type in pAssembly.GetTypes())
         {
-            red($"TODO: {pMsg}");
-            throw new NotImplementedException($"TODO: {pMsg}");
+            CheckMember(type, type.Name, ref throwExceptionAtEnd, ref exceptionDetails);
+
+            foreach (var method in type.GetMethods(flags))
+                CheckMember(method, $"{type.Name}.{method.Name}()", ref throwExceptionAtEnd, ref exceptionDetails);
+
+            foreach (var field in type.GetFields(flags))
+                CheckMember(field, $"{type.Name}.{field.Name}", ref throwExceptionAtEnd, ref exceptionDetails);
+
+            foreach (var prop in type.GetProperties(flags))
+                CheckMember(prop, $"{type.Name}.{prop.Name}", ref throwExceptionAtEnd, ref exceptionDetails);
         }
-        else
+
+        if (throwExceptionAtEnd)
+            throw new NotImplementedException($"Unresolved critical TODOs were found:\n{exceptionDetails}");
+    }
+
+    private static void CheckMember(MemberInfo pMember, string pDisplayName, ref bool pThrowException, ref string pExceptionDetails)
+    {
+        var attributes = pMember.GetCustomAttributes(typeof(TODOAttribute), false);
+
+        foreach (TODOAttribute todo in attributes)
         {
-            yellow($"TODO: {pMsg}");
+            string outputText = $"<{pDisplayName}> TODO: {todo.Message}";
+
+            if (todo.Exception)
+            {
+                red(outputText);
+                pThrowException = true;
+                pExceptionDetails += $"- {outputText}\n";
+            }
+            else
+            {
+                yellow(outputText);
+            }
         }
     }
 
-
-    private void red(string pMsg)
+    private static void red(string pMsg)
     {
         var old = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Red;
         Console.WriteLine(pMsg);
         Console.ForegroundColor = old;
     }
-    private void yellow(string pMsg)
+
+    private static void yellow(string pMsg)
     {
         var old = Console.ForegroundColor;
         Console.ForegroundColor = ConsoleColor.Yellow;

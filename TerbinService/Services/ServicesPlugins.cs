@@ -46,7 +46,7 @@ internal static class ServicesPlugins
         string pathPlugin;
         pathInstance = Manager.Instances.MakePathFolder(name);
         if (pathInstance is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExit));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExist));
         if (requierBepInEx)
         {
             if (!Manager.BepInEx.CheckInstallBepInEx(pathInstance))
