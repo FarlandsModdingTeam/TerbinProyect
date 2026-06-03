@@ -74,7 +74,7 @@ public static partial class Manager
 
                 Manager.Instances.CreatePredeterminated(pName, pOverwrite);
 
-                Manager.Index.RegisterNewInstance(pName);
+                Manager.Index.RegisterInstance(pName);
             }
             return true;
         }
