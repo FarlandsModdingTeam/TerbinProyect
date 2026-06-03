@@ -128,23 +128,11 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
     /// <param name="pAction">Es: Los objetos a convertir a identificadores.<br />En: The objects to convert to identifiers.</param>
     public IdArray(params object[] pAction)
     {
-        ArgumentNullException.ThrowIfNull(pAction);
-        if (pAction.Length > byte.MaxValue)
+        if (pAction?.Length > byte.MaxValue)
             throw new OverflowException($"Actionre overflow byte max");
-
-        byte[] tmp = new byte[pAction.Length];
-        for (int i = 0; i < pAction.Length; i++)
-        {
-            try
-            {
-                tmp[i] = pAction[i] != null ? Convert.ToByte(pAction[i]) : (byte)0;
-            }
-            catch (Exception ex) when (ex is InvalidCastException || ex is FormatException || ex is OverflowException)
-            {
-                throw new ArgumentException($"El elemento en el índice {i} ({pAction[i]?.GetType()}) no se puede convertir a byte.", nameof(pAction), ex);
-            }
-        }
-        this._actionMethod = tmp;
+#pragma warning disable CS8604 // Posible argumento de referencia nulo
+        this._actionMethod = Serialineitor.ConvertToByte(pAction); // Peta adentro.
+#pragma warning restore CS8604 // Posible argumento de referencia nulo
     }
 
     /// <summary>

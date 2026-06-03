@@ -471,8 +471,6 @@ public class Serialineitor
     public static byte[] ConvertToByte(params object[] pData)
     {
         ArgumentNullException.ThrowIfNull(pData);
-        //if (pData.Length > byte.MaxValue)
-        //    throw new OverflowException($"Actionre overflow byte max");
 
         byte[] tmp = new byte[pData.Length];
         for (int i = 0; i < pData.Length; i++)
