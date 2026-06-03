@@ -15,7 +15,7 @@ public partial class Manager
     /// Manages the general index of instance references in the manager.<br />
     /// Provides utilities to register, update, delete, and retrieve the manifest of configured instances in the system.<br />
     /// </summary>
-    public class Index
+    public static class Index
     {
         private const string _INSTANCES = ".IndexInstances.json";
 

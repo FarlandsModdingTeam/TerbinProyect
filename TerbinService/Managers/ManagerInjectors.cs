@@ -55,6 +55,7 @@ public partial class Manager
         };
     }
 #endif
+    [Obsolete("Use: Injectors")]
     public static class BepInEx
     {
 
@@ -97,6 +98,7 @@ public partial class Manager
             }
         }
 
+        [Obsolete("Use: normal nstall")]
         public static async Task<StatusNetUtil?> HandleInstallBepInEx(string pDir, IProgress<TerbinInfoProgrss>? pProgress = default)
         {
             StatusNetUtil r = StatusNetUtil.Succes;
@@ -105,6 +107,7 @@ public partial class Manager
             return r;
         }
 
+        [Obsolete("Use: Injectors")]
         public static bool CheckInstallBepInEx(string pDir)
         {
             string bep = Path.Combine(pDir, "BepInEx");
@@ -112,6 +115,7 @@ public partial class Manager
         }
 
 
+        [Obsolete("Use: Injectors")]
         public static string GetBepInExFolderPlugin(string pPathInstance) // BepInEx/plugins/
         {
             string pathBepInExFolder;
@@ -127,5 +131,36 @@ public partial class Manager
 
             return pathPlugins;
         }
+    }
+
+    public static class Injector
+    {
+        private const string _FOLDER_BEPINEX = "BepInEx";
+        private const string _FOLDER_PLUGIN = "plugins";
+
+        public static bool CheckInstallBepInEx(string pDir)
+        {
+            string bep = Path.Combine(pDir, _FOLDER_BEPINEX);
+            return Directory.Exists(bep);
+        }
+
+        public static string GetBepInExFolderPlugin(string pPathInstance) // BepInEx/plugins/
+        {
+            string pathBepInExFolder;
+            string pathPlugins;
+
+            pathBepInExFolder = Path.Combine(pPathInstance, _FOLDER_BEPINEX);
+            if (!Directory.Exists(pathBepInExFolder))
+                Directory.CreateDirectory(pathBepInExFolder);
+
+            pathPlugins = Path.Combine(pathBepInExFolder, _FOLDER_PLUGIN);
+            if (!Directory.Exists(pathPlugins))
+                Directory.CreateDirectory(pathPlugins);
+
+            return pathPlugins;
+        }
+
+        public static string MakeBepInExFolderPlugin(string pPathInstance) =>
+            Path.Combine(pPathInstance, _FOLDER_BEPINEX, _FOLDER_PLUGIN);
     }
 }
