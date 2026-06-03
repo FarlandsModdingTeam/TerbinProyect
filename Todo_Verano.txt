@@ -2,4 +2,4 @@
 -TerbinExecutable que serialice a los parametros de la funcion
 -Una interfaz con su extension que haga un ToJson, Save, Access. De la propia clase al heredar.
 -Problema Gordo: BufferReader no contenpla que le metas un Span Vacio.
-
+-Crear Una instancia donde quieras
