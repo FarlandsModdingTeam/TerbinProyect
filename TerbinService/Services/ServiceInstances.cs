@@ -25,7 +25,7 @@ namespace TerbinService.Services;
   empieza: minusculas = privada.
  */
 
-
+[TODO("Update Instance")]
 internal static class ServiceInstances
 {
     [TerbinExecutable((byte)CodeServices.Create, (byte)CodeServicesSection.Instances)]
@@ -87,7 +87,4 @@ internal static class ServiceInstances
 
         return InfoResponse.CreateSucces(pHead.IdRequest, pld);
     }
-
-    // TODO: Update Instance.
-    // TODO: Deleted Instance (Obsoleto), Dinamitar en ServiceNode.
 }

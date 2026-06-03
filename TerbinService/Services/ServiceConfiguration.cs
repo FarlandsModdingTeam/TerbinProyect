@@ -28,8 +28,8 @@ namespace TerbinService.Services;
 // ├─ Temporal de Proton
 // └─ Steam Instalado
 
-// TODO: Las instancias no deberia ser una ruta, deberias cambiar su posicion desde el propio servicio que se encarge de mover toda la carpeta.
-
+[TODO(" Guardar y gestionar:\r\n ├─ Proton Instalado\r\n ├─ Al cambiar la ruta toca mover todo.\r\n ├─ Temporal de Proton\r\n └─ Steam Instalado")]
+[TODO("Las instancias no deberia ser una ruta, deberias cambiar su posicion desde el propio servicio que se encarge de mover toda la carpeta.")]
 internal static class ServiceConfiguration
 {
     [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Rute)]

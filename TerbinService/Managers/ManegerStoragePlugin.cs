@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
@@ -11,8 +12,6 @@ namespace TerbinService.Managers;
 
 public static partial class Manager
 {
-    // TODO: Actualizar plugin.
-
     // No esta protegido el ExistsByFile y el guardar como uno.
     /// <summary>
     /// ___________________( Español )___________________<br />
@@ -26,6 +25,8 @@ public static partial class Manager
     /// Notes: All physical operations are controlled by a lock or semaphore.<br />
     /// Tips: Avoid manually manipulating or moving files listed in the manifest.<br />
     /// </summary>
+    [TODO("Actualizar plugin")]
+    [TODO("Un TryGetVersion, A partir del nombre del archivo intentar detectar un patron de versionado.")]
     public static class StoragePlugin
     {
         // TerbinConfiguration
@@ -424,6 +425,5 @@ public static partial class Manager
             return Path.Combine(path, pName);
         }
 
-        // TODO: Un TryGetVersion, A partir del nombre del archivo intentar detectar un patron de versionado.
     }
 }

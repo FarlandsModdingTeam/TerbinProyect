@@ -41,7 +41,7 @@ public enum CodeAcessJSonSave : sbyte
  */
 
 
-// TODO: Hacer los Acces y Saves con patrón Try.
+[TODO("Hacer los Acces y Saves con patrón Try.")]
 public class JSonUtil
 {
     private static readonly ConcurrentDictionary<string, string> _places = new();

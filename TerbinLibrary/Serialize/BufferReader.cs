@@ -86,7 +86,6 @@ public class BufferReader
     }
 }
 
-// TODO: Usar "out" para devolver el byte[] y asin funcionar directamente con arrays.
 /// <summary>
 /// ___________________( Español )___________________<br />
 /// Clase de extensión para la lectura de datos mediante Span de sólo lectura.<br />
@@ -97,6 +96,7 @@ public class BufferReader
 /// Notes: Facilitates the use of the BufferReader class directly from a ReadOnlySpan.<br />
 /// Tips: Use the 'ref ReadOnlySpan' methods to automatically advance the buffer, or the 'ref int pOffset' methods to keep the original buffer intact and only advance the index.<br />
 /// </summary>
+[TODO("Usar \"out\" para devolver el byte[] y asin funcionar directamente con arrays.")]
 public static class BufferReaderExtension
 {
     /// <summary>

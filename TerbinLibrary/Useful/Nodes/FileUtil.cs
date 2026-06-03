@@ -151,7 +151,6 @@ public static class FileUtil // : File
     }
 
     // Teoricamente DeleteFromHandwritten no puede fallar, Raro.
-    // TODO: Hacerla asincrona.
     // TODO: Que no salte excepcion.
     /// <summary>
     /// ___________________( Español )___________________<br />

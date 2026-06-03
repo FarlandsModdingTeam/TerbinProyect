@@ -18,7 +18,6 @@ namespace TerbinLibrary.Serialize;
   empieza: minusculas = privada.
  */
 
-// TODO: Que estos si permitan ampliar automaticamente y adaptarlos a BufferErrorCode.
 /// <summary>
 /// ___________________( Español )___________________<br />
 /// Clase utilitaria para la escritura de datos en búferes de memoria secuencial.<br />
@@ -27,6 +26,7 @@ namespace TerbinLibrary.Serialize;
 /// Utility class for writing data to sequential memory buffers.<br />
 /// Provides methods to efficiently add unmanaged types and arrays using Spans.<br />
 /// </summary>
+[TODO("Que estos si permitan ampliar automaticamente y adaptarlos a BufferErrorCode.")]
 public class BufferWriter
 {
     /// <summary>

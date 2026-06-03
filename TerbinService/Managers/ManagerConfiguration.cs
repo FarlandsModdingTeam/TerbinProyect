@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful.Nodes;
@@ -20,7 +21,7 @@ namespace TerbinService.Managers;
 
 
 
-// TODO: Que el json no sea un Dictionary<string, string>, sino un objeto que dentro tenga el Diccionario.
+[TODO("Que el json no sea un Dictionary<string, string>, sino un objeto que dentro tenga el Diccionario.")]
 public static partial class Manager
 {
     public static class Configuration

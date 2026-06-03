@@ -50,7 +50,7 @@ namespace TerbinLibrary.Communication;
 // Seria ideal que al cancelar pudieras revertirlo, al clonar farlands borrarlo, al instalar bepiex desintalarlo, etc.
 // Tengo mucho sueño
 
-// TODO: (importante) Mandar al cliente un paquete si hah avido una excepcion.
+// TODO: (importante) Mandar al cliente un paquete si hah abido una excepcion.
 // └─Un evento que se dispare al recibir una excepcion.
 
 /// <summary>
@@ -65,6 +65,7 @@ namespace TerbinLibrary.Communication;
 /// Notes: Implements <see cref="IDisposable"/> for proper resource release.<br />
 /// Tips: Can operate in Server or Client mode depending on its initialization.<br />
 /// </summary>
+[TODO("Hay Muchos, Revisar")]
 public class TerbinCommunicator : IDisposable
 {
     // ****************************( Variables )**************************** //
@@ -426,6 +427,7 @@ public class TerbinCommunicator : IDisposable
     /// <param name="pIdMemory">Es: ID de la memoria destino en el otro extremo. <br />En: Destination memory ID on the other end.</param>
     /// <param name="pPayload">Es: El fragmento de payload a subir. <br />En: The payload fragment to upload.</param>
     /// <param name="pIdRequest">Es: El identificador general de la solicitud original. <br />En: General identifier of the original request.</param>
+    [TODO("Returna false cuando alomejor deneria meter una excepcion")]
     public async Task<bool> Load(
                 ushort pOrderRequest,
                 byte pIdMemory,
@@ -625,7 +627,6 @@ public class TerbinCommunicator : IDisposable
             }
             catch (Exception e)
             {
-                // TODO: Logger.
                 e.PrintException("TerbinCommunicator>manageSend");
                 break;
             }

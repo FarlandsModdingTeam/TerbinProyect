@@ -21,12 +21,13 @@ public static class ManagerFarlands
         NotInstaled = -1,
         Succes = 0,
     }
+    [TODO("Lanzar juego de la instancia")]
     public static ErrorLaunchFarlands LaunchFarlands(string? pName = null)
     {
         if (pName == null)
             return LaunchFarlandsBySteam();
 
-        // TODO: Lanzar juego de la instancia,
+        // TODO: Lanzar juego de la instancia.
         return ErrorLaunchFarlands.Succes;
     }
 

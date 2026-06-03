@@ -28,7 +28,6 @@ namespace TerbinLibrary.Serialize;
 /// </summary>
 public interface IStructSerializable
 {
-    // TODO: no tiene sentido que sea un ushort si un array es un tresCuartosInt.
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Obtiene el tamaño de la estructura en bytes.<br />
@@ -36,6 +35,7 @@ public interface IStructSerializable
     /// Gets the size of the structure in bytes.<br />
     /// </summary>
     /// <returns>Es: Tamaño en bytes. <br />En: Size in bytes.</returns>
+    [TODO("no tiene sentido que sea un ushort si un array es un tresCuartosInt")]
     ushort GetSize();
 
     /// <summary>
@@ -57,9 +57,7 @@ public interface IStructSerializable
     void ReadFrom(ReadOnlySpan<byte> pBuffer);
 }
 
-// TODO: Abrir Minecraft si es mejor Raw o otra cosa.
-// TODO: La parte estatica solo deberia contener Raw y no añadir largo.
-// Los Raw no deberian avanzar offset.
+
 /// <summary>
 /// ___________________( Español )___________________<br />
 /// Utilidad para la serialización secuencial de datos en un búfer de bytes dinámico.<br />
@@ -70,6 +68,8 @@ public interface IStructSerializable
 /// Allows adding different data types (structures, arrays, unmanaged generics).<br />
 /// Notes: The internal buffer grows automatically when needed.<br />
 /// </summary>
+[TODO("Abrir Minecraft si es mejor Raw o otra cosa")]
+[TODO("La parte estatica solo deberia contener Raw y no añadir largo y Los Raw no deberian avanzar offset")]
 public class Serialineitor
 {
     private byte[] _content;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
+using TerbinLibrary;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
@@ -43,6 +44,7 @@ public struct ReferenceInstanceSerilizable : IStructSerializable
         Path = pBuffer.ReadArray<char>(ref offset).CrString();
     }
 
+    [TODO("Solucionar que pueda pasar un dato incorrecto")]
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
