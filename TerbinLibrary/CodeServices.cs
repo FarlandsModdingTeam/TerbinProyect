@@ -33,6 +33,14 @@ public enum CodeServices : byte
     //Plugin_Tests = 20,
     //ReadAllInstances = 30,
     //WIP_NewService = 255,
+
+    ReadAll = TerbinCRUD.ReadAll,
+    Duplicate = TerbinCRUD.Duplicate,
+
+    Create = TerbinCRUD.Create,
+    Read = TerbinCRUD.Read,
+    Update = TerbinCRUD.Update,
+    Deleted = TerbinCRUD.Deleted,
 }
 
 public enum CodeServicesSection : byte
@@ -47,7 +55,6 @@ public enum CodeServicesSection : byte
     FCM = 40,
 
     Rute = 50,
-    Rute_Antiguo_Obsoleto_MagincianPuto = 110,
 }
 
 [Obsolete("User CodeServicesSection instead")]
