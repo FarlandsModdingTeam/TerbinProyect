@@ -89,20 +89,29 @@ public class BufferReader
 // TODO: Usar "out" para devolver el byte[] y asin funcionar directamente con arrays.
 /// <summary>
 /// ___________________( Español )___________________<br />
-/// Provee facilidades funcionales a Spans directos para leer transparente reduciendo su formato acampado.<br />
+/// Clase de extensión para la lectura de datos mediante Span de sólo lectura.<br />
+/// Notas: Facilita el uso de la clase BufferReader directamente desde un ReadOnlySpan.<br />
+/// Tips: Utiliza los métodos con 'ref ReadOnlySpan' para avanzar automáticamente el buffer, o los métodos con 'ref int pOffset' para mantener el buffer original intacto y solo avanzar el índice.<br />
 /// ___________________( English )___________________<br />
-/// Offers functionally extended syntactic helpers on spans slicing off shrink footprint formats automatically implicitly tracking bounds off bounds padding constraints context sizes string constraints mappings matrices layout matrices parameter map mapping wrapper map mappings layout wrapper payload map parameters variables layouts property sequences elements parameters limit parameter variables map variables array sequences vector configurations.<br />
+/// Extension class for reading data through a read-only Span.<br />
+/// Notes: Facilitates the use of the BufferReader class directly from a ReadOnlySpan.<br />
+/// Tips: Use the 'ref ReadOnlySpan' methods to automatically advance the buffer, or the 'ref int pOffset' methods to keep the original buffer intact and only advance the index.<br />
 /// </summary>
 public static class BufferReaderExtension
 {
     /// <summary>
     /// ___________________( Español )___________________<br />
-    /// Interpreta desde el índice cortando el espacio ocupado retornando la data no manipulada alojada vectorizada por byte block array footprint param format layout mold target limits variables constraints layout properties properties sizes params factors sizes forms map array params lists param configurations properties matrix properties limits boundaries strings limits string mapping parameters source layouts maps element mapping limit string constraints mappings layouts parameter structures configurations. <br />
+    /// Lee un arreglo de elementos de tipo no administrado avanzando directamente el span de memoria proporcionado.<br />
+    /// Notas: Usa internamente el encabezado de tamaño en formato bytes definido por el dato inicial.<br />
+    /// Tips: Ideal para evitar el uso manual de variables de offset cuando no se necesita conservar el inicio del span.<br />
     /// ___________________( English )___________________<br />
-    /// Interprets limits chunk boundary sequences constraints mapped mapped layouts limits structures param layouts properties param configurations lists source parameters bounds sizes configurations parameters mapping mappings elements layout sizes constraints factor matrices payload mapping property strings strings variables boundary mappings structures mappings matrices list mappings mappings mapping array layouts lists payload parameter variables parameters structures variables string mappings variables bounds lists bounds lists properties limitations sizes layout factor mapping parameter array bounds constraints structures constraints mappings mappings. <br />
+    /// Reads an array of unmanaged elements by directly advancing the provided memory span.<br />
+    /// Notes: Internally uses the size header in byte format defined by the initial data.<br />
+    /// Tips: Ideal for avoiding manual use of offset variables when you do not need to keep the start of the span.<br />
     /// </summary>
-    /// <param name="pBuffer">Es: Fragmento inmutable cambiante mediante corte. <br />En: Structurally slicing reducing map chunk payload limitation reference mapping strings payload string formatting mapping mapping structure bounds layout formatting factors configurations parameters configurations mappings factors configurations mapping variables constraints maps constraints bounds forms properties mapping limitations mappings list maps factor matrix vector lists configurations maps configurations boundaries formats configurations factors variables string constraints properties boundaries variables.</param>
-    /// <returns>Es: Un conjunto escalar agrupado vector. <br />En: An ordered generic set structure format layout variables configuration payload bounds form lists arrays sizes payload matrix array sequences properties layouts structures element maps limitations layout boundary vector element bounds.</returns>
+    /// <param name="pBuffer">Es: El búfer de solo lectura pasado por referencia para modificar su inicio resultante. <br />En: The read-only buffer passed by reference to modify its resulting start slice.</param>
+    /// <typeparam name="T">Es: El tipo de valor unmanaged esperado. <br />En: The expected unmanaged value type.</typeparam>
+    /// <returns>Es: Un nuevo array construido con los datos leídos. <br />En: A new array built with the read data.</returns>
     public static T[] ReadArray<T>(this ref ReadOnlySpan<byte> pBuffer)
         where T : unmanaged
     {
@@ -113,14 +122,20 @@ public static class BufferReaderExtension
 
         return newArray;
     }
+
     /// <summary>
     /// ___________________( Español )___________________<br />
-    /// Recorta consumiento el fragmento de modo destructivo devolviendo lectura nativa. <br />
+    /// Extrae el siguiente valor unmanaged y recorta el span al primer byte no leído.<br />
+    /// Notas: Este método asume que el tipo T cabe completamente en lo que resta del buffer.<br />
+    /// Tips: Úselo secuencialmente para leer estructuras simples y datos primitivos.<br />
     /// ___________________( English )___________________<br />
-    /// Slices down consuming limits natively translating returned mapped limit array constraint mapping constraints properties forms layout limits format constraint array parameter elements parameters bounds string forms constraints factor vector bounds mapping strings lists constraints mappings mapping bounds limit parameters string sizes bounds boundaries vectors bounds parameters arrays string formats variables variables strings constraints strings parameters mappings variables configurations param configurations limitations constraints layouts configurations attributes element boundaries lists source string element parameter vector elements arrays sequences constraints. <br />
+    /// Extracts the next unmanaged value and slices the span to the first unread byte.<br />
+    /// Notes: This method assumes the type T fully fits into the remaining buffer.<br />
+    /// Tips: Use it sequentially to read simple structures and primitive data.<br />
     /// </summary>
-    /// <param name="pBuffer">Es: Espacio consumible span por factor. <br />En: Expendable limiting variable space layout setup factor formats parameter factors properties boundaries sequences mapping array mappings variables vector properties structure matrices factor limits payload maps limitations mappings sequences constraint parameters configurations maps layouts parameters variables string configurations vectors mappings arrays boundaries forms bounds string variables factors strings limitations properties layout forms matrices configurations payload parameters boundary configurations parameters variables sequences variables limitations element bounds mappings attributes bounds sequences strings attributes parameters limits sizes lists formats layouts map arrays bounds bounds matrix sequence variables mappings arrays.</param>
-    /// <returns>Es: Equivalencia serializada interna unmanaged. <br />En: Direct plain mapping unmanaged structure matrix.</returns>
+    /// <param name="pBuffer">Es: Span de memoria de lectura por referencia. <br />En: Read memory span by reference.</param>
+    /// <typeparam name="T">Es: Estructura unmanaged objetivo. <br />En: Target unmanaged structure.</typeparam>
+    /// <returns>Es: El valor leído des-serializado. <br />En: The deserialized read value.</returns>
     public static T Read<T>(this ref ReadOnlySpan<byte> pBuffer)
         where T : unmanaged
     {
@@ -128,15 +143,21 @@ public static class BufferReaderExtension
         pBuffer = pBuffer[Unsafe.SizeOf<T>()..];
         return newValue;
     }
+
     /// <summary>
     /// ___________________( Español )___________________<br />
-    /// Resta asumiendo estructura instanciada consumiendo búfer implícito devolviendo su mapeo estructural. <br />
+    /// Convierte y extrae el segmento inicial a una estructura con un formato específico basado en una instancia provista.<br />
+    /// Notas: Se basa en la interfaz IStructSerializable para la reconstrucción.<br />
+    /// Tips: Utiliza deserialización cruda pasando el tamaño de la estructura para ajustar el span.<br />
     /// ___________________( English )___________________<br />
-    /// Casts consuming structured space mapping subtracting returning filled map setup formatting vector boundary mapped. <br />
+    /// Converts and extracts the initial slice to a specifically formatted structure based on a provided instance.<br />
+    /// Notes: It relies on the IStructSerializable interface for reconstruction.<br />
+    /// Tips: It uses raw deserialization passing the structure size to trim the span.<br />
     /// </summary>
-    /// <param name="pBuffer">Es: Target inmutable límite cortable string ref delimitación secuencia constraint de búfer variable matrices de vectores param. <br />En: Slicing subtractive bounds constraints matrices parameters form string layout sequence configurations variable mapping.</param>
-    /// <param name="pStruct">Es: Molde guía tipo param de vector. <br />En: Molding limit template mapping structure context target limit struct payload boundary factor object string configurations vector properties setup param formats sizes string bounds layouts string arrays vectors parameters mapping bounds array limit strings variables limits properties factors restrictions attributes lists maps parameters sequence structures variable vector layouts mappings layouts mappings element vectors formats layout vector constraints sizes sizes bounds lists element form limits matrix attributes configurations boundaries forms structures bounds arrays properties string element properties arrays limits configurations variables configurations configurations mappings limitations variables matrices parameters configurations limitations variables properties layouts parameters matrices.</param>
-    /// <returns>Es: Representación instanciada formateada unmanaged target mapeada estructurada a través de vectores array mapeados string. <br />En: Setup cast format property object limitation layout limits setup formats properties limit sequence limits.</returns>
+    /// <param name="pBuffer">Es: Span de memoria como fuente. <br />En: Memory span as source.</param>
+    /// <param name="pStruct">Es: Instancia estructural de referencia y esquema. <br />En: Reference structural instance and schema.</param>
+    /// <typeparam name="T">Es: Tipo estructural implementando IStructSerializable. <br />En: Structural type implementing IStructSerializable.</typeparam>
+    /// <returns>Es: La nueva instancia serializada extraída del buffer. <br />En: The newly extracted serialized instance from the buffer.</returns>
     public static T ReadStruct<T>(this ref ReadOnlySpan<byte> pBuffer, T pStruct)
         where T : struct, IStructSerializable
     {
@@ -146,50 +167,81 @@ public static class BufferReaderExtension
         return newStruct;
     }
 
-
     /// <summary>
     /// ___________________( Español )___________________<br />
-    /// Wrapper de puente referenciado para GetArray extendiendo el Span. <br />
+    /// Lee y devuelve un array no administrado avanzando el offset de manera tradicional.<br />
+    /// Notas: Llama estáticamente a la clase principal BufferReader.<br />
+    /// Tips: Preferido si mantiene la referencia base del buffer y usa el offset como cursor.<br />
     /// ___________________( English )___________________<br />
-    /// Reference bridge wrapper format extending over GetArray map limits boundary variables struct. <br />
+    /// Reads and returns an unmanaged array advancing the offset in a traditional way.<br />
+    /// Notes: Statically calls the main BufferReader class.<br />
+    /// Tips: Preferred if you keep the base reference to the buffer and use the offset as cursor.<br />
     /// </summary>
-    /// <param name="pBuffer">Es: Matriz continua de contexto general bounds layouts vectores forms matrices parameters limitaciones. <br />En: Limits structures variables properties sequences boundary strings payload map size layout parameter setup map.</param>
-    /// <param name="pOffset">Es: Apuntador al inicio limit de padding array forms limits bounds matrices mapping vectores. <br />En: Offset pointer marker sequence boundary array vector mappings structure parameters.</param>
-    /// <returns>Es: Variable serializada vector limits payload string variables properties limitations forms format matrices vectores parameters limits matrices bounds variables matrices vectors properties properties strings properties form layout limitations variable matrices bounds constraints limits map string constraints layout constraints boundary string limitations properties attributes parameters arrays properties vectors map matrices layouts element limit configurations vector mapping array bounds mappings parameters forms lengths bounds mapping array formats bounds forms estructuras element configurations matrices boundaries element arrays mappings bounds attributes parameters constraints strings bounds properties arrays limits layout variables shapes. <br />En: Structure limit boundaries structures variables configurations layouts limit mappings mapping elements variables mapped parameters forms limits configurations factors map vector limit properties array matrices shapes vectors bounds configurations boundaries configurations constraints forms form mappings properties shapes structures vectors lists properties lengths sizes limit matrices.</returns>
+    /// <param name="pBuffer">Es: El búfer original inalterado. <br />En: The unedited original buffer.</param>
+    /// <param name="pOffset">Es: Puntero que simula el índice actual. <br />En: Pointer simulating the current index.</param>
+    /// <typeparam name="T">Es: El tipo de valor del array. <br />En: The value type of the array.</typeparam>
+    /// <returns>Es: Arreglo de tipo no administrado recién creado e inicializado. <br />En: Freshly created and initialized unmanaged type array.</returns>
     public static T[] ReadArray<T>(this ReadOnlySpan<byte> pBuffer, ref int pOffset)
         where T : unmanaged
     {
         return BufferReader.GetArray<T>(pBuffer, ref pOffset);
     }
+
     /// <summary>
     /// ___________________( Español )___________________<br />
-    /// Extrapolación wrapper a read unmanaged consumible no destructivo. <br />
+    /// Lee un valor singular del tipo no administrado y suma el tamaño al marcador de posición.<br />
+    /// Notas: Forma estándar dependiente de la talla nativa del tipo.<br />
+    /// Tips: Forma segura de leer secuencialmente sin cambiar el apuntador original del span.<br />
     /// ___________________( English )___________________<br />
-    /// Non disruptive pointing proxy formatting structure wrapping Get map boundary structures mappings parameters boundaries bounds form variable limit limitations map boundaries setup strings string layout limitations variables forms configuration array mappings vectors limit configurations layout boundaries shapes factors parameters variables forms attributes mapping configurations sequences properties boundaries limits form arrays variables lengths configurations parameters maps shapes forms variables mapping sizes limitations limit vector. <br />
+    /// Reads a singular value of an unmanaged type and adds its size to the position marker.<br />
+    /// Notes: Standard way depending on the native size of the type.<br />
+    /// Tips: Safe way to read sequentially without changing the span's original starting pointer.<br />
     /// </summary>
-    /// <param name="pBuffer">Es: Referencia estática base matrices bounds vectors element limit constraints configuraciones layout formats mapped configuraciones limitations mapping parameters layouts matrices layout bounds configuraciones estructuras element mapping limits limitations arrays vectors configuraciones limitations lengths parameters bounds variables properties strings shapes matrices vectors properties sizes arrays parameters shapes configuraciones variables properties shapes lengths variables layouts constraints strings limitations shapes bounds constraints limitations constraints bounds bounds mappings forms limites mappings mappings strings limitations element shapes mappings configuraciones boundaries. <br />En: Layout shape map boundaries properties parameters sizes lengths parameters forms bounds matrices mappings properties constraints mapping limit bounds forms limits arrays variables lengths properties mappings layout parameters vectors limitations boundary properties configuraciones shapes layouts variables properties shapes mapping array boundaries matrices lengths configuraciones vectores vectores mapping configuraciones element attributes sizes constraints string mappings shapes limits boundaries layouts limits configuraciones parameters bounds limitations elements. </param>
-    /// <param name="pOffset">Es: Apuntador limit variables limits bounds matrices parameters vector configuraciones constraints boundaries string properties attributes boundaries mappings forms element layouts variables layouts bounds bounds mappings limits limits variables array restrictions sizes maps properties matrices limitations boundary mapping parameters layouts mapping forms estructuras parámetros limit limites vectors lengths mapping vectors boundaries strings element mappings limitations limites configuraciones arrays constraints constraints configuraciones strings constraints parameters element layouts configuraciones parameters configuraciones layouts boundaries properties lengths array lengths bounds mapped shapes geometries boundaries shapes strings matrices properties lengths borders arrays borders constraints boundaries layouts variables mappings string boundaries arrays layout mapped matrices bounds configuraciones sizes properties parameters matrices mappings sequences constraints restrictions configuraciones vectores boundaries parameters. <br />En: Marker map string arrays layout properties limites vectors lengths bounds limit matrices boundaries limits array mapped strings forms limit bounds properties arrays bounds bounds limitations limits vectors strings mapping variables mapping mapping strings element mapped sizes mapping mappings parameters parameters attributes boundaries structures configuraciones string geometries variables variables limitations strings properties attributes sequences constraints mappings variables forms mappings bounds constraints array layout strings lengths variables variables vectores.</param>
-    /// <returns>Es: Cast devuelto. <br />En: Parsed target element.</returns>
+    /// <param name="pBuffer">Es: Array de span de bytes de solo lectura. <br />En: Read-only byte span array.</param>
+    /// <param name="pOffset">Es: Indice o puntero incremental. <br />En: Incremental index or pointer.</param>
+    /// <typeparam name="T">Es: El tipo a deserializar de manera insegura desde su cast binario. <br />En: The type to deserialize unsafely via its binary cast.</typeparam>
+    /// <returns>Es: Elemento decodificado extraído del arreglo. <br />En: Decoded element extracted from the array.</returns>
     public static T Read<T>(this ReadOnlySpan<byte> pBuffer, ref int pOffset)
         where T : unmanaged
     {
         return BufferReader.Get<T>(pBuffer, ref pOffset);
     }
+
     /// <summary>
     /// ___________________( Español )___________________<br />
-    /// Extrae vectorizando tipo mapping GetStruct usando un offset modificable. <br />
+    /// Obtiene un componente estructurado complejo usando una memoria base como molde dimensional.<br />
+    /// Notas: Usa polimorfismo superficial para descifrar la estructura predefinida.<br />
+    /// Tips: Útil cuando se necesita el cascarón pStruct para dictar comportamientos de copiado.<br />
     /// ___________________( English )___________________<br />
-    /// Yields type mapped cast GetStruct format updating referencing mutating padding properties bound parameters strings constraints limit array layout strings properties boundaries formatting vectors layout variables limits lengths properties constraints variables properties boundaries sizes. <br />
+    /// Gets a complex structured component using a base memory as dimensional mold.<br />
+    /// Notes: Uses shallow polymorphism to decode the predefined structure.<br />
+    /// Tips: Useful when the pStruct shell is needed to dictate copying behaviors.<br />
     /// </summary>
-    /// <param name="pBuffer">Es: Target buffer string map limitations variable limits properties sequences map arrays variables boundaries mapping parameters configuraciones limitations bounds properties array configuraciones boundary properties variables configuraciones vectores matrices boundaries layout properties shapes sizes forms matrices configuraciones limits. <br />En: Bound string vectors limits variables boundaries layouts configuraciones matrices variables properties configuraciones matrix limits sizes matrices limitations vectors properties constraints. </param>
-    /// <param name="pOffset">Es: Vector map limit parameter layout size constraints strings arrays limits lengths limitations variables limitations geometries mapping parameters. <br />En: Size limitation setup pointer layout constraint forms properties geometry string bounding mapping limitations boundaries configuraciones lengths properties mappings configuraciones boundaries limitations vectors mapping layouts limites configuraciones mapping limits arrays constraints limits parameters sizes boundaries limit limits shapes constraint formats boundaries configuraciones restrictions limits shapes parameters matrices boundaries variables shapes templates mappings formats limits properties limits map limits sizes restrictions limitations limits arrays structures limits boundaries restrictions layouts variables bounds bounds mapping limits matrices mapping. </param>
-    /// <param name="pStruct">Es: Layout base limits mapped vector forms boundaries strings. <br />En: Boundary format layout map sequences arrays limitations arrays bounding properties limit map structures limites vectors layouts bounds strings. </param>
-    /// <returns>Es: Devuelve form boundary bounds matrices parameters vectors boundaries form mappings constraints boundaries limite limits strings vectors limits constraints geometries geometries bounds variables limits properties constraints limits shapes structures arrays arrays boundaries strings variables vectores variables lengths limites layout mappings properties bounds mappings limitations variables geometries shapes variables mappings mapping limits vectors mapping string templates bounds limites sizes layouts limites constraints templates boundaries geometries properties geometries sizes sizes restrictions arrays layouts limitations arrays vectores matrices strings properties layout strings attributes layouts geometries limitation forms sizes properties matrices mapping templates restrictions restrictions properties geometry forms boundaries restrictions limitations boundaries limites bounds mapping configuraciones arrays bounds limites variables bounds mapping. <br />En: Limits limit matrices map mapping variables forms limitations bounds configuraciones string mappings array mappings limit bound boundaries boundaries vectors boundaries limites vectors layouts configuraciones bounds attributes limitations lengths limitations boundaries mappings geometries variables mapping variables sizes limitation vectors maps shapes layouts limits configuraciones geometries coordinates limitations properties geometry forms vectors matrices arrays limits strings layouts constraints bounds limitation limits bounds boundaries constraints mapping sizes mappings arrays parameters arrays coordinates templates mapped boundary properties geometries constraints variables vector properties coordinates map forms limits map string mapping coordinates arrays vectores sizes bounds attributes limits limitation parameters mapping borders restrictions map. </returns>
+    /// <param name="pBuffer">Es: Origen de bytes estáticos puros. <br />En: Pure static byte source.</param>
+    /// <param name="pOffset">Es: Valor a incrementar al consumir espacio. <br />En: Value to increment upon space consumption.</param>
+    /// <param name="pStruct">Es: Plantilla a seguir en la deserialización. <br />En: Template to follow during deserialization.</param>
+    /// <typeparam name="T">Es: Estructura conteniendo reglas de objeto serializable. <br />En: Structure containing serializable object rules.</typeparam>
+    /// <returns>Es: Instancia completamente poblada e independiente. <br />En: Fully populated and independent instance.</returns>
     public static T ReadStruct<T>(this ReadOnlySpan<byte> pBuffer, ref int pOffset, T pStruct)
         where T : struct, IStructSerializable
     {
         return BufferReader.GetStruct<T>(pBuffer, ref pOffset, pStruct);
     }
+
+    /// <summary>
+    /// ___________________( Español )___________________<br />
+    /// Infiere una nueva instancia tipo T y prosigue a deserializar un segmento para llenarlo.<br />
+    /// Notas: Internamente llama a su contraparte sobrecargada generando una instancia limpia previamente.<br />
+    /// Tips: Método sugerido para estructuras sin estado previo requerido.<br />
+    /// ___________________( English )___________________<br />
+    /// Infers a new T-type instance and proceeds to deserialize a chunk to fill it.<br />
+    /// Notes: Internally calls its overloaded counterpart generating a clean instance first.<br />
+    /// Tips: Suggested method for structures without required prior state.<br />
+    /// </summary>
+    /// <param name="pBuffer">Es: Entorno de memoria constante de lectura. <br />En: Read constant memory environment.</param>
+    /// <param name="pOffset">Es: Indice que mantiene seguimiento del tamaño procesado. <br />En: Index keeping track of the processed size.</param>
+    /// <typeparam name="T">Es: El tipo exacto que describe IStructSerializable. <br />En: Exact type mapping to IStructSerializable.</typeparam>
+    /// <returns>Es: Elemento T resultante extraido como copia desde los bytes. <br />En: Resultant T element extracted as a copy from the bytes.</returns>
     public static T ReadStruct<T>(this ReadOnlySpan<byte> pBuffer, ref int pOffset)
         where T : struct, IStructSerializable
     {
