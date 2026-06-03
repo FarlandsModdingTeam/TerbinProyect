@@ -67,6 +67,8 @@ public struct ThreeQuartersInt : IConvertible, IMinMaxValue<ThreeQuartersInt>
     /// </summary>
     public const int MinValue = 0x0;
 
+    public const int Space = 3; // Cuanto espacio ocupa (3 bytes).
+
     static ThreeQuartersInt IMinMaxValue<ThreeQuartersInt>.MaxValue => MaxValue;
 
     static ThreeQuartersInt IMinMaxValue<ThreeQuartersInt>.MinValue => MinValue;
