@@ -42,27 +42,26 @@ public class TODOAttribute : Attribute
 
         bool throwExceptionAtEnd = false;
         string exceptionDetails = "";
-        int count = 1;
 
         foreach (var type in pAssembly.GetTypes())
         {
-            checkMember(type, type.Name, ref throwExceptionAtEnd, ref exceptionDetails, ref count);
+            checkMember(type, type.Name, ref throwExceptionAtEnd, ref exceptionDetails);
 
             foreach (var method in type.GetMethods(flags))
-                checkMember(method, $"{type.Name}.{method.Name}()", ref throwExceptionAtEnd, ref exceptionDetails, ref count);
+                checkMember(method, $"{type.Name}.{method.Name}()", ref throwExceptionAtEnd, ref exceptionDetails);
 
             foreach (var field in type.GetFields(flags))
-                checkMember(field, $"{type.Name}.{field.Name}", ref throwExceptionAtEnd, ref exceptionDetails, ref count);
+                checkMember(field, $"{type.Name}.{field.Name}", ref throwExceptionAtEnd, ref exceptionDetails);
 
             foreach (var prop in type.GetProperties(flags))
-                checkMember(prop, $"{type.Name}.{prop.Name}", ref throwExceptionAtEnd, ref exceptionDetails, ref count);
+                checkMember(prop, $"{type.Name}.{prop.Name}", ref throwExceptionAtEnd, ref exceptionDetails);
         }
 
         if (throwExceptionAtEnd)
             throw new NotImplementedException($"Unresolved critical TODOs were found:\n{exceptionDetails}");
     }
 
-    private static void checkMember(MemberInfo pMember, string pDisplayName, ref bool pThrowException, ref string pExceptionDetails, ref int pCount)
+    private static void checkMember(MemberInfo pMember, string pDisplayName, ref bool pThrowException, ref string pExceptionDetails)
     {
         var attributes = pMember.GetCustomAttributes(typeof(TODOAttribute), false);
 
@@ -72,14 +71,14 @@ public class TODOAttribute : Attribute
 
             if (todo.Exception)
             {
-                var c = getColor(true, ref pCount);
+                var c = getColor(pMember, true);
                 print(outputText, c);
                 pThrowException = true;
                 pExceptionDetails += $"- {outputText}\n";
             }
             else
             {
-                var c = getColor(false, ref pCount);
+                var c = getColor(pMember, false);
                 print(outputText, c);
             }
         }
@@ -93,6 +92,25 @@ public class TODOAttribute : Attribute
         else
             c = (pCount % 2 == 1) ? ConsoleColor.Yellow : ConsoleColor.DarkYellow;
         pCount++;
+        return c;
+    }
+
+    private static ConsoleColor getColor(MemberInfo pMember, bool pException)
+    {
+        if (pException)
+            return ConsoleColor.Red;
+
+        ConsoleColor c = pMember.MemberType switch
+        {
+            MemberTypes.Method => ConsoleColor.Yellow,
+            MemberTypes.Property => ConsoleColor.Blue,
+            MemberTypes.Field => ConsoleColor.Cyan,
+            MemberTypes.TypeInfo => ConsoleColor.DarkGreen,
+            MemberTypes.Constructor => ConsoleColor.Green,
+            MemberTypes.NestedType => ConsoleColor.DarkGreen,
+            _ => ConsoleColor.White
+        };
+
         return c;
     }
 

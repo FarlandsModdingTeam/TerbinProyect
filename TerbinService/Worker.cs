@@ -32,9 +32,9 @@ public class Worker : BackgroundService
     public Worker(ILogger<Worker> pLogger, IHostApplicationLifetime pAppLifetime)
     {
         Worker._appLifetime = pAppLifetime;
-        Console.Log("Por Hacer TerbinService: ");
+        Console.PrintLn("Por Hacer TerbinService: ");
         TODOAttribute.ChekAndPrint(Assembly.GetExecutingAssembly());
-        Console.Log("Por Hacer TerbinLibrary: ");
+        Console.PrintLn("Por Hacer TerbinLibrary: ");
         TODOAttribute.ChekAndPrint(Assembly.Load("TerbinLibrary"));
     }
 
