@@ -44,6 +44,15 @@ public partial class Manager
         /// <returns>Es: Una acción que agrega la instancia dada. <br />En: An action that adds the given instance.</returns>
         private static Action<ManifestIndex> addInInstance(ReferenceInstance pReference) => ii => { ii.Instances.Add(pReference); };
 
+        private static Action<ManifestIndex> deletedInstanceByName(string pName) => ii =>
+        {
+            for (int i = 0; i < ii.Instances.Count; i++)
+            {
+                var inst = ii.Instances[i];
+                if (inst.Name == pName)
+                    ii.Instances.RemoveAt(i);
+            }
+        };
 
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -64,6 +73,7 @@ public partial class Manager
             return true;
         }
 
+        // TODO: Doc.
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Elimina una instancia del índice de instancias.<br />
@@ -72,13 +82,13 @@ public partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia a eliminar. <br />En: The name of the instance to remove.</param>
         /// <returns>Es: Verdadero si se elimina con éxito, falso en caso de error. <br />En: True if successfully removed, false on error.</returns>
-        public static bool DeleteIndex(ReferenceInstance pReference)
+        public static bool DeleteIndex(string pName)
         {
             var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
                 return false;
 
-            JSonUtil.UpdateDirect<ManifestIndex>(dir, _INSTANCES, deletedInInstance(pReference));
+            JSonUtil.UpdateDirect<ManifestIndex>(dir, _INSTANCES, deletedInstanceByName(pName));
             NodeUtil.HideFile(dir, _INSTANCES);
             return true;
         }
@@ -137,12 +147,15 @@ public partial class Manager
             ReferenceInstance r = new()
             {
                 Name = pName,
-                Path = pPath ?? Manager.Instances.MakePathFolder(pName),
+                Path = pPath ?? Manager.Instances.MakePathFolderFromConfig(pName),
                 OutSide = pOutSide,
             };
             Manager.Index.UpdateIndex(r);
             return r;
         }
-
+        public static bool UnregisterInstance(string pName)
+        {
+            return Manager.Index.DeleteIndex(pName);
+        }
     }
 }

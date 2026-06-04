@@ -272,7 +272,7 @@ public static partial class Manager
             if (ins.OutSide ?? false)
                 return ins.Path;
             else
-                return Manager.Instances.makePathFolderFromConfig(pName);
+                return Manager.Instances.MakePathFolderFromConfig(pName);
         }
 
         // TODO: Doc Actualizar.
@@ -299,7 +299,7 @@ public static partial class Manager
 
             return MakePathFolder(pName, dir);
         }
-        private static string makePathFolderFromConfig(string pName)
+        public static string MakePathFolderFromConfig(string pName)
         {
             var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
