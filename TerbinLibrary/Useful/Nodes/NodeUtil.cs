@@ -216,20 +216,24 @@ public static class NodeUtil
         return StatusNodeUtil.Succes;
     }
 
+    /*
     public static async ValueTask<bool> DeleteDirectory
         (string pPathDir, bool pRecursive, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
     {
         if (!Directory.Exists(pPathDir))
             return false;
 
-        List<string> allDirectories = GetAllFiles(pPathDir);
-        List<string> allFiles = GetAllDirectories(pPathDir);
+        List<string> allDirectories = GetAllDirectories(pPathDir);
+        List<string> allFiles = GetAllFiles(pPathDir);
 
-        //if (!pRecursive && )
+        if (!pRecursive && allFiles.Count > 1)
+            return false;
 
+        // TODO
 
         return true;
     }
+     */
 
     /// <summary>
     /// ___________________( Español )___________________<br />
