@@ -91,7 +91,7 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            var (status, json) = await FileUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss);
+            var (status, json) = await NodeUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss);
             if (status != StatusFileUtil.Succes)
                 return Status.GenericError;
 
@@ -103,7 +103,7 @@ public static partial class Manager
                 return Status.IsCancelled;
             }
                 
-            var exes = FileUtil.GetAllExeFiles(pathInstace);
+            var exes = NodeUtil.GetAllExeFiles(pathInstace);
             if (exes is null)
                 return Status.ErrorGameNotExes;
 
@@ -174,7 +174,7 @@ public static partial class Manager
                 return Status.IsCancelled;
 
             // Teoricamente DeleteFromHandwritten no puede fallar.
-            var r = FileUtil.DeleteFromHandwritten(pathInstace, handwritten, pProgress);
+            var r = NodeUtil.DeleteFromHandwritten(pathInstace, handwritten, pProgress);
 
             bool removeHand = Manager.Manifest.RemoveHandwritten(pathInstace);
             if (!removeHand)

@@ -420,7 +420,7 @@ public static partial class Manager
             {
                 if (pCancellationToken.IsCancellationRequested)
                     return StatusFileUtil.IsCancelled;
-                var result = FileUtil.DeleteFromHandwritten(pathInstance, pPlugin, pProgress);
+                var result = NodeUtil.DeleteFromHandwritten(pathInstance, pPlugin, pProgress);
                 return result;
             }
             finally

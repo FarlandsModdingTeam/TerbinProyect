@@ -59,7 +59,7 @@ public partial class Manager
                 return false;
 
             JSonUtil.UpdateDirect<ManifestIndex>(dir, _INSTANCES, addInInstance(pReference));
-            FileUtil.Hide(dir, _INSTANCES);
+            NodeUtil.Hide(dir, _INSTANCES);
             return true;
         }
 
@@ -78,7 +78,7 @@ public partial class Manager
                 return false;
 
             JSonUtil.UpdateDirect<ManifestIndex>(dir, _INSTANCES, deletedInInstance(pReference));
-            FileUtil.Hide(dir, _INSTANCES);
+            NodeUtil.Hide(dir, _INSTANCES);
             return true;
         }
 

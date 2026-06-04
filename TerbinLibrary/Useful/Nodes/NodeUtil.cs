@@ -41,7 +41,7 @@ public enum StatusFileUtil : sbyte
 /// ___________________( English )___________________<br />
 /// Static utility class to handle files and directories in an advanced way.<br />
 /// </summary>
-public static class FileUtil // : File
+public static class NodeUtil // : File
 {
     //  private const ushort _falseSizeFolder = 0xFFFF;
 

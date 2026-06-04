@@ -7,6 +7,17 @@ using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 
+
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.IO.Enumeration;
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
+
 namespace TerbinService.Managers;
 /*
  -- Variables:
@@ -26,8 +37,8 @@ public static partial class Manager
     {
         public static (long? maxFiles, long? maxDir) GetSizeDir(string pDir)
         {
-            long? countFiles = FileUtil.GetCountFiles(pDir);
-            long? countDir = FileUtil.GetCountDirectories(pDir);
+            long? countFiles = NodeUtil.GetCountFiles(pDir);
+            long? countDir = NodeUtil.GetCountDirectories(pDir);
             return (countFiles, countDir);
         }
 
@@ -38,11 +49,18 @@ public static partial class Manager
             throw new NotImplementedException();
         }
 
-        [TODO("Dinamitar cualquier directorio.")]
-        public static async Task DinamiteDirectory
-            (string pPathDir, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
-        {
 
+        [TODO("Dinamitar cualquier directorio.")]
+        public static async Task<Status> DinamiteDirectory
+            (string pPathDir, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
+        {
+            string fullPath = Path.GetFullPath(pPathDir);
+
+
+
+
+            Directory.Delete(path: fullPath, recursive: true);
+            return Status.Succes;
         }
 
         public static string GetNameByFile(string pFile)
@@ -58,6 +76,18 @@ public static partial class Manager
         {
             pFileNameWithoutExtension = pFileNameWithoutExtension.Replace('_', ' ').Replace('-', ' ');
             return string.Join(' ', pFileNameWithoutExtension.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+        }
+
+
+
+        public enum Status : sbyte
+        {
+            GenericException = -1,
+
+            IsCancelled = 0,
+            Succes = 1,
+
+            GenericError = 2,
         }
     }
 }
