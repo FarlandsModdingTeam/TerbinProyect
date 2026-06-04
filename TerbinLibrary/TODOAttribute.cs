@@ -46,23 +46,23 @@ public class TODOAttribute : Attribute
 
         foreach (var type in pAssembly.GetTypes())
         {
-            CheckMember(type, type.Name, ref throwExceptionAtEnd, ref exceptionDetails, ref count);
+            checkMember(type, type.Name, ref throwExceptionAtEnd, ref exceptionDetails, ref count);
 
             foreach (var method in type.GetMethods(flags))
-                CheckMember(method, $"{type.Name}.{method.Name}()", ref throwExceptionAtEnd, ref exceptionDetails, ref count);
+                checkMember(method, $"{type.Name}.{method.Name}()", ref throwExceptionAtEnd, ref exceptionDetails, ref count);
 
             foreach (var field in type.GetFields(flags))
-                CheckMember(field, $"{type.Name}.{field.Name}", ref throwExceptionAtEnd, ref exceptionDetails, ref count);
+                checkMember(field, $"{type.Name}.{field.Name}", ref throwExceptionAtEnd, ref exceptionDetails, ref count);
 
             foreach (var prop in type.GetProperties(flags))
-                CheckMember(prop, $"{type.Name}.{prop.Name}", ref throwExceptionAtEnd, ref exceptionDetails, ref count);
+                checkMember(prop, $"{type.Name}.{prop.Name}", ref throwExceptionAtEnd, ref exceptionDetails, ref count);
         }
 
         if (throwExceptionAtEnd)
             throw new NotImplementedException($"Unresolved critical TODOs were found:\n{exceptionDetails}");
     }
 
-    private static void CheckMember(MemberInfo pMember, string pDisplayName, ref bool pThrowException, ref string pExceptionDetails, ref int pCount)
+    private static void checkMember(MemberInfo pMember, string pDisplayName, ref bool pThrowException, ref string pExceptionDetails, ref int pCount)
     {
         var attributes = pMember.GetCustomAttributes(typeof(TODOAttribute), false);
 
