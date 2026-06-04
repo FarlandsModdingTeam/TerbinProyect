@@ -272,7 +272,7 @@ public static partial class Manager
             if (ins.OutSide ?? false)
                 return ins.Path;
             else
-                return Manager.Instances.MakePathFolder(pName);
+                return Manager.Instances.MakePathFolderFromConfig(pName);
         }
 
         // TODO: Doc Actualizar.
@@ -290,7 +290,16 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia a enrutar. <br />En: The name of the instance to route.</param>
         /// <returns>Es: La ruta resultante a la instancia o null si no se halla configuración. <br />En: Resulting path to the instance or null if config is absent.</returns>
+        [Obsolete("Use GetPathFolder")]
         public static string MakePathFolder(string pName)
+        {
+            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            if (dir == null)
+                throw new Exception($"The key TerbinConfiguration.RUTE_INSTANCES is not defined: ({TerbinConfiguration.RUTE_INSTANCES})");
+
+            return MakePathFolder(pName, dir);
+        }
+        public static string MakePathFolderFromConfig(string pName)
         {
             var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
             if (dir == null)
