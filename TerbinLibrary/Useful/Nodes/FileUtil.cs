@@ -175,9 +175,11 @@ public static class FileUtil // : File
         {
             string file = pHandwritten.Files[i];
             string destFile =
-                Path.IsPathFullyQualified(file) ? file
-                : (root != null) ? Path.Combine(root, file) 
-                : throw new NullReferenceException("Try acces Root null in path Handwritten relative");
+                (Path.IsPathFullyQualified(file))
+                ? file 
+                    : (root != null)
+                ? Path.Combine(root, file) 
+                    : throw new NullReferenceException("Try acces Root null in path Handwritten relative");
 
             if (File.Exists(destFile))
                 File.Delete(destFile);
@@ -194,9 +196,11 @@ public static class FileUtil // : File
         {
             string dir = orderedDirectories[i];
             string destSub =
-                Path.IsPathFullyQualified(dir) ? dir
-                : (root != null) ? Path.Combine(root, dir)
-                : throw new NullReferenceException("Try acces Root null in path Handwritten relative");
+                (Path.IsPathFullyQualified(dir))
+                ? dir
+                    : (root != null)
+                ? Path.Combine(root, dir)
+                    : throw new NullReferenceException("Try acces Root null in path Handwritten relative");
 
             if (Directory.Exists(destSub))
             {
