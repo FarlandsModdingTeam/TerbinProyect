@@ -59,6 +59,7 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la nueva instancia a crear. <br />En: The name of the new instance to create.</param>
         /// <returns>Es: <c>true</c> si se creó con éxito, de lo contrario <c>false</c>. <br />En: <c>true</c> if created successfully, otherwise <c>false</c>.</returns>
+        [TODO("Cuando permitas crear instancia fuera, recuerda que el path incluya el nombre")]
         public static bool NewInstance(string pName, bool pOverwrite)
         {
             string dirInstace = Manager.Instances.MakePathFolder(pName);
@@ -106,6 +107,16 @@ public static partial class Manager
             directoryInfo.Attributes |= FileAttributes.Hidden;
 
             Manager.Manifest.CreateInstance(pName, dirInfo);
+        }
+
+
+        public static async Task<bool> Dinamite
+            (string pName, CancellationToken pCancellationToken = default)
+        {
+
+
+
+            return true;
         }
 
         /// <summary>
@@ -254,9 +265,14 @@ public static partial class Manager
         // TODO: Doc.
         public static string? GetPathFolder(string pName)
         {
-            if (!Manager.Instances.ExistInIndex(pName))
+            var ins = Manager.Index.GetInstance(pName);
+            if (ins is null)
                 return null;
-            return Manager.Instances.MakePathFolder(pName);
+
+            if (ins.OutSide ?? false)
+                return ins.Path;
+            else
+                return Manager.Instances.MakePathFolder(pName);
         }
 
         // TODO: Doc Actualizar.

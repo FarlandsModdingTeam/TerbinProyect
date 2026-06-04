@@ -1,4 +1,5 @@
 ﻿using TerbinLibrary.Configuration;
+using TerbinLibrary.Extension;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
 using TerbinService.Data.References;
@@ -82,6 +83,20 @@ public partial class Manager
             return true;
         }
 
+        // TODO: Doc.
+        public static ReferenceInstance? GetInstance(string pName)
+        {
+            List<ReferenceInstance> all = GetAllInstances();
+            for (int i = 0; i < all.Count; i++)
+            {
+                var ins = all[i];
+                if ((ins.Name?.Equals(pName)).ToBool())
+                    return ins;
+            }
+            return null;
+        }
+
+        // TODO: Doc.
         public static List<ReferenceInstance> GetAllInstances() =>
             Manager.Index.GetIndex().Instances ?? new();
         

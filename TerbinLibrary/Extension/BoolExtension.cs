@@ -26,6 +26,10 @@ public static class BoolExtension
     {
         return pByte == 1;
     }
+    public static bool ToBool(this bool? pBool)
+    {
+        return pBool ?? false;
+    }
     public static bool? ToBoolUk(this sbyte pSByte)
     {
         return (pSByte > 0) ? null : ToBool(pSByte);

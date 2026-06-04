@@ -52,11 +52,12 @@ public static partial class Manager
 
         [TODO("Dinamitar cualquier directorio.")]
         public static async Task<Status> DinamiteDirectory
-            (string pPathDir, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
+            (string pPathDir, CancellationToken pCancellationToken = default)
         {
             string fullPath = Path.GetFullPath(pPathDir);
 
 
+            throw new NotImplementedException();
 
 
             Directory.Delete(path: fullPath, recursive: true);
