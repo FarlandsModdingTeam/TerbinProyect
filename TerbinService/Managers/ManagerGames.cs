@@ -92,7 +92,7 @@ public static partial class Manager
                 return Status.IsCancelled;
 
             var (status, json) = await NodeUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss);
-            if (status != StatusFileUtil.Succes)
+            if (status != StatusNodeUtil.Succes)
                 return Status.GenericError;
 
             Manager.Manifest.WriteHandwritten(pathInstace, json);

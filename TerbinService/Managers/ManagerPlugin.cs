@@ -291,12 +291,12 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            StatusFileUtil r = await Manager.Instances.UnistallPlugin(manifest.HandWritten, pNameInstance, pProgress, pCancellationToken);
+            StatusNodeUtil r = await Manager.Instances.UnistallPlugin(manifest.HandWritten, pNameInstance, pProgress, pCancellationToken);
             Status result = r switch
             {
-                StatusFileUtil.Succes => Status.Succes,
-                StatusFileUtil.IsCancelled => Status.IsCancelled,
-                StatusFileUtil.InvalidSource => Status.InstanceNotExist,
+                StatusNodeUtil.Succes => Status.Succes,
+                StatusNodeUtil.IsCancelled => Status.IsCancelled,
+                StatusNodeUtil.InvalidSource => Status.InstanceNotExist,
 
                 _ => Status.GenericError,
             };

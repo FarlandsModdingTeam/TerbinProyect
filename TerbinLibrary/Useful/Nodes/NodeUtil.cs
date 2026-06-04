@@ -23,7 +23,7 @@ namespace TerbinLibrary.Useful.Nodes;
 /// ___________________( English )___________________<br />
 /// Enum representing the possible states in file utilities.<br />
 /// </summary>
-public enum StatusFileUtil : sbyte
+public enum StatusNodeUtil : sbyte
 {
     IsCancelled = 0,
     Succes = 1,
@@ -41,7 +41,7 @@ public enum StatusFileUtil : sbyte
 /// ___________________( English )___________________<br />
 /// Static utility class to handle files and directories in an advanced way.<br />
 /// </summary>
-public static class NodeUtil // : File
+public static class NodeUtil
 {
     //  private const ushort _falseSizeFolder = 0xFFFF;
 
@@ -63,7 +63,7 @@ public static class NodeUtil // : File
     /// <param name="pProgress">Es: Objeto para reportar el progreso. <br />En: Object to report progress.</param>
     /// <param name="pCancellationToken">Es: Token para cancelación. <br />En: Cancellation token.</param>
     /// <returns>Es: Estado y registro del directorio clonado. <br />En: Status and cloned directory record.</returns>
-    public static async Task<(StatusFileUtil status, DirectoryHandwritten? json)> CloneDirectory(
+    public static async Task<(StatusNodeUtil status, DirectoryHandwritten? json)> CloneDirectory(
                                             string pSourceDir,
                                             string pDestinationDir,
                                             bool pOverwrite,
@@ -79,7 +79,7 @@ public static class NodeUtil // : File
 
         allFiles = GetAllFiles(pSourceDir);
         if (allFiles is null)
-            return (StatusFileUtil.InvalidFiles, null);
+            return (StatusNodeUtil.InvalidFiles, null);
 
         if (!Directory.Exists(pDestinationDir))
             Directory.CreateDirectory(pDestinationDir);
@@ -108,7 +108,7 @@ public static class NodeUtil // : File
 
         allDictories = GetAllDirectories(pSourceDir);
         if (allDictories is null)
-            return (StatusFileUtil.InvalidSource, null);
+            return (StatusNodeUtil.InvalidSource, null);
 
         inverse = (pProgress != null) ? Util.GetInverse(allDictories.Count) : null;
         previus = -1;
@@ -130,7 +130,7 @@ public static class NodeUtil // : File
         if (pProgress != null)
             Util.ReportProgressPercent(100, previus, true, pProgress);
 
-        return (StatusFileUtil.Succes, handwritten);
+        return (StatusNodeUtil.Succes, handwritten);
     }
 
 
@@ -144,7 +144,7 @@ public static class NodeUtil // : File
     /// <param name="pHandwritten">Es: Registro de los contenidos. <br />En: Record of the contents.</param>
     /// <param name="pProgress">Es: Para reportar el progreso. <br />En: To report progress.</param>
     /// <returns>Es: Estado de la operación. <br />En: Operation status.</returns>
-    public static StatusFileUtil DeleteFromHandwritten(string pDir, DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
+    public static StatusNodeUtil DeleteFromHandwritten(string pDir, DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
     {
         pHandwritten.Root = pDir;
         return DeleteFromHandwritten(pHandwritten, pProgress);
@@ -164,7 +164,7 @@ public static class NodeUtil // : File
     /// <param name="pProgress">Es: Progreso de eliminación. <br />En: Deletion progress.</param>
     /// <returns>Es: Resultado de la operación. <br />En: Operation result.</returns>
     [TODO("Hacer asincrono DeleteFromHandwritten")]
-    public static StatusFileUtil DeleteFromHandwritten(DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
+    public static StatusNodeUtil DeleteFromHandwritten(DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
     {
         int previus = -1;
         double? inverse;
@@ -213,7 +213,23 @@ public static class NodeUtil // : File
         if (pProgress != null)
             Util.ReportProgressPercent(100, previus, true, pProgress);
 
-        return StatusFileUtil.Succes;
+        return StatusNodeUtil.Succes;
+    }
+
+    public static async ValueTask<bool> DeleteDirectory
+        (string pPathDir, bool pRecursive, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
+    {
+
+        if (!Directory.Exists(pPathDir))
+            return false;
+
+        List<string>? allDirectories = GetAllFiles(pPathDir);
+        List<string>? allFiles = GetAllDirectories(pPathDir);
+
+        //if (!pRecursive && )
+
+
+        return true;
     }
 
     /// <summary>
@@ -224,7 +240,7 @@ public static class NodeUtil // : File
     /// </summary>
     /// <param name="pDir">Es: O carpeta contenedora. <br />En: Or containing folder.</param>
     /// <param name="pFileName">Es: Nombre de archivo a ocultar. <br />En: Name of the file to hide.</param>
-    public static void Hide(string pDir, string pFileName)
+    public static void HideFile(string pDir, string pFileName)
     {
         if (!OperatingSystem.IsWindows())
             return;
@@ -358,4 +374,10 @@ public static class NodeUtil // : File
         return (countFiles, countDir);
     }
 
+
+    public static ulong CountContent(string pPath)
+    {
+        var (files, direc) = GetSizeDir(pPath);
+        return (ulong)((files ?? 0) + (direc ?? 0));
+    }
 }

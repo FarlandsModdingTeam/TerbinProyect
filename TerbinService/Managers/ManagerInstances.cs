@@ -407,7 +407,7 @@ public static partial class Manager
         /// <param name="pProgress">Es: Manejador de notificaciones visuales/backend de progreso. <br />En: Visual or backend notification handler for progress ticks.</param>
         /// <param name="pCancellationToken">Es: Token cancelatorio. <br />En: Cancellation token.</param>
         /// <returns>Es: Un enum indicando el estado final de la limpieza. <br />En: An enum noting the cleanup ending status.</returns>
-        public static async Task<StatusFileUtil> UnistallPlugin
+        public static async Task<StatusNodeUtil> UnistallPlugin
             (DirectoryHandwritten pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             //ArgumentNullException.ThrowIfNull(pPlugin.Root, "Root is not asing, need root in DirectoryHandwritten");
@@ -419,7 +419,7 @@ public static partial class Manager
             try
             {
                 if (pCancellationToken.IsCancellationRequested)
-                    return StatusFileUtil.IsCancelled;
+                    return StatusNodeUtil.IsCancelled;
                 var result = NodeUtil.DeleteFromHandwritten(pathInstance, pPlugin, pProgress);
                 return result;
             }
