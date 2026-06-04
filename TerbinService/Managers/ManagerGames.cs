@@ -103,8 +103,8 @@ public static partial class Manager
                 return Status.IsCancelled;
             }
                 
-            var exes = NodeUtil.GetAllExeFiles(pathInstace);
-            if (exes is null)
+            List<string> exes = NodeUtil.GetAllExeFiles(pathInstace);
+            if (exes.Count <= 0)
                 return Status.ErrorGameNotExes;
 
             var update = Manager.Manifest.UpdateInstace(pNameInstance, pathInstace, manifest =>

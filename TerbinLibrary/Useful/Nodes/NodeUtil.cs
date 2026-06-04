@@ -47,8 +47,6 @@ public static class NodeUtil
 
     // Son los unicos que el tamaño no es por el peso de los archivos en bytes.
 
-    // PaVerano:
-    // (Permitira actualizar farlands borrando solo el contenido marcado del json y volver a clonar actualizar de version la instancia)
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Clona un directorio copiando sus archivos y subdirectorios a un nuevo destino.<br />
@@ -63,6 +61,8 @@ public static class NodeUtil
     /// <param name="pProgress">Es: Objeto para reportar el progreso. <br />En: Object to report progress.</param>
     /// <param name="pCancellationToken">Es: Token para cancelación. <br />En: Cancellation token.</param>
     /// <returns>Es: Estado y registro del directorio clonado. <br />En: Status and cloned directory record.</returns>
+    [TODO("(Verano)Permitira actualizar farlands borrando solo el contenido marcado del json y volver a clonar actualizar de version la instancia")]
+    [TODO("Dividir en dos metodos distintos (uno para archivos y otro para directorios) (pasar ref DirectoryHandwritten)")]
     public static async Task<(StatusNodeUtil status, DirectoryHandwritten? json)> CloneDirectory(
                                             string pSourceDir,
                                             string pDestinationDir,
@@ -75,11 +75,12 @@ public static class NodeUtil
         int previus = -1;
         double? inverse;
 
+        if (!Directory.Exists(pSourceDir))
+            return (StatusNodeUtil.InvalidSource, null);
+
         DirectoryHandwritten handwritten = new();
 
         allFiles = GetAllFiles(pSourceDir);
-        if (allFiles is null)
-            return (StatusNodeUtil.InvalidFiles, null);
 
         if (!Directory.Exists(pDestinationDir))
             Directory.CreateDirectory(pDestinationDir);
@@ -107,8 +108,6 @@ public static class NodeUtil
         }
 
         allDictories = GetAllDirectories(pSourceDir);
-        if (allDictories is null)
-            return (StatusNodeUtil.InvalidSource, null);
 
         inverse = (pProgress != null) ? Util.GetInverse(allDictories.Count) : null;
         previus = -1;
@@ -163,6 +162,7 @@ public static class NodeUtil
     /// <param name="pHandwritten">Es: Registro de directorio con su raíz configurada. <br />En: Directory record with its root configured.</param>
     /// <param name="pProgress">Es: Progreso de eliminación. <br />En: Deletion progress.</param>
     /// <returns>Es: Resultado de la operación. <br />En: Operation result.</returns>
+    [TODO("Dividir en dos metodos distintos (uno para archivos y otro para directorios)")]
     [TODO("Hacer asincrono DeleteFromHandwritten")]
     public static StatusNodeUtil DeleteFromHandwritten(DirectoryHandwritten pHandwritten, IProgress<TerbinInfoProgrss>? pProgress = null)
     {
@@ -219,12 +219,11 @@ public static class NodeUtil
     public static async ValueTask<bool> DeleteDirectory
         (string pPathDir, bool pRecursive, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
     {
-
         if (!Directory.Exists(pPathDir))
             return false;
 
-        List<string>? allDirectories = GetAllFiles(pPathDir);
-        List<string>? allFiles = GetAllDirectories(pPathDir);
+        List<string> allDirectories = GetAllFiles(pPathDir);
+        List<string> allFiles = GetAllDirectories(pPathDir);
 
         //if (!pRecursive && )
 
@@ -275,10 +274,10 @@ public static class NodeUtil
     /// </summary>
     /// <param name="pDir">Es: Directorio a mapear. <br />En: Directory to map.</param>
     /// <returns>Es: Lista de archivos encontrados o null si no existe. <br />En: List of found files or null if it doesn't exist.</returns>
-    public static List<string>? GetAllFiles(string pDir)
+    public static List<string> GetAllFiles(string pDir)
     {
         if (!Directory.Exists(pDir))
-            return null;
+            throw new Exception("Not Exist Directory");
         return Directory.EnumerateFiles(pDir, "*", SearchOption.AllDirectories).ToList();
     }
 
@@ -290,10 +289,10 @@ public static class NodeUtil
     /// </summary>
     /// <param name="pDir">Es: Directorio fuente a explorar. <br />En: Source directory to explore.</param>
     /// <returns>Es: Lista de carpetas o null. <br />En: List of folders or null.</returns>
-    public static List<string>? GetAllDirectories(string pDir)
+    public static List<string> GetAllDirectories(string pDir)
     {
         if (!Directory.Exists(pDir))
-            return null;
+            throw new Exception("Not Exist Directory");
         return Directory.EnumerateDirectories(pDir, "*", SearchOption.AllDirectories).ToList();
     }
 
@@ -305,10 +304,10 @@ public static class NodeUtil
     /// </summary>
     /// <param name="pDir">Es: Directorio a consultar. <br />En: Directory to query.</param>
     /// <returns>Es: Colección de ejecutables o null. <br />En: Executable paths collection or null.</returns>
-    public static List<string>? GetAllExeFiles(string pDir)
+    public static List<string> GetAllExeFiles(string pDir)
     {
         if (!Directory.Exists(pDir))
-            return null;
+            throw new Exception("Not Exist Directory");
 
         return Directory.EnumerateFiles(pDir, "*", SearchOption.AllDirectories)
             .Where(file => file.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
