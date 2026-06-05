@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
 using TerbinLibrary;
+using TerbinLibrary.Async;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
 using TerbinLibrary.Useful;
@@ -41,7 +42,7 @@ public static partial class Manager
     [TODO("Permitir Actualizar")]
     public static class Instances
     {
-        private static readonly ConcurrentDictionary<string, SemaphoreSlim> _instanceLocks = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly SemaphoreByKey<string> _instanceLocks = new(StringComparer.OrdinalIgnoreCase);
 
         private static readonly Lock _lockCreatingInstance = new();
 
@@ -393,29 +394,37 @@ public static partial class Manager
         /// Tips: The overwrite variable defines how backward file collisions are resolved gracefully via the extraction tool.<br />
         /// </summary>
         /// <param name="pPathPlugin">Es: Ruta directa al contenedor ZIP del plugin. <br />En: Direct path to the plugin ZIP container.</param>
-        /// <param name="pNameInstance">Es: Nombre de la instancia objetivo. <br />En: Target instance name.</param>
+        /// <param name="pName">Es: Nombre de la instancia objetivo. <br />En: Target instance name.</param>
         /// <param name="pOverwrite">Es: Booleano para forzar reemplazo si el archivo ya existe. <br />En: Boolean to force replacement if the file exists.</param>
         /// <param name="pProgress">Es: Proveedor iterativo del progreso del volcado. <br />En: Iterative progress provider for dumping process.</param>
         /// <param name="pCancellationToken">Es: Token para frenar en seco la instalación. <br />En: Token to halt the installation immediately.</param>
         /// <returns>Es: Un directorio estructurado (Handwritten) con su rastro o null. <br />En: A structured directory (Handwritten) trace or null.</returns>
         public static async Task<DirectoryHandwritten?> InstallPlugin
-            (string pPathPlugin, string pNameInstance, string pTarjetPath, bool pOverwrite, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+            (string pPathPlugin, string pName, string pTarjetPath, bool pOverwrite, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             if (!Directory.Exists(pTarjetPath))
                 Directory.CreateDirectory(pTarjetPath);
 
-            SemaphoreSlim instanceLock = _instanceLocks.GetOrAdd(pNameInstance, _ => new SemaphoreSlim(1, 1));
-            await instanceLock.WaitAsync(pCancellationToken).ConfigureAwait(false);
-            try
+            string? path = GetPathFolder(pName);
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            path = Path.Combine(path, pTarjetPath);
+
+            return await InstallPlugin(pPathPlugin, pTarjetPath, pOverwrite, pProgress, pCancellationToken).ConfigureAwait(false);
+        }
+        public static async Task<DirectoryHandwritten?> InstallPlugin
+            (string pPathPlugin, string pTarjetPath, bool pOverwrite, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+        {
+            if (!Directory.Exists(pTarjetPath))
+                Directory.CreateDirectory(pTarjetPath);
+
+            using (await _instanceLocks.LockAsync(pPathPlugin))
             {
                 if (pCancellationToken.IsCancellationRequested)
                     return null;
                 var result = await ZipUtil.ExtractWithProgress(pPathPlugin, pTarjetPath, pProgress, pOverwrite, pCancellationToken).ConfigureAwait(false);
                 return result;
-            }
-            finally
-            {
-                instanceLock.Release();
             }
         }
 
@@ -443,18 +452,12 @@ public static partial class Manager
 
             string pathInstance = Manager.Instances.MakePathFolder(pNameInstance);
 
-            SemaphoreSlim instanceLock = _instanceLocks.GetOrAdd(pNameInstance, _ => new SemaphoreSlim(1, 1));
-            await instanceLock.WaitAsync(pCancellationToken).ConfigureAwait(false);
-            try
+            using (await _instanceLocks.LockAsync(pNameInstance))
             {
                 if (pCancellationToken.IsCancellationRequested)
                     return StatusNodeUtil.IsCancelled;
                 var result = NodeUtil.DeleteFromHandwritten(pathInstance, pPlugin, pProgress);
                 return result;
-            }
-            finally
-            {
-                instanceLock.Release();
             }
         }
     }
