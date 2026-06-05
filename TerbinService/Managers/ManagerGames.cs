@@ -163,7 +163,9 @@ public static partial class Manager
         public static async Task<Status> RemoveInInstance
             (string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            string pathInstace = Instances.MakePathFolder(pNameInstance);
+            string? pathInstace = Instances.GetPathFolder(pNameInstance);
+            if (string.IsNullOrEmpty(pathInstace))
+                return Status.ErrorGetInstance;
 
             var handwritten = Manager.Manifest.GetHandwritten(pathInstace);
 
