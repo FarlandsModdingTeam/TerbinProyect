@@ -16,31 +16,26 @@ public static class ManagerFarlands
                Process.GetProcessesByName("steamwebhelper").Length > 0;
     }
 
-    public enum ErrorLaunchFarlands : sbyte
-    {
-        NotInstaled = -1,
-        Succes = 0,
-    }
     [TODO("Lanzar juego de la instancia")]
-    public static ErrorLaunchFarlands LaunchFarlands(string? pName = null)
+    public static Status LaunchFarlands(string? pName = null)
     {
         if (pName == null)
             return LaunchFarlandsBySteam();
 
         // TODO: Lanzar juego de la instancia.
-        return ErrorLaunchFarlands.Succes;
+        return Status.Succes;
     }
 
-    public static ErrorLaunchFarlands LaunchFarlandsBySteam()
+    public static Status LaunchFarlandsBySteam()
     {
         if (SteamLocator.GetGamePath(KEY_FARLANDS) == null)
-            return ErrorLaunchFarlands.NotInstaled;
+            return Status.NotInstaled;
         Process.Start(new ProcessStartInfo
         {
             FileName = "steam://run/2252680",
             UseShellExecute = true
         });
-        return ErrorLaunchFarlands.Succes;
+        return Status.Succes;
     }
 
     public static List<string> GetDLCs(string pManifestPath)
@@ -85,5 +80,16 @@ public static class ManagerFarlands
     public static string GetVersion()
     {
         return "0.0.9";
+    }
+
+
+
+
+
+    public enum Status : sbyte
+    {
+        NotInstaled = 2,
+
+        Succes = 1,
     }
 }
