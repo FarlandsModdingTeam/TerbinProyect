@@ -113,7 +113,7 @@ public static partial class Manager
         public static async Task<bool> Dinamite
             (string pName, CancellationToken pCancellationToken = default)
         {
-
+            var inst = Manager.Instances.GetPathFolder(pName);
 
 
             return true;
@@ -164,13 +164,11 @@ public static partial class Manager
         /// <returns>Es: El contenido del manifiesto como string, o null si falla. <br />En: The manifest content as a string, or null on failure.</returns>
         public static string? GetStringManifestByName(string pName)
         {
-            string dir = Manager.Instances.MakePathFolder(pName);
-
-            var mani = JSonUtil.AcessDirect<ManifestInstance>(dir, TerbinServiceConst.MANIFEST_INSTANCE);
-            if (mani == null)
+            string? dir = Manager.Instances.GetPathFolder(pName);
+            if (string.IsNullOrEmpty(dir))
                 return null;
 
-            return JSonUtil.ToJson(mani, Newtonsoft.Json.Formatting.None);
+            return GetStringManifestByPath(dir);
         }
 
         // TODO: Doc.
@@ -201,14 +199,20 @@ public static partial class Manager
         /// <returns>Es: Objeto del manifiesto o null. <br />En: Manifest object or null.</returns>
         public static ManifestInstance? GetManifestByName(string pName)
         {
-            string dir = Manager.Instances.MakePathFolder(pName);
+            string? dir = Manager.Instances.GetPathFolder(pName);
+            if (dir is null)
+                return null;
 
             return GetManifestByPath(dir);
         }
 
         // TODO: Doc.
-        public static ManifestInstance? GetManifestByPath(string pPath) =>
-             JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
+        [TODO("Lockear por pPath entrante")]
+        public static ManifestInstance? GetManifestByPath(string pPath)
+        {
+            return JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
+        }
+             
         
         // TODO: Doc Actualizar.
         /// <summary>

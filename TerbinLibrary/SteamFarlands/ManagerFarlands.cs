@@ -4,6 +4,17 @@ using System.Diagnostics;
 using TerbinLibrary.Useful;
 
 namespace TerbinLibrary.SteamFarlands;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: menorculas = es privada local.
+  empieza: "p"en menorculas = parametro entrante local.
+  empieza: mayorculas = publica.
+ -- Funciones:
+  empieza: mayorculas = publica.
+  empieza: menorculas = privada.
+ */
+
 
 public static class ManagerFarlands
 {
@@ -16,7 +27,7 @@ public static class ManagerFarlands
                Process.GetProcessesByName("steamwebhelper").Length > 0;
     }
 
-    [TODO("Lanzar juego de la instancia")]
+    [Obsolete("Lanzar juego de la instancia")]
     public static Status LaunchFarlands(string? pName = null)
     {
         if (pName == null)
