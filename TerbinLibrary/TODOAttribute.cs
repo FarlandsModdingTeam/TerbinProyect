@@ -45,6 +45,8 @@ public class TODOAttribute : Attribute
 
         foreach (var type in pAssembly.GetTypes())
         {
+            if (!type.Name.StartsWith('<'))
+                print($"{type.Name}: ", ConsoleColor.Blue);
             checkMember(type, type.Name, ref throwExceptionAtEnd, ref exceptionDetails);
 
             foreach (var method in type.GetMethods(flags))
@@ -67,7 +69,7 @@ public class TODOAttribute : Attribute
 
         foreach (TODOAttribute todo in attributes)
         {
-            string outputText = $"<{pDisplayName}> TODO: {todo.Message}";
+            string outputText = $"\t<{pDisplayName}> TODO: {todo.Message}";
 
             if (todo.Exception)
             {
@@ -103,7 +105,7 @@ public class TODOAttribute : Attribute
         ConsoleColor c = pMember.MemberType switch
         {
             MemberTypes.Method => ConsoleColor.Yellow,
-            MemberTypes.Property => ConsoleColor.Blue,
+            MemberTypes.Property => ConsoleColor.DarkCyan,
             MemberTypes.Field => ConsoleColor.Cyan,
             MemberTypes.TypeInfo => ConsoleColor.DarkGreen,
             MemberTypes.Constructor => ConsoleColor.Green,
