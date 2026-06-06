@@ -23,7 +23,7 @@ using TerbinLibrary.Protocol;
 
 // Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
 
-#if true
+#if false
 
 Console.WriteLine($"SimulateClient esta desactivado.");
 Console.WriteLine($"Ponga en false el if para activarlo.");
