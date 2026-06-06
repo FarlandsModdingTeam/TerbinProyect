@@ -235,6 +235,23 @@ public static class NodeUtil
     }
      */
 
+    // TODO: Doc.
+    public static bool Within(string pOrigin, string pTarjet)
+    {
+        string basePath = Path.GetFullPath(pOrigin);
+        string targetPath = Path.GetFullPath(pTarjet);
+
+        if (!basePath.EndsWith(Path.DirectorySeparatorChar))
+            basePath += Path.DirectorySeparatorChar;
+
+        StringComparison comparasion = OperatingSystem.IsWindows()
+                                        ? StringComparison.OrdinalIgnoreCase
+                                        : StringComparison.Ordinal;
+
+        return targetPath.StartsWith(basePath, comparasion);
+    }
+
+
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Oculta un archivo combinando atributos, aplicando solo en sistemas Windows.<br />

@@ -32,10 +32,11 @@ public class Worker : BackgroundService
     public Worker(ILogger<Worker> pLogger, IHostApplicationLifetime pAppLifetime)
     {
         Worker._appLifetime = pAppLifetime;
-        Console.PrintLn("Por Hacer TerbinService: ");
-        TODOAttribute.ChekAndPrint(Assembly.GetExecutingAssembly());
+
         Console.PrintLn("Por Hacer TerbinLibrary: ");
         TODOAttribute.ChekAndPrint(Assembly.Load("TerbinLibrary"));
+        Console.PrintLn("Por Hacer TerbinService: ");
+        TODOAttribute.ChekAndPrint(Assembly.GetExecutingAssembly());
     }
 
     protected override async Task ExecuteAsync(CancellationToken pStoppingToken)

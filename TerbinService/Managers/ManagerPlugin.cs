@@ -187,35 +187,35 @@ public static partial class Manager
         public static async Task<Status> InstallOne
             (string pPlugin, string pNameInstance, string pTarjetPath, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            var reference = await StoragePlugin.Get(pPlugin).ConfigureAwait(false);
+            var reference = await Manager.StoragePlugin.Get(pPlugin).ConfigureAwait(false);
             if (reference?.FileName == null)
                 return Status.ErrorGetPlugin;
 
-            string? pathPlugin = StoragePlugin.MakePathPlugin(reference.FileName);
+            string? pathPlugin = Manager.StoragePlugin.MakePathPlugin(reference.FileName);
             if (string.IsNullOrEmpty(pathPlugin))
                 return Status.ErrorGetPathPlugin;
 
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            var result = await Instances.InstallPlugin
+            var result = await Manager.Instances.InstallPlugin
                 (pathPlugin, pNameInstance, pTarjetPath, true, pProgress, pCancellationToken).ConfigureAwait(false);
 
             if (pCancellationToken.IsCancellationRequested)
             {
                 if (result != null)
-                    await Instances.UnistallPlugin(result, pNameInstance, pCancellationToken: CancellationToken.None);
+                    await Manager.Instances.UnistallPlugin(result, pNameInstance, pCancellationToken: CancellationToken.None);
                 return Status.IsCancelled;
             }
 
             string id = reference.Id ?? $"E:{CodeManifestError.NotAccesId}";
             string namePlugin = reference.Name ?? $"E:{CodeManifestError.NotAccesName}";
-            bool inInstance = InInstance(pNameInstance, pTarjetPath);
+            bool inInstance = Manager.Instances.InsideConfig(pNameInstance, pTarjetPath);
 
-            var (status, local) = Manifest.HandleAddPlugin
+            var (status, local) = Manager.Manifest.HandleAddPlugin
                 (id, namePlugin, pNameInstance, inInstance, result);
 
-            if (status != Manifest.Status.Succes)
+            if (status != Manager.Manifest.Status.Succes)
                 return status switch
                 {
                     Manifest.Status.ErrorGetManifest => Status.ErrorGetManifest,
@@ -406,23 +406,6 @@ public static partial class Manager
 
 
 
-        // TODO: Documentacion.
-        public static bool InInstance(string pName, string pTarjet)
-        {
-            string pathInstance = Manager.Instances.MakePathFolder(pName);
-
-            string basePath = Path.GetFullPath(pathInstance);
-            string targetPath = Path.GetFullPath(pTarjet);
-
-            if (!basePath.EndsWith(Path.DirectorySeparatorChar))
-                basePath += Path.DirectorySeparatorChar;
-
-            StringComparison comparasion = OperatingSystem.IsWindows()
-                                            ? StringComparison.OrdinalIgnoreCase
-                                            : StringComparison.Ordinal;
-
-            return targetPath.StartsWith(basePath, comparasion);
-        }
 
         /// <summary>
         /// ___________________( Español )___________________<br />

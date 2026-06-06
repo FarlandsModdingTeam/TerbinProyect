@@ -111,15 +111,43 @@ public static partial class Manager
             Manager.Manifest.CreateInstance(pName, dirInfo);
         }
 
-        [TODO("Termianar")]
-        public static async Task<bool> Dinamite
+        // TODO: Doc.
+        public static async Task<Status> Delete
             (string pName, CancellationToken pCancellationToken = default)
         {
-            var inst = Manager.Instances.GetPathFolder(pName);
+            string? path = Manager.Instances.GetPathFolder(pName);
+            if (string.IsNullOrEmpty(path))
+                return Status.ErrorNotExit;
 
+            if (!Manager.Instances.IsInstance(path))
+                return Status.ErrorIsNotInstance;
 
-            return true;
+            if (pCancellationToken.IsCancellationRequested)
+                return Status.IsCanelled;
+
+            bool r = Manager.Index.UnregisterInstance(pName);
+            if (!r) return Status.ErrorUnregistInstance;
+
+            if (pCancellationToken.IsCancellationRequested)
+            {
+                Manager.Index.RegisterInstance(pName, path, InsideConfig(pName, path));
+                return Status.IsCanelled;
+            }
+
+            await Manager.Node.DinamiteDirectory(path, pCancellationToken);
+
+            return Status.Succes;
         }
+
+
+        // TODO: Documentacion.
+        public static bool InsideConfig(string pName, string pTarjet)
+        {
+            string pathInstance = Manager.Instances.MakePathFolderFromConfig(pName);
+
+            return NodeUtil.Within(pathInstance, pTarjet);
+        }
+
 
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -215,8 +243,8 @@ public static partial class Manager
                 return JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
             }
         }
-             
-        
+
+
         // TODO: Doc Actualizar.
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -232,6 +260,7 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: Ruta a la carpeta de información o null. <br />En: Path to the information folder or null.</returns>
+        [Obsolete("use ByPath")]
         public static string MakePathFolderInformationByName(string pName)
         {
             string dir = Manager.Instances.MakePathFolder(pName);
@@ -276,8 +305,11 @@ public static partial class Manager
             if (ins is null)
                 return null;
 
-            if (ins.OutSide ?? false)
+            if (!string.IsNullOrEmpty(ins.Path))
                 return ins.Path;
+
+            if (ins.OutSide ?? false)
+                return null;
             else
                 return Manager.Instances.MakePathFolderFromConfig(pName);
         }
@@ -297,7 +329,7 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia a enrutar. <br />En: The name of the instance to route.</param>
         /// <returns>Es: La ruta resultante a la instancia o null si no se halla configuración. <br />En: Resulting path to the instance or null if config is absent.</returns>
-        [Obsolete("Use GetPathFolder")]
+        [Obsolete("Use GetPathFolder or MakePathFolderFromConfig")]
         public static string MakePathFolder(string pName)
         {
             var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
@@ -368,9 +400,9 @@ public static partial class Manager
         /// <returns>Es: <c>true</c> o <c>false</c> según la existencia; <c>null</c> bajo fallo de contexto base. <br />En: <c>true</c> or <c>false</c> based on existence; <c>null</c> on base context failure.</returns>
         public static bool? ExistInPhisic(string pName)
         {
-            var dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            var dir = Manager.Instances.GetPathFolder(pName);
             if (string.IsNullOrEmpty(dir))
-                return null;
+                return false;
 
             if (!Directory.Exists(dir))
                 return null;
@@ -461,6 +493,22 @@ public static partial class Manager
                 var result = NodeUtil.DeleteFromHandwritten(pathInstance, pPlugin, pProgress);
                 return result;
             }
+        }
+
+
+
+
+        public enum Status : sbyte
+        {
+            GenericException = -1,
+
+            IsCanelled = 0,
+            Succes = 1,
+
+            GenericError = 2,
+            ErrorNotExit = 3,
+            ErrorIsNotInstance = 4,
+            ErrorUnregistInstance = 5,
         }
     }
 }

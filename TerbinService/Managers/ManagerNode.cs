@@ -50,15 +50,13 @@ public static partial class Manager
         }
 
 
-        [TODO("Dinamitar cualquier directorio.")]
+        [TODO("Comprobar que no borre algo que no debe como .TerbinInstaceInformation")]
         public static async Task<Status> DinamiteDirectory
             (string pPathDir, CancellationToken pCancellationToken = default)
         {
             string fullPath = Path.GetFullPath(pPathDir);
 
-
-            throw new NotImplementedException();
-
+            // TODO
 
             Directory.Delete(path: fullPath, recursive: true);
             return Status.Succes;
