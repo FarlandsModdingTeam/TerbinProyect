@@ -79,8 +79,8 @@ internal static class ServiceInstances
         ReadOnlySpan<byte> reader = pParameters;
         var name = reader.ReadArray<char>().CrString();
 
-        var manifest = Manager.Instances.GetStringManifestByName(name);
-        if (manifest is null)
+        string? manifest = await Manager.Instances.GetStringManifestByName(name);
+        if (string.IsNullOrEmpty(manifest))
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExist));
 
         byte[] pld = Serialineitor.SerializeArray(manifest.ToCharArray());

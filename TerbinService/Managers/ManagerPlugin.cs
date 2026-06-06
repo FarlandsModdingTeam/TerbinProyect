@@ -320,13 +320,13 @@ public static partial class Manager
         /// <param name="pNameInstance">Es: La instancia asignada a revisar.<br />En: The assigned instance to review.</param>
         /// <param name="pCancellationToken">Es: Token de la operación.<br />En: Operation token.</param>
         /// <returns>Es: Tupla con estado de operación y el manifiesto si se encontró.<br />En: Tuple with the operation status and the manifest if found.</returns>
-        public static async Task<(Status status, ManifestPlugin? manifest)> GetOne
-            (string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
+        public static async Task<(Status status, ManifestPlugin? manifest)>
+            GetOne(string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
         {
             if (pCancellationToken.IsCancellationRequested)
                 return (Status.IsCancelled, null);
 
-            var manifest = Manager.Instances.GetManifestByName(pNameInstance);
+            var manifest = await Manager.Instances.GetManifestByName(pNameInstance);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
@@ -370,12 +370,13 @@ public static partial class Manager
         /// <param name="pNameInstance">Es: Nombre de la instancia a escanear.<br />En: Name of the instance to scan.</param>
         /// <param name="pCancellationToken">Es: Token de cancelación de la iteración.<br />En: Iteration cancellation token.</param>
         /// <returns>Es: Tupla con el estado de la tarea y la lista de todos los manifiestos hallados.<br />En: Tuple containing the task status and the list of all found manifests.</returns>
-        public static async Task<(Status status, List<ManifestPlugin>? manifests)> GetAll(string pNameInstance, CancellationToken pCancellationToken = default)
+        public static async Task<(Status status, List<ManifestPlugin>? manifests)>
+            GetAll(string pNameInstance, CancellationToken pCancellationToken = default)
         {
             if (pCancellationToken.IsCancellationRequested)
                 return (Status.IsCancelled, null);
 
-            var manifest = Manager.Instances.GetManifestByName(pNameInstance);
+            var manifest = await Manager.Instances.GetManifestByName(pNameInstance);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 

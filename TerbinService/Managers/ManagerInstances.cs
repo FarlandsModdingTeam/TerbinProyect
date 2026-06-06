@@ -10,6 +10,7 @@ using TerbinLibrary.Data;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
+using TerbinService.Data.References;
 
 namespace TerbinService.Managers;
 /*
@@ -110,7 +111,7 @@ public static partial class Manager
             Manager.Manifest.CreateInstance(pName, dirInfo);
         }
 
-
+        [TODO("Termianar")]
         public static async Task<bool> Dinamite
             (string pName, CancellationToken pCancellationToken = default)
         {
@@ -163,20 +164,19 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: El contenido del manifiesto como string, o null si falla. <br />En: The manifest content as a string, or null on failure.</returns>
-        public static string? GetStringManifestByName(string pName)
+        public static async Task<string?> GetStringManifestByName(string pName)
         {
             string? dir = Manager.Instances.GetPathFolder(pName);
             if (string.IsNullOrEmpty(dir))
                 return null;
 
-            return GetStringManifestByPath(dir);
+            return await GetStringManifestByPath(dir);
         }
 
         // TODO: Doc.
-        public static string? GetStringManifestByPath(string pPath)
+        public static async Task<string?> GetStringManifestByPath(string pPath)
         {
-            var mani = JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
-
+            ManifestInstance? mani = await GetManifestByPath(pPath);
             if (mani == null)
                 return null;
 
@@ -198,20 +198,22 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: Objeto del manifiesto o null. <br />En: Manifest object or null.</returns>
-        public static ManifestInstance? GetManifestByName(string pName)
+        public static async Task<ManifestInstance?> GetManifestByName(string pName)
         {
             string? dir = Manager.Instances.GetPathFolder(pName);
-            if (dir is null)
+            if (string.IsNullOrEmpty(dir))
                 return null;
 
-            return GetManifestByPath(dir);
+            return await GetManifestByPath(dir);
         }
 
         // TODO: Doc.
-        [TODO("Lockear por pPath entrante")]
-        public static ManifestInstance? GetManifestByPath(string pPath)
+        public static async Task<ManifestInstance?> GetManifestByPath(string pPath)
         {
-            return JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
+            using (await _instanceLocks.LockAsync(pPath))
+            {
+                return JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
+            }
         }
              
         
@@ -270,7 +272,7 @@ public static partial class Manager
         // TODO: Doc.
         public static string? GetPathFolder(string pName)
         {
-            var ins = Manager.Index.GetInstance(pName);
+            ReferenceInstance? ins = Manager.Index.GetInstance(pName);
             if (ins is null)
                 return null;
 
@@ -419,7 +421,7 @@ public static partial class Manager
             if (!Directory.Exists(pTarjetPath))
                 Directory.CreateDirectory(pTarjetPath);
 
-            using (await _instanceLocks.LockAsync(pPathPlugin))
+            using (await _instanceLocks.LockAsync(pTarjetPath))
             {
                 if (pCancellationToken.IsCancellationRequested)
                     return null;
