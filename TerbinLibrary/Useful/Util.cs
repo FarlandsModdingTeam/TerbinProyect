@@ -176,6 +176,12 @@ public static class Util
         if (pMethod.Length <= 0)
             throw new OverflowException($"¡No Action send!");
 
+        return CreateProgessBarr(pCommunicator, pIdRequest, new IdArray(pMethod), pAction);
+    }
+
+    public static IProgress<TerbinInfoProgrss> CreateProgessBarr(
+        TerbinCommunicator pCommunicator, ushort pIdRequest, IdArray pMethod, Action<TerbinInfoProgrss>? pAction = default)
+    {
         byte[] id = Serialineitor.Serialize(pIdRequest);
         return new Progress<TerbinInfoProgrss>(p =>
         {
@@ -184,16 +190,6 @@ public static class Util
             _ = pCommunicator.Send(new IdArray((byte)CodeTerbinProtocol.Prolong), id);
         });
     }
-
-
-
-
-
-
-
-
-
-
 
 
 
