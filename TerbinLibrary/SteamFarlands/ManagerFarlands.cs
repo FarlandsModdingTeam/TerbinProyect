@@ -90,7 +90,24 @@ public static class ManagerFarlands
 
     public static string GetVersion()
     {
-        return "0.0.9";
+        var ruteFarlands = GetRuteSteamFarlands();
+        if (ruteFarlands == null)
+            return string.Empty;
+
+        var farlandsExePath = Path.Combine(ruteFarlands, FARLANDS_EXE);
+
+        if (!File.Exists(farlandsExePath))
+            return string.Empty;
+
+        try
+        {
+            var fileInfo = FileVersionInfo.GetVersionInfo(farlandsExePath);
+            return fileInfo.FileVersion ?? fileInfo.ProductVersion ?? "0.0.0";
+        }
+        catch
+        {
+            return string.Empty;
+        }
     }
 
 
