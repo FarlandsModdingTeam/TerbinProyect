@@ -5,7 +5,7 @@ using TerbinLibrary.Communication;
 
 namespace TerbinLibrary;
 
-public struct AmongInfoThreads
+public struct InfoLocalThreads
 {
     public TerbinCommunicator Communicator;
     // Lo que se valla necesitando.

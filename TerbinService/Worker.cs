@@ -26,7 +26,7 @@ public class Worker : BackgroundService
     public static CancellationTokenSource? Cts;
     private static IHostApplicationLifetime? _appLifetime;
 
-    public static AsyncLocal<AmongInfoThreads> CurrentContext = new AsyncLocal<AmongInfoThreads>();
+    public static AsyncLocal<InfoLocalThreads> CurrentContext = new AsyncLocal<InfoLocalThreads>();
 
     public Worker(ILogger<Worker> pLogger, IHostApplicationLifetime pAppLifetime)
     {
@@ -64,7 +64,7 @@ public class Worker : BackgroundService
             communicator.OnRecive += async (pCapsule) =>
             {
                 Console.Log($"Packet: {pCapsule}");
-                CurrentContext.Value = new AmongInfoThreads
+                CurrentContext.Value = new InfoLocalThreads
                 {
                     Communicator = communicator,
                 };

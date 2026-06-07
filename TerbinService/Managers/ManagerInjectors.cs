@@ -83,7 +83,7 @@ public partial class Manager
                     throw new Exception($"TODO: informar de {error}");
 
                     // Prototipo del funcionamiento de Info
-                    AmongInfoThreads info = Worker.CurrentContext.Value;
+                    InfoLocalThreads info = Worker.CurrentContext.Value;
                     byte[] pld = new Serialineitor()
                         .Add(TypeService.Service)
                         .Add(CodeServices.Dowload)
