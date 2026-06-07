@@ -62,6 +62,9 @@ internal static class ServiceConfiguration
     [TerbinExecutable((byte)CodeServices.Read, (byte)CodeServicesSection.Rute)]
     public static async Task<InfoResponse?> ReadRute(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
         byte[] pld;
         string keyRute = new(Serialineitor.DeserializeArray<char>(ref pParameters));
         CodeStatus status;
