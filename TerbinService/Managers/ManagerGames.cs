@@ -83,10 +83,12 @@ public static partial class Manager
         public static async Task<Status> CloneInInstance
             (string pPathDir, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
         {
-            string pathInstace = Instances.GetPathFolder(pNameInstance);
-
-            if (!Manager.Instances.IsInstance(pathInstace))
+            string? pathInstace = Instances.GetPathFolder(pNameInstance);
+            if (string.IsNullOrEmpty(pathInstace))
                 return Status.ErrorNotIsInstance;
+
+            // if (!Manager.Instances.IsInstance(pathInstace))
+            //     return Status.ErrorNotIsInstance;
 
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;

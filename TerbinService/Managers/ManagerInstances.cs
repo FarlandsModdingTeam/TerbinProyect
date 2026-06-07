@@ -177,6 +177,18 @@ public static partial class Manager
             return File.Exists(manifest);
         }
 
+        // TODO: Documentacion.
+        public static bool ThereGame(string pName)
+        {
+            string? path = Manager.Instances.GetPathFolder(pName);
+            if (string.IsNullOrEmpty(path))
+                return false;
+
+            var hand = Manager.Manifest.GetHandwritten(path);
+            return !(hand is null);
+        }
+
+
         // TODO: Doc Actualizar.
         /// <summary>
         /// ___________________( Español )___________________<br />
