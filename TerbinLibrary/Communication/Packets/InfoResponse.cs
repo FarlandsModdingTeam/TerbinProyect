@@ -95,6 +95,16 @@ public struct InfoResponse //: IInfo
     }
 
 
+    public static InfoResponse Create(ushort pIdRequest, CodeStatus pStatus, params byte[] pPLD)
+    {
+        return new InfoResponse
+        {
+            IdRequest = pIdRequest,
+            Status = pStatus,
+            Payload = pPLD,
+        };
+    }
+
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Crea velozmente un mensaje de respuesta para cuando ocurre un error interno en el Worker.<br />
