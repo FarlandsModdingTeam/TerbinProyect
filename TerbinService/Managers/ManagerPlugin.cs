@@ -72,7 +72,7 @@ public static partial class Manager
         /// <returns>Es: El estado de la operación de descarga.<br />En: The status of the download operation.</returns>
         public static async Task<Status> HandleDowloadPlugin(string pUrl, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
         {
-            var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
+            var progress = Util.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest, pMethod: pMethod);
 
             return await DowloadOne(pUrl, progress, pCancellationToken);
         }
@@ -167,7 +167,7 @@ public static partial class Manager
         /// <returns>Es: Estado resultante de la operación.<br />En: Resulting status of the operation.</returns>
         public static async Task<Status> HandleInstallPlugin(string pPlugin, string pInstance, string pTarjetPath, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
         {
-            var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
+            var progress = Util.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest, pMethod: pMethod);
 
             return await InstallOne(pPlugin, pInstance, pTarjetPath, progress, pCancellationToken);
         }
@@ -260,7 +260,7 @@ public static partial class Manager
         public static async Task<Status> HandleUnistallOne
             (string pPlugin, string pNameInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
         {
-            var progress = Util.CreateProgessBarr(Worker.CurrentConst.Value.Communicator, pIdRequest, pMethod: pMethod);
+            var progress = Util.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest, pMethod: pMethod);
 
             return await UnistallOne(pPlugin, pNameInstance, progress, pCancellationToken);
         }

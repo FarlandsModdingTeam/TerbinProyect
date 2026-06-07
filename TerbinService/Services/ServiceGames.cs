@@ -31,7 +31,7 @@ internal static class ServiceGames
         if (sizes.maxFiles == null || sizes.maxDir == null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
 
-        var rId = await Worker.CurrentConst.Value.Communicator.SoliciteRequestMemory();
+        var rId = await Worker.CurrentContext.Value.Communicator.SoliciteRequestMemory();
         if (rId.Head.Status != CodeStatus.Succes)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         byte id = rId.Payload[0];
@@ -65,7 +65,7 @@ internal static class ServiceGames
         if (sizes.maxFiles == null || sizes.maxDir == null)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
 
-        var rId = await Worker.CurrentConst.Value.Communicator.SoliciteRequestMemory();
+        var rId = await Worker.CurrentContext.Value.Communicator.SoliciteRequestMemory();
         if (rId.Head.Status != CodeStatus.Succes)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         byte id = rId.Payload[0];

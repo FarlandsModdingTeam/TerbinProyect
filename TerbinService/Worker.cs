@@ -26,8 +26,7 @@ public class Worker : BackgroundService
     public static CancellationTokenSource? Cts;
     private static IHostApplicationLifetime? _appLifetime;
 
-    // TODO: Este es el mismo objeto para todos los hilos, es el mismo Communicator para todos los clientes, Areglar.
-    public static AsyncLocal<AmongInfoThreads> CurrentConst = new AsyncLocal<AmongInfoThreads>();
+    public static AsyncLocal<AmongInfoThreads> CurrentContext = new AsyncLocal<AmongInfoThreads>();
 
     public Worker(ILogger<Worker> pLogger, IHostApplicationLifetime pAppLifetime)
     {
@@ -65,7 +64,7 @@ public class Worker : BackgroundService
             communicator.OnRecive += async (pCapsule) =>
             {
                 Console.Log($"Packet: {pCapsule}");
-                CurrentConst.Value = new AmongInfoThreads
+                CurrentContext.Value = new AmongInfoThreads
                 {
                     Communicator = communicator,
                 };

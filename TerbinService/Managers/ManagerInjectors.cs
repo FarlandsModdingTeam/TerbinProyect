@@ -65,7 +65,7 @@ public partial class Manager
             IProgress<TerbinInfoProgrss> progressBarr = new Progress<TerbinInfoProgrss>(p =>
             {
                 var Content = p.ToArray();
-                _ = Worker.CurrentConst.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
+                _ = Worker.CurrentContext.Value.Communicator.Load(TerbinProtocol.ORDER_SINGLE, pIdMemory, Content);
                 Console.Write($"\rDescargando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual ");
             });
             try
@@ -83,7 +83,7 @@ public partial class Manager
                     throw new Exception($"TODO: informar de {error}");
 
                     // Prototipo del funcionamiento de Info
-                    AmongInfoThreads info = Worker.CurrentConst.Value;
+                    AmongInfoThreads info = Worker.CurrentContext.Value;
                     byte[] pld = new Serialineitor()
                         .Add(TypeService.Service)
                         .Add(CodeServices.Dowload)

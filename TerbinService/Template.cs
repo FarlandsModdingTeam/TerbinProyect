@@ -39,7 +39,7 @@ internal partial class Template
         string dir = buffer.ReadArray<char>().CrString();
 
         // AmongInfoThreads.
-        AmongInfoThreads info = Worker.CurrentConst.Value;
+        AmongInfoThreads info = Worker.CurrentContext.Value;
 
         // Solicitar id memoria.
         var rIdB = await info.Communicator.SoliciteRequestMemory();
