@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
-using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 
@@ -163,6 +164,19 @@ public static class ProgressUtil
     {
         return (100.0d / pTotal);
     }
+
+
+
+    public static IProgress<TerbinInfoProgrss> CreateProgressAndSetMax
+        (TerbinCommunicator pCommunicator, IStructSerializable pMax, ushort pIdRequest, params byte[] pMethod)
+    {
+        IdArray idMax = new IdArray(pMethod, (byte)CodeServicesClient.SetMaxProgress);
+        IdArray idSet = new IdArray(pMethod, (byte)CodeServicesClient.SetBarProgress);
+
+        ProgressUtil.SendAndProlong(pCommunicator, pMax, pIdRequest, idMax);
+        return ProgressUtil.CreateProgessBarr(pCommunicator, pIdRequest, pMethod: idSet);
+    }
+
 
 
     /// <summary>

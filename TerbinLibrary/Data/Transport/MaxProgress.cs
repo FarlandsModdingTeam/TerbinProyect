@@ -23,6 +23,11 @@ public struct MaxProgress : IStructSerializable
 {
     public long Max;
 
+    public MaxProgress(long pMax)
+    {
+        this.Max = pMax;
+    }
+
     public int GetSize() => 8;
 
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
