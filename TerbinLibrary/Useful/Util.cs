@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
@@ -7,6 +8,17 @@ using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Useful;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: minuscula = es privada local.
+  empieza: "p"en minuscula = parametro entrante local.
+  empieza: mayuscula = publica.
+ -- Funciones:
+  empieza: mayusculas = publica.
+  empieza: minusculas = privada.
+ */
+
 
 /// <summary>
 /// ___________________( Español )___________________<br />
@@ -14,6 +26,7 @@ namespace TerbinLibrary.Useful;
 /// ___________________( English )___________________<br />
 /// Structure that stores progress information.<br />
 /// </summary>
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct TerbinInfoProgrss : IStructSerializable
 {
     public byte Percentage; // 0 => 100
