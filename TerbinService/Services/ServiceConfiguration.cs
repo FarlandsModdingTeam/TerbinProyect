@@ -45,6 +45,9 @@ internal static class ServiceConfiguration
         if (newRute == null)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+
         var result = Manager.Configuration.SetConfig(keyRute, newRute);
         pHead.Status = result switch
         {
@@ -61,6 +64,8 @@ internal static class ServiceConfiguration
     {
         byte[] pld;
         string keyRute = new(Serialineitor.DeserializeArray<char>(ref pParameters));
+        CodeStatus status;
+
         if (string.IsNullOrEmpty(keyRute))
         {
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
@@ -68,20 +73,15 @@ internal static class ServiceConfiguration
         if (Manager.Configuration.GetConfg(keyRute) is var rute && rute != null)
         {
             pld = Serialineitor.SerializeArray<char>(rute.ToCharArray());
-            pHead.Status = CodeStatus.Succes;
+            status = CodeStatus.Succes;
         }
         else
         {
             pld = [];
             // Farlands no esta instalado.
-            pHead.Status = CodeStatus.AccesNullOrNotExist;
+            status = CodeStatus.AccesNullOrNotExist;
         }
-        return new InfoResponse
-        {
-            IdRequest = pHead.IdRequest,
-            Status = pHead.Status,
-            Payload = pld
-        };
+        return InfoResponse.Create(pHead.IdRequest, status, pld);
     }
 
 }
