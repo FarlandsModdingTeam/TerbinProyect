@@ -96,8 +96,16 @@ public static partial class Manager
         public static async Task<Status> DowloadOne
             (string pUrl, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
+            if (pCancellationToken.IsCancellationRequested)
+                return Status.IsCancelled;
+
             if (await NetUtil.DownloadAny(pUrl, pProgress) is var r && r.status != StatusNetUtil.Succes)
-                return Status.ErrorOnDowload;
+                return r.status switch
+                {
+                    StatusNetUtil.NotSuchSpace => Status.NotSuchSpace,
+                    StatusNetUtil.InvalidURL => Status.InvalidURL,
+                    _ => Status.ErrorOnDowload,
+                };
 
             Guid? id = null;
             try
@@ -613,6 +621,10 @@ public static partial class Manager
             ErrorGetManifest = 11,
 
             ErrorOnSaveManifest = 12,
+
+            InvalidURL = 13,
+
+            NotSuchSpace = 14,
         }
     }
 }
