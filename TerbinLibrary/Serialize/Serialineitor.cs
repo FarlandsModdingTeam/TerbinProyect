@@ -36,7 +36,7 @@ public interface IStructSerializable
     /// </summary>
     /// <returns>Es: Tamaño en bytes. <br />En: Size in bytes.</returns>
     [TODO("no tiene sentido que sea un ushort si un array es un tresCuartosInt")]
-    ushort GetSize();
+    int GetSize();
 
     /// <summary>
     /// ___________________( Español )___________________<br />

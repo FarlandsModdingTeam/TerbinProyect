@@ -33,8 +33,8 @@ public struct ReferenceInstanceSerilizable : IStructSerializable
     public bool? OutSide;
     public string? Path;
 
-    public ushort GetSize() =>
-        (ushort)(((Name?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY + ((Path?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY + 1);
+    public int GetSize() =>
+        ((Name?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY + ((Path?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY + 1;
 
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
     {

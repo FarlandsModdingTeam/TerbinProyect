@@ -119,7 +119,7 @@ public struct PacketRequest : IStructSerializable
     /// Gets the size in bytes this structure will occupy when serialized.<br />
     /// </summary>
     /// <returns>Es: Cantidad total de bytes. <br />En: Total amount of bytes.</returns>
-    public readonly ushort GetSize() => (ushort)(8 + TerbinProtocol.LENGTH_ARRAY + (Payload?.Length ?? 0) + ActionMethod.GetSize());
+    public readonly int GetSize() => 8 + TerbinProtocol.LENGTH_ARRAY + (Payload?.Length ?? 0) + ActionMethod.GetSize();
 
     /// <summary>
     /// ___________________( Español )___________________<br />

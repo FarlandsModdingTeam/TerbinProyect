@@ -230,7 +230,7 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
     /// ___________________( English )___________________<br />
     /// Gets the size required (in bytes) to serialize the structure.<br />
     /// </summary>
-    public readonly ushort GetSize() => (ushort)((_actionMethod?.Length ?? 0) + 1);
+    public readonly int GetSize() => (_actionMethod?.Length ?? 0) + 1;
 
     //public readonly ushort GetSize()
     //{
