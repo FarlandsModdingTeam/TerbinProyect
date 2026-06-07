@@ -42,13 +42,6 @@ public static partial class Manager
             return (countFiles, countDir);
         }
 
-        [TODO("Clonar Juego En cualquier lado, Se deberia permitir tener una instancia separada del resto y donde te salga de los cataplines.")]
-        public static async Task CloneGame
-            (string pPathDir, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
-        {
-            throw new NotImplementedException();
-        }
-
 
         [TODO("Comprobar que no borre algo que no debe como .TerbinInstaceInformation")]
         public static async Task<Status> DinamiteDirectory

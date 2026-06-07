@@ -40,17 +40,16 @@ public struct ReferenceInstanceSerilizable : IStructSerializable
     {
         int offset = 0;
         Name = pBuffer.ReadArray<char>(ref offset).CrString();
-        OutSide = pBuffer.Read<bool>(ref offset);
+        OutSide = pBuffer.Read<sbyte>(ref offset).ToBoolUk();
         Path = pBuffer.ReadArray<char>(ref offset).CrString();
     }
 
-    [TODO("Solucionar que pueda pasar un dato incorrecto")]
     public void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
-        pBuffer.WriteArray<char>(ref offset, Name?.ToCharArray() ?? "null".ToCharArray());
-        pBuffer.Write<bool>(ref offset, OutSide ?? false); // TODO: Solucionar que pueda pasar un dato incorrecto.
-        pBuffer.WriteArray<char>(ref offset, Path?.ToCharArray() ?? "null".ToCharArray());
+        pBuffer.WriteArray<char>(ref offset, Name?.ToCharArray() ?? "".ToCharArray());
+        pBuffer.Write<sbyte>(ref offset, OutSide.ToSByte());
+        pBuffer.WriteArray<char>(ref offset, Path?.ToCharArray() ?? "".ToCharArray());
     }
 
 

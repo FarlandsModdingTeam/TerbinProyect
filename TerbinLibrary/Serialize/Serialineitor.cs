@@ -35,7 +35,6 @@ public interface IStructSerializable
     /// Gets the size of the structure in bytes.<br />
     /// </summary>
     /// <returns>Es: Tamaño en bytes. <br />En: Size in bytes.</returns>
-    [TODO("no tiene sentido que sea un ushort si un array es un tresCuartosInt")]
     int GetSize();
 
     /// <summary>

@@ -36,8 +36,7 @@ public static partial class Manager
     /// Notes: All physical operations are controlled by a lock or semaphore.<br />
     /// Tips: Avoid manually manipulating or moving files listed in the manifest.<br />
     /// </summary>
-    [TODO("Actualizar plugin")]
-    [TODO("Un TryGetVersion, A partir del nombre del archivo intentar detectar un patron de versionado.")]
+    [TODO("Actualizar plugin, ahunque ¿Que vas ah cambiar?")]
     public static class StoragePlugin
     {
         // TerbinConfiguration
