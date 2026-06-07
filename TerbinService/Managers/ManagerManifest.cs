@@ -88,7 +88,9 @@ public static partial class Manager
         /// <returns>Es: Verdadero si se encuentra la información y se actualiza. <br />En: True if information is found and updated.</returns>
         public static bool UpdateInstace(string pName, string pPathInstance, Action<ManifestInstance> updateAction)
         {
-            string pathInformation = Manager.Instances.MakePathFolderInformationByName(pName);
+            string? pathInformation = Manager.Instances.GetPathFolderInformationByName(pName);
+            if (string.IsNullOrEmpty(pathInformation))
+                return false;
 
             JSonUtil.UpdateDirect<ManifestInstance>(pathInformation, TerbinServiceConst.MANIFEST_INSTANCE, updateAction);
             return true;
