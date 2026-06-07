@@ -19,11 +19,11 @@ namespace TerbinLibrary.Data.Transport;
 
 
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
-public struct MaxProgress : IStructSerializable
+public struct MaxProgressDTO : IStructSerializable
 {
     public long Max;
 
-    public MaxProgress(long pMax)
+    public MaxProgressDTO(long pMax)
     {
         this.Max = pMax;
     }

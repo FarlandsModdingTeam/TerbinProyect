@@ -63,8 +63,8 @@ internal static class ServiceInstances
         s.Add<ThreeQuartersInt>(instances.Count);
         for (int i = 0; i < instances.Count; i++)
         {
-            ReferenceInstanceSerilizable tmp = (ReferenceInstanceSerilizable)instances[i];
-            s.AddStruct<ReferenceInstanceSerilizable>(tmp);
+            ReferenceInstanceDTO tmp = (ReferenceInstanceDTO)instances[i];
+            s.AddStruct<ReferenceInstanceDTO>(tmp);
         }
 
         return InfoResponse.CreateSucces(pHead.IdRequest, s.Serialize());

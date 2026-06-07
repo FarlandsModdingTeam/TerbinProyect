@@ -50,7 +50,7 @@ internal static class ServicePlugins
 
         if (useProgress)
         {
-            MaxProgress max = new(sizePlugin.Value);
+            MaxProgressDTO max = new(sizePlugin.Value);
             progress = ProgressUtil.CreateProgressAndSetMax
                 (Worker.CurrentContext.Value.Communicator, max, pHead.IdRequest, (byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin);
         }
@@ -98,7 +98,7 @@ internal static class ServicePlugins
 
         if (useProgress)
         {
-            MaxProgress max = new(await Manager.StoragePlugin.GetSize(idPlugin));
+            MaxProgressDTO max = new(await Manager.StoragePlugin.GetSize(idPlugin));
             progress = ProgressUtil.CreateProgressAndSetMax
                 (Worker.CurrentContext.Value.Communicator, max, pHead.IdRequest, (byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin);
         }
