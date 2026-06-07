@@ -96,7 +96,7 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            var (status, json) = await NodeUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss, pCancellationToken: CancellationToken.None);
+            var (status, json) = await NodeUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss, pCancellationToken);
             if (status != StatusNodeUtil.Succes)
                 return Status.GenericError;
 
