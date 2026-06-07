@@ -297,6 +297,15 @@ public static partial class Manager
             return dir;
         }
 
+        // TODO: Doc.
+        public static string? GetPathFolderInformationByName(string pName)
+        {
+            string? path = GetPathFolder(pName);
+            if (string.IsNullOrEmpty(path))
+                return null;
+
+            return MakePathFolderInformationByPath(path);
+        }
 
         // TODO: Doc.
         public static string? GetPathFolder(string pName)
