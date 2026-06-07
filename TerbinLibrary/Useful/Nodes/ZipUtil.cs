@@ -173,4 +173,12 @@ public class ZipUtil
 
         return handwritten;
     }
+
+    public static long GetSize(string pSourceZipPath)
+    {
+        if (File.Exists(pSourceZipPath))
+            return new FileInfo(pSourceZipPath).Length;
+        else
+            return long.MinValue;
+    }
 }
