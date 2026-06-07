@@ -89,6 +89,7 @@ public static partial class Manager
                 Name = namePlugin,
                 Id = $"{id:N}",
                 FileName = nameFile,
+                Version = PluginUtil.ExtratVersion(nameFile),
             };
 
             if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null; 
