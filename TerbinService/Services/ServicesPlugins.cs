@@ -1,18 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Execution;
-using TerbinLibrary.Serialize;
 using TerbinLibrary.Extension;
-using TerbinService.Managers;
-using TerbinLibrary.TerbinServiceHelper;
-using TerbinLibrary.TerbinServiceHelper.Exceptions;
-using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.NetWork;
+using TerbinService.Managers;
 
 namespace TerbinService.Services;
 /*
@@ -29,88 +32,95 @@ namespace TerbinService.Services;
 
 internal static class ServicesPlugins
 {
-    [TerbinExecutable((byte)CodeServices.Install, (byte)CodeSubServices.Plugin)]
-    public static async Task<InfoResponse?> InstallPlugin(Header pHead, byte[] pParameters, CancellationToken pToken)
-    {
-        if (pParameters.Length <= 0)
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
-
-        AmongInfoThreads info = Worker.CurrentConst.Value;
-
-        ReadOnlySpan<byte> reader = pParameters;
-        string name = reader.ReadArray<char>().CrString();
-        string urlPlugin = reader.ReadArray<char>().CrString();
-        bool requierBepInEx = reader.Read<bool>();
-
-        string? pathInstance;
-        string pathPlugin;
-        pathInstance = Manager.Instances.MakePathFolder(name);
-        if (pathInstance is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExist));
-        if (requierBepInEx)
-        {
-            if (!Manager.BepInEx.CheckInstallBepInEx(pathInstance))
-                return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.BepInExNotInstall));
-            //pathPlugin = MakePathPluginByInstance(pathInstance);
-            pathPlugin = Manager.BepInEx.GetBepInExFolderPlugin(pathInstance);
-        }
-        else
-        {
-            pathPlugin = pathInstance;
-        }
-
-
-        long? sizePlugin = await NetUtil.GetContentLength(urlPlugin);
-        if (sizePlugin is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.PluginNotConect));
-
-        // Solicitar id de memoria.
-        var rId = await info.Communicator.SoliciteRequestMemory();
-        if (rId.Head.Status != CodeStatus.Succes)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
-        byte memoryDownload = rId.Payload[0];
-
-        rId = await info.Communicator.SoliciteRequestMemory();
-        if (rId.Head.Status != CodeStatus.Succes)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
-        byte memoryExtract = rId.Payload[0];
-
-        //_ = Manager.Plugin.HandleInstallPluginWithProgress(name, memoryDownload, memoryExtract, pathPlugin, urlPlugin);
-        throw new Exception("Manager.Plugin.HandleInstallPluginWithProgress no ejecutable");
-
-        return new InfoResponse
-        {
-            IdRequest = pHead.IdRequest,
-            Status = CodeStatus.Succes,
-            Payload = new Serialineitor()
-                        .Add(memoryDownload)
-                        .Add(memoryExtract)
-                        .Add(sizePlugin.Value)
-                        .Serialize(),
-        };
-    }
-
-
-    [TerbinExecutable((byte)CodeServices.Dowload, (byte)CodeSubServices.Plugin)]
+    [TerbinExecutable((byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin)]
     public static async Task<InfoResponse?> DowloadPlugin(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
-        AmongInfoThreads info = Worker.CurrentConst.Value;
-
         ReadOnlySpan<byte> reader = pParameters;
         string urlPlugin = reader.ReadArray<char>().CrString();
-        bool requierBepInEx = reader.Read<bool>();
+        bool useProgress = (reader.Length >= 1) && reader.Read<bool>();
 
+        IProgress<TerbinInfoProgrss>? progress = null;
 
-        return new InfoResponse
+        long? sizePlugin = await NetUtil.GetContentLength(urlPlugin, pCancellationToken: CancellationToken.None);
+        if (sizePlugin is null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.PluginNotConect));
+
+        if (useProgress)
         {
-            IdRequest = pHead.IdRequest,
-            Status = CodeStatus.Succes,
-            Payload = new Serialineitor()
-                        .Add('a')
-                        .Serialize(),
-        };
+            MaxProgress max = new(sizePlugin.Value);
+            progress = ProgressUtil.CreateProgressAndSetMax
+                (Worker.CurrentContext.Value.Communicator, max, pHead.IdRequest, (byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin);
+        }
+
+        var r = await Manager.Plugin.DowloadOne(urlPlugin, progress, pToken);
+
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+        if (r != Manager.Plugin.Status.Succes)
+        {
+            var error = TSHelper.GetError(r switch
+            {
+                Manager.Plugin.Status.NotSuchSpace => CodeInternalErrors.PluginNotSuchSpace,
+                Manager.Plugin.Status.InvalidURL => CodeInternalErrors.PluginInvalidURL,
+                _ => CodeInternalErrors.PluginOnDowload,
+            });
+            return InfoResponse.CreateInteralError(pHead.IdRequest, error);
+        }
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
+    }
+
+
+    [TerbinExecutable((byte)CodeServices.Install, (byte)CodeServicesSection.Plugin)]
+    public static async Task<InfoResponse?> InstallPlugin(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        ReadOnlySpan<byte> reader = pParameters;
+        string name = reader.ReadArray<char>().CrString();
+        string idPlugin = reader.ReadArray<char>().CrString();
+        string relativePath = reader.ReadArray<char>().CrString();
+        bool useProgress = (reader.Length >= 1) && reader.Read<bool>();
+
+        string? pathPlugin;
+        string? pathInstance;
+        IProgress<TerbinInfoProgrss>? progress = null;
+
+        pathInstance = Manager.Instances.GetPathFolder(name);
+        if (string.IsNullOrEmpty(pathInstance))
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExist));
+
+        pathPlugin = Path.Combine(pathInstance, relativePath);
+
+        if (useProgress)
+        {
+            MaxProgress max = new(await Manager.StoragePlugin.GetSize(idPlugin));
+            progress = ProgressUtil.CreateProgressAndSetMax
+                (Worker.CurrentContext.Value.Communicator, max, pHead.IdRequest, (byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin);
+        }
+
+        var r = await Manager.Plugin.InstallOne(idPlugin, name, pathPlugin, progress, pToken);
+
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+
+        if (r != Manager.Plugin.Status.Succes)
+        {
+            // ErrorGetPlugin, ErrorGetPathPlugin, ErrorGetManifest, ErrorOnSaveManifest, GenericError
+            var error = TSHelper.GetError(r switch
+            {
+                Manager.Plugin.Status.ErrorGetPathPlugin => CodeInternalErrors.PluginGetPath,
+                Manager.Plugin.Status.ErrorGetManifest => CodeInternalErrors.PluginGetManifest,
+                Manager.Plugin.Status.ErrorOnSaveManifest => CodeInternalErrors.PluginOnSave,
+                _ => CodeInternalErrors.PluginNotExist,
+            });
+            return InfoResponse.CreateInteralError(pHead.IdRequest, error);
+        }
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 }

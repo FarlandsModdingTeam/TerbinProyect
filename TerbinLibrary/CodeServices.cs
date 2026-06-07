@@ -110,6 +110,11 @@ public enum CodeInternalErrors : ushort
     PluginOnDowload = 202,
     PluginNotSuchSpace = 203,
     PluginInvalidURL = 204,
+    PluginNotExist = 205,
+    PluginGet = 206,
+    PluginGetPath = 207,
+    PluginOnSave = 208,
+    PluginGetManifest = 209,
 
     // Instances = 300,
     InstaceGetSizeError = 301,
