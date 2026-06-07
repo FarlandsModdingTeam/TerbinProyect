@@ -107,6 +107,9 @@ public enum CodeInternalErrors : ushort
 
     // Mods = 200,
     PluginNotConect = 201,
+    PluginOnDowload = 202,
+    PluginNotSuchSpace = 203,
+    PluginInvalidURL = 204,
 
     // Instances = 300,
     InstaceGetSizeError = 301,
