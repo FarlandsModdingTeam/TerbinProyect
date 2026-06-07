@@ -54,6 +54,21 @@ public interface IStructSerializable
     /// </summary>
     /// <param name="pBuffer">Es: El búfer de origen de solo lectura. <br />En: The read-only source buffer.</param>
     void ReadFrom(ReadOnlySpan<byte> pBuffer);
+
+
+    byte[] Read()
+    {
+        Span<byte> buffer = new byte[this.GetSize()];
+        this.WriteTo(buffer);
+        return buffer.ToArray();
+    }
+
+
+    void Write(byte[] pArray)
+    {
+        ReadOnlySpan<byte> buffer = pArray;
+        this.ReadFrom(buffer);
+    }
 }
 
 

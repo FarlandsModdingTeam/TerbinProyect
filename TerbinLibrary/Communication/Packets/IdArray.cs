@@ -437,7 +437,7 @@ public struct IdArray : IStructSerializable, ICollection, ICollection<byte>, IEn
         //    else
         //        isLockedByOther = true;
         //}
-        return $"(Action: [{Util.DebugTerbinLibrary.ArrayToString(_actionMethod)}])";
+        return $"(Action: [{ProgressUtil.DebugTerbinLibrary.ArrayToString(_actionMethod)}])";
     }
 
     /// <summary>

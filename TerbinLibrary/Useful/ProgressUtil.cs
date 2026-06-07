@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
+using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Protocol;
@@ -66,6 +66,7 @@ public struct TerbinInfoProgrss : IStructSerializable
 
     public void WriteTo(Span<byte> pBuffer)
     {
+        // A dios Rezo.
         pBuffer = Serialize();
     }
 
@@ -84,7 +85,7 @@ public struct TerbinInfoProgrss : IStructSerializable
 /// ___________________( English )___________________<br />
 /// Static class that provides various system support utilities.<br />
 /// </summary>
-public static class Util
+public static class ProgressUtil
 {
     /// <summary>
     /// ___________________( Español )___________________<br />
@@ -214,13 +215,19 @@ public static class Util
         return new Progress<TerbinInfoProgrss>(p =>
         {
             pAction?.Invoke(p);
-            _ = pCommunicator.Send(new IdArray(pMethod), p.Serialize());
+            _ = pCommunicator.Send(pMethod, p.Serialize());
             _ = pCommunicator.Send(new IdArray((byte)CodeTerbinProtocol.Prolong), id);
         });
     }
 
 
+    public static void SendMax(TerbinCommunicator pCommunicator, MaxProgress pMax, ushort pIdRequest, IdArray pMethod)
+    {
 
+        byte[] id = Serialineitor.Serialize(pIdRequest);
+        _ = pCommunicator.Send(pMethod, pMax.;
+        _ = pCommunicator.Send(new IdArray((byte)CodeTerbinProtocol.Prolong), id);
+    }
 
 
 

@@ -57,7 +57,7 @@ public static partial class Manager
         public static async Task<Status> HandleCloneInInstance
             (string pPathDir, string pNameInstance, ushort pIdRequest, bool pOverwrite, CancellationToken pCancellationToken = default)
         {
-            var progress = Util.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest);
+            var progress = ProgressUtil.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest);
 
             return await CloneInInstance(pPathDir, pNameInstance, pOverwrite, progress, pCancellationToken);
         }
@@ -146,7 +146,7 @@ public static partial class Manager
         public static async Task<Status> HandleRemoveInInstance
             (string pNameInstance, ushort pIdRequest, CancellationToken pCancellationToken = default)
         {
-            var progress = Util.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest);
+            var progress = ProgressUtil.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest);
 
             return await RemoveInInstance(pNameInstance, progress, pCancellationToken);
         }

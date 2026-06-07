@@ -272,7 +272,7 @@ public static class NetUtil
         int read;
         bool last = false;
 
-        double? totalInverse = Util.GetInverse(pTotal);
+        double? totalInverse = ProgressUtil.GetInverse(pTotal);
         int lastPercentage = -1;
         while ((read = await pSource.ReadAsync(
                    buffer.AsMemory(0, buffer.Length),
@@ -286,7 +286,7 @@ public static class NetUtil
 
             last = (pTotal.HasValue) ? (currentRead >= pTotal.Value) : false;
 
-            Util.TryReportProgressPercent(currentRead, totalInverse, pProgress, last, ref lastPercentage);
+            ProgressUtil.TryReportProgressPercent(currentRead, totalInverse, pProgress, last, ref lastPercentage);
         }
     }
 

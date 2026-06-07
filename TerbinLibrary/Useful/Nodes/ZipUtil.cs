@@ -31,7 +31,7 @@ public class ZipUtil
         int currentEntry = 0;
         int previusly = -1;
 
-        double totalInverse = Util.GetInverse(totalEntries);
+        double totalInverse = ProgressUtil.GetInverse(totalEntries);
 
         for (int i = 0; i < totalEntries; i++)
         {
@@ -65,10 +65,10 @@ public class ZipUtil
 
             currentEntry++;
 
-            Util.TryReportProgressPercent(currentEntry, totalInverse, pProgress, false, ref previusly);
+            ProgressUtil.TryReportProgressPercent(currentEntry, totalInverse, pProgress, false, ref previusly);
         }
 
-        Util.TryReportProgressPercent(currentEntry, totalInverse, pProgress, true, ref previusly);
+        ProgressUtil.TryReportProgressPercent(currentEntry, totalInverse, pProgress, true, ref previusly);
 
         return handwritten;
     }
@@ -119,7 +119,7 @@ public class ZipUtil
         long currentSize = 0;
         int previusly = -1;
 
-        double totalInverse = Util.GetInverse(totalSize);
+        double totalInverse = ProgressUtil.GetInverse(totalSize);
 
         for (int i = 0; i < totalEntries; i++)
         {
@@ -165,11 +165,11 @@ public class ZipUtil
             }
 
             currentSize += entry.Length;
-            Util.TryReportProgressPercent(currentSize, totalInverse, pProgress, false, ref previusly);
+            ProgressUtil.TryReportProgressPercent(currentSize, totalInverse, pProgress, false, ref previusly);
         }
 
         if (pProgress != null)
-            Util.ReportProgressPercent(100, currentSize, true, pProgress);
+            ProgressUtil.ReportProgressPercent(100, currentSize, true, pProgress);
 
         return handwritten;
     }

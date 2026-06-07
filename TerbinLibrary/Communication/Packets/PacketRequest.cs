@@ -256,7 +256,7 @@ public struct PacketRequest : IStructSerializable
     /// <returns>Es: Cadena textual que representa cada valor. <br />En: Text string depicting each value.</returns>
     public override string ToString()
     {
-        return $"(Head: {Head}, ActionMethod: {ActionMethod}, Payload: {Util.DebugTerbinLibrary.ArrayToString(Payload)})";
+        return $"(Head: {Head}, ActionMethod: {ActionMethod}, Payload: {ProgressUtil.DebugTerbinLibrary.ArrayToString(Payload)})";
     }
 }
 

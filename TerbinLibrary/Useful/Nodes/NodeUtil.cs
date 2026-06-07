@@ -85,7 +85,7 @@ public static class NodeUtil
         if (!Directory.Exists(pDestinationDir))
             Directory.CreateDirectory(pDestinationDir);
 
-        inverse = (pProgress != null) ? Util.GetInverse(allFiles.Count) : null;
+        inverse = (pProgress != null) ? ProgressUtil.GetInverse(allFiles.Count) : null;
         for (int i = 0; i < allFiles.Count; i++)
         {
             if (pCancellationToken.IsCancellationRequested)
@@ -104,12 +104,12 @@ public static class NodeUtil
 
             handwritten.Files.Add(rel);
 
-            Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
+            ProgressUtil.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         allDictories = GetAllDirectories(pSourceDir);
 
-        inverse = (pProgress != null) ? Util.GetInverse(allDictories.Count) : null;
+        inverse = (pProgress != null) ? ProgressUtil.GetInverse(allDictories.Count) : null;
         previus = -1;
 
         for (int i = 0; i < allDictories.Count; i++)
@@ -123,11 +123,11 @@ public static class NodeUtil
 
             handwritten.Directories.Add(rel);
 
-            Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
+            ProgressUtil.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         if (pProgress != null)
-            Util.ReportProgressPercent(100, previus, true, pProgress);
+            ProgressUtil.ReportProgressPercent(100, previus, true, pProgress);
 
         return (StatusNodeUtil.Succes, handwritten);
     }
@@ -170,7 +170,7 @@ public static class NodeUtil
         double? inverse;
         string? root = pHandwritten.Root;
 
-        inverse = (pProgress != null) ? Util.GetInverse(pHandwritten.Files.Count) : null;
+        inverse = (pProgress != null) ? ProgressUtil.GetInverse(pHandwritten.Files.Count) : null;
         for (int i = 0; i < pHandwritten.Files.Count; i++)
         {
             string file = pHandwritten.Files[i];
@@ -184,14 +184,14 @@ public static class NodeUtil
             if (File.Exists(destFile))
                 File.Delete(destFile);
 
-            Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
+            ProgressUtil.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         // Borrar directorios vacíos (de más profundos a más superficiales)
         // Al ordenar por longitud descendente, procesamos "A/B/C" antes que "A/B"
         var orderedDirectories = pHandwritten.Directories.OrderByDescending(d => d.Length).ToList();
 
-        inverse = (pProgress != null) ? Util.GetInverse(orderedDirectories.Count) : null;
+        inverse = (pProgress != null) ? ProgressUtil.GetInverse(orderedDirectories.Count) : null;
         for (int i = 0; i < orderedDirectories.Count; i++)
         {
             string dir = orderedDirectories[i];
@@ -207,11 +207,11 @@ public static class NodeUtil
                 if (!Directory.EnumerateFileSystemEntries(destSub).Any())
                     Directory.Delete(destSub, false); // NO borrado recursivo
             }
-            Util.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
+            ProgressUtil.TryReportProgressPercent(i + 1, inverse, pProgress, false, ref previus);
         }
 
         if (pProgress != null)
-            Util.ReportProgressPercent(100, previus, true, pProgress);
+            ProgressUtil.ReportProgressPercent(100, previus, true, pProgress);
 
         return StatusNodeUtil.Succes;
     }
