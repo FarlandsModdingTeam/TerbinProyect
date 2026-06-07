@@ -287,9 +287,11 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: El nombre de la instancia. <br />En: The name of the instance.</param>
         /// <returns>Es: Ruta del directorio raíz de la instancia creado/verificado. <br />En: Instance root directory path created/verified.</returns>
-        public static string CreatePathFolder(string pName)
+        public static string? CreatePathFolder(string pName)
         {
-            string dir = Manager.Instances.MakePathFolder(pName);
+            string? dir = Manager.Instances.GetPathFolder(pName);
+            if (string.IsNullOrEmpty(dir))
+                return null;
 
             if (!Directory.Exists(dir))
                 Directory.CreateDirectory(dir);
