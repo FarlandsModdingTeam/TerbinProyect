@@ -32,7 +32,7 @@ namespace TerbinService.Services;
 [TODO("Las instancias no deberia ser una ruta, deberias cambiar su posicion desde el propio servicio que se encarge de mover toda la carpeta.")]
 internal static class ServiceConfiguration
 {
-    [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Rute)]
+    //[TerbinExecutable((byte)CodeServices.Create, (byte)CodeServicesSection.Rute)]
     public static async Task<InfoResponse?> UpdateRute(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
@@ -56,7 +56,7 @@ internal static class ServiceConfiguration
         return InfoResponse.Create(pHead.IdRequest, pHead.Status);
     }
 
-    [TerbinExecutable((byte)TerbinCRUD.Read, (byte)CodeSubServices.Rute)]
+    [TerbinExecutable((byte)CodeServices.Read, (byte)CodeServicesSection.Rute)]
     public static async Task<InfoResponse?> ReadRute(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         byte[] pld;
