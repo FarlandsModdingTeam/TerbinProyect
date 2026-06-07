@@ -7,6 +7,7 @@ using TerbinLibrary.Data.Manifests;
 using TerbinLibrary.Data.References;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
+using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Managers;
 /*
@@ -37,6 +38,7 @@ public static partial class Manager
     /// Tips: Avoid manually manipulating or moving files listed in the manifest.<br />
     /// </summary>
     [TODO("Actualizar plugin, ahunque ¿Que vas ah cambiar?")]
+    [TODO("IndexStore en vez de ser una lista")]
     public static class StoragePlugin
     {
         // TerbinConfiguration
@@ -109,6 +111,7 @@ public static partial class Manager
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
             {
+                // ¿Tendria que ser el nameFile?
                 await operatePlugin(nameFile, (p, d) => { File.Delete(d); }).ConfigureAwait(false);
                 return null;
             }
@@ -140,6 +143,7 @@ public static partial class Manager
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
             {
+                // ¿Tendria que ser el nameFile?
                 await operatePlugin(nameFile, (p, d) => { File.Delete(d); }).ConfigureAwait(false);
                 return null;
             }
@@ -177,6 +181,19 @@ public static partial class Manager
                 return false;
             return true;
         }
+
+
+        public static async ValueTask<long> GetSize(string pId)
+        {
+            ReferencePluginStore? reference = await Get(pId).ConfigureAwait(false);
+            if (reference is null || reference.FileName is null)
+                return -1;
+
+            var path = Manager.StoragePlugin.MakePathPlugin(reference.FileName);
+
+            return ZipUtil.GetSize(path);
+        }
+
 
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -344,6 +361,7 @@ public static partial class Manager
         /// <param name="pFile">Es: Criterio final con nombre o extensión de fichero. <br />En: Match criteria with name or file extension.</param>
         /// <param name="pPath">Es: Ruta directa donde iterar. <br />En: Target direct iterating route.</param>
         /// <returns>Es: True si el buffer encuentra una o más devoluciones en el glob. <br />En: True if buffer returns one or more results from glob.</returns>
+        [TODO("Puede no ser async")]
         public static async Task<bool> ExistByFile(string pFile, string pPath)
         {
             string[] r = Directory.GetFiles(pPath, pFile);
@@ -362,6 +380,7 @@ public static partial class Manager
         /// </summary>
         /// <param name="pId">Es: El valor Id guardado en el archivo base. <br />En: Saved Id value in the base string.</param>
         /// <returns>Es: True si la lista expone positivamente tu Key. <br />En: True if list safely exposes your Key.</returns>
+        [TODO("Puede no ser async")]
         public static async Task<bool> Exists(string pId)
         {
             var references = await GetAll().ConfigureAwait(false);
@@ -387,6 +406,7 @@ public static partial class Manager
         /// </summary>
         /// <param name="pId">Es: Referencia clave exacta Guid a consultar. <br />En: Precise referential Guid to fetch.</param>
         /// <returns>Es: Objeto mapeado del plugin completo en base de datos. <br />En: Database fully mapped plugin entity.</returns>
+        [TODO("Puede no ser async")]
         public static async Task<ReferencePluginStore?> Get(string pId)
         {
             var references = await GetAll().ConfigureAwait(false);
@@ -411,6 +431,7 @@ public static partial class Manager
         /// Tips: Buffer it or map via background queues to drop runtime hitches.<br />
         /// </summary>
         /// <returns>Es: Una Lista completa mapeada que ilustra el inventario del store. <br />En: Complete mapped listing that paints the warehouse inventory.</returns>
+        [TODO("Puede no ser async")]
         public static async Task<List<ReferencePluginStore>?> GetAll()
         {
             var man = await getManifest().ConfigureAwait(false);
@@ -429,6 +450,7 @@ public static partial class Manager
         /// Tips: Enclose this within read boundary rules, logic changes belong to update JSON tools only.<br />
         /// </summary>
         /// <returns>Es: Objeto manifiesto cargado al ecosistema actual asincrono. <br />En: Loaded manifest object to asynchronous layer core.</returns>
+        [TODO("Puede no ser async")]
         private static async ValueTask<ManifestStorage?> getManifest()
         {
             string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
@@ -452,10 +474,11 @@ public static partial class Manager
         /// </summary>
         /// <param name="pName">Es: Entrada nombre final de tu extensión. <br />En: Your final input extension label.</param>
         /// <returns>Es: Salida mapeada C://Ruta//Almacen... o null si falta configuración matriz. <br />En: Built local C://Path... result missing core setup nullish flag.</returns>
-        public static string? MakePathPlugin(string pName)
+        public static string MakePathPlugin(string pName)
         {
             string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (string.IsNullOrEmpty(path)) return null;
+            if (string.IsNullOrEmpty(path))
+                throw new Exception($"The key TerbinConfiguration.RUTE_STORAGE_PLUGINS is not defined: ({TerbinConfiguration.RUTE_STORAGE_PLUGINS})");
 
             return Path.Combine(path, pName);
         }
