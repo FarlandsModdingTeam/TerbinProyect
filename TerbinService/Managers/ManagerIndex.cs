@@ -122,6 +122,7 @@ public partial class Manager
             Manager.Index.GetIndex().Instances ?? new();
         
 
+        // TODO: Actualizar Doc.
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Obtiene la lista de instancias registradas en el índice.<br />
