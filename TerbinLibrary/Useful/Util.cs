@@ -14,7 +14,7 @@ namespace TerbinLibrary.Useful;
 /// ___________________( English )___________________<br />
 /// Structure that stores progress information.<br />
 /// </summary>
-public struct TerbinInfoProgrss
+public struct TerbinInfoProgrss : IStructSerializable
 {
     public byte Percentage; // 0 => 100
     public long Current;
@@ -47,6 +47,21 @@ public struct TerbinInfoProgrss
             .Add(Finish)
             .Serialize();
         return array;
+    }
+
+    public readonly int GetSize() => 10;
+
+    public void WriteTo(Span<byte> pBuffer)
+    {
+        pBuffer = Serialize();
+    }
+
+    public void ReadFrom(ReadOnlySpan<byte> pBuffer)
+    {
+        int offset = 0;
+        Percentage = pBuffer.Read<byte>(ref offset);
+        Current = pBuffer.Read<long>(ref offset);
+        Finish = pBuffer.Read<bool>(ref offset);
     }
 }
 
