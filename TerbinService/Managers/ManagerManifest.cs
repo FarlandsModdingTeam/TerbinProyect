@@ -67,13 +67,13 @@ public static partial class Manager
         /// <param name="pName">Es: Nombre de la instancia. <br />En: Name of the instance.</param>
         /// <param name="updateAction">Es: Acción a realizar sobre el manifiesto. <br />En: Action to perform on the manifest.</param>
         /// <returns>Es: Verdadero si la ruta es válida y se puede actualizar. <br />En: True if the path is valid and can be updated.</returns>
-        public static bool UpdateInstace(string pName, Action<ManifestInstance> updateAction)
+        public static bool UpdateInstaceByName(string pName, Action<ManifestInstance> updateAction)
         {
-            var pathInstance = Manager.Instances.MakePathFolder(pName);
+            var pathInstance = Manager.Instances.GetPathFolder(pName);
             if (pathInstance == null)
                 return false;
 
-            return UpdateInstace(pName, pathInstance, updateAction);
+            return UpdateInstaceByPath(pathInstance, updateAction);
         }
 
         /// <summary>
@@ -86,9 +86,9 @@ public static partial class Manager
         /// <param name="pPathInstance">Es: Ruta directa a la instancia. <br />En: Direct path to the instance.</param>
         /// <param name="updateAction">Es: Acción a realizar sobre el manifiesto. <br />En: Action to perform on the manifest.</param>
         /// <returns>Es: Verdadero si se encuentra la información y se actualiza. <br />En: True if information is found and updated.</returns>
-        public static bool UpdateInstace(string pName, string pPathInstance, Action<ManifestInstance> updateAction)
+        public static bool UpdateInstaceByPath(string pPathInstance, Action<ManifestInstance> updateAction)
         {
-            string? pathInformation = Manager.Instances.GetPathFolderInformationByName(pName);
+            string? pathInformation = Manager.Instances.MakePathFolderInformationByPath(pPathInstance);
             if (string.IsNullOrEmpty(pathInformation))
                 return false;
 
@@ -159,7 +159,7 @@ public static partial class Manager
                 Path = pathRelativeManifest,
             };
 
-            Manager.Manifest.UpdateInstace(pNameInstace, m => { m.Plugins.Add(reference); });
+            Manager.Manifest.UpdateInstaceByName(pNameInstace, m => { m.Plugins.Add(reference); });
             return (Status.Succes, local);
         }
         
@@ -180,7 +180,7 @@ public static partial class Manager
 
             ReferencePlugin? reference = null;
 
-            Manager.Manifest.UpdateInstace(pNameInstace, m =>
+            Manager.Manifest.UpdateInstaceByName(pNameInstace, m =>
             {
                 reference = m.Plugins.FirstOrDefault(p => p.IdLocal == pIdLocal);
                 if (reference != null)
