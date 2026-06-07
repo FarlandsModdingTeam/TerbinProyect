@@ -126,7 +126,9 @@ public static partial class Manager
         /// <returns>Es: El resultado de la operación (ej. Éxito, Error al obtener manifiesto). <br />En: The result of the operation (e.g., Success, Error getting manifest).</returns>
         public static (Status status, string local) HandleAddPlugin(string pGuid, string pNamePlugin, string pNameInstace, bool pOutSideIntence, DirectoryHandwritten? pHandwritten)
         {
-            string information = Manager.Instances.MakePathFolderInformationByName(pNameInstace);
+            string? information = Manager.Instances.GetPathFolderInformationByName(pNameInstace);
+            if (string.IsNullOrEmpty(information))
+                return (Status.ErrorInstanceNotExist, "");
 
             string local = $"{Guid.NewGuid:N}";
             string name = pNamePlugin;
@@ -170,7 +172,9 @@ public static partial class Manager
         /// <returns>Es: El estado de la eliminación. <br />En: The status of the removal.</returns>
         public static Status HandleRemovePlugin(string pIdLocal, string pNameInstace)
         {
-            string information = Manager.Instances.MakePathFolderInformationByName(pNameInstace);
+            string? information = Manager.Instances.GetPathFolderInformationByName(pNameInstace);
+            if (string.IsNullOrEmpty(information))
+                return Status.ErrorInstanceNotExist;
 
             ReferencePlugin? reference = null;
 
@@ -260,11 +264,11 @@ public static partial class Manager
 
         public static bool RemoveHandwritten(string pPath)
         {
-            pPath = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE, TerbinServiceConst.HANDWRITTEN);
-            if (!File.Exists(pPath))
+            string path = Path.Combine(pPath, TerbinServiceConst.FOLDER_INFORMATION_INSTANCE, TerbinServiceConst.HANDWRITTEN);
+            if (!File.Exists(path))
                 return false;
 
-            File.Delete(pPath);
+            File.Delete(path);
             return true;
         }
 
@@ -319,6 +323,8 @@ public static partial class Manager
             ErrorGetReference = 4,
 
             ErrorOnSaveManifest = 5,
+
+            ErrorInstanceNotExist = 6,
         }
     }
 }
