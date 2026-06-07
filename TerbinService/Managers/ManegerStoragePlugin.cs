@@ -55,10 +55,12 @@ public static partial class Manager
             string newPath = Path.Combine(Path.GetDirectoryName(pPathPlugin) ?? string.Empty, pNameFile);
             lock (_lockRename)
             {
-                File.Move(pPathPlugin, newPath);
+                File.Move(pPathPlugin, newPath); // Renombrar.
             }
-                
-            return Store(newPath, pDuplicate);
+            if (pDuplicate)
+                return StoreDuplicate(newPath);
+            else
+                return Store(newPath);
         }
 
         /// <summary>
@@ -74,12 +76,11 @@ public static partial class Manager
         /// <param name="pPathPlugin">Es: Ruta directa al plugin a guardar. <br />En: Direct path to the plugin to save.</param>
         /// <param name="pDuplicate">Es: Indiferencia temporal para clonar o trasladar el archivo. <br />En: Temporary indifference to clone or move the file.</param>
         /// <returns>Es: Un código único validado (Guid en texto). <br />En: A validated unique code (text Guid).</returns>
-        public static async ValueTask<Guid?> Store(string pPathPlugin, bool pDuplicate = false)
+        public static async ValueTask<Guid?> Store(string pPathPlugin)
         {
             string nameFile = Path.GetFileName(pPathPlugin);
             string namePlugin;
             Guid id;
-
 
             namePlugin = Manager.Node.GetNameByFile(pPathPlugin);
             id = Guid.NewGuid();
@@ -92,17 +93,40 @@ public static partial class Manager
                 Version = PluginUtil.ExtratVersion(nameFile),
             };
 
-            if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null; 
-            if (pDuplicate)
+            if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
+            if (!await operatePlugin(pPathPlugin, (p, d) => { File.Move(p, d); }).ConfigureAwait(false))
+                return null;
+
+            if (!await registerPlugin(reference).ConfigureAwait(false))
             {
-                if (!await operatePlugin(pPathPlugin, (p, d) => { File.Copy(p, d); }).ConfigureAwait(false))
-                    return null;
+                await operatePlugin(nameFile, (p, d) => { File.Delete(d); }).ConfigureAwait(false);
+                return null;
             }
-            else
+
+            return id;
+        }
+
+        // TODO: Doc.
+        public static async ValueTask<Guid?> StoreDuplicate(string pPathPlugin)
+        {
+            string nameFile = Path.GetFileName(pPathPlugin);
+            string namePlugin;
+            Guid id;
+
+            namePlugin = Manager.Node.GetNameByFile(pPathPlugin);
+            id = Guid.NewGuid();
+
+            var reference = new ReferencePluginStore
             {
-                if (!await operatePlugin(pPathPlugin, (p, d) => { File.Move(p, d); }).ConfigureAwait(false))
-                    return null;
-            }
+                Name = namePlugin,
+                Id = $"{id:N}",
+                FileName = nameFile,
+                Version = PluginUtil.ExtratVersion(nameFile),
+            };
+
+            if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
+            if (!await operatePlugin(pPathPlugin, (p, d) => { File.Copy(p, d); }).ConfigureAwait(false))
+                return null;
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
             {
