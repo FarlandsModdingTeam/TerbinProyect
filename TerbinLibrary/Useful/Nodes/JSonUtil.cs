@@ -52,7 +52,7 @@ public class JSonUtil
         NullValueHandling = NullValueHandling.Ignore
     };
 
-    private static object getFileLock(string pFilePath)
+    private static Lock getFileLock(string pFilePath)
     {
         lock (_fileLocks)
         {
