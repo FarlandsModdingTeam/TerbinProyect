@@ -178,16 +178,21 @@ public static partial class Manager
         }
 
         // TODO: Documentacion.
-        public static bool ThereGame(string pName)
+        public static bool ThereGameByName(string pName)
         {
             string? path = Manager.Instances.GetPathFolder(pName);
             if (string.IsNullOrEmpty(path))
                 return false;
 
-            var hand = Manager.Manifest.GetHandwritten(path);
-            return !(hand is null);
+            return ThereGameByPath(path);
         }
 
+        // TODO: Documentacion.
+        public static bool ThereGameByPath(string pPath)
+        {
+            var hand = Manager.Manifest.GetHandwritten(pPath);
+            return !(hand is null);
+        }
 
         // TODO: Doc Actualizar.
         /// <summary>

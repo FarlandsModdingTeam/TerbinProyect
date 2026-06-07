@@ -67,7 +67,7 @@ public static class NodeUtil
                                             string pSourceDir,
                                             string pDestinationDir,
                                             bool pOverwrite,
-                                            IProgress<TerbinInfoProgrss>? pProgress = null,
+                                            IProgress<TerbinInfoProgrss>? pProgress = default,
                                             CancellationToken pCancellationToken = default)
     {
         List<string>? allFiles;

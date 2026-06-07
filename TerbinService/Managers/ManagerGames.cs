@@ -81,11 +81,14 @@ public static partial class Manager
         /// <param name="pCancellationToken">Es: Token interno para abortar. <br />En: Internal token to safely abort.</param>
         /// <returns>Es: Resultado Status dictaminando el éxito o el código de fallo específico. <br />En: Status result declaring success or specific failure code.</returns>
         public static async Task<Status> CloneInInstance
-            (string pPathDir, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss> pProgrss = default, CancellationToken pCancellationToken = default)
+            (string pPathDir, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss>? pProgrss = default, CancellationToken pCancellationToken = default)
         {
-            string? pathInstace = Instances.GetPathFolder(pNameInstance);
+            string? pathInstace = Manager.Instances.GetPathFolder(pNameInstance);
             if (string.IsNullOrEmpty(pathInstace))
                 return Status.ErrorNotIsInstance;
+
+            if (Manager.Instances.ThereGameByPath(pathInstace))
+                return Status.ErrorGameAlreadyExist;
 
             // if (!Manager.Instances.IsInstance(pathInstace))
             //     return Status.ErrorNotIsInstance;
@@ -93,7 +96,7 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            var (status, json) = await NodeUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss);
+            var (status, json) = await NodeUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss, pCancellationToken: CancellationToken.None);
             if (status != StatusNodeUtil.Succes)
                 return Status.GenericError;
 
@@ -231,6 +234,7 @@ public static partial class Manager
 
             ErrorGetHandwritten = 8,
             ErrorRemoveHandwritten = 9,
+            ErrorGameAlreadyExist = 10,
         }
     }
 }
