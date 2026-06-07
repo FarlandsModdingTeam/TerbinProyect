@@ -107,7 +107,7 @@ public static partial class Manager
             if (exes.Count <= 0)
                 return Status.ErrorGameNotExes;
 
-            var update = Manager.Manifest.UpdateInstaceByPath(pNameInstance, pathInstace, manifest =>
+            var update = Manager.Manifest.UpdateInstaceByPath(pathInstace, manifest =>
             {
                 manifest.Executable = exes[0];
             });
