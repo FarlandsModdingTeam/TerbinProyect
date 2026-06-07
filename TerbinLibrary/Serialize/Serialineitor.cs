@@ -56,7 +56,7 @@ public interface IStructSerializable
     void ReadFrom(ReadOnlySpan<byte> pBuffer);
 
 
-    byte[] Read()
+    byte[] Serialize()
     {
         Span<byte> buffer = new byte[this.GetSize()];
         this.WriteTo(buffer);
@@ -64,10 +64,22 @@ public interface IStructSerializable
     }
 
 
-    void Write(byte[] pArray)
+    void Deserialize(byte[] pArray)
     {
         ReadOnlySpan<byte> buffer = pArray;
         this.ReadFrom(buffer);
+    }
+}
+
+public static class ExtensionIStructSerializable
+{
+    public static byte[] Serialize(this IStructSerializable pData)
+    {
+        return pData.Serialize();
+    }
+    public static void Deserialize(this IStructSerializable pData, byte[] pArray)
+    {
+        pData.Deserialize(pArray);
     }
 }
 

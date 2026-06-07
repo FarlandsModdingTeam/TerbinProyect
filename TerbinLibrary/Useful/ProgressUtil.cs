@@ -221,11 +221,10 @@ public static class ProgressUtil
     }
 
 
-    public static void SendMax(TerbinCommunicator pCommunicator, MaxProgress pMax, ushort pIdRequest, IdArray pMethod)
+    public static void SendAndProlong(TerbinCommunicator pCommunicator, IStructSerializable pData, ushort pIdRequest, IdArray pMethod)
     {
-
         byte[] id = Serialineitor.Serialize(pIdRequest);
-        _ = pCommunicator.Send(pMethod, pMax.;
+        _ = pCommunicator.Send(pMethod, pData.Serialize());
         _ = pCommunicator.Send(new IdArray((byte)CodeTerbinProtocol.Prolong), id);
     }
 
