@@ -54,7 +54,7 @@ internal static class ServiceInstances
     [TerbinExecutable((byte)CodeServices.ReadAll, (byte)CodeServicesSection.Instances)]
     public static async Task<InfoResponse?> GetAllInstances(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
-        List<ReferenceInstance> instances = Manager.Index.GetIndex().Instances;
+        List<ReferenceInstance> instances = Manager.Index.GetAllInstances();
         Serialineitor s = new();
 
         if (instances.Count <= 0)
