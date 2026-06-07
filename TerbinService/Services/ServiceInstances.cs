@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Data.References;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
@@ -10,7 +11,6 @@ using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
-using TerbinService.Data.References;
 using TerbinService.Managers;
 
 namespace TerbinService.Services;

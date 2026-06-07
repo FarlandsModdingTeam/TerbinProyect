@@ -5,11 +5,10 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
+using TerbinLibrary.Data.Manifests;
+using TerbinLibrary.Data.References;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful.Nodes;
-using TerbinService.Data;
-using TerbinService.Data.Manifests;
-using TerbinService.Data.References;
 using TerbinService.Services;
 
 namespace TerbinService.Managers;

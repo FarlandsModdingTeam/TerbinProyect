@@ -3,9 +3,10 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
 using TerbinLibrary.Data;
-using TerbinService.Data.References;
+using TerbinLibrary.Data.Manifests;
+using TerbinLibrary.Data.References;
 
-namespace TerbinService.Data.Manifests;
+namespace TerbinLibrary.Data.Manifests;
 
 internal interface IManifest
 {

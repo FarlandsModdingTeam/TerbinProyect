@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TerbinService.Data.References;
+using TerbinLibrary.Data.References;
 
-namespace TerbinService.Data.Manifests;
+namespace TerbinLibrary.Data.Manifests;
 
 public class ManifestStorage : IManifest
 {

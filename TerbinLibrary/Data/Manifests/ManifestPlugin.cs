@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Data;
 
-namespace TerbinService.Data.Manifests;
+namespace TerbinLibrary.Data.Manifests;
 
 
 public class ManifestPlugin : IManifest

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TerbinService.Data.References;
+namespace TerbinLibrary.Data.References;
 
 public class ReferencePlugin
 {

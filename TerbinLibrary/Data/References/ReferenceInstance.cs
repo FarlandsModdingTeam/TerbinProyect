@@ -8,7 +8,7 @@ using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 
-namespace TerbinService.Data.References;
+namespace TerbinLibrary.Data.References;
 
 public class ReferenceInstance 
 {

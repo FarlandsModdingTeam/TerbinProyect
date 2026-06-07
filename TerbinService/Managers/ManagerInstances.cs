@@ -7,10 +7,10 @@ using TerbinLibrary;
 using TerbinLibrary.Async;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
+using TerbinLibrary.Data.Manifests;
+using TerbinLibrary.Data.References;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
-using TerbinService.Data.Manifests;
-using TerbinService.Data.References;
 
 namespace TerbinService.Managers;
 /*

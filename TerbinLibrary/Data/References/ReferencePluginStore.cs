@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TerbinService.Data.Manifests;
+using TerbinLibrary.Data.Manifests;
 
-namespace TerbinService.Data.References;
+namespace TerbinLibrary.Data.References;
 
 public class ReferencePluginStore : IManifest
 {

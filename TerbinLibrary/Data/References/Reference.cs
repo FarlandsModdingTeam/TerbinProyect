@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace TerbinService.Data.References;
+namespace TerbinLibrary.Data.References;
 
 /// <summary>
 /// Es la referencia del mod en el Json (¿que json?, El del Index). <br />
