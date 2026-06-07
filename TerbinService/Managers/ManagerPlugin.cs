@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 using TerbinLibrary;
+using TerbinLibrary.Async;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
 using TerbinLibrary.Protocol;
@@ -11,7 +14,9 @@ using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.NetWork;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Data.Manifests;
+using TerbinService.Data.References;
 using TerbinService.Services;
+using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Managers;
 /*
@@ -45,6 +50,7 @@ public static partial class Manager
 
 
 
+        private static readonly SemaphoreByKey<string> _locks = new(StringComparer.OrdinalIgnoreCase);
 
 
         //-----------------( Dowload/Deleted )-----------------//
@@ -323,14 +329,22 @@ public static partial class Manager
         public static async Task<(Status status, ManifestPlugin? manifest)>
             GetOne(string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
         {
+            ManifestInstance? manifest;
+            string information;
+            string? path;
+
             if (pCancellationToken.IsCancellationRequested)
                 return (Status.IsCancelled, null);
 
-            var manifest = await Manager.Instances.GetManifestByName(pNameInstance);
+            path = Manager.Instances.GetPathFolder(pNameInstance);
+            if (string.IsNullOrEmpty(path))
+                return (Status.InstanceNotExist, null);
+
+            manifest = await Manager.Instances.GetManifestByPath(path);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
-            string information = Manager.Instances.MakePathFolderInformationByName(pNameInstance);
+            information = Manager.Instances.MakePathFolderInformationByPath(path);
 
             for (int i = 0; i < manifest.Plugins.Count; i++)
             {
@@ -373,17 +387,25 @@ public static partial class Manager
         public static async Task<(Status status, List<ManifestPlugin>? manifests)>
             GetAll(string pNameInstance, CancellationToken pCancellationToken = default)
         {
+            ManifestInstance? manifest;
+            string information;
+            List<ManifestPlugin> manis;
+            string? path;
+
             if (pCancellationToken.IsCancellationRequested)
                 return (Status.IsCancelled, null);
 
-            var manifest = await Manager.Instances.GetManifestByName(pNameInstance);
+            path = Manager.Instances.GetPathFolder(pNameInstance);
+            if (string.IsNullOrEmpty(path))
+                return (Status.InstanceNotExist, null);
+
+            manifest = await Manager.Instances.GetManifestByPath(path);
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
-            string information = Manager.Instances.MakePathFolderInformationByName(pNameInstance);
+            information = Manager.Instances.MakePathFolderInformationByPath(path);
 
-            List<ManifestPlugin> manis = new();
-
+            manis = new();
             for (int i = 0; i < manifest.Plugins.Count; i++)
             {
                 if (pCancellationToken.IsCancellationRequested)
@@ -404,7 +426,22 @@ public static partial class Manager
             return (Status.Succes, manis);
         }
 
+        // TODO: Doc.
+        public static async Task BrowseIn(ManifestInstance pMani, Action<ReferencePlugin?> pPredicate, CancellationToken pCancellationToken = default)
+        {
+            for (int i = 0; i < pMani.Plugins.Count; i++)
+            {
+                if (pCancellationToken.IsCancellationRequested)
+                    return;
 
+                ReferencePlugin? refe = pMani.Plugins[i];
+
+                using (_locks.LockAsync(refe.IdLocal ?? pMani.Name ?? "BrowseIn", pCancellationToken))
+                {
+                    pPredicate(refe);
+                }
+            }
+        }
 
 
         /// <summary>

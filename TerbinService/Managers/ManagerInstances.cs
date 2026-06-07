@@ -240,6 +240,7 @@ public static partial class Manager
         {
             using (await _instanceLocks.LockAsync(pPath))
             {
+                // El JSonUtil Ya esta protegido, Pero por lock, no se hay alguna diferencia interna.
                 return JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
             }
         }
