@@ -30,7 +30,7 @@ namespace TerbinService.Services;
  */
 
 
-internal static class ServicesPlugins
+internal static class ServicePlugins
 {
     [TerbinExecutable((byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin)]
     public static async Task<InfoResponse?> DowloadPlugin(Header pHead, byte[] pParameters, CancellationToken pToken)
