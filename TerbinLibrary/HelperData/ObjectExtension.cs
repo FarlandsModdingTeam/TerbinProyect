@@ -8,7 +8,7 @@ namespace TerbinLibrary.HelperData;
 
 public static class ObjectExtension
 {
-    public static bool IsNull(this object pObj)
+    public static bool IsNull(this object? pObj)
     {
         return pObj is null;
     }
