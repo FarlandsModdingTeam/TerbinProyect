@@ -117,8 +117,12 @@ public enum CodeInternalErrors : ushort
     PluginGetManifest = 209,
 
     // Instances = 300,
-    InstaceGetSizeError = 301,
-    InstaceNotExist = 302,
+    InstanceGetSizeError = 301,
+    InstanceNotExist = 302,
+    InstanceIsNotInstance = 303,
+    InstanceRegister = 304,
+    InstanceUnregister = 305,
+
 
     // FCM = 400,
 
