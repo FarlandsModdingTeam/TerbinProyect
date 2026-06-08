@@ -123,7 +123,7 @@ public static partial class Manager
                 return Status.ErrorIsNotInstance;
 
             if (pCancellationToken.IsCancellationRequested)
-                return Status.IsCanelled;
+                return Status.IsCancelled;
 
             bool r = Manager.Index.UnregisterInstance(pName);
             if (!r) return Status.ErrorUnregistInstance;
@@ -131,7 +131,7 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
             {
                 Manager.Index.RegisterInstance(pName, path, InsideConfig(pName, path));
-                return Status.IsCanelled;
+                return Status.IsCancelled;
             }
 
             await Manager.Node.DinamiteDirectory(path, pCancellationToken);
@@ -531,7 +531,7 @@ public static partial class Manager
         {
             GenericException = -1,
 
-            IsCanelled = 0,
+            IsCancelled = 0,
             Succes = 1,
 
             GenericError = 2,
