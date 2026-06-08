@@ -20,8 +20,8 @@ namespace TerbinLibrary.Execution;
   empieza: "p"en minuscula = parametro entrante local.
   empieza: mayuscula = publica.
  -- Funciones:
-  empieza: mayorculas = publica.
-  empieza: menorculas = privada.
+  empieza: mayusculas = publica.
+  empieza: minuscula = privada.
  */
 
 /// <summary>
@@ -119,7 +119,7 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
             return InfoResponse.CreateSucces(pHead.IdRequest);
 
         else if (pHead.Status == CodeStatus.CancelByAction)
-            return CancelCts(pActions, pHead.IdRequest);
+            return cancelCts(pActions, pHead.IdRequest);
         else if (pHead.Status == CodeStatus.CancelByRequest)
             return null; // TODO_Verano: el sistema.
 
@@ -200,7 +200,7 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
     /// <param name="pActions">Es: Las acciones a identificar. <br />En: The actions to identify.</param>
     /// <param name="pIdRequest">Es: Identificador de la petición. <br />En: The request identifier.</param>
     /// <returns>Es: Respuesta indicando si se procesó la cancelación o no. <br />En: Response indicating validation of cancellation.</returns>
-    private InfoResponse CancelCts(IEquatable<IEnumerable<byte>> pActions, ushort pIdRequest)
+    private InfoResponse cancelCts(IEquatable<IEnumerable<byte>> pActions, ushort pIdRequest)
     {
         if (_activeExecutionsByAction.TryRemove(pActions, out var ctsCancel))
         {
