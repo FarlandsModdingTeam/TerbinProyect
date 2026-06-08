@@ -19,7 +19,7 @@ namespace TerbinLibrary.Protocol;
  */
 
 
-public class TerbinProtocol
+public static class TerbinProtocol
 {
     public const ushort MAX_PLD = 0xFFFD; // ¡Vamos Miura!
     public const ushort FRAGMENT_IN = 0xFFFA; // 0xFFF
@@ -30,12 +30,12 @@ public class TerbinProtocol
     public const ushort FIRST_PACKET = 1;
     public const ushort FINAL_PACKET = ushort.MaxValue;
 
-    public const byte MAXIMUS_RESPONSE_TIME = 16;
+    public const byte MAXIMUS_RESPONSE_TIME = 8;
 
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
 
-    public const byte LENGTH_ARRAY = 3;
+    public const byte LENGTH_ARRAY = ThreeQuartersInt.Space;
 
     /*
     public static async Task InitProtocol(CancellationToken pTokenCancellation)
