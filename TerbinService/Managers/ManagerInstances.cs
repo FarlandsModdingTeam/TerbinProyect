@@ -117,7 +117,7 @@ public static partial class Manager
         {
             string? path = Manager.Instances.GetPathFolder(pName);
             if (string.IsNullOrEmpty(path))
-                return Status.ErrorNotExit;
+                return Status.ErrorNotExist;
 
             if (!Manager.Instances.IsInstance(path))
                 return Status.ErrorIsNotInstance;
@@ -535,7 +535,7 @@ public static partial class Manager
             Succes = 1,
 
             GenericError = 2,
-            ErrorNotExit = 3,
+            ErrorNotExist = 3,
             ErrorIsNotInstance = 4,
             ErrorUnregistInstance = 5,
         }

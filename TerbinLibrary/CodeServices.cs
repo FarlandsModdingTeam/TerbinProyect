@@ -100,7 +100,7 @@ public enum CodeInternalErrors : ushort
 {
     IdSoliciteError = 11,
     TODO_WIP = 12,
-    TODO_SoliciteInfo = 13,
+    //TODO_SoliciteInfo = 13,
 
     // Farland = 100,
     FarlandRuteNotExist = 101,
@@ -133,6 +133,9 @@ public enum CodeInternalErrors : ushort
     // BepInEx = 600,
     BepInExNotConect = 601,
     BepInExNotInstall = 602,
+
+    // Node = 700,
+    NodeDinamite = 701,
 
     // Zip = 1000,
     ZipExtractError = 1001,

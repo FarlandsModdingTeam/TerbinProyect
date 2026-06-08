@@ -3,16 +3,18 @@ using System.Collections.Generic;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Data.Manifests;
 using TerbinLibrary.Data.References;
+using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
+using TerbinLibrary.HelperData;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinService.Managers;
-using TerbinLibrary.Data.Transport;
 
 namespace TerbinService.Services;
 /*
@@ -52,6 +54,35 @@ internal static class ServiceInstances
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
+    [TerbinExecutable((byte)CodeServices.Deleted, (byte)CodeServicesSection.Instances)]
+    public static async Task<InfoResponse?> DeleteInstances(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        string name;
+        ReadOnlySpan<byte> reader = pParameters;
+        name = reader.ReadArray<char>().CrString();
+
+        var r = await Manager.Instances.Delete(name, pToken);
+
+        if (r != Manager.Instances.Status.IsCancelled)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+        if (r != Manager.Instances.Status.Succes)
+        {
+            var error = TSHelper.GetError(r switch
+            {
+                Manager.Instances.Status.ErrorNotExist => CodeInternalErrors.InstanceNotExist,
+                Manager.Instances.Status.ErrorIsNotInstance => CodeInternalErrors.InstanceIsNotInstance,
+                Manager.Instances.Status.ErrorUnregistInstance => CodeInternalErrors.InstanceUnregister,
+                _ => CodeInternalErrors.NodeDinamite,
+            });
+            return InfoResponse.CreateInteralError(pHead.IdRequest, error);
+        }
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
+    }
+
     [TerbinExecutable((byte)CodeServices.ReadAll, (byte)CodeServicesSection.Instances)]
     public static async Task<InfoResponse?> GetAllInstances(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
@@ -59,7 +90,7 @@ internal static class ServiceInstances
         Serialineitor s = new();
 
         if (instances.Count <= 0)
-            return InfoResponse.CreateSucces(pHead.IdRequest);
+            return InfoResponse.CreateSucces(pHead.IdRequest, [0]);
 
         s.Add<ThreeQuartersInt>(instances.Count);
         for (int i = 0; i < instances.Count; i++)
@@ -80,12 +111,14 @@ internal static class ServiceInstances
         ReadOnlySpan<byte> reader = pParameters;
         var name = reader.ReadArray<char>().CrString();
 
-        string? manifest = await Manager.Instances.GetStringManifestByName(name);
-        if (string.IsNullOrEmpty(manifest))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExist));
+        ManifestInstance? manifest;
 
-        byte[] pld = Serialineitor.SerializeArray(manifest.ToCharArray());
+        manifest = await Manager.Instances.GetManifestByName(name);
+        if (manifest is null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
 
-        return InfoResponse.CreateSucces(pHead.IdRequest, pld);
+        byte[] dto = ((ManifestInstanceDTO)manifest).Serialize();
+
+        return InfoResponse.CreateSucces(pHead.IdRequest, dto);
     }
 }

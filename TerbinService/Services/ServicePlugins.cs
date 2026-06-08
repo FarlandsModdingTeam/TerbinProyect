@@ -92,7 +92,7 @@ internal static class ServicePlugins
 
         pathInstance = Manager.Instances.GetPathFolder(name);
         if (string.IsNullOrEmpty(pathInstance))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
 
         pathPlugin = Path.Combine(pathInstance, relativePath);
 
@@ -105,7 +105,7 @@ internal static class ServicePlugins
 
         var r = await Manager.Plugin.InstallOne(idPlugin, name, pathPlugin, progress, pToken);
 
-        if (pToken.IsCancellationRequested)
+        if (r != Manager.Plugin.Status.IsCancelled)
             return InfoResponse.CreateCancelled(pHead.IdRequest);
 
         if (r != Manager.Plugin.Status.Succes)
