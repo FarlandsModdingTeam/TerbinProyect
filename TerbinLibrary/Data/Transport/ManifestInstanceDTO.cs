@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using TerbinLibrary.Data.Manifests;
 using TerbinLibrary.Data.References;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
@@ -57,5 +58,16 @@ public struct ManifestInstanceDTO : IStructSerializable
         pBuffer.WriteArray<char>(ref offset, Name?.ToCharArray() ?? "".ToCharArray());
         pBuffer.WriteArray<char>(ref offset, Version?.ToCharArray() ?? "".ToCharArray());
         pBuffer.Write<ThreeQuartersInt>(ref offset, PluginCount);
+    }
+
+
+    public static explicit operator ManifestInstanceDTO(ManifestInstance pData)
+    {
+        return new ManifestInstanceDTO
+        {
+            Name = pData.Name,
+            Version = pData.Version,
+            PluginCount = pData.Plugins.Count,
+        };
     }
 }

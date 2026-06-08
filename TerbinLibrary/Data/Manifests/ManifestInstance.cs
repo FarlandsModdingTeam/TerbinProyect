@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Data.References;
+using TerbinLibrary.Data.Transport;
 
 namespace TerbinLibrary.Data.Manifests;
 
@@ -20,5 +21,14 @@ public class ManifestInstance : IManifest
     public string? GetId()
     {
         return Name;
+    }
+
+    public static explicit operator ManifestInstance(ManifestInstanceDTO pData)
+    {
+        return new ManifestInstance
+        {
+            Name = pData.Name,
+            Version = pData.Version,
+        };
     }
 }

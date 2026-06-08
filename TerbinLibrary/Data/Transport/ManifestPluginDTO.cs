@@ -34,7 +34,7 @@ public struct ManifestPluginDTO : IStructSerializable
         OutSideIntance = pBuffer.Read<sbyte>(ref offset).ToBoolUk();
     }
 
-    public void WriteTo(Span<byte> pBuffer)
+    public readonly void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
         pBuffer.WriteArray<char>(ref offset, Name?.ToCharArray() ?? "".ToCharArray());
