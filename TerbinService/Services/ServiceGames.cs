@@ -29,7 +29,7 @@ internal static class ServiceGames
 
         var sizes = Manager.Node.GetSizeDir(dirGame);
         if (sizes.maxFiles == null || sizes.maxDir == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceGetSizeError));
 
         var rId = await Worker.CurrentContext.Value.Communicator.SoliciteRequestMemory();
         if (rId.Head.Status != CodeStatus.Succes)
@@ -63,7 +63,7 @@ internal static class ServiceGames
 
         var sizes = Manager.Node.GetSizeDir(dirGame);
         if (sizes.maxFiles == null || sizes.maxDir == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceGetSizeError));
 
         var rId = await Worker.CurrentContext.Value.Communicator.SoliciteRequestMemory();
         if (rId.Head.Status != CodeStatus.Succes)
