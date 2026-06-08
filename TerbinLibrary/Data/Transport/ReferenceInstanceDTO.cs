@@ -26,8 +26,11 @@ public struct ReferenceInstanceDTO : IStructSerializable
     public bool? OutSide;
     public string? Path;
 
+    [TODO("Optimizar")]
     public readonly int GetSize() =>
-        ((Name?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY + ((Path?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY + 1;
+        ((Name?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY +
+        ((Path?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY + 
+        1;
 
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
     {
@@ -37,7 +40,7 @@ public struct ReferenceInstanceDTO : IStructSerializable
         Path = pBuffer.ReadArray<char>(ref offset).CrString();
     }
 
-    public void WriteTo(Span<byte> pBuffer)
+    public readonly void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
         pBuffer.WriteArray<char>(ref offset, Name?.ToCharArray() ?? "".ToCharArray());

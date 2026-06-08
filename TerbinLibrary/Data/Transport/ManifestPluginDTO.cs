@@ -18,6 +18,7 @@ public struct ManifestPluginDTO : IStructSerializable
     // Si fue instalado fuera de la instancia y por tanto las rutas no son relativas.
     public bool? OutSideIntance { get; set; }
 
+    [TODO("Optimizar")]
     public readonly int GetSize() =>
         ((Name?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY +
         ((Id?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY +

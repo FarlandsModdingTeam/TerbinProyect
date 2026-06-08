@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
+using TerbinLibrary.Data.References;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
@@ -27,6 +28,7 @@ public struct ReferencePluginStoreDTO : IStructSerializable
     public string? UrlWeb { get; set; }
     public string? Version { get; set; }
 
+    [TODO("Optimizar")]
     public readonly int GetSize() =>
         ((Name?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY +
         ((Id?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY +
@@ -44,7 +46,7 @@ public struct ReferencePluginStoreDTO : IStructSerializable
         Version = pBuffer.ReadArray<char>(ref offset).CrString();
     }
 
-    public void WriteTo(Span<byte> pBuffer)
+    public readonly void WriteTo(Span<byte> pBuffer)
     {
         int offset = 0;
         pBuffer.WriteArray<char>(ref offset, Name?.ToCharArray() ?? "".ToCharArray());
@@ -52,5 +54,17 @@ public struct ReferencePluginStoreDTO : IStructSerializable
         pBuffer.WriteArray<char>(ref offset, FileName?.ToCharArray() ?? "".ToCharArray());
         pBuffer.WriteArray<char>(ref offset, UrlWeb?.ToCharArray() ?? "".ToCharArray());
         pBuffer.WriteArray<char>(ref offset, Version?.ToCharArray() ?? "".ToCharArray());
+    }
+
+    public static explicit operator ReferencePluginStoreDTO(ReferencePluginStore pData)
+    {
+        return new ReferencePluginStoreDTO
+        {
+            Name = pData.Name,
+            Id = pData.Id,
+            FileName = pData.FileName,
+            UrlWeb = pData.UrlWeb,
+            Version = pData.Version,
+        };
     }
 }

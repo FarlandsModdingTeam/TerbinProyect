@@ -44,6 +44,7 @@ namespace TerbinLibrary;
 /// Notes: Implements IConvertible to ensure conversion with other basic numerical types.<br />
 /// Tips: Recommended when handling large arrays of elements that can fit in 24 bits and do not exceed this limit.<br />
 /// </summary>
+[Serializable]
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct ThreeQuartersInt : IConvertible, IMinMaxValue<ThreeQuartersInt>
 {
@@ -67,7 +68,7 @@ public struct ThreeQuartersInt : IConvertible, IMinMaxValue<ThreeQuartersInt>
     /// </summary>
     public const int MinValue = 0x0;
 
-    public const int Space = 3; // Cuanto espacio ocupa (3 bytes).
+    public const int Size = 3; // Cuanto espacio ocupa (3 bytes).
 
     static ThreeQuartersInt IMinMaxValue<ThreeQuartersInt>.MaxValue => MaxValue;
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Data.Manifests;
+using TerbinLibrary.Data.Transport;
 
 namespace TerbinLibrary.Data.References;
 
@@ -16,5 +17,17 @@ public class ReferencePluginStore : IManifest
     public string? GetId()
     {
         return Id;
+    }
+
+    public static explicit operator ReferencePluginStore(ReferencePluginStoreDTO pData)
+    {
+        return new ReferencePluginStore
+        {
+            Name = pData.Name,
+            Id = pData.Id,
+            FileName = pData.FileName,
+            UrlWeb = pData.UrlWeb,
+            Version = pData.Version,
+        };
     }
 }

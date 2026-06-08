@@ -35,7 +35,7 @@ public static class TerbinProtocol
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
 
-    public const byte LENGTH_ARRAY = ThreeQuartersInt.Space;
+    public const byte LENGTH_ARRAY = ThreeQuartersInt.Size;
 
     /*
     public static async Task InitProtocol(CancellationToken pTokenCancellation)

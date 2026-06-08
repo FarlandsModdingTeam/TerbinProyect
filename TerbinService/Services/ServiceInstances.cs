@@ -12,6 +12,7 @@ using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinService.Managers;
+using TerbinLibrary.Data.Transport;
 
 namespace TerbinService.Services;
 /*
@@ -39,7 +40,7 @@ internal static class ServiceInstances
 
         ReadOnlySpan<byte> reader = pParameters;
         name = reader.ReadArray<char>().CrString();
-        if (reader.Length > ThreeQuartersInt.Space)
+        if (reader.Length > ThreeQuartersInt.Size)
             path = reader.ReadArray<char>().CrString();
 
         if (pToken.IsCancellationRequested)

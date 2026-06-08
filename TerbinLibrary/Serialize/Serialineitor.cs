@@ -6,7 +6,6 @@ using System.Text;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
-using static System.Collections.Specialized.BitVector32;
 
 namespace TerbinLibrary.Serialize;
 /*

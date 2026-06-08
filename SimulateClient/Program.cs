@@ -23,8 +23,11 @@ using TerbinLibrary.Protocol;
 
 // Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
 
-#if false
+#if true
 
+ThreeQuartersInt v1 = 777;
+
+Console.WriteLine($"Vegeta" + v1.ToString());
 Console.WriteLine($"SimulateClient esta desactivado.");
 Console.WriteLine($"Ponga en false el if para activarlo.");
 await pressAnyKeyToContinue();
