@@ -188,8 +188,7 @@ public class Serialineitor
     /// <returns>Es: Instancia actual de Serialineitor. <br />En: Current Serialineitor instance.</returns>
     public Serialineitor AddStruct<T>(T pStruct) where T : struct, IStructSerializable
     {
-        int structSize = (int)pStruct.GetSize();
-        ensureCapacity(structSize);
+        ensureCapacity((int)pStruct.GetSize());
 
         BufferWriter.AddStruct<T>(_content, ref _offset, pStruct);
 
