@@ -2,9 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Text;
+using System.Xml.Linq;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Data.Manifests;
+using TerbinLibrary.Data.References;
 using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
@@ -15,7 +18,9 @@ using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.NetWork;
+using TerbinLibrary.Useful.Nodes;
 using TerbinService.Managers;
+using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Services;
 /*
@@ -105,7 +110,7 @@ internal static class ServicePlugins
 
         var r = await Manager.Plugin.InstallOne(idPlugin, name, pathPlugin, progress, pToken);
 
-        if (r != Manager.Plugin.Status.IsCancelled)
+        if (r == Manager.Plugin.Status.IsCancelled)
             return InfoResponse.CreateCancelled(pHead.IdRequest);
 
         if (r != Manager.Plugin.Status.Succes)
@@ -120,6 +125,134 @@ internal static class ServicePlugins
             });
             return InfoResponse.CreateInteralError(pHead.IdRequest, error);
         }
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
+    }
+
+    [TerbinExecutable((byte)CodeServices.ReadAll, (byte)CodeServicesSection.Plugin)]
+    public static async Task<InfoResponse?> GetAll(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        ReadOnlySpan<byte> reader = pParameters;
+        string nameInstance = reader.ReadArray<char>().CrString();
+
+        ManifestInstance? manifest;
+        ManifestPlugin[] manis;
+        string? path;
+
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+
+        path = Manager.Instances.GetPathFolder(nameInstance);
+        if (string.IsNullOrEmpty(path))
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+
+        manifest = await Manager.Instances.GetManifestByPath(path);
+        if (manifest == null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+
+        manis = await Manager.Plugin.GetAll(path, manifest, pToken);
+
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+
+        Serialineitor s = new();
+
+
+        if (manis.Length <= 0)
+            return InfoResponse.CreateSucces(pHead.IdRequest, [0]);
+
+        s.Add<ThreeQuartersInt>(manis.Length);
+        for (int i = 0; i < manis.Length; i++)
+        {
+            ManifestPluginDTO tmp = (ManifestPluginDTO)manis[i];
+            s.AddStruct<ManifestPluginDTO>(tmp);
+        }
+
+        return InfoResponse.CreateSucces(pHead.IdRequest, s.Serialize());
+    }
+
+    [TerbinExecutable((byte)CodeServices.Read, (byte)CodeServicesSection.Plugin)]
+    public static async Task<InfoResponse?> GetOne(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        ReadOnlySpan<byte> reader = pParameters;
+        string name = reader.ReadArray<char>().CrString();
+        string id = reader.ReadArray<char>().CrString();
+
+        ManifestInstance? manifest;
+        ManifestPlugin? mani;
+        string? path;
+
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+
+        path = Manager.Instances.GetPathFolder(name);
+        if (string.IsNullOrEmpty(path))
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+
+        manifest = await Manager.Instances.GetManifestByPath(path);
+        if (manifest == null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+
+        mani = await Manager.Plugin.GetOne(id, name, manifest, pToken);
+        if (mani is null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+
+        byte[] dto = ((ManifestPluginDTO)mani).Serialize();
+
+        return InfoResponse.CreateSucces(pHead.IdRequest, dto);
+    }
+
+
+    [TerbinExecutable((byte)CodeServices.Deleted, (byte)CodeServicesSection.Plugin)]
+    public static async Task<InfoResponse?> Delete(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        ReadOnlySpan<byte> reader = pParameters;
+        string name = reader.ReadArray<char>().CrString();
+        string id = reader.ReadArray<char>().CrString();
+        bool useProgress = (reader.Length >= 1) && reader.Read<bool>();
+
+        IProgress<TerbinInfoProgrss>? progress = null;
+
+        ManifestInstance? manifest;
+        ManifestPlugin? mani;
+        string? path;
+
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+
+        path = Manager.Instances.GetPathFolder(name);
+        if (string.IsNullOrEmpty(path))
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+
+        manifest = await Manager.Instances.GetManifestByPath(path);
+        if (manifest == null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+
+        mani = await Manager.Plugin.GetOne(id, name, manifest, pToken);
+        if (mani is null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+
+        if (useProgress)
+        {
+            MaxProgressDTO max = new(mani.HandWritten.GetSize());
+            progress = ProgressUtil.CreateProgressAndSetMax
+                (Worker.CurrentContext.Value.Communicator, max, pHead.IdRequest, (byte)CodeServices.Deleted, (byte)CodeServicesSection.Plugin);
+        }
+
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+
+        // Eh mirado y se supone que no puede fallar, raro.
+        StatusNodeUtil r = await Manager.Instances.UnistallPlugin(mani.HandWritten, name, progress, pToken);
 
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }

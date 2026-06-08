@@ -37,7 +37,7 @@ public class ManifestPlugin : IManifest
     // Si fue instalado fuera de la instancia y por tanto las rutas no son relativas.
     public bool? OutSideIntance { get; set; }
     // Contenido del plugin
-    public DirectoryHandwritten? HandWritten { get; set; }
+    public DirectoryHandwritten HandWritten { get; set; } = new();
 
     public string? GetId()
     {

@@ -66,7 +66,7 @@ internal static class ServiceInstances
 
         var r = await Manager.Instances.Delete(name, pToken);
 
-        if (r != Manager.Instances.Status.IsCancelled)
+        if (r == Manager.Instances.Status.IsCancelled)
             return InfoResponse.CreateCancelled(pHead.IdRequest);
         if (r != Manager.Instances.Status.Succes)
         {

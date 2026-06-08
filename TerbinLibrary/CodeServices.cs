@@ -115,6 +115,7 @@ public enum CodeInternalErrors : ushort
     PluginGetPath = 207,
     PluginOnSave = 208,
     PluginGetManifest = 209,
+    PluginOnUnistall = 210,
 
     // Instances = 300,
     InstanceGetSizeError = 301,

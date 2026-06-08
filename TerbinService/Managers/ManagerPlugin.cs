@@ -16,6 +16,7 @@ using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.NetWork;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Services;
+using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Managers;
 /*
@@ -34,6 +35,7 @@ public static partial class Manager
 {
     public static class Plugin
     {
+        // todo esto hay que sacarlo fuera.
         public const string ROOT = /*Game*/"/";
         public static readonly string BEPINEX_PLUGINS = Path.Combine(ROOT, "BepInEx/plugins");
         public static readonly string MELONLOADER_MODS = Path.Combine(ROOT, "Mods");
@@ -329,12 +331,12 @@ public static partial class Manager
         /// Notes: Combines relative and absolute paths as appropriate, and checks if manifests exist.<br />
         /// Tips: Useful for validating a plugin's state before uninstalling or initializing.<br />
         /// </summary>
-        /// <param name="pPlugin">Es: Identificador local del plugin a consultar.<br />En: Local identifier of the plugin to check.</param>
-        /// <param name="pNameInstance">Es: La instancia asignada a revisar.<br />En: The assigned instance to review.</param>
+        /// <param name="pIdPlugin">Es: Identificador local del plugin a consultar.<br />En: Local identifier of the plugin to check.</param>
+        /// <param name="pPath">Es: La instancia asignada a revisar.<br />En: The assigned instance to review.</param>
         /// <param name="pCancellationToken">Es: Token de la operación.<br />En: Operation token.</param>
         /// <returns>Es: Tupla con estado de operación y el manifiesto si se encontró.<br />En: Tuple with the operation status and the manifest if found.</returns>
         public static async Task<(Status status, ManifestPlugin? manifest)>
-            GetOne(string pPlugin, string pNameInstance, CancellationToken pCancellationToken = default)
+            GetOne(string pIdPlugin, string pPath, CancellationToken pCancellationToken = default)
         {
             ManifestInstance? manifest;
             string information;
@@ -343,7 +345,7 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return (Status.IsCancelled, null);
 
-            path = Manager.Instances.GetPathFolder(pNameInstance);
+            path = Manager.Instances.GetPathFolder(pPath);
             if (string.IsNullOrEmpty(path))
                 return (Status.InstanceNotExist, null);
 
@@ -359,6 +361,34 @@ public static partial class Manager
                     return (Status.IsCancelled, null);
 
                 var refe = manifest.Plugins[i];
+                if (refe.IdLocal == pIdPlugin)
+                {
+                    if (refe.Path == null) continue;
+
+                    string pathJson = Path.IsPathFullyQualified(refe.Path)
+                        ? refe.Path
+                        : Path.Combine(information, refe.Path);
+
+                    ManifestPlugin? man = JSonUtil.AcessDirect<ManifestPlugin>(pathJson);
+                    if (man == null)
+                        return (Status.ManifestNotExit, null); // <==
+                    return (Status.Succes, man);
+                }
+            }
+            return (Status.NotFound, null);
+        }
+
+        public static async Task<ManifestPlugin?>
+            GetOne(string pPlugin, string pPath, ManifestInstance pManifestInstance, CancellationToken pCancellationToken = default)
+        {
+            string information = Manager.Instances.MakePathFolderInformationByPath(pPath);
+
+            for (int i = 0; i < pManifestInstance.Plugins.Count; i++)
+            {
+                if (pCancellationToken.IsCancellationRequested)
+                    return null;
+
+                var refe = pManifestInstance.Plugins[i];
                 if (refe.IdLocal == pPlugin)
                 {
                     if (refe.Path == null) continue;
@@ -369,13 +399,13 @@ public static partial class Manager
 
                     ManifestPlugin? man = JSonUtil.AcessDirect<ManifestPlugin>(pathJson);
                     if (man == null)
-                        return (Status.ManifestNotExit, null);
-                    return (Status.Succes, man);
+                        return null;
+                    return man;
                 }
             }
-            return (Status.NotFound, null);
+            return null;
         }
-        
+
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Recopila todos los manifiestos de los plugins pertenecientes a una sola instancia.<br />
@@ -391,12 +421,11 @@ public static partial class Manager
         /// <param name="pNameInstance">Es: Nombre de la instancia a escanear.<br />En: Name of the instance to scan.</param>
         /// <param name="pCancellationToken">Es: Token de cancelación de la iteración.<br />En: Iteration cancellation token.</param>
         /// <returns>Es: Tupla con el estado de la tarea y la lista de todos los manifiestos hallados.<br />En: Tuple containing the task status and the list of all found manifests.</returns>
-        public static async Task<(Status status, List<ManifestPlugin>? manifests)>
+        public static async Task<(Status status, ManifestPlugin[]? manifests)>
             GetAll(string pNameInstance, CancellationToken pCancellationToken = default)
         {
             ManifestInstance? manifest;
-            string information;
-            List<ManifestPlugin> manis;
+            ManifestPlugin[] manis;
             string? path;
 
             if (pCancellationToken.IsCancellationRequested)
@@ -410,15 +439,31 @@ public static partial class Manager
             if (manifest == null)
                 return (Status.InstanceNotExist, null);
 
-            information = Manager.Instances.MakePathFolderInformationByPath(path);
+            manis = await GetAll(path, manifest, pCancellationToken);
 
-            manis = new();
-            for (int i = 0; i < manifest.Plugins.Count; i++)
+            return (Status.Succes, manis);
+        }
+
+
+        // TODO: Doc.
+        public static async Task<ManifestPlugin[]>
+            GetAll(string pPath, ManifestInstance pManifest, CancellationToken pCancellationToken = default)
+        {
+            string information;
+            ManifestPlugin[] manis;
+
+            if (pCancellationToken.IsCancellationRequested)
+                return Array.Empty<ManifestPlugin>();
+
+            information = Manager.Instances.MakePathFolderInformationByPath(pPath);
+
+            manis = new ManifestPlugin[pManifest.Plugins.Count];
+            for (int i = 0; i < pManifest.Plugins.Count; i++)
             {
                 if (pCancellationToken.IsCancellationRequested)
-                    return (Status.IsCancelled, null);
+                    return Array.Empty<ManifestPlugin>();
 
-                var refe = manifest.Plugins[i];
+                var refe = pManifest.Plugins[i];
                 if (refe.Path == null) continue;
 
                 string pathJson = Path.IsPathFullyQualified(refe.Path)
@@ -428,9 +473,9 @@ public static partial class Manager
                 ManifestPlugin? man = JSonUtil.AcessDirect<ManifestPlugin>(pathJson);
 
                 if (man == null) continue;
-                manis.Add(man);
+                manis[i] = man;
             }
-            return (Status.Succes, manis);
+            return manis;
         }
 
         // TODO: Doc.
