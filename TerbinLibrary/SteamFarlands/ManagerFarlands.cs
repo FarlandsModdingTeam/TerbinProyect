@@ -27,15 +27,50 @@ public static class ManagerFarlands
                Process.GetProcessesByName("steamwebhelper").Length > 0;
     }
 
-    [Obsolete("Lanzar juego de la instancia")]
-    public static Status LaunchFarlands(string? pName = null)
+    public static Status LaunchFarlands(string pPath)
     {
-        if (pName == null)
-            return LaunchFarlandsBySteam();
+        if (string.IsNullOrEmpty(pPath) || !File.Exists(pPath))
+            return Status.NotInstaled;
 
-        // TODO: Lanzar juego de la instancia.
-        return Status.Succes;
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = pPath,
+                UseShellExecute = true,
+                WorkingDirectory = Path.GetDirectoryName(pPath)
+            });
+            return Status.Succes;
+        }
+        catch
+        {
+            return Status.NotInstaled;
+        }
     }
+
+    /*
+    public static Status LaunchFarlandsByPotron()
+    {
+        var potronPath = GetPotronPath();
+        if (potronPath == null)
+            return Status.NotInstaled;
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = potronPath,
+                UseShellExecute = true,
+                WorkingDirectory = Path.GetDirectoryName(potronPath)
+            });
+            return Status.Succes;
+        }
+        catch
+        {
+            return Status.NotInstaled;
+        }
+    }
+    */
 
     public static Status LaunchFarlandsBySteam()
     {
@@ -76,6 +111,17 @@ public static class ManagerFarlands
     public static string? GetRuteSteamFarlands()
     {
         return SteamLocator.GetGamePath(KEY_FARLANDS);
+    }
+
+    // Esto no tiene nigun puto sentido.
+    public static string? GetPotronPath()
+    {
+        var ruteFarlands = GetRuteSteamFarlands();
+        if (ruteFarlands == null)
+            return null;
+
+        string potronPath = Path.Combine(ruteFarlands, "Potron", "Potron.exe");
+        return File.Exists(potronPath) ? potronPath : null;
     }
 
     public static bool IsFarlands(string pDir)

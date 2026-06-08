@@ -526,6 +526,11 @@ public static partial class Manager
 
 
 
+        public static async Task RunGame(string pNameInstance, CancellationToken pCancellationToken = default)
+        {
+
+        }
+
 
         public enum Status : sbyte
         {
