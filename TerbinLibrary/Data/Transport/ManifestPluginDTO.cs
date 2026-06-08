@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary.Data.Manifests;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
@@ -41,5 +42,16 @@ public struct ManifestPluginDTO : IStructSerializable
         pBuffer.WriteArray<char>(ref offset, Id?.ToCharArray() ?? "".ToCharArray());
         pBuffer.WriteArray<char>(ref offset, IdLocal?.ToCharArray() ?? "".ToCharArray());
         pBuffer.Write<sbyte>(ref offset, OutSideIntance.ToSByte());
+    }
+
+    public static explicit operator ManifestPluginDTO(ManifestPlugin pData)
+    {
+        return new ManifestPluginDTO
+        {
+            Name = pData.Name,
+            Id = pData.Id,
+            IdLocal = pData.IdLocal,
+            OutSideIntance = pData.OutSideIntance,
+        };
     }
 }

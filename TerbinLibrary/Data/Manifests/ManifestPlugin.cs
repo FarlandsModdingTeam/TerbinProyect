@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Data;
+using TerbinLibrary.Data.Transport;
 
 namespace TerbinLibrary.Data.Manifests;
 /*
@@ -41,6 +42,17 @@ public class ManifestPlugin : IManifest
     public string? GetId()
     {
         return Id;
+    }
+
+    public static explicit operator ManifestPlugin(ManifestPluginDTO pData)
+    {
+        return new ManifestPlugin
+        {
+            Name = pData.Name,
+            Id = pData.Id,
+            IdLocal = pData.IdLocal,
+            OutSideIntance = pData.OutSideIntance,
+        };
     }
 }
 
