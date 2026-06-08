@@ -53,9 +53,9 @@ public struct ThreeQuartersInt : IConvertible, IMinMaxValue<ThreeQuartersInt>
 
     /// <summary>
     /// ___________________( Español )___________________<br />
-    /// El máximo valor posible que se puede representar con 24 bits (0xFF_FF_FF).<br />
+    /// El máximo valor posible que se puede representar con 24 bits (16.777.215).<br />
     /// ___________________( English )___________________<br />
-    /// The maximum possible value that can be represented with 24 bits (0xFF_FF_FF).<br />
+    /// The maximum possible value that can be represented with 24 bits (16,777,215).<br />
     /// </summary>
     public const int MaxValue = 0xFF_FF_FF;
 
