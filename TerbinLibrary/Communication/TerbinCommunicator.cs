@@ -427,7 +427,6 @@ public class TerbinCommunicator : IDisposable
     /// <param name="pIdMemory">Es: ID de la memoria destino en el otro extremo. <br />En: Destination memory ID on the other end.</param>
     /// <param name="pPayload">Es: El fragmento de payload a subir. <br />En: The payload fragment to upload.</param>
     /// <param name="pIdRequest">Es: El identificador general de la solicitud original. <br />En: General identifier of the original request.</param>
-    [TODO("Returna false cuando alomejor deneria meter una excepcion")]
     public async Task<bool> Load(
                 ushort pOrderRequest,
                 byte pIdMemory,
@@ -436,7 +435,7 @@ public class TerbinCommunicator : IDisposable
     {
         pIdRequest ??= MiniID.NewS;
         if (pPayload.Length >= TerbinProtocol.MAX_PLD)
-            return false; // TODO: que false ni ostia, metele una excepcion.
+            throw new Exception("Overpased \"TerbinProtocol.MAX_PLD\"");
 
         await addQueue(pOrderRequest, CodeStatus.Execute, new IdArray((byte)CodeTerbinProtocol.Load), pIdMemory, pPayload, pIdRequest.Value);
         return true;
