@@ -101,12 +101,15 @@ public static partial class Manager
                 return Status.IsCancelled;
 
             if (await NetUtil.DownloadAny(pUrl, pProgress) is var r && r.status != StatusNetUtil.Succes)
+            {
+                NodeUtil.TryDelete(r.tempFilePath);
                 return r.status switch
                 {
                     StatusNetUtil.NotSuchSpace => Status.NotSuchSpace,
                     StatusNetUtil.InvalidURL => Status.InvalidURL,
                     _ => Status.ErrorOnDowload,
                 };
+            }
 
             Guid? id = null;
             try
