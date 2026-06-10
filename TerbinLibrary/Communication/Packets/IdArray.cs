@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Runtime.InteropServices;
 using System.Text;
-using TerbinLibrary.Execution.Collection;
+using TerbinLibrary.Execution.Data;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.Useful;

@@ -4,7 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
 
-namespace TerbinLibrary.Execution.Collection;
+namespace TerbinLibrary.Execution.Data;
 /*
  -- Variables:
   empieza: _ = es privada NO local.
