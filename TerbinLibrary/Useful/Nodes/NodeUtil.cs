@@ -236,6 +236,20 @@ public static class NodeUtil
      */
 
     // TODO: Doc.
+    public static bool TryDelete(string pPath)
+    {
+        try
+        {
+            File.Delete(pPath);
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    // TODO: Doc.
     public static bool Within(string pOrigin, string pTarjet)
     {
         string basePath = Path.GetFullPath(pOrigin);
