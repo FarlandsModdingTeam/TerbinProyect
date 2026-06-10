@@ -5,6 +5,7 @@ using TerbinLibrary;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Data.Instance;
 using TerbinLibrary.Data.Plugin;
+using TerbinLibrary.Data.Store;
 using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
@@ -24,76 +25,39 @@ internal class ServicePluginStorage
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
         ReadOnlySpan<byte> reader = pParameters;
-        string nameInstance = reader.ReadArray<char>().CrString();
+        string id = reader.ReadArray<char>().CrString();
 
-        ManifestInstance? manifest;
-        ManifestPlugin[] manis;
-        string? path;
+        ReferencePluginStore? plugin;
 
-        if (pToken.IsCancellationRequested)
-            return InfoResponse.CreateCancelled(pHead.IdRequest);
+        plugin = await Manager.StoragePlugin.Get(id);
+        if (plugin is null)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.PluginNotExist));
 
-        path = Manager.Instances.GetPathFolder(nameInstance);
-        if (string.IsNullOrEmpty(path))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
-
-        manifest = await Manager.Instances.GetManifestByPath(path);
-        if (manifest == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
-
-        manis = await Manager.Plugin.GetAll(path, manifest, pToken);
-
-        if (pToken.IsCancellationRequested)
-            return InfoResponse.CreateCancelled(pHead.IdRequest);
-
-        Serialineitor s = new();
-
-
-        if (manis.Length <= 0)
-            return InfoResponse.CreateSucces(pHead.IdRequest, [0]);
-
-        s.Add<ThreeQuartersInt>(manis.Length);
-        for (int i = 0; i < manis.Length; i++)
-        {
-            ManifestPluginDTO tmp = (ManifestPluginDTO)manis[i];
-            s.AddStruct<ManifestPluginDTO>(tmp);
-        }
-
-        return InfoResponse.CreateSucces(pHead.IdRequest, s.Serialize());
+        return InfoResponse.CreateSucces(pHead.IdRequest, plugin.ToSerilizeDTO());
     }
 
     [TerbinExecutable((byte)CodeServices.Read, (byte)CodeServicesSection.PluginStorage)]
     public static async Task<InfoResponse?> GetOne(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
-        if (pParameters.Length <= 0)
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+        //if (pParameters.Length <= 0)
+        //    return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
-        ReadOnlySpan<byte> reader = pParameters;
-        string name = reader.ReadArray<char>().CrString();
-        string id = reader.ReadArray<char>().CrString();
+        //ReadOnlySpan<byte> reader = pParameters;
+        //string id = reader.ReadArray<char>().CrString();
 
-        ManifestInstance? manifest;
-        ManifestPlugin? mani;
-        string? path;
+        List<ReferencePluginStore> plugin;
+        Serialineitor s = new();
 
-        if (pToken.IsCancellationRequested)
-            return InfoResponse.CreateCancelled(pHead.IdRequest);
+        plugin = await Manager.StoragePlugin.GetAll();
 
-        path = Manager.Instances.GetPathFolder(name);
-        if (string.IsNullOrEmpty(path))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+        if (plugin.Count <= 0)
+            return InfoResponse.CreateSucces(pHead.IdRequest, [0]);
 
-        manifest = await Manager.Instances.GetManifestByPath(path);
-        if (manifest == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+        s.Add<ThreeQuartersInt>(plugin.Count);
+        for (int i = 0; i < plugin.Count; i++)
+            s.AddStruct<ReferencePluginStoreDTO>(plugin[i].ToDTO());
 
-        mani = await Manager.Plugin.GetOne(id, name, manifest, pToken);
-        if (mani is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
-
-        byte[] dto = ((ManifestPluginDTO)mani).Serialize();
-
-        return InfoResponse.CreateSucces(pHead.IdRequest, dto);
+        return InfoResponse.CreateSucces(pHead.IdRequest, s.Serialize());
     }
 
 }

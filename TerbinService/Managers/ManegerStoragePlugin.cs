@@ -429,10 +429,9 @@ public static partial class Manager
         /// </summary>
         /// <returns>Es: Una Lista completa mapeada que ilustra el inventario del store. <br />En: Complete mapped listing that paints the warehouse inventory.</returns>
         [TODO("Puede no ser async")]
-        public static async Task<List<ReferencePluginStore>?> GetAll()
+        public static async Task<List<ReferencePluginStore>> GetAll()
         {
             var man = await getIndex().ConfigureAwait(false);
-            if (man is null) return null;
             return man.References;
         }
 
@@ -448,10 +447,11 @@ public static partial class Manager
         /// </summary>
         /// <returns>Es: Objeto manifiesto cargado al ecosistema actual asincrono. <br />En: Loaded manifest object to asynchronous layer core.</returns>
         [TODO("Puede no ser async")]
-        private static async ValueTask<ManifestIndexStorage?> getIndex()
+        private static async ValueTask<ManifestIndexStorage> getIndex()
         {
             string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (string.IsNullOrEmpty(path)) return null;
+            if (string.IsNullOrEmpty(path))
+                throw new Exception($"The key TerbinConfiguration.RUTE_STORAGE_PLUGINS is not defined: ({TerbinConfiguration.RUTE_STORAGE_PLUGINS})");
 
             var man = JSonUtil.AcessDirect<ManifestIndexStorage>(path, TerbinServiceConst.MANIFEST_STORAGE);
             man ??= new()

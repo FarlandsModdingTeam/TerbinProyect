@@ -159,7 +159,6 @@ internal static class ServicePlugins
 
         Serialineitor s = new();
 
-
         if (manis.Length <= 0)
             return InfoResponse.CreateSucces(pHead.IdRequest, [0]);
 
