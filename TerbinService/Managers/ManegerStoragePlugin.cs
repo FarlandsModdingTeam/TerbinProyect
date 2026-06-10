@@ -38,7 +38,7 @@ public static partial class Manager
     /// Notes: All physical operations are controlled by a lock or semaphore.<br />
     /// Tips: Avoid manually manipulating or moving files listed in the manifest.<br />
     /// </summary>
-    [TODO("Actualizar plugin, ahunque ¿Que vas ah cambiar?")]
+    [TODO("Actualizar plugin \"Borrar y volver ah guardar PERO manteniendo el IdLocal\"")]
     public static class StoragePlugin
     {
         // TerbinConfiguration
@@ -108,6 +108,7 @@ public static partial class Manager
             string nameFile = Path.GetFileName(pPathPlugin);
             string namePlugin;
             Guid id;
+            bool exist = false;
 
             namePlugin = Manager.Node.GetNameByFile(pPathPlugin);
             id = Guid.NewGuid();
@@ -122,7 +123,7 @@ public static partial class Manager
 
             if (await ExistsByFile(nameFile).ConfigureAwait(false))
             {
-                return null;
+                exist = true;
                 //var r = await GetByFileName(nameFile);
                 //if (r is not null)
                 //    await unregisterPlugin(r);
@@ -130,7 +131,7 @@ public static partial class Manager
             if (!await save(pPathPlugin, pDuplicate))
                 return null;
 
-            if (!await registerPlugin(reference).ConfigureAwait(false))
+            if (!exist && !await registerPlugin(reference).ConfigureAwait(false))
             {
                 await operatePlugin(nameFile, (p, d) => { File.Delete(d); }).ConfigureAwait(false);
                 return null;
