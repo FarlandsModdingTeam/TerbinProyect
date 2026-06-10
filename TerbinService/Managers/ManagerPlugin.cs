@@ -122,6 +122,7 @@ public static partial class Manager
             {
                 if (pCancellationToken.IsCancellationRequested && id is not null)
                     await Manager.StoragePlugin.Eliminate($"{id:N}").ConfigureAwait(false);
+                NodeUtil.TryDelete(r.tempFilePath);
             }
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
