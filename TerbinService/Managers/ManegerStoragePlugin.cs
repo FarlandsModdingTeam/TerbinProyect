@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Xml.Linq;
 using TerbinLibrary;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data.Store;
@@ -85,10 +86,8 @@ public static partial class Manager
             {
                 File.Move(pPathPlugin, newPath, true); // Renombrar.
             }
-            if (pDuplicate)
-                return StoreDuplicate(newPath);
-            else
-                return Store(newPath);
+
+            return Store(newPath, pDuplicate);
         }
 
         /// <summary>
@@ -104,7 +103,7 @@ public static partial class Manager
         /// <param name="pPathPlugin">Es: Ruta directa al plugin a guardar. <br />En: Direct path to the plugin to save.</param>
         /// <param name="pDuplicate">Es: Indiferencia temporal para clonar o trasladar el archivo. <br />En: Temporary indifference to clone or move the file.</param>
         /// <returns>Es: Un código único validado (Guid en texto). <br />En: A validated unique code (text Guid).</returns>
-        public static async ValueTask<Guid?> Store(string pPathPlugin)
+        public static async ValueTask<Guid?> Store(string pPathPlugin, bool pDuplicate = false)
         {
             string nameFile = Path.GetFileName(pPathPlugin);
             string namePlugin;
@@ -121,8 +120,14 @@ public static partial class Manager
                 Version = PluginUtil.ExtratVersion(nameFile),
             };
 
-            //if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
-            if (!await operatePlugin(pPathPlugin, (p, d) => File.Move(p, d, true)).ConfigureAwait(false))
+            if (await ExistsByFile(nameFile).ConfigureAwait(false))
+            {
+                return null;
+                //var r = await GetByFileName(nameFile);
+                //if (r is not null)
+                //    await unregisterPlugin(r);
+            }
+            if (!await save(pPathPlugin, pDuplicate))
                 return null;
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
@@ -135,34 +140,19 @@ public static partial class Manager
         }
 
         // TODO: Doc.
-        public static async ValueTask<Guid?> StoreDuplicate(string pPathPlugin)
+        private static async ValueTask<bool> save(string pPathPlugin, bool pDuplicate)
         {
-            string nameFile = Path.GetFileName(pPathPlugin);
-            string namePlugin;
-            Guid id;
-
-            namePlugin = Manager.Node.GetNameByFile(pPathPlugin);
-            id = Guid.NewGuid();
-
-            var reference = new ReferencePluginStore
+            if (pDuplicate)
             {
-                Name = namePlugin,
-                Id = $"{id:N}",
-                FileName = nameFile,
-                Version = PluginUtil.ExtratVersion(nameFile),
-            };
-
-            //if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
-            if (!await operatePlugin(pPathPlugin, (p, d) => File.Copy(p, d, true)).ConfigureAwait(false))
-                return null;
-
-            if (!await registerPlugin(reference).ConfigureAwait(false))
-            {
-                await operatePlugin(nameFile, (p, d) => { File.Delete(d); }).ConfigureAwait(false);
-                return null;
+                if (!await operatePlugin(pPathPlugin, (p, d) => File.Copy(p, d, true)).ConfigureAwait(false))
+                    return false;
             }
-
-            return id;
+            else
+            {
+                if (!await operatePlugin(pPathPlugin, (p, d) => File.Move(p, d, true)).ConfigureAwait(false))
+                    return false;
+            }
+            return true;
         }
 
         /// <summary>
@@ -400,6 +390,20 @@ public static partial class Manager
                     return true;
             }
             return false;
+        }
+
+        public static async Task<ReferencePluginStore?> GetByFileName(string pName)
+        {
+            var references = await GetAll().ConfigureAwait(false);
+            if (references is null) return null;
+
+            for (int i = 0; i < references.Count; i++)
+            {
+                var r = references[i];
+                if (r.FileName == pName)
+                    return r;
+            }
+            return null;
         }
 
         /// <summary>
