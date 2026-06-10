@@ -7,7 +7,10 @@ namespace TerbinLibrary.Useful;
 
 public static partial class PluginUtil
 {
-    private const string _pattern = @"\b\d+\.\d+(?:\.\d+)*\b(?:-[a-zA-Z0-9.-]+)?";
+    [TODO("Que detecte beta en cualquier lado")]
+    [TODO("Que detecte alpha en cualquier lado")]
+    private const string _pattern = @"(?<!\b)\d+\.\d+(?:\.\d+)*\b";
+    // (?:-[a-zA-Z0-9.-]+)? // -beta
 
     [GeneratedRegex(_pattern)]
     private static partial Regex versionRegex();
