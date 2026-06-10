@@ -121,8 +121,8 @@ public static partial class Manager
                 Version = PluginUtil.ExtratVersion(nameFile),
             };
 
-            if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
-            if (!await operatePlugin(pPathPlugin, File.Move ).ConfigureAwait(false))
+            //if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
+            if (!await operatePlugin(pPathPlugin, (p, d) => File.Move(p, d, true)).ConfigureAwait(false))
                 return null;
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
@@ -152,8 +152,8 @@ public static partial class Manager
                 Version = PluginUtil.ExtratVersion(nameFile),
             };
 
-            if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
-            if (!await operatePlugin(pPathPlugin, File.Copy ).ConfigureAwait(false))
+            //if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
+            if (!await operatePlugin(pPathPlugin, (p, d) => File.Copy(p, d, true)).ConfigureAwait(false))
                 return null;
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
