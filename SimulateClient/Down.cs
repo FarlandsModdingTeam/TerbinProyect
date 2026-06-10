@@ -30,7 +30,7 @@ internal class Down : ITests
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            if (await Helper.IsError(r.Head.Status)) return;
+            await Helper.IsError(r.Head.Status);
         }
 
 
@@ -44,7 +44,7 @@ internal class Down : ITests
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            if (await Helper.IsError(r.Head.Status)) return;
+            await Helper.IsError(r.Head.Status);
         }
 
 
@@ -58,7 +58,7 @@ internal class Down : ITests
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            if (await Helper.IsError(r.Head.Status)) return;
+            await Helper.IsError(r.Head.Status);
         }
 
 
