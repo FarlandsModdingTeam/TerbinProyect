@@ -8,6 +8,7 @@ using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Memory;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace TerbinLibrary.Execution;
 
@@ -131,6 +132,14 @@ public static class TerbinExecutor
     public static async Task<InfoResponse?> Response(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pToken.IsCancellationRequested) return null;
+        if (pHead.Status == CodeStatus.ExecutionException)
+        {
+            ExceptionDTO dto = new();
+            dto.Deserialize(pParameters);
+            Console.Error(dto.ToString());
+            return null;
+        }    
+
         _communicator?.GiveResponse(new PacketRequest(pHead: pHead, new IdArray((byte)CodeTerbinProtocol.Response), pParameters));
         return null;
     }
