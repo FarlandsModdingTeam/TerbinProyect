@@ -21,12 +21,6 @@ public static class ManagerFarlands
     public const int KEY_FARLANDS = 2252680;
     public const string FARLANDS_EXE = "Farlands.exe";
 
-    public static bool IsOpenSteam
-    {
-        get => Process.GetProcessesByName("steam").Length > 0 ||
-               Process.GetProcessesByName("steamwebhelper").Length > 0;
-    }
-
     public static bool LaunchGame(string pPath)
     {
         if (string.IsNullOrEmpty(pPath) || !File.Exists(pPath))
@@ -48,40 +42,6 @@ public static class ManagerFarlands
             return false;
         }
     }
-
-    public static bool FindProton(out string pPathProton)
-    {
-        pPathProton = "";
-
-
-
-        return true;
-    }
-
-
-    /*
-    public static Status LaunchFarlandsByPotron()
-    {
-        var potronPath = GetPotronPath();
-        if (potronPath == null)
-            return Status.NotInstaled;
-
-        try
-        {
-            Process.Start(new ProcessStartInfo
-            {
-                FileName = potronPath,
-                UseShellExecute = true,
-                WorkingDirectory = Path.GetDirectoryName(potronPath)
-            });
-            return Status.Succes;
-        }
-        catch
-        {
-            return Status.NotInstaled;
-        }
-    }
-    */
 
     public static bool LaunchFarlandsBySteam()
     {
