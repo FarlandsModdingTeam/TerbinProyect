@@ -21,13 +21,12 @@ using TerbinLibrary.Protocol;
 // TODO: Manifest de Plugin guarde si requiere BepInEx.
 // TODO: InstallByInstace y InstallByPath
 
-// Console.Write($"\rClonando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
+// Console.Write($"\Trabajando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
 
 #if true
 
-ThreeQuartersInt v1 = 777;
 
-Console.WriteLine($"Vegeta" + v1.ToString());
+//ManagerFarlands.LaunchGame("C:\\Users\\PC\\Documents\\TerbinInstaces\\_cosas_old\\mqm1\\Farlands.exe");
 Console.WriteLine($"SimulateClient esta desactivado.");
 Console.WriteLine($"Ponga en false el if para activarlo.");
 await pressAnyKeyToContinue();
