@@ -15,7 +15,7 @@ namespace SimulateClient;
 static class Yolo
 {
     [Obsolete("Falta cambiar cosas antiguas", true)]
-    static async Task yolo(TerbinCommunicator pCommunicator)
+    static async Task yolo_old(TerbinCommunicator pCommunicator)
     {
         string? nameInstace, pathInstaces, pathInstace, pathFarlands;
         char[] nameArray;

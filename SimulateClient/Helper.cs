@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net.NetworkInformation;
 using System.Text;
 using TerbinLibrary.Protocol;
 
@@ -16,6 +17,11 @@ static class Helper
             return true;
         }
         return false;
+    }
+    public static async Task Fin()
+    {
+        Console.WriteLine($"[Client] ==> FIN");
+        await PressAnyKeyToContinue();
     }
     public static async Task PressAnyKeyToContinue()
     {
