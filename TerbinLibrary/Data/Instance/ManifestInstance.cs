@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TerbinLibrary.Data.References;
+using TerbinLibrary.Data.Plugin;
 using TerbinLibrary.Data.Transport;
 
-namespace TerbinLibrary.Data.Manifests;
+namespace TerbinLibrary.Data.Instance;
 
 
 /// <summary>

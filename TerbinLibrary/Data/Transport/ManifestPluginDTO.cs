@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TerbinLibrary.Data.Manifests;
+using TerbinLibrary.Data.Plugin;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;

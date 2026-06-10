@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TerbinLibrary.Data.References;
 
-namespace TerbinLibrary.Data.Manifests;
+namespace TerbinLibrary.Data.Instance;
 
 public class ManifestIndex
 {

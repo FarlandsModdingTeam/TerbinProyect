@@ -1,6 +1,5 @@
 ﻿using TerbinLibrary.Configuration;
-using TerbinLibrary.Data.Manifests;
-using TerbinLibrary.Data.References;
+using TerbinLibrary.Data.Instance;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Useful.Nodes;
 

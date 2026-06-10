@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Configuration;
-using TerbinLibrary.Data.Manifests;
-using TerbinLibrary.Data.References;
+using TerbinLibrary.Data.Store;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 using static TerbinService.Managers.Manager;
@@ -106,12 +105,11 @@ public static partial class Manager
             };
 
             if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
-            if (!await operatePlugin(pPathPlugin, (p, d) => { File.Move(p, d); }).ConfigureAwait(false))
+            if (!await operatePlugin(pPathPlugin, File.Move ).ConfigureAwait(false))
                 return null;
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
             {
-                // ¿Tendria que ser el nameFile?
                 await operatePlugin(nameFile, (p, d) => { File.Delete(d); }).ConfigureAwait(false);
                 return null;
             }
@@ -138,12 +136,11 @@ public static partial class Manager
             };
 
             if (await ExistsByFile(nameFile).ConfigureAwait(false)) return null;
-            if (!await operatePlugin(pPathPlugin, (p, d) => { File.Copy(p, d); }).ConfigureAwait(false))
+            if (!await operatePlugin(pPathPlugin, File.Copy ).ConfigureAwait(false))
                 return null;
 
             if (!await registerPlugin(reference).ConfigureAwait(false))
             {
-                // ¿Tendria que ser el nameFile?
                 await operatePlugin(nameFile, (p, d) => { File.Delete(d); }).ConfigureAwait(false);
                 return null;
             }
@@ -253,7 +250,7 @@ public static partial class Manager
                 if (pathStorage == null)
                     return false;
 
-                r = JSonUtil.UpdateDirect<ManifestStorage>(
+                r = JSonUtil.UpdateDirect<ManifestIndexStorage>(
                     pathStorage,
                     TerbinServiceConst.MANIFEST_STORAGE,
                     ii => { ii.References?.Add(pReference); }
@@ -308,7 +305,7 @@ public static partial class Manager
                 if (pathStorage == null)
                     return false;
 
-                r = JSonUtil.UpdateDirect<ManifestStorage>(
+                r = JSonUtil.UpdateDirect<ManifestIndexStorage>(
                     pathStorage,
                     TerbinServiceConst.MANIFEST_STORAGE,
                     ii =>
@@ -451,12 +448,12 @@ public static partial class Manager
         /// </summary>
         /// <returns>Es: Objeto manifiesto cargado al ecosistema actual asincrono. <br />En: Loaded manifest object to asynchronous layer core.</returns>
         [TODO("Puede no ser async")]
-        private static async ValueTask<ManifestStorage?> getManifest()
+        private static async ValueTask<ManifestIndexStorage?> getManifest()
         {
             string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
             if (string.IsNullOrEmpty(path)) return null;
 
-            var man = JSonUtil.AcessDirect<ManifestStorage>(path, TerbinServiceConst.MANIFEST_STORAGE);
+            var man = JSonUtil.AcessDirect<ManifestIndexStorage>(path, TerbinServiceConst.MANIFEST_STORAGE);
             //if (man is null) return null;
 
             return man;

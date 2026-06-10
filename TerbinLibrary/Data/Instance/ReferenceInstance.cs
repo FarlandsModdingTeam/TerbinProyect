@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Linq;
-using TerbinLibrary;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 
-namespace TerbinLibrary.Data.References;
+namespace TerbinLibrary.Data.Instance;
 /*
  -- Variables:
   empieza: _ = es privada NO local.

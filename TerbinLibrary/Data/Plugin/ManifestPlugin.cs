@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using TerbinLibrary.Data;
 using TerbinLibrary.Data.Transport;
 
-namespace TerbinLibrary.Data.Manifests;
+namespace TerbinLibrary.Data.Plugin;
 /*
  -- Variables:
   empieza: _ = es privada NO local.

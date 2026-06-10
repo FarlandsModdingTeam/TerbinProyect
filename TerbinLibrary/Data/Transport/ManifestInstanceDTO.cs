@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-using TerbinLibrary.Data.Manifests;
-using TerbinLibrary.Data.References;
+using TerbinLibrary.Data.Instance;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;

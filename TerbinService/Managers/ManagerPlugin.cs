@@ -7,8 +7,8 @@ using TerbinLibrary;
 using TerbinLibrary.Async;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
-using TerbinLibrary.Data.Manifests;
-using TerbinLibrary.Data.References;
+using TerbinLibrary.Data.Instance;
+using TerbinLibrary.Data.Plugin;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
@@ -16,7 +16,6 @@ using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.NetWork;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Services;
-using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Managers;
 /*

@@ -2,11 +2,8 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json.Serialization;
-using TerbinLibrary.Data;
-using TerbinLibrary.Data.Manifests;
-using TerbinLibrary.Data.References;
 
-namespace TerbinLibrary.Data.Manifests;
+namespace TerbinLibrary.Data;
 
 internal interface IManifest
 {

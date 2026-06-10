@@ -6,8 +6,8 @@ using System.Xml.Linq;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
-using TerbinLibrary.Data.Manifests;
-using TerbinLibrary.Data.References;
+using TerbinLibrary.Data.Instance;
+using TerbinLibrary.Data.Plugin;
 using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
@@ -20,7 +20,6 @@ using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.NetWork;
 using TerbinLibrary.Useful.Nodes;
 using TerbinService.Managers;
-using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Services;
 /*

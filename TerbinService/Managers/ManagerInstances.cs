@@ -7,8 +7,7 @@ using TerbinLibrary;
 using TerbinLibrary.Async;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
-using TerbinLibrary.Data.Manifests;
-using TerbinLibrary.Data.References;
+using TerbinLibrary.Data.Instance;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 
