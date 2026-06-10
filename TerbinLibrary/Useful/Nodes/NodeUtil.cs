@@ -238,6 +238,8 @@ public static class NodeUtil
     // TODO: Doc.
     public static bool TryDelete(string pPath)
     {
+        if (!File.Exists(pPath))
+            return false;
         try
         {
             File.Delete(pPath);

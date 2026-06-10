@@ -58,6 +58,19 @@ public static class NetUtil
     [TODO("tener uno en configuracion y pasarlo por funcion.")]
     private static readonly HttpClient _httpClient = new();
 
+    private static readonly string _tmp = Path.Combine(Path.GetTempPath(), "TerbinTmp");
+
+    public static string TmpPath
+    {
+        get
+        {
+            if (!Directory.Exists(_tmp))
+                Directory.CreateDirectory(_tmp);
+            return _tmp;
+        }
+    }
+
+
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Descarga un archivo ZIP desde una URL y lo extrae en el destino indicado.<br />
@@ -176,7 +189,7 @@ public static class NetUtil
                                             IProgress<TerbinInfoProgrss>? pProgress = null,
                                             CancellationToken pCancellationToken = default)
     {
-        string tmp = Path.Combine(Path.GetTempPath(), $"terbin_tmp_{Guid.NewGuid():N}");
+        string tmp = Path.Combine(TmpPath, $"terbin_tmp_{Guid.NewGuid():N}");
 
         if (!Uri.TryCreate(pUrl, UriKind.Absolute, out _))
             return (StatusNetUtil.InvalidURL, "");
@@ -210,6 +223,13 @@ public static class NetUtil
             return (StatusNetUtil.ExceptionOnDownload, e.Message);
         }
     }
+
+    public static string GetTmpPath()
+    {
+        return TmpPath;
+    }
+
+
     /// <summary>
     /// ___________________( Español )___________________<br />
     /// Envía una petición HTTP GET recibiendo la respuesta sin descargarla.<br />
