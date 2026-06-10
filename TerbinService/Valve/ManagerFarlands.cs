@@ -27,10 +27,11 @@ public static class ManagerFarlands
                Process.GetProcessesByName("steamwebhelper").Length > 0;
     }
 
-    public static Status LaunchFarlands(string pPath)
+    public static bool LaunchGame(string pPath)
     {
         if (string.IsNullOrEmpty(pPath) || !File.Exists(pPath))
-            return Status.NotInstaled;
+            return false;
+
 
         try
         {
@@ -40,13 +41,23 @@ public static class ManagerFarlands
                 UseShellExecute = true,
                 WorkingDirectory = Path.GetDirectoryName(pPath)
             });
-            return Status.Succes;
+            return true;
         }
         catch
         {
-            return Status.NotInstaled;
+            return false;
         }
     }
+
+    public static bool FindProton(out string pPathProton)
+    {
+        pPathProton = "";
+
+
+
+        return true;
+    }
+
 
     /*
     public static Status LaunchFarlandsByPotron()
@@ -72,16 +83,16 @@ public static class ManagerFarlands
     }
     */
 
-    public static Status LaunchFarlandsBySteam()
+    public static bool LaunchFarlandsBySteam()
     {
         if (SteamLocator.GetGamePath(KEY_FARLANDS) == null)
-            return Status.NotInstaled;
+            return false;
         Process.Start(new ProcessStartInfo
         {
             FileName = "steam://run/2252680",
             UseShellExecute = true
         });
-        return Status.Succes;
+        return true;
     }
 
     public static List<string> GetDLCs(string pManifestPath)
@@ -111,17 +122,6 @@ public static class ManagerFarlands
     public static string? GetRuteSteamFarlands()
     {
         return SteamLocator.GetGamePath(KEY_FARLANDS);
-    }
-
-    // Esto no tiene nigun puto sentido.
-    public static string? GetPotronPath()
-    {
-        var ruteFarlands = GetRuteSteamFarlands();
-        if (ruteFarlands == null)
-            return null;
-
-        string potronPath = Path.Combine(ruteFarlands, "Potron", "Potron.exe");
-        return File.Exists(potronPath) ? potronPath : null;
     }
 
     public static bool IsFarlands(string pDir)
