@@ -9,7 +9,7 @@ using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace SimulateClient;
 
-internal class SimulateDownload
+internal class Down : ITests
 {
     // Poco a Poco.
     public static async Task LittleByLittle(TerbinCommunicator pCommunicator)

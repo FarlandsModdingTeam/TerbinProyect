@@ -1,19 +1,20 @@
 ﻿using Newtonsoft.Json.Linq;
+using SimulateClient;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
+using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
 using TerbinLibrary.Memory;
-using TerbinLibrary.Serialize;
-using TerbinLibrary.Communication.Packets;
-using TerbinLibrary.TerbinServiceHelper;
-using TerbinLibrary.TerbinServiceHelper.Exceptions;
-using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
 
 // TODO: No cambiarle el nombre al descargar.
 // TODO: Antes de instalar ver si dentro tiene una carpeta llamada Plugins.
@@ -53,7 +54,13 @@ else
     return;
 }
 
+Console.Write($"-------( Start )---------\n" +
+    $"[Client] (Nombre Clase)\n" +
+    $"[Client] Nombre -> ");
+string name = Console.ReadLine();
+Console.Write($"[Client] Nombre -> ");
 
+await ITests.LittleByLittle(communicator);
 
 
 
