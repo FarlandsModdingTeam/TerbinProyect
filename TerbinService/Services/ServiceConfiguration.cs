@@ -4,11 +4,11 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution;
-using TerbinLibrary.Serialize;
-using TerbinLibrary.Useful;
 using TerbinLibrary.Extension;
-using static TerbinService.Managers.ManagerConfiguration;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.Serialize;
+using TerbinLibrary.Useful.Nodes;
+using TerbinService.Managers;
 
 namespace TerbinService.Services;
 /*
@@ -24,12 +24,15 @@ namespace TerbinService.Services;
 
 // TODO: Guardar y gestionar:
 // ├─ Proton Instalado
+// ├─ Al cambiar la ruta toca mover todo.
 // ├─ Temporal de Proton
 // └─ Steam Instalado
 
+[TODO("Guardar y gestionar:\r\n ├─ Proton Instalado\r\n ├─ Al cambiar la ruta toca mover todo.\r\n ├─ Temporal de Proton\r\n └─ Steam Instalado")]
+[TODO("Las instancias no deberia ser una ruta, deberias cambiar su posicion desde el propio servicio que se encarge de mover toda la carpeta.")]
 internal static class ServiceConfiguration
 {
-    [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Rute)]
+    //[TerbinExecutable((byte)CodeServices.Create, (byte)CodeServicesSection.Rute)]
     public static async Task<InfoResponse?> UpdateRute(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
@@ -42,7 +45,10 @@ internal static class ServiceConfiguration
         if (newRute == null)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
-        var result = SetConfig(keyRute, newRute);
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+
+        var result = Manager.Configuration.SetConfig(keyRute, newRute);
         pHead.Status = result switch
         {
             CodeAcessJSonSave.Succes => CodeStatus.Succes,
@@ -53,32 +59,32 @@ internal static class ServiceConfiguration
         return InfoResponse.Create(pHead.IdRequest, pHead.Status);
     }
 
-    [TerbinExecutable((byte)TerbinCRUD.Read, (byte)CodeSubServices.Rute)]
+    [TerbinExecutable((byte)CodeServices.Read, (byte)CodeServicesSection.Rute)]
     public static async Task<InfoResponse?> ReadRute(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
         byte[] pld;
         string keyRute = new(Serialineitor.DeserializeArray<char>(ref pParameters));
+        CodeStatus status;
+
         if (string.IsNullOrEmpty(keyRute))
         {
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
         }
-        if (GetConfg(keyRute) is var rute && rute != null)
+        if (Manager.Configuration.GetConfg(keyRute) is var rute && rute != null)
         {
             pld = Serialineitor.SerializeArray<char>(rute.ToCharArray());
-            pHead.Status = CodeStatus.Succes;
+            status = CodeStatus.Succes;
         }
         else
         {
             pld = [];
             // Farlands no esta instalado.
-            pHead.Status = CodeStatus.AccesNullOrNotExist;
+            status = CodeStatus.AccesNullOrNotExist;
         }
-        return new InfoResponse
-        {
-            IdRequest = pHead.IdRequest,
-            Status = pHead.Status,
-            Payload = pld
-        };
+        return InfoResponse.Create(pHead.IdRequest, status, pld);
     }
 
 }

@@ -26,11 +26,16 @@ public class Worker : BackgroundService
     public static CancellationTokenSource? Cts;
     private static IHostApplicationLifetime? _appLifetime;
 
-    public static AsyncLocal<AmongInfoThreads> CurrentConst = new AsyncLocal<AmongInfoThreads>();
+    public static AsyncLocal<InfoLocalThreads> CurrentContext = new AsyncLocal<InfoLocalThreads>();
 
     public Worker(ILogger<Worker> pLogger, IHostApplicationLifetime pAppLifetime)
     {
         Worker._appLifetime = pAppLifetime;
+
+        Console.PrintLn("Por Hacer TerbinLibrary: ");
+        TODOAttribute.ChekAndPrint(Assembly.Load("TerbinLibrary"));
+        Console.PrintLn("Por Hacer TerbinService: ");
+        TODOAttribute.ChekAndPrint(Assembly.GetExecutingAssembly());
     }
 
     protected override async Task ExecuteAsync(CancellationToken pStoppingToken)
@@ -59,7 +64,7 @@ public class Worker : BackgroundService
             communicator.OnRecive += async (pCapsule) =>
             {
                 Console.Log($"Packet: {pCapsule}");
-                CurrentConst.Value = new AmongInfoThreads
+                CurrentContext.Value = new InfoLocalThreads
                 {
                     Communicator = communicator,
                 };
@@ -78,13 +83,14 @@ public class Worker : BackgroundService
 
 
     [TerbinExecutable((byte)CodeTerbinProtocol.Stop)]
-    public static async Task<InfoResponse?> Stop(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> Stop(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         _ = Task.Run(async () =>
         {
             await Task.Delay(100);
 
             Console.WriteLine("[Worker] Execution stoped");
+            if (pToken.IsCancellationRequested) return;
             _appLifetime?.StopApplication();
             Cts?.Cancel();
         });

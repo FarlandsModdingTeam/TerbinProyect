@@ -19,7 +19,7 @@ namespace TerbinLibrary.Protocol;
  */
 
 
-public class TerbinProtocol
+public static class TerbinProtocol
 {
     public const ushort MAX_PLD = 0xFFFD; // ¡Vamos Miura!
     public const ushort FRAGMENT_IN = 0xFFFA; // 0xFFF
@@ -30,12 +30,12 @@ public class TerbinProtocol
     public const ushort FIRST_PACKET = 1;
     public const ushort FINAL_PACKET = ushort.MaxValue;
 
-    public const byte MAXIMUS_RESPONSE_TIME = 16;
+    public const byte MAXIMUS_RESPONSE_TIME = 8;
 
     public const byte RESERVE_PROTOCOL = 9;
     public const byte RESERVE_MEMORY = 9;
 
-    public const byte LENGTH_ARRAY = 3;
+    public const byte LENGTH_ARRAY = ThreeQuartersInt.Size;
 
     /*
     public static async Task InitProtocol(CancellationToken pTokenCancellation)
@@ -154,11 +154,16 @@ public enum CodeStatus : short
 {
     NotAsign = -1,
 
+    Info = 100,
+    Alert = 101,
+    Exception = 102,
+    IsCancelled = 103,
+
     Succes = 200,
 
     Execute = 300, // Hace mucha falta.
     ExecuteInternal = 301,
-    Info = 302,
+    // 302
     CheckExecution = 303,
     CancelByRequest = 304,
     CancelByAction = 305,
@@ -474,7 +479,9 @@ public enum TerbinErrorCode : ushort
     NotImplementedYet = 9999
 }
 
-public enum AppError : int
+
+
+public enum AppError : long
 {
     None = 0, // Operación exitosa
 

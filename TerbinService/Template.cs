@@ -27,7 +27,7 @@ namespace TerbinService;
 internal partial class Template
 {
     // [TerbinExecutable(CodeServices.WIP_NewService)]
-    public static async Task<InfoResponse?> TemplateMethod(Header pHead, byte[] pParameters)
+    public static async Task<InfoResponse?> TemplateMethod(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         // Comprobaciones.
         if (pParameters.Length <= 0)
@@ -39,7 +39,7 @@ internal partial class Template
         string dir = buffer.ReadArray<char>().CrString();
 
         // AmongInfoThreads.
-        AmongInfoThreads info = Worker.CurrentConst.Value;
+        InfoLocalThreads info = Worker.CurrentContext.Value;
 
         // Solicitar id memoria.
         var rIdB = await info.Communicator.SoliciteRequestMemory();

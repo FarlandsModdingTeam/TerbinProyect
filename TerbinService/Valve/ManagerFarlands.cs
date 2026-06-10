@@ -4,42 +4,55 @@ using System.Diagnostics;
 using TerbinLibrary.Useful;
 
 namespace TerbinLibrary.SteamFarlands;
+/*
+ -- Variables:
+  empieza: _ = es privada NO local.
+  empieza: menorculas = es privada local.
+  empieza: "p"en menorculas = parametro entrante local.
+  empieza: mayorculas = publica.
+ -- Funciones:
+  empieza: mayorculas = publica.
+  empieza: menorculas = privada.
+ */
+
 
 public static class ManagerFarlands
 {
     public const int KEY_FARLANDS = 2252680;
     public const string FARLANDS_EXE = "Farlands.exe";
 
-    public static bool IsOpenSteam
+    public static bool LaunchGame(string pPath)
     {
-        get => Process.GetProcessesByName("steam").Length > 0 ||
-               Process.GetProcessesByName("steamwebhelper").Length > 0;
+        if (string.IsNullOrEmpty(pPath) || !File.Exists(pPath))
+            return false;
+
+
+        try
+        {
+            Process.Start(new ProcessStartInfo
+            {
+                FileName = pPath,
+                UseShellExecute = true,
+                WorkingDirectory = Path.GetDirectoryName(pPath)
+            });
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
     }
 
-    public enum ErrorLaunchFarlands : sbyte
-    {
-        NotInstaled = -1,
-        Succes = 0,
-    }
-    public static ErrorLaunchFarlands LaunchFarlands(string? pName = null)
-    {
-        if (pName == null)
-            return LaunchFarlandsBySteam();
-
-        // TODO: Lanzar juego de la instancia,
-        return ErrorLaunchFarlands.Succes;
-    }
-
-    public static ErrorLaunchFarlands LaunchFarlandsBySteam()
+    public static bool LaunchFarlandsBySteam()
     {
         if (SteamLocator.GetGamePath(KEY_FARLANDS) == null)
-            return ErrorLaunchFarlands.NotInstaled;
+            return false;
         Process.Start(new ProcessStartInfo
         {
             FileName = "steam://run/2252680",
             UseShellExecute = true
         });
-        return ErrorLaunchFarlands.Succes;
+        return true;
     }
 
     public static List<string> GetDLCs(string pManifestPath)
@@ -81,8 +94,36 @@ public static class ManagerFarlands
     }
 
 
-    public static string? GetVersion()
+    public static string GetVersion()
     {
-        return "0.0.9";
+        var ruteFarlands = GetRuteSteamFarlands();
+        if (ruteFarlands == null)
+            return string.Empty;
+
+        var farlandsExePath = Path.Combine(ruteFarlands, FARLANDS_EXE);
+
+        if (!File.Exists(farlandsExePath))
+            return string.Empty;
+
+        try
+        {
+            var fileInfo = FileVersionInfo.GetVersionInfo(farlandsExePath);
+            return fileInfo.FileVersion ?? fileInfo.ProductVersion ?? "0.0.0";
+        }
+        catch
+        {
+            return string.Empty;
+        }
+    }
+
+
+
+
+
+    public enum Status : sbyte
+    {
+        NotInstaled = 2,
+
+        Succes = 1,
     }
 }

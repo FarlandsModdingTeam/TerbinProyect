@@ -1,13 +1,16 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Resources;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using TerbinLibrary.Extension;
 
-namespace TerbinLibrary.Useful;
+namespace TerbinLibrary.Useful.Nodes;
 /*
  -- Variables:
   empieza: _ = es privada NO local.
@@ -33,9 +36,34 @@ public enum CodeAcessJSonSave : sbyte
     Succes = 1,
 }
 
+/*
+ Recuerdo que por X razon no podia utilizar System.Text.Json pero no recuerdo.
+ */
+
+
+[TODO("Hacer los Acces y Saves con patrón Try.")]
 public class JSonUtil
 {
-    private static Dictionary<string, string> _places = new Dictionary<string, string>();
+    private static readonly ConcurrentDictionary<string, string> _places = new();
+    private static readonly ConcurrentDictionary<string, Lock> _fileLocks = new(StringComparer.OrdinalIgnoreCase);
+
+    private static readonly JsonSerializerSettings _settings = new()
+    {
+        NullValueHandling = NullValueHandling.Ignore
+    };
+
+    private static Lock getFileLock(string pFilePath)
+    {
+        lock (_fileLocks)
+        {
+            if (!_fileLocks.TryGetValue(pFilePath, out var fileLock))
+            {
+                fileLock = new Lock();
+                _fileLocks[pFilePath] = fileLock;
+            }
+            return fileLock;
+        }
+    }
 
     public static string? Get(string pKeyDir)
     {
@@ -62,7 +90,7 @@ public class JSonUtil
         lock (_places)
         {
             if (_places.ContainsKey(pKeyDir))
-                return (CodeAcessJSonDel)_places.Remove(pKeyDir).ToSByte();
+                return (CodeAcessJSonDel)_places.TryRemove(pKeyDir, out _ ).ToSByte();
             return CodeAcessJSonDel.NotExistKey;
         }
     }
@@ -76,22 +104,36 @@ public class JSonUtil
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(dir, fileName);
-        if (!File.Exists(routeComplete)) return null;
 
-        string json = File.ReadAllText(routeComplete);
+        lock (getFileLock(routeComplete))
+        {
+            if (!File.Exists(routeComplete)) return null;
 
-        return JsonConvert.DeserializeObject<T>(json);
+            string json = File.ReadAllText(routeComplete);
+
+            return JsonConvert.DeserializeObject<T>(json);
+        }
+    }
+    public static T? AcessDirect<T>(string pPath) where T : class
+    {
+        string dir = Path.GetDirectoryName(pPath) ?? throw new Exception("Not Acces to Path");
+        string file = Path.GetFileName(pPath);
+        return AcessDirect<T>(dir, file);
     }
     public static T? AcessDirect<T>(string pDir, string pFile) where T : class
     {
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(pDir, fileName);
-        if (!File.Exists(routeComplete)) return null;
 
-        string json = File.ReadAllText(routeComplete);
+        lock (getFileLock(routeComplete))
+        {
+            if (!File.Exists(routeComplete)) return null;
 
-        return JsonConvert.DeserializeObject<T>(json);
+            string json = File.ReadAllText(routeComplete);
+
+            return JsonConvert.DeserializeObject<T>(json);
+        }
     }
 
 
@@ -104,14 +146,18 @@ public class JSonUtil
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(dir, fileName);
-        if (!File.Exists(routeComplete))
-            Directory.CreateDirectory(dir);
 
-        string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
-        if (json == null) return CodeAcessJSonSave.ErrorSerialize;
+        lock (getFileLock(routeComplete))
+        {
+            if (!File.Exists(routeComplete))
+                Directory.CreateDirectory(dir);
 
-        File.WriteAllText(routeComplete, json);
-        return CodeAcessJSonSave.Succes;
+            string json = JsonConvert.SerializeObject(pContent, Formatting.Indented, _settings);
+            if (json == null) return CodeAcessJSonSave.ErrorSerialize;
+
+            File.WriteAllText(routeComplete, json);
+            return CodeAcessJSonSave.Succes;
+        }
     }
 
 
@@ -120,14 +166,18 @@ public class JSonUtil
         string fileName = getFileName(pFile);
 
         string routeComplete = Path.Combine(pDir, fileName);
-        if (!File.Exists(routeComplete))
-            Directory.CreateDirectory(pDir);
 
-        string json = JsonConvert.SerializeObject(pContent, Formatting.Indented);
-        if (json == null) return CodeAcessJSonSave.ErrorSerialize;
+        lock (getFileLock(routeComplete))
+        {
+            if (!File.Exists(routeComplete))
+                Directory.CreateDirectory(pDir);
 
-        File.WriteAllText(routeComplete, json);
-        return CodeAcessJSonSave.Succes;
+            string json = JsonConvert.SerializeObject(pContent, Formatting.Indented, _settings);
+            if (json == null) return CodeAcessJSonSave.ErrorSerialize;
+
+            File.WriteAllText(routeComplete, json);
+            return CodeAcessJSonSave.Succes;
+        }
     }
 
     private static string? getDir(string pKeyDir)
@@ -146,18 +196,6 @@ public class JSonUtil
     }
 
 
-
-
-    // ********************( Prototipos )******************** //
-
-    public string? this[string pKeyDir] // XD
-    {
-        get => Get(pKeyDir);
-        set
-        {
-            if (value != null) Set(pKeyDir, value);
-        }
-    }
 
     /// <summary>
     /// Carga un JSON, ejecuta las modificaciones dadas y lo guarda automáticamente.
@@ -181,5 +219,24 @@ public class JSonUtil
         updateAction(data);
 
         return SaveDirect(pDir, pFile, data);
+    }
+
+
+    // ********************( Prototipos )******************** //
+
+    public string? this[string pKeyDir] // XD
+    {
+        get => Get(pKeyDir);
+        set
+        {
+            if (value != null) Set(pKeyDir, value);
+        }
+    }
+
+    public static string ToJson<T>(T? pObj, Formatting? pFor = null, JsonSerializerSettings? pSettings = null)
+    {
+        pFor ??= Formatting.Indented;
+        pSettings ??= _settings;
+        return JsonConvert.SerializeObject(pObj, pFor.Value, pSettings);
     }
 }

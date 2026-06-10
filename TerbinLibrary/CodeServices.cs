@@ -4,7 +4,7 @@ using System.Text;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Serialize;
-using TerbinLibrary.Useful;
+using TerbinLibrary.Protocol;
 
 namespace TerbinLibrary;
 /*
@@ -25,20 +25,45 @@ public enum CodeServices : byte
     Info = 10,
     Alert = 11,
 
-    InstallBepInEx = 12,
+    Execute = 12,
+    Dowload = 13,
+    Install = 14,
 
-    Plugin_Tests = 20,
+    //InstallBepInEx = 12,
+    //Plugin_Tests = 20,
+    //ReadAllInstances = 30,
+    //WIP_NewService = 255,
 
-    ReadAllInstances = 30,
+    ReadAll = TerbinCRUD.ReadAll,
+    Duplicate = TerbinCRUD.Duplicate,
 
-    WIP_NewService = 255,
+    Create = TerbinCRUD.Create,
+    Read = TerbinCRUD.Read,
+    Update = TerbinCRUD.Update,
+    Deleted = TerbinCRUD.Deleted,
 }
 
+public enum CodeServicesSection : byte
+{
+    Game = 10,
+
+    Plugin = 20,
+    PluginStorage = 21,
+
+    Instances = 30,
+
+    FCM = 40,
+
+    Rute = 50,
+}
+
+[Obsolete("User CodeServicesSection instead")]
 public enum CodeSubServices : byte
 {
     Game = 10,
 
     Plugin = 20,
+    PluginStorage = 21,
 
     Instances = 30,
 
@@ -47,6 +72,21 @@ public enum CodeSubServices : byte
     Rute = 50,
     Rute_Antiguo_Obsoleto_MagincianPuto = 110,
 }
+
+public enum CodeServicesClient : byte
+{
+    SetMaxProgress = 10,
+    SetBarProgress = 11,
+}
+
+public enum CodeManifestError : byte
+{
+    NotAccesName = 2,
+    NotAccesId = 3,
+    NotAccesIdLocal = 4,
+    NotAccesPath = 5,
+}
+
 
 [Obsolete]
 public enum TypeService : byte
@@ -60,18 +100,30 @@ public enum CodeInternalErrors : ushort
 {
     IdSoliciteError = 11,
     TODO_WIP = 12,
-    TODO_SoliciteInfo = 13,
+    //TODO_SoliciteInfo = 13,
 
     // Farland = 100,
     FarlandRuteNotExist = 101,
 
     // Mods = 200,
     PluginNotConect = 201,
+    PluginOnDowload = 202,
+    PluginNotSuchSpace = 203,
+    PluginInvalidURL = 204,
+    PluginNotExist = 205,
+    PluginGet = 206,
+    PluginGetPath = 207,
+    PluginOnSave = 208,
+    PluginGetManifest = 209,
+    PluginOnUnistall = 210,
 
     // Instances = 300,
-    InstaceGetSizeError = 301,
-    InstaceNotExistOrConfigError = 302,
-    InstaceNotExit = 303,
+    InstanceGetSizeError = 301,
+    InstanceNotExist = 302,
+    InstanceIsNotInstance = 303,
+    InstanceRegister = 304,
+    InstanceUnregister = 305,
+
 
     // FCM = 400,
 
@@ -82,6 +134,9 @@ public enum CodeInternalErrors : ushort
     // BepInEx = 600,
     BepInExNotConect = 601,
     BepInExNotInstall = 602,
+
+    // Node = 700,
+    NodeDinamite = 701,
 
     // Zip = 1000,
     ZipExtractError = 1001,

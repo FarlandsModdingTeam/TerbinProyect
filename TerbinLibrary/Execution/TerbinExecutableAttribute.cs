@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Text;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Execution;
 /*
@@ -57,22 +58,10 @@ public sealed class TerbinExecutableAttribute : Attribute, IExecutableAttribute
 
     public TerbinExecutableAttribute(params object[] pAction)
     {
-        ArgumentNullException.ThrowIfNull(pAction);
-        if (pAction.Length > byte.MaxValue)
+        if (pAction?.Length > byte.MaxValue)
             throw new OverflowException($"Actionre overflow byte max");
-
-        byte[] tmp = new byte[pAction.Length];
-        for (int i = 0; i < pAction.Length; i++)
-        {
-            if (pAction[i] is byte b)
-            {
-                tmp[i] = b;
-            }
-            else if (pAction[i] != null && pAction[i].GetType().IsEnum)
-            {
-                tmp[i] = Convert.ToByte(pAction[i]);
-            }
-        }
-        this.Action = tmp;
+#pragma warning disable CS8604 // Posible argumento de referencia nulo
+        this.Action = Serialineitor.CastToByte(pAction); // Peta adentro.
+#pragma warning restore CS8604 // Posible argumento de referencia nulo
     }
 }

@@ -3,15 +3,17 @@ using System.Collections.Generic;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Data.Instance;
+using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Execution;
 using TerbinLibrary.Extension;
-using TerbinLibrary.Serialize;
-using TerbinService.Managers;
-using static TerbinService.Managers.ManagerInstances;
-using TerbinLibrary.TerbinServiceHelper;
-using TerbinLibrary.TerbinServiceHelper.Exceptions;
-using TerbinLibrary.TerbinServiceHelper.Consoles;
+using TerbinLibrary.HelperData;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using TerbinService.Managers;
 
 namespace TerbinService.Services;
 /*
@@ -25,53 +27,82 @@ namespace TerbinService.Services;
   empieza: minusculas = privada.
  */
 
-
+[TODO("Update Instance")]
 internal static class ServiceInstances
 {
-    [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Instances)]
+    [TerbinExecutable((byte)CodeServices.Create, (byte)CodeServicesSection.Instances)]
     public static async Task<InfoResponse?> CreateInstance(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
+        string name;
+        string path;
+
         ReadOnlySpan<byte> reader = pParameters;
-        var name = reader.ReadArray<char>().CrString();
+        name = reader.ReadArray<char>().CrString();
+        if (reader.Length > ThreeQuartersInt.Size)
+            path = reader.ReadArray<char>().CrString();
 
-        NewInstance(name);
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
 
-        return new InfoResponse
-        {
-            IdRequest = pHead.IdRequest,
-            Status = CodeStatus.Succes,
-            Payload = [],
-        };
+        bool succes = Manager.Instances.NewInstance(name, false);
+        // TODO: Si hay path crearlo ahí.
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
-    [TerbinExecutable((byte)CodeServices.ReadAllInstances)]
+    [TerbinExecutable((byte)CodeServices.Deleted, (byte)CodeServicesSection.Instances)]
+    public static async Task<InfoResponse?> DeleteInstances(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        string name;
+        ReadOnlySpan<byte> reader = pParameters;
+        name = reader.ReadArray<char>().CrString();
+
+        var r = await Manager.Instances.Delete(name, pToken);
+
+        if (r == Manager.Instances.Status.IsCancelled)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+        if (r != Manager.Instances.Status.Succes)
+        {
+            var error = TSHelper.GetError(r switch
+            {
+                Manager.Instances.Status.ErrorNotExist => CodeInternalErrors.InstanceNotExist,
+                Manager.Instances.Status.ErrorIsNotInstance => CodeInternalErrors.InstanceIsNotInstance,
+                Manager.Instances.Status.ErrorUnregistInstance => CodeInternalErrors.InstanceUnregister,
+                _ => CodeInternalErrors.NodeDinamite,
+            });
+            return InfoResponse.CreateInteralError(pHead.IdRequest, error);
+        }
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
+    }
+
+    [TerbinExecutable((byte)CodeServices.ReadAll, (byte)CodeServicesSection.Instances)]
     public static async Task<InfoResponse?> GetAllInstances(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
-        List<string> instances = ManagerManifest.GetIndex();
+        List<ReferenceInstance> instances = Manager.Index.GetAllInstances();
         Serialineitor s = new();
 
         if (instances.Count <= 0)
-            return InfoResponse.CreateSucces(pHead.IdRequest);
+            return InfoResponse.CreateSucces(pHead.IdRequest, [0]);
 
         s.Add<ThreeQuartersInt>(instances.Count);
         for (int i = 0; i < instances.Count; i++)
         {
-            s.AddArray(instances[i].ToCharArray());
+            ReferenceInstanceDTO tmp = (ReferenceInstanceDTO)instances[i];
+            s.AddStruct<ReferenceInstanceDTO>(tmp);
         }
 
-        return new InfoResponse
-        {
-            IdRequest = pHead.IdRequest,
-            Status = CodeStatus.Succes,
-            Payload = s.Serialize(),
-        };
+        return InfoResponse.CreateSucces(pHead.IdRequest, s.Serialize());
     }
 
-    [TerbinExecutable((byte)TerbinCRUD.Read, (byte)CodeSubServices.Instances)]
-    public static async Task<InfoResponse?> ReadInstance(Header pHead, byte[] pParameters, CancellationToken pToken)
+    [TerbinExecutable((byte)CodeServices.Read, (byte)CodeServicesSection.Instances)]
+    public static async Task<InfoResponse?> GetOne(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
@@ -79,20 +110,14 @@ internal static class ServiceInstances
         ReadOnlySpan<byte> reader = pParameters;
         var name = reader.ReadArray<char>().CrString();
 
-        var manifest = GetStringManifest(name);
+        ManifestInstance? manifest;
+
+        manifest = await Manager.Instances.GetManifestByName(name);
         if (manifest is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceNotExistOrConfigError));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
 
-        byte[] pld = Serialineitor.SerializeArray(manifest.ToCharArray());
+        byte[] dto = ((ManifestInstanceDTO)manifest).Serialize();
 
-        return new InfoResponse
-        {
-            IdRequest = pHead.IdRequest,
-            Status = CodeStatus.Succes,
-            Payload = pld,
-        };
+        return InfoResponse.CreateSucces(pHead.IdRequest, dto);
     }
-
-    // TODO: Update Instance.
-    // TODO: Deleted Instance.
 }

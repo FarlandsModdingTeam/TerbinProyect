@@ -6,6 +6,7 @@ using TerbinLibrary.Protocol;
 
 namespace TerbinLibrary.Communication.Packets;
 
+// Adbertencia esto es un prototipo!!!
 
 public ref struct InfoCommunicateResponse
 {
@@ -23,7 +24,7 @@ public struct InfoCommunicate : IInfo
     public InfoCommunicate()
     {
     }
-
+    
     public void InfoSend(TerbinCommunicator pCommunicator)
     {
         throw new NotImplementedException();

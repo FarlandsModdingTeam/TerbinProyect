@@ -1,9 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using TerbinLibrary;
 using TerbinLibrary.Data;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
+using TerbinLibrary.Useful.Nodes;
+
+
+
+using System;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.IO.Enumeration;
+using System.Runtime.CompilerServices;
+using System.Runtime.Versioning;
+
 
 namespace TerbinService.Managers;
 /*
@@ -18,22 +31,55 @@ namespace TerbinService.Managers;
  */
 
 
-public static class ManagerNode
+public static partial class Manager
 {
-    public static async Task<Task<(StatusFileUtil status, DirectoryHandwritten? json)>?>
-                HandleCloneGame(string pDirSource, string pDirTarjet, IProgress<TerbinInfoProgrss> pProgrss = default)
+    public static class Node
     {
-        if (!ManagerFarlands.IsFarlands(pDirSource))
-            return null;
+        public static (long? maxFiles, long? maxDir) GetSizeDir(string pDir)
+        {
+            long? countFiles = NodeUtil.GetCountFiles(pDir);
+            long? countDir = NodeUtil.GetCountDirectories(pDir);
+            return (countFiles, countDir);
+        }
 
-        var result = FileUtil.CloneDirectory(pDirSource, pDirTarjet, true, pProgrss);
-        return result;
-    }
 
-    public static (long? maxFiles, long? maxDir) GetSizeDir(string pDir)
-    {
-        long? countFiles = FileUtil.GetCountFiles(pDir);
-        long? countDir = FileUtil.GetCountDirectories(pDir);
-        return (countFiles, countDir);
+        [TODO("Comprobar que no borre algo que no debe como .TerbinInstaceInformation")]
+        public static async Task<Status> DinamiteDirectory
+            (string pPathDir, CancellationToken pCancellationToken = default)
+        {
+            string fullPath = Path.GetFullPath(pPathDir);
+
+            // TODO
+
+            Directory.Delete(path: fullPath, recursive: true);
+            return Status.Succes;
+        }
+
+        public static string GetNameByFile(string pFile)
+        {
+            if (string.IsNullOrWhiteSpace(pFile))
+                return string.Empty;
+
+            string fileName = Path.GetFileNameWithoutExtension(pFile);
+            return ClearNameByFile(fileName);
+        }
+
+        public static string ClearNameByFile(string pFileNameWithoutExtension)
+        {
+            pFileNameWithoutExtension = pFileNameWithoutExtension.Replace('_', ' ').Replace('-', ' ');
+            return string.Join(' ', pFileNameWithoutExtension.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+        }
+
+
+
+        public enum Status : sbyte
+        {
+            GenericException = -1,
+
+            IsCancelled = 0,
+            Succes = 1,
+
+            GenericError = 2,
+        }
     }
 }

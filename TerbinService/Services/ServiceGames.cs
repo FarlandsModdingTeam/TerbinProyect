@@ -8,7 +8,6 @@ using TerbinLibrary.Execution;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.Extension;
 using TerbinService.Managers;
-using static TerbinService.Managers.ManagerGames;
 using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
@@ -18,7 +17,7 @@ namespace TerbinService.Services;
 
 internal static class ServiceGames
 {
-    [TerbinExecutable((byte)TerbinCRUD.Create, (byte)CodeSubServices.Game)]
+    [TerbinExecutable((byte)TerbinCRUD.Duplicate, (byte)CodeServicesSection.Game)]
     public static async Task<InfoResponse?> CloneGame(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
@@ -28,16 +27,16 @@ internal static class ServiceGames
         string nameInstance = buffer.ReadArray<char>().CrString();
         string dirGame = buffer.ReadArray<char>().CrString();
 
-        var sizes = ManagerNode.GetSizeDir(dirGame);
+        var sizes = Manager.Node.GetSizeDir(dirGame);
         if (sizes.maxFiles == null || sizes.maxDir == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstaceGetSizeError));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceGetSizeError));
 
-        var rId = await Worker.CurrentConst.Value.Communicator.SoliciteRequestMemory();
+        var rId = await Worker.CurrentContext.Value.Communicator.SoliciteRequestMemory();
         if (rId.Head.Status != CodeStatus.Succes)
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
         byte id = rId.Payload[0];
 
-        _ = HandleCloneInInstanceWithProgress(nameInstance, id, dirGame);
+        //_ = Manager.Games.HandleCloneInInstanceWithProgress(nameInstance, id, dirGame);
 
         return new InfoResponse
         {
@@ -49,5 +48,20 @@ internal static class ServiceGames
                         .Add(sizes.maxDir.Value)
                         .Serialize(),
         };
+    }
+
+
+    [TerbinExecutable((byte)CodeServices.Execute, (byte)CodeServicesSection.Game)]
+    public static async Task<InfoResponse?> ExecuteGame(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        ReadOnlySpan<byte> buffer = pParameters;
+        string nameInstance = buffer.ReadArray<char>().CrString();
+
+        // TODO: ejecutar.
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 }

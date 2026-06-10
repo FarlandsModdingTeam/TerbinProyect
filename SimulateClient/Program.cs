@@ -145,7 +145,7 @@ async Task manuallity()
             var r = await communicator.Communicate(new(input), menssage);
 
             Console.WriteLine($"[Client] R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-            if (input == (byte)CodeServices.InstallBepInEx && r.Head.Status == CodeStatus.Succes)
+            if (input == (byte)CodeServices.Dowload && r.Head.Status == CodeStatus.Succes)
             {
                 ReadOnlySpan<byte> w = r.Payload;
                 byte id = w.Read<byte>();
