@@ -38,7 +38,6 @@ public static partial class Manager
     /// Tips: Avoid manually manipulating or moving files listed in the manifest.<br />
     /// </summary>
     [TODO("Actualizar plugin, ahunque ¿Que vas ah cambiar?")]
-    [TODO("IndexStore en vez de ser una lista")]
     public static class StoragePlugin
     {
         // TerbinConfiguration

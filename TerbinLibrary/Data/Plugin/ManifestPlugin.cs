@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using TerbinLibrary.Data.Transport;
+using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Data.Plugin;
 /*
@@ -17,7 +18,7 @@ namespace TerbinLibrary.Data.Plugin;
 
 
 
-public class ManifestPlugin : IManifest
+public class ManifestPlugin : IManifest, IToDTO<ManifestPluginDTO>, IToSerializeDTO
 {
     // Nombre del mod
     public string? Name { get; set; }
@@ -41,6 +42,16 @@ public class ManifestPlugin : IManifest
     public string? GetId()
     {
         return Id;
+    }
+
+    public ManifestPluginDTO ToDTO()
+    {
+        return (ManifestPluginDTO)this;
+    }
+
+    public byte[] ToSerilizeDTO()
+    {
+        return ((ManifestPluginDTO)this).Serialize();
     }
 
     public static explicit operator ManifestPlugin(ManifestPluginDTO pData)

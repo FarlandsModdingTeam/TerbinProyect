@@ -21,11 +21,21 @@ namespace TerbinLibrary.Data.Instance;
  */
 
 
-public class ReferenceInstance 
+public class ReferenceInstance : IToDTO<ReferenceInstanceDTO>, IToSerializeDTO
 {
     public string? Name;
     public bool? OutSide;
     public string? Path;
+
+    public ReferenceInstanceDTO ToDTO()
+    {
+        return (ReferenceInstanceDTO)this;
+    }
+
+    public byte[] ToSerilizeDTO()
+    {
+        return ((ReferenceInstanceDTO)this).Serialize();
+    }
 
     public static explicit operator ReferenceInstance(ReferenceInstanceDTO pData)
     {
