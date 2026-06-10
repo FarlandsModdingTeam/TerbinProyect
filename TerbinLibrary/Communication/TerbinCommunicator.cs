@@ -475,6 +475,7 @@ public class TerbinCommunicator : IDisposable
             return;
 
         Console.Warn($"Packet: {pCapsule}");
+        Console.WriteLine($"[{(CodeServices)pCapsule.ActionMethod[0]}, {(CodeServicesSection)pCapsule.ActionMethod[1]}]");
         if (TerbinMemoryHelper.TryGetMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
         {
             var error = (r == TerbinErrorCode.MemoryReleaseFailed) ? CodeStatus.ErrorReleaseMemory : CodeStatus.ErrorGetPaylaodMemory;
