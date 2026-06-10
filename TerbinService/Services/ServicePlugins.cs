@@ -60,6 +60,7 @@ internal static class ServicePlugins
                 (Worker.CurrentContext.Value.Communicator, max, pHead.IdRequest, (byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin);
         }
 
+        // TODO: Comprobar que exista y si existe preguntar si quiere sobre-escrbir.
         var r = await Manager.Plugin.DowloadOne(urlPlugin, progress, pToken);
 
         if (pToken.IsCancellationRequested)

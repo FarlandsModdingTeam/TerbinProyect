@@ -473,8 +473,8 @@ public class TerbinCommunicator : IDisposable
         if (_onRecive == null)
             return;
 
-        Console.Warn($"Packet: {pCapsule}");
-        Console.WriteLine($"[{(CodeServices)pCapsule.ActionMethod[0]}, {(CodeServicesSection)pCapsule.ActionMethod[1]}]");
+        //Console.Warn($"Packet: {pCapsule}");
+        //Console.WriteLine($"[{(CodeServices)pCapsule.ActionMethod[0]}, {(CodeServicesSection)pCapsule.ActionMethod[1]}]");
         if (TerbinMemoryHelper.TryGetMemoryStream(pCapsule, out var memo) is var r && r != TerbinErrorCode.None)
         {
             var error = (r == TerbinErrorCode.MemoryReleaseFailed) ? CodeStatus.ErrorReleaseMemory : CodeStatus.ErrorGetPaylaodMemory;
@@ -575,7 +575,6 @@ public class TerbinCommunicator : IDisposable
     /// <param name="pCapsule">Es: Paquete ya formado a guardar. <br />En: Formed packet to store.</param>
     public async Task addQueue(PacketRequest pCapsule)
     {
-        Console.Log($"Packet: {pCapsule}");
         _queue.Enqueue(pCapsule);
         _signal.Release();
     }
@@ -588,7 +587,6 @@ public class TerbinCommunicator : IDisposable
             try
             {
                 PacketRequest r = await _reader.ReadAsycn<PacketRequest>(_stopToken);
-                Console.Log($"Packet: {r}");
                 if (_stopToken.IsCancellationRequested)
                     break;
                 _ = handleReceive(r);
@@ -617,7 +615,6 @@ public class TerbinCommunicator : IDisposable
 
                 if (_stopToken.IsCancellationRequested)
                     break;
-                Console.Log($"Packet: {data}");
                 await _writer.WriteAsycn<PacketRequest>(data, _stopToken);
             }
             catch (EndOfStreamException)

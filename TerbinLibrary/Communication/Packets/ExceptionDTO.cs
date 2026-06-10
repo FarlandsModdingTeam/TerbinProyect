@@ -64,9 +64,9 @@ public struct ExceptionDTO() : IStructSerializable
             [{{Site}}] =>
             {
                 Message: {{Message}};
-                Source: {{Source ?? "N/A"}};
-                Inner: {{Inner ?? "N/A"}};
-                Trace: {{Trace ?? "N/A"}};
+                Source: {{Source}};
+                Inner: {{Inner}};
+                Trace: {{Trace}};
                 String: {{String}}
             }
             """;
