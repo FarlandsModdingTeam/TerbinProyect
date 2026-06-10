@@ -7,6 +7,7 @@ using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Execution.Data;
 using TerbinLibrary.Memory;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
@@ -36,6 +37,7 @@ namespace TerbinLibrary.Execution;
 /// Notes: Implements <see cref="IExecutableDispatcher"/>.<br />
 /// Tips: Avoid long blocking operations within the registered delegates without the use of the CancellationToken.<br />
 /// </summary>
+[TODO("Separar esto del Protocolo y hacer un envoltorio que haga estos pero contrlando excepciones, Status, etc... del protocolo")]
 public sealed class ExecutableDispatcher : IExecutableDispatcher
 {
     // (byte action, byte subAction), ByteArrayKey
@@ -140,8 +142,8 @@ public sealed class ExecutableDispatcher : IExecutableDispatcher
         catch (Exception e)
         {
             e.PrintException("CompoundExecutableDispatcher>DispatchAsync");
-            // TODO: Crear String y mandar de vuelta.
-            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionException);
+            byte[] pld = new ExceptionDTO(e, "CompoundExecutableDispatcher>DispatchAsync").Serialize();
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ExecutionException, pld);
         }
         finally
         {
