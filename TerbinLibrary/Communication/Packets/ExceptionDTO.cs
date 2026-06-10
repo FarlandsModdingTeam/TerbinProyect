@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Text;
 using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Extension;
@@ -53,5 +54,21 @@ public struct ExceptionDTO() : IStructSerializable
         pBuffer.WriteArray<char>(ref offset, Inner.ToCharArray());
         pBuffer.WriteArray<char>(ref offset, Trace.ToCharArray());
         pBuffer.WriteArray<char>(ref offset, String.ToCharArray());
+    }
+
+
+    public override readonly string ToString()
+    {
+        return
+            $$"""
+            [{{Site}}] =>
+            {
+                Message: {{Message}};
+                Source: {{Source ?? "N/A"}};
+                Inner: {{Inner ?? "N/A"}};
+                Trace: {{Trace ?? "N/A"}};
+                String: {{String}}
+            }
+            """;
     }
 }
