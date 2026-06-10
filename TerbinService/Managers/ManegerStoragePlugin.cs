@@ -4,6 +4,7 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data.Store;
+using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 using static TerbinService.Managers.Manager;
@@ -431,7 +432,7 @@ public static partial class Manager
         [TODO("Puede no ser async")]
         public static async Task<List<ReferencePluginStore>?> GetAll()
         {
-            var man = await getManifest().ConfigureAwait(false);
+            var man = await getIndex().ConfigureAwait(false);
             if (man is null) return null;
             return man.References;
         }
@@ -448,13 +449,17 @@ public static partial class Manager
         /// </summary>
         /// <returns>Es: Objeto manifiesto cargado al ecosistema actual asincrono. <br />En: Loaded manifest object to asynchronous layer core.</returns>
         [TODO("Puede no ser async")]
-        private static async ValueTask<ManifestIndexStorage?> getManifest()
+        private static async ValueTask<ManifestIndexStorage?> getIndex()
         {
             string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
             if (string.IsNullOrEmpty(path)) return null;
 
             var man = JSonUtil.AcessDirect<ManifestIndexStorage>(path, TerbinServiceConst.MANIFEST_STORAGE);
-            //if (man is null) return null;
+            man ??= new()
+            {
+                NameGame = "Farlands",
+                KeySteam = ManagerFarlands.KEY_FARLANDS,
+            };
 
             return man;
         }
