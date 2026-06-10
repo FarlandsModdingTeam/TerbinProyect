@@ -29,4 +29,45 @@ static class Helper
         _ = Console.ReadLine();
         await Task.Delay(500);
     }
+
+    public static string Read(string pMSG)
+    {
+        Console.Write($"[Client] {pMSG} -> ( ");
+
+        int startX = Console.CursorLeft;
+        int startTop = Console.CursorTop;
+
+        Console.Write(")");
+        Console.SetCursorPosition(startX, startTop);
+
+        StringBuilder txt = new();
+        bool flag = true;
+
+        while (flag)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(true);
+
+            if (key.Key == ConsoleKey.Enter)
+            {
+                flag = false;
+            }
+            else if (key.Key == ConsoleKey.Backspace)
+            {
+                if (txt.Length > 0)
+                    txt.Remove(txt.Length - 1, 1);
+            }
+            else if (!char.IsControl(key.KeyChar))
+            {
+                txt.Append(key.KeyChar);
+            }
+
+            Console.SetCursorPosition(startX, startTop);
+            Console.Write(txt.ToString() + " ) ");
+            Console.SetCursorPosition(startX + txt.Length, startTop);
+        }
+
+        Console.WriteLine();
+
+        return txt.ToString();
+    }
 }
