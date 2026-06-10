@@ -29,6 +29,7 @@ internal class Down : ITests
             r = await pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize());
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+            Helper.PrintMethod(r.ActionMethod);
             if (await Helper.IsError(r.Head.Status)) return;
         }
 
@@ -42,6 +43,7 @@ internal class Down : ITests
             r = await pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize());
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+            Helper.PrintMethod(r.ActionMethod);
             if (await Helper.IsError(r.Head.Status)) return;
         }
 
@@ -55,6 +57,7 @@ internal class Down : ITests
             r = await pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize());
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+            Helper.PrintMethod(r.ActionMethod);
             if (await Helper.IsError(r.Head.Status)) return;
         }
 
@@ -113,5 +116,19 @@ internal class Down : ITests
 
 
         await Helper.Fin();
+    }
+
+
+    private static Task<PacketRequest> download(TerbinCommunicator pCommunicator, Serialineitor s)
+    {
+        var r = pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize());
+        r.ContinueWith(async p =>
+        {
+            PacketRequest r = await p;
+            Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+            Helper.PrintMethod(r.ActionMethod);
+            if (await Helper.IsError(r.Head.Status)) return;
+        });
+        return r;
     }
 }

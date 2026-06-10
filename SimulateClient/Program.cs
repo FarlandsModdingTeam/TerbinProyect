@@ -66,7 +66,7 @@ MethodInfo? method = classType?.GetMethod(meth, BindingFlags.Static | BindingFla
 if (method != null)
 {
     method.Invoke(null, new object[] { communicator });
-    Console.WriteLine($"Método {meth} ejecutado correctamente");
+    //Console.WriteLine($"Método {meth} ejecutado correctamente");
 }
 
 
@@ -90,5 +90,5 @@ if (method != null)
 
 #endif
 
-Console.Log("Fin del Programa del todo");
-await Helper.Fin();
+//Console.Error("Fin del Programa del todo");
+//await Helper.Fin();
