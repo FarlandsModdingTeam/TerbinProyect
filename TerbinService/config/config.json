@@ -1,1 +1,5 @@
-{"rute_farlands":"C:\\Program Files (x86)\\Steam\\steamapps\\common\\Farlands","rute_instances":"C:\\Users\\PC\\Documents\\TerbinInstaces"}
+{
+  "rute_farlands": "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Farlands",
+  "rute_instances": "C:\\Users\\PC\\Documents\\TerbinInstaces",
+  "rute_plugins": "C:\\Users\\PC\\Documents\\TerbinStorage"
+}

@@ -47,6 +47,23 @@ public static partial class Manager
 
         private static readonly Lock _lockRename = new();
 
+
+        public static string PathStorage
+        {
+            get
+            {
+                string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
+                if (string.IsNullOrEmpty(path))
+                    throw new Exception($"The key TerbinConfiguration.RUTE_STORAGE_PLUGINS is not defined: ({TerbinConfiguration.RUTE_STORAGE_PLUGINS})");
+
+                if (!Directory.Exists(path))
+                    Directory.CreateDirectory(path);
+
+                return path;
+            }
+        }
+
+
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Almacena un plugin en el almacén de seguridad, permitiendo renombrarlo en el proceso.<br />
@@ -66,7 +83,7 @@ public static partial class Manager
             string newPath = Path.Combine(Path.GetDirectoryName(pPathPlugin) ?? string.Empty, pNameFile);
             lock (_lockRename)
             {
-                File.Move(pPathPlugin, newPath); // Renombrar.
+                File.Move(pPathPlugin, newPath, true); // Renombrar.
             }
             if (pDuplicate)
                 return StoreDuplicate(newPath);
@@ -213,8 +230,7 @@ public static partial class Manager
             await _semaphoreOperate.WaitAsync().ConfigureAwait(false);
             try
             {
-                pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-                if (pathStorage is null) return false;
+                pathStorage = PathStorage;
 
                 destination = Path.Combine(pathStorage, Path.GetFileName(pPathPlugin));
 
@@ -246,9 +262,7 @@ public static partial class Manager
             await _semaphoreManifest.WaitAsync().ConfigureAwait(false);
             try
             {
-                string? pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-                if (pathStorage == null)
-                    return false;
+                string pathStorage = PathStorage;
 
                 r = JSonUtil.UpdateDirect<ManifestIndexStorage>(
                     pathStorage,
@@ -301,9 +315,7 @@ public static partial class Manager
             await _semaphoreManifest.WaitAsync().ConfigureAwait(false);
             try
             {
-                string? pathStorage = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-                if (pathStorage == null)
-                    return false;
+                string pathStorage = PathStorage;
 
                 r = JSonUtil.UpdateDirect<ManifestIndexStorage>(
                     pathStorage,
@@ -339,8 +351,7 @@ public static partial class Manager
         /// <returns>Es: True en caso de encontrar el fichero. <br />En: True when file is found.</returns>
         public static async Task<bool> ExistsByFile(string pFile)
         {
-            string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (path is null) return false;
+            string path = PathStorage;
             string[] r = Directory.GetFiles(path, pFile);
             return r.Length > 0;
         }
@@ -449,9 +460,7 @@ public static partial class Manager
         [TODO("Puede no ser async")]
         private static async ValueTask<ManifestIndexStorage> getIndex()
         {
-            string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (string.IsNullOrEmpty(path))
-                throw new Exception($"The key TerbinConfiguration.RUTE_STORAGE_PLUGINS is not defined: ({TerbinConfiguration.RUTE_STORAGE_PLUGINS})");
+            string path = PathStorage;
 
             var man = JSonUtil.AcessDirect<ManifestIndexStorage>(path, TerbinServiceConst.MANIFEST_STORAGE);
             man ??= new()
@@ -477,12 +486,12 @@ public static partial class Manager
         /// <returns>Es: Salida mapeada C://Ruta//Almacen... o null si falta configuración matriz. <br />En: Built local C://Path... result missing core setup nullish flag.</returns>
         public static string MakePathPlugin(string pName)
         {
-            string? path = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_STORAGE_PLUGINS);
-            if (string.IsNullOrEmpty(path))
-                throw new Exception($"The key TerbinConfiguration.RUTE_STORAGE_PLUGINS is not defined: ({TerbinConfiguration.RUTE_STORAGE_PLUGINS})");
+            string path = PathStorage;
+
+            if (!Directory.Exists(path))
+                Directory.CreateDirectory(path);
 
             return Path.Combine(path, pName);
         }
-
     }
 }

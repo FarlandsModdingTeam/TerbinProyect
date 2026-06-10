@@ -55,13 +55,19 @@ else
 }
 
 Console.Write($"-------( Start )---------\n" +
-    $"[Client] (Nombre Clase)\n" +
-    $"[Client] Nombre -> ");
-string name = Console.ReadLine();
-Console.Write($"[Client] Nombre -> ");
+    $"[Client] \"1. Nombre-Clase | 2. Yolo(1) o Poco-A-Poco(2)\" \n");
 
-await ITests.LittleByLittle(communicator);
+string clas = Helper.Read("1. name");
+string meth = (int.Parse(Helper.Read("2. tipe")) == 1) ? "Yolo" : "LittleByLittle";
 
+Type? classType = Type.GetType($"SimulateClient.{clas}");
+MethodInfo? method = classType?.GetMethod(meth, BindingFlags.Static | BindingFlags.Public);
+
+if (method != null)
+{
+    method.Invoke(null, new object[] { communicator });
+    Console.WriteLine($"Método {meth} ejecutado correctamente");
+}
 
 
 //public class ProgramStoped
@@ -84,3 +90,5 @@ await ITests.LittleByLittle(communicator);
 
 #endif
 
+Console.Log("Fin del Programa del todo");
+await Helper.Fin();

@@ -37,7 +37,7 @@ static class Helper
         int startX = Console.CursorLeft;
         int startTop = Console.CursorTop;
 
-        Console.Write(")");
+        Console.Write(" )");
         Console.SetCursorPosition(startX, startTop);
 
         StringBuilder txt = new();

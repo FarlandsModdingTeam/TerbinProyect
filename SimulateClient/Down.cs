@@ -26,7 +26,7 @@ internal class Down : ITests
             s = new Serialineitor()
                         .AddArray(TerbinURLs.BepInEx.ToCharArray())
                         .Add(false);
-            r = await pCommunicator.Communicate(new(CodeServices.Install, CodeServicesSection.Plugin), s.Serialize());
+            r = await pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize());
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             if (await Helper.IsError(r.Head.Status)) return;
@@ -39,7 +39,7 @@ internal class Down : ITests
 
             s = new Serialineitor()
                         .AddArray(TerbinURLs.MOD_EXPLORER.ToCharArray());
-            r = await pCommunicator.Communicate(new(CodeServices.Install, CodeServicesSection.Plugin), s.Serialize());
+            r = await pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize());
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             if (await Helper.IsError(r.Head.Status)) return;
@@ -52,7 +52,7 @@ internal class Down : ITests
 
             s = new Serialineitor()
                         .AddArray(TerbinURLs.MOD_FCM.ToCharArray());
-            r = await pCommunicator.Communicate(new(CodeServices.Install, CodeServicesSection.Plugin), s.Serialize());
+            r = await pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize());
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             if (await Helper.IsError(r.Head.Status)) return;
@@ -64,8 +64,6 @@ internal class Down : ITests
     
     public static async Task Yolo(TerbinCommunicator pCommunicator)
     {
-
-        PacketRequest r;
         Serialineitor s;
         int c = 0;
 
@@ -76,10 +74,13 @@ internal class Down : ITests
             s = new Serialineitor()
                         .AddArray(TerbinURLs.BepInEx.ToCharArray())
                         .Add(false);
-            r = await pCommunicator.Communicate(new(CodeServices.Install, CodeServicesSection.Plugin), s.Serialize());
+            _ = pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize()).ContinueWith(async p =>
+            {
+                PacketRequest r = await p;
+                Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+                if (await Helper.IsError(r.Head.Status)) return;
+            });
 
-            Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-            if (await Helper.IsError(r.Head.Status)) return;
         }
 
 
@@ -88,10 +89,12 @@ internal class Down : ITests
 
             s = new Serialineitor()
                         .AddArray(TerbinURLs.MOD_EXPLORER.ToCharArray());
-            r = await pCommunicator.Communicate(new(CodeServices.Install, CodeServicesSection.Plugin), s.Serialize());
-
-            Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-            if (await Helper.IsError(r.Head.Status)) return;
+            _ = pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize()).ContinueWith(async p =>
+            {
+                PacketRequest r = await p;
+                Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+                if (await Helper.IsError(r.Head.Status)) return;
+            });
         }
 
 
@@ -100,10 +103,12 @@ internal class Down : ITests
 
             s = new Serialineitor()
                         .AddArray(TerbinURLs.MOD_FCM.ToCharArray());
-            r = await pCommunicator.Communicate(new(CodeServices.Install, CodeServicesSection.Plugin), s.Serialize());
-
-            Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-            if (await Helper.IsError(r.Head.Status)) return;
+            _ = pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize()).ContinueWith(async p =>
+            {
+                PacketRequest r = await p;
+                Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+                if (await Helper.IsError(r.Head.Status)) return;
+            });
         }
 
 

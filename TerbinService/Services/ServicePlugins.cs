@@ -36,6 +36,7 @@ namespace TerbinService.Services;
 
 internal static class ServicePlugins
 {
+    [TODO("Comprobar que el plugin no exista")]
     [TerbinExecutable((byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin)]
     public static async Task<InfoResponse?> DowloadPlugin(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
