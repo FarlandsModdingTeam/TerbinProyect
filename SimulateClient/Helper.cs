@@ -74,13 +74,13 @@ static class Helper
     public static void PrintMethod(params byte[] pData)
     {
         if (pData.Length >= 3)
-            Console.WriteLine($"3:{(CodeServicesClient)pData[2]}");
+            Console.WriteLine($"CodeServicesClient:{(CodeServicesClient)pData[2]}");
         if (pData.Length >= 2)
-            Console.WriteLine($"2:{(CodeServicesSection)pData[1]}");
+            Console.WriteLine($"CodeServicesSection:{(CodeServicesSection)pData[1]}");
         if (pData.Length >= 1)
         {
-            Console.WriteLine($"1:{(CodeServices)pData[0]}");
-            Console.WriteLine($"1:{(CodeTerbinProtocol)pData[0]}");
+            Console.WriteLine($"CodeServices:{(CodeServices)pData[0]}");
+            Console.WriteLine($"CodeTerbinProtocol:{(CodeTerbinProtocol)pData[0]}");
         }
     }
 }

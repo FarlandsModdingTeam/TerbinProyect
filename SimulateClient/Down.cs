@@ -16,7 +16,7 @@ internal class Down : ITests
     {
         PacketRequest r;
         Serialineitor s;
-        int c = 0;
+        int c = 1;
 
 
         {
@@ -68,7 +68,7 @@ internal class Down : ITests
     public static async Task Yolo(TerbinCommunicator pCommunicator)
     {
         Serialineitor s;
-        int c = 0;
+        int c = 1;
 
 
         {
@@ -81,7 +81,8 @@ internal class Down : ITests
             {
                 PacketRequest r = await p;
                 Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-                if (await Helper.IsError(r.Head.Status)) return;
+                Helper.PrintMethod(r.ActionMethod);
+                await Helper.IsError(r.Head.Status);
             });
 
         }
@@ -96,7 +97,8 @@ internal class Down : ITests
             {
                 PacketRequest r = await p;
                 Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-                if (await Helper.IsError(r.Head.Status)) return;
+                Helper.PrintMethod(r.ActionMethod);
+                await Helper.IsError(r.Head.Status);
             });
         }
 
