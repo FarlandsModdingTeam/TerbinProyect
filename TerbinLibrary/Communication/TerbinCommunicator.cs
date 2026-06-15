@@ -330,7 +330,7 @@ public class TerbinCommunicator : IDisposable
     /// <param name="pPayload">Es: El contenido del mensaje (payload). <br />En: The message content (payload).</param>
     /// <param name="pStatus">Es: Estado a configurar. <br />En: Status to configure.</param>
     /// <param name="pId">Es: Identificador forzado del requerimiento. <br />En: Forced request identifier.</param>
-    public async Task<PacketRequest?> send(IdArray pActionMethod, byte[] pPayload, CodeStatus pStatus, ushort pId)
+    private async Task<PacketRequest?> send(IdArray pActionMethod, byte[] pPayload, CodeStatus pStatus, ushort pId)
     {
         PacketRequest? error = null;
         if (pPayload.Length <= TerbinProtocol.MAX_PLD)

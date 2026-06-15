@@ -47,7 +47,7 @@ internal static class ServicePlugins
         string urlPlugin = reader.ReadArray<char>().CrString();
         bool useProgress = (reader.Length >= 1) && reader.Read<bool>();
 
-        Console.WriteLine($"Puto: {urlPlugin}");
+        Console.WriteLine($"urlPlugin: {urlPlugin}");
 
         IProgress<TerbinInfoProgrss>? progress = null;
 
