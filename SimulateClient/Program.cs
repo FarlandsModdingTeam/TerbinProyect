@@ -27,7 +27,7 @@ using TerbinLibrary.TerbinServiceHelper.Exceptions;
 #if false
 
 
-//ManagerFarlands.LaunchGame("C:\\Users\\PC\\Documents\\TerbinInstaces\\_cosas_old\\mqm1\\Farlands.exe");
+//ManagerFarlands.LaunchGame("C:\\Users\\PC\\Documents\\TerbinInstances\\_cosas_old\\mqm1\\Farlands.exe");
 Console.WriteLine($"SimulateClient esta desactivado.");
 Console.WriteLine($"Ponga en false el if para activarlo.");
 await pressAnyKeyToContinue();

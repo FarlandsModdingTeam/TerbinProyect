@@ -129,7 +129,7 @@ public static partial class Manager
         public static string MakePathInstances()
         {
             string d = GetPathDocument();
-            return Path.Combine(d, "TerbinInstaces");
+            return Path.Combine(d, "TerbinInstances");
         }
 
         public static string MakePathStorage()
