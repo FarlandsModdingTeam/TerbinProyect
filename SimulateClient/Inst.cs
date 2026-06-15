@@ -48,15 +48,14 @@ internal class Inst : ITests
         Serialineitor s;
 
         s = new Serialineitor()
-                    .AddArray<char>(TerbinURLs.BepInEx.ToCharArray())
-                    .Add<bool>(false);
+                    .AddArray<char>(pName.ToCharArray());
         r = pCommunicator.Communicate(new(CodeServices.Create, CodeServicesSection.Instances), s.Serialize());
         r.ContinueWith(async p =>
         {
             PacketRequest r = await p;
             Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            await Helper.IsError(r.Head.Status);
+            await Helper.IsError(r);
         });
         return r;
     }

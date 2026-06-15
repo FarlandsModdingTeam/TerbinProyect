@@ -47,8 +47,10 @@ internal static class ServiceInstances
         if (pToken.IsCancellationRequested)
             return InfoResponse.CreateCancelled(pHead.IdRequest);
 
-        bool succes = Manager.Instances.NewInstance(name, false);
         // TODO: Si hay path crearlo ahí.
+        bool succes = Manager.Instances.NewInstance(name, false);
+        if (!succes)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceCreate));
 
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }

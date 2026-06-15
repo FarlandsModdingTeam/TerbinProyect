@@ -123,6 +123,7 @@ public enum CodeInternalErrors : ushort
     InstanceIsNotInstance = 303,
     InstanceRegister = 304,
     InstanceUnregister = 305,
+    InstanceCreate = 306,
 
 
     // FCM = 400,

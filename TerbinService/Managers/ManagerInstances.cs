@@ -63,7 +63,8 @@ public static partial class Manager
         [TODO("Cuando permitas crear instancia fuera, recuerda que el path incluya el nombre")]
         public static bool NewInstance(string pName, bool pOverwrite)
         {
-            string dirInstace = Manager.Instances.MakePathFolder(pName);
+            string dirInstace = Manager.Instances.MakePathFolder(pName)
+                                                    .Replace(':', '_');
 
             if (!pOverwrite && Manager.Instances.ExistInIndex(pName))
                 return false;
@@ -73,7 +74,16 @@ public static partial class Manager
                 if (Directory.Exists(dirInstace))
                     return false;
                 else
-                    Directory.CreateDirectory(dirInstace);
+                {
+                    try
+                    {
+                        Directory.CreateDirectory(dirInstace);
+                    }
+                    catch (Exception)
+                    {
+                        return false;
+                    }
+                }
 
                 Manager.Instances.CreatePredeterminated(pName, pOverwrite);
 

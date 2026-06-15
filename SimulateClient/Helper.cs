@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Text;
 using TerbinLibrary;
+using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Protocol;
 
 namespace SimulateClient;
@@ -13,12 +14,33 @@ static class Helper
     {
         if (pStatus != CodeStatus.Succes)
         {
-            Console.WriteLine($"Error: {pStatus}");
+            //Console.WriteLine($"Error: {pStatus}");
             await PressAnyKeyToContinue();
             return true;
         }
         return false;
     }
+    public static async Task<bool> IsError(PacketRequest pCapsule)
+    {
+        CodeStatus st;
+
+        if (!pCapsule.IsSucces)
+        {
+            st = pCapsule.Head.Status;
+            if (st == CodeStatus.InternalWorkerError)
+            {
+                ushort value = BitConverter.ToUInt16(pCapsule.Payload[0..2]);
+                Console.WriteLine($"ErrorInternal: {(CodeInternalErrors)value}");
+            }
+            else
+                Console.WriteLine($"Error: {st}");
+
+            await PressAnyKeyToContinue();
+        }
+
+        return pCapsule.IsSucces;
+    }
+
     public static async Task Fin()
     {
         Console.WriteLine($"[Client] ==> FIN");
