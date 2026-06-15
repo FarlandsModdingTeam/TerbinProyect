@@ -6,6 +6,7 @@ using TerbinLibrary;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data.Store;
 using TerbinLibrary.SteamFarlands;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 using static TerbinService.Managers.Manager;
@@ -124,6 +125,7 @@ public static partial class Manager
             if (await ExistsByFile(nameFile).ConfigureAwait(false))
             {
                 exist = true;
+                Console.Error($"The plugin {nameFile} already exists");
                 //var r = await GetByFileName(nameFile);
                 //if (r is not null)
                 //    await unregisterPlugin(r);
@@ -143,6 +145,7 @@ public static partial class Manager
         // TODO: Doc.
         private static async ValueTask<bool> save(string pPathPlugin, bool pDuplicate)
         {
+            Console.Log($"Path: {pPathPlugin}");
             if (pDuplicate)
             {
                 if (!await operatePlugin(pPathPlugin, (p, d) => File.Copy(p, d, true)).ConfigureAwait(false))
