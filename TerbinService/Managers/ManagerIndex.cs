@@ -155,18 +155,30 @@ public partial class Manager
         /// <returns>Es: La referencia de la instancia creada. <br />En: The reference to the created instance.</returns>
         public static ReferenceInstance RegisterInstance(string pName, string? pPath = null, bool pOutSide = false)
         {
+            if (string.IsNullOrEmpty(pPath))
+            {
+                pPath ??= Manager.Instances.MakePathFolderFromConfig(pName);
+            }
+
             ReferenceInstance r = new()
             {
                 Name = pName,
-                Path = pPath ?? Manager.Instances.MakePathFolderFromConfig(pName),
+                Path = pPath,
                 OutSide = pOutSide,
             };
             Manager.Index.UpdateIndex(r);
             return r;
         }
+
+        private static string makeRelativePath()
+        {
+
+        }
+
         public static bool UnregisterInstance(string pName)
         {
             return Manager.Index.DeleteIndex(pName);
         }
+
     }
 }

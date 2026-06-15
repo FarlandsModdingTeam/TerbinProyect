@@ -35,8 +35,10 @@ public static partial class Manager
         private static readonly Lock _lockPredeterminated = new();
         private static readonly Lock _lockSetGet = new();
 
-        public static string? GetConfg(string pKey)
+        public static string GetConfg(string pKey)
         {
+            string? result;
+
             lock (_lockSetGet)
                 if (JSonUtil.Get(KEY) == null)
                     JSonUtil.Set(KEY, FOLDER);
@@ -47,13 +49,17 @@ public static partial class Manager
                 setPredeterminatedConfig();
                 r = JSonUtil.Acess<Dictionary<string, string>>(KEY, JSON);
                 if (r == null)
-                    return null;
+                    throw new Exception($"The key TerbinConfiguration.RUTE_INSTANCES is not defined: ({TerbinConfiguration.RUTE_INSTANCES})");
             }
 
-            if (r.TryGetValue(pKey, out string? value))
-                return value;
+            if (r?.TryGetValue(pKey, out string? value) ?? false)
+                result = value;
             else
-                return getPredeterminatedAndSave(pKey, r);
+                result = getPredeterminatedAndSave(pKey, r);
+
+            if (result == null)
+                throw new Exception($"The key TerbinConfiguration.RUTE_INSTANCES is not defined: ({TerbinConfiguration.RUTE_INSTANCES})");
+            return result;
         }
 
         public static CodeAcessJSonSave SetConfig(string pKey, string pData)
