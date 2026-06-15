@@ -53,7 +53,8 @@ static class Helper
         await Task.Delay(500);
     }
 
-    public static string Read(string pMSG)
+    // TODO: Un start y un end.
+    public static string Read(string pMSG) // string pStart, string pEnd
     {
         Console.Write($"[Client] {pMSG} -> ( ");
 
