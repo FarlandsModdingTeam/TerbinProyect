@@ -92,13 +92,14 @@ internal class Inst : ITests
 
                 ThreeQuartersInt length = reader.Read<ThreeQuartersInt>();
 
+                int offset = 0;
+                Console.WriteLine("**( ReferenceInstanceDTO )**");
                 for (int i = 0; i < length; i++)
                 {
-                    ReferenceInstanceDTO tmp = new();
-                    //reader.ReadStruct<ReferenceInstanceDTO>();
-                    tmp.ReadFrom(reader);
+                    //ReferenceInstanceDTO tmp = new();
+                    ReferenceInstanceDTO tmp = reader.ReadStruct<ReferenceInstanceDTO>(ref offset);
+                    //tmp.ReadFrom(reader);
 
-                    Console.WriteLine("**( ReferenceInstanceDTO )**");
                     Console.WriteLine($"""
                     Name: {tmp.Name};
                     OutSide: {tmp.OutSide};
