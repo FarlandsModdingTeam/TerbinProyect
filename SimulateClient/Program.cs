@@ -56,14 +56,18 @@ else
 
 while (true)
 {
+    string @class;
+    string select;
+
     Console.Write($"-------( Start )---------\n" +
         $"[Client] \"1. Nombre-Clase | 2. Yolo(1) o Poco-A-Poco(2)\" \n");
 
-    string clas = Helper.Read("1. name");
-    string select = Helper.Read("2. tipe"); //(int.Parse(Helper.Read("2. tipe")) == 1) ? "Yolo" : "LittleByLittle";
-
-    if (select is "exit" or "ex" or "sa" or "salir")
+    @class = Helper.Read("1. name");
+    if (@class is "exit" or "ex" or "sa" or "salir")
         break;
+
+    select = Helper.Read("2. tipe"); //(int.Parse(Helper.Read("2. tipe")) == 1) ? "Yolo" : "LittleByLittle";
+
 
     string? meth = select switch
     {
@@ -80,7 +84,7 @@ while (true)
 
     Type? classType;
     MethodInfo? method;
-    classType = Type.GetType($"SimulateClient.{clas}");
+    classType = Type.GetType($"SimulateClient.{@class}");
     method = (string.IsNullOrEmpty(meth)) ? null : classType?.GetMethod(meth, BindingFlags.Static | BindingFlags.Public);
 
 
