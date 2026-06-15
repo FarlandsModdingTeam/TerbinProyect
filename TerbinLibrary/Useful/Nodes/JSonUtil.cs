@@ -46,6 +46,7 @@ public class JSonUtil
 {
     private static readonly ConcurrentDictionary<string, string> _places = new();
     private static readonly ConcurrentDictionary<string, Lock> _fileLocks = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentDictionary<string, Lock> _updateLocks = new(StringComparer.OrdinalIgnoreCase);
 
     private static readonly JsonSerializerSettings _settings = new()
     {
@@ -62,6 +63,20 @@ public class JSonUtil
                 _fileLocks[pFilePath] = fileLock;
             }
             return fileLock;
+        }
+    }
+
+    private static Lock getUpdateLock(string pPath, string pFile)
+    {
+        string key = pPath + "|" + pFile;
+        lock (_updateLocks)
+        {
+            if (!_fileLocks.TryGetValue(key, out var updateLock))
+            {
+                updateLock = new Lock();
+                _fileLocks[key] = updateLock;
+            }
+            return updateLock;
         }
     }
 
@@ -202,11 +217,11 @@ public class JSonUtil
     /// </summary>
     public static CodeAcessJSonSave Update<T>(string pKeyDir, string pFile, Action<T> updateAction) where T : class, new()
     {
-        T data = Acess<T>(pKeyDir, pFile) ?? new T();
+        string? dir = getDir(pKeyDir);
+        if (dir == null)
+            return CodeAcessJSonSave.NotExistKey;
 
-        updateAction(data);
-
-        return Save(pKeyDir, pFile, data);
+        return UpdateDirect(dir, pFile, updateAction);
     }
 
     /// <summary>
@@ -214,11 +229,14 @@ public class JSonUtil
     /// </summary>
     public static CodeAcessJSonSave UpdateDirect<T>(string pDir, string pFile, Action<T> updateAction) where T : class, new()
     {
-        T data = AcessDirect<T>(pDir, pFile) ?? new T();
+        lock (getUpdateLock(pDir, pFile))
+        {
+            T data = AcessDirect<T>(pDir, pFile) ?? new T();
 
-        updateAction(data);
+            updateAction(data);
 
-        return SaveDirect(pDir, pFile, data);
+            return SaveDirect(pDir, pFile, data);
+        }
     }
 
 
