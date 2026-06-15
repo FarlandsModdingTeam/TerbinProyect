@@ -42,6 +42,7 @@ public class Worker : BackgroundService
     {
         Cts = CancellationTokenSource.CreateLinkedTokenSource(pStoppingToken);
         //await TerbinProtocol.InitProtocol(Cts.Token);
+        TerbinExecutor.Register(Assembly.GetExecutingAssembly());
         await autoCreatePipe(Cts.Token);
         //ExecutableDispatcher.RegisterFromAssembly(Assembly.GetExecutingAssembly());
         //TerbinExecutableCRUDManager.RegisterFromAssembly(Assembly.GetExecutingAssembly());
@@ -60,7 +61,7 @@ public class Worker : BackgroundService
         try
         {
             var communicator = new TerbinCommunicator(true, pTokenCancellation);
-            TerbinExecutor.Register(Assembly.GetExecutingAssembly());
+            //TerbinExecutor.Register(Assembly.GetExecutingAssembly());
             communicator.OnRecive += async (pCapsule) =>
             {
                 Console.Log($"Packet: {pCapsule}");
