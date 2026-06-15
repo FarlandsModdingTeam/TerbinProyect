@@ -64,8 +64,10 @@ string? meth = select switch
 {
     "1" => "Yolo",
     "2" => "LittleByLittle",
+
     "n" => null,
     "null" => null,
+    string msg when string.IsNullOrEmpty(msg) => null,
 
     _ => select,
 };
