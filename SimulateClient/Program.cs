@@ -54,43 +54,49 @@ else
     return;
 }
 
-Console.Write($"-------( Start )---------\n" +
-    $"[Client] \"1. Nombre-Clase | 2. Yolo(1) o Poco-A-Poco(2)\" \n");
-
-string clas = Helper.Read("1. name");
-string select = Helper.Read("2. tipe"); //(int.Parse(Helper.Read("2. tipe")) == 1) ? "Yolo" : "LittleByLittle";
-
-string? meth = select switch
+while (true)
 {
-    "1" => "Yolo",
-    "2" => "LittleByLittle",
+    Console.Write($"-------( Start )---------\n" +
+        $"[Client] \"1. Nombre-Clase | 2. Yolo(1) o Poco-A-Poco(2)\" \n");
 
-    "n" => null,
-    "null" => null,
-    string msg when string.IsNullOrEmpty(msg) => null,
+    string clas = Helper.Read("1. name");
+    string select = Helper.Read("2. tipe"); //(int.Parse(Helper.Read("2. tipe")) == 1) ? "Yolo" : "LittleByLittle";
 
-    _ => select,
-};
+    if (select is "exit" or "ex" or "sa" or "salir")
+        break;
 
-
-Type? classType;
-MethodInfo? method;
-classType = Type.GetType($"SimulateClient.{clas}");
-method = (string.IsNullOrEmpty(meth)) ? null : classType?.GetMethod(meth, BindingFlags.Static | BindingFlags.Public);
-
-
-if (method != null)
-{
-    var result = method.Invoke(null, new object[] { communicator });
-
-    if (result is Task task)
+    string? meth = select switch
     {
-        await task;
+        "1" => "Yolo",
+        "2" => "LittleByLittle",
+
+        "n" => null,
+        "null" => null,
+        string msg when string.IsNullOrEmpty(msg) => null,
+
+        _ => select,
+    };
+
+
+    Type? classType;
+    MethodInfo? method;
+    classType = Type.GetType($"SimulateClient.{clas}");
+    method = (string.IsNullOrEmpty(meth)) ? null : classType?.GetMethod(meth, BindingFlags.Static | BindingFlags.Public);
+
+
+    if (method != null)
+    {
+        var result = method.Invoke(null, new object[] { communicator });
+
+        if (result is Task task)
+        {
+            await task;
+        }
     }
-}
-else
-{
-    Console.WriteLine($"[Client] El method es null");
+    else
+    {
+        Console.WriteLine($"[Client] El method es null");
+    }
 }
 
 

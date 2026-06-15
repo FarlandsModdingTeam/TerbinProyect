@@ -80,6 +80,12 @@ public static class ExtensionIStructSerializable
     {
         pData.Deserialize(pArray);
     }
+
+    public static IStructSerializable Read(this IStructSerializable pData, byte[] pArray)
+    {
+        pData.Deserialize(pArray);
+        return pData;
+    }
 }
 
 

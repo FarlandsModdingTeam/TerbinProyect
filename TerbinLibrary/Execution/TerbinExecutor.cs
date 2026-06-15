@@ -134,8 +134,8 @@ public static class TerbinExecutor
         if (pToken.IsCancellationRequested) return null;
         if (pHead.Status == CodeStatus.ExecutionException)
         {
-            ExceptionDTO dto = new();
-            dto.Deserialize(pParameters);
+            ExceptionDTO dto = (ExceptionDTO)new ExceptionDTO().Read(pParameters);
+            //dto.Deserialize(pParameters);
             Console.Error(dto.ToString());
             return null;
         }    
