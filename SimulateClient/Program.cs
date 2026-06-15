@@ -58,10 +58,22 @@ Console.Write($"-------( Start )---------\n" +
     $"[Client] \"1. Nombre-Clase | 2. Yolo(1) o Poco-A-Poco(2)\" \n");
 
 string clas = Helper.Read("1. name");
-string meth = (int.Parse(Helper.Read("2. tipe")) == 1) ? "Yolo" : "LittleByLittle";
+string select = Helper.Read("2. tipe"); //(int.Parse(Helper.Read("2. tipe")) == 1) ? "Yolo" : "LittleByLittle";
 
-Type? classType = Type.GetType($"SimulateClient.{clas}");
-MethodInfo? method = classType?.GetMethod(meth, BindingFlags.Static | BindingFlags.Public);
+string? meth = select switch
+{
+    "1" => "Yolo",
+    "2" => "LittleByLittle",
+
+    _ => null,
+};
+
+
+Type? classType;
+MethodInfo? method;
+classType = Type.GetType($"SimulateClient.{clas}");
+method = (string.IsNullOrEmpty(meth)) ? null : classType?.GetMethod(meth, BindingFlags.Static | BindingFlags.Public);
+
 
 if (method != null)
 {
@@ -71,6 +83,10 @@ if (method != null)
     {
         await task;
     }
+}
+else
+{
+    Console.WriteLine($"[Client] El method es null");
 }
 
 
