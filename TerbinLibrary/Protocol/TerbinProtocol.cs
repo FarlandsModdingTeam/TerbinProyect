@@ -21,8 +21,8 @@ namespace TerbinLibrary.Protocol;
 
 public static class TerbinProtocol
 {
-    public const ushort MAX_PLD = 0xFFFD; // ¡Vamos Miura!
-    public const ushort FRAGMENT_IN = 0xFFFA; // 0xFFF
+    public const ushort MAX_PLD = 0xFFF0; // ¡Vamos Miura! // del paquete entero
+    public const ushort FRAGMENT_IN = 0xFFAA; // 0xFFF
     public const double FRAGMENT_IN__MULTIPLICATE_INVERSE = 1.0D / FRAGMENT_IN;
 
     public const ushort ORDER_SINGLE = ushort.MinValue;
