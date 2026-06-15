@@ -24,8 +24,8 @@ internal class Down : ITests
             await Helper.PressAnyKeyToContinue();
 
             s = new Serialineitor()
-                        .AddArray(TerbinURLs.BepInEx.ToCharArray())
-                        .Add(false);
+                        .AddArray<char>(TerbinURLs.BepInEx.ToCharArray())
+                        .Add<bool>(false);
             r = await pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize());
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
