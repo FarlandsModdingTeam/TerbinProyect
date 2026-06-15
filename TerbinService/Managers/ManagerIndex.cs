@@ -153,26 +153,24 @@ public partial class Manager
         /// <param name="pPath">Es: La ruta opcional donde residirá la instancia. <br />En: The optional path where the instance will reside.</param>
         /// <param name="pOutSide">Es: Indica si la instancia se encuentra fuera de la estructura predeterminada. <br />En: Indicates whether the instance is outside the default structure.</param>
         /// <returns>Es: La referencia de la instancia creada. <br />En: The reference to the created instance.</returns>
-        public static ReferenceInstance RegisterInstance(string pName, string? pPath = null, bool pOutSide = false)
+        public static ReferenceInstance RegisterInstance(string pName, string? pPath = null)
         {
-            if (string.IsNullOrEmpty(pPath))
-            {
-                pPath ??= Manager.Instances.MakePathFolderFromConfig(pName);
-            }
+            pPath ??= makeRelativePath(Manager.Instances.MakePathFolderFromConfig(pName));
 
             ReferenceInstance r = new()
             {
                 Name = pName,
                 Path = pPath,
-                OutSide = pOutSide,
+                OutSide = Manager.Instances.InsideConfig(pName, pPath),
             };
             Manager.Index.UpdateIndex(r);
             return r;
         }
 
-        private static string makeRelativePath()
+        private static string makeRelativePath(string pPath)
         {
-
+            string dir = Manager.Configuration.GetConfg(TerbinConfiguration.RUTE_INSTANCES);
+            return Path.GetRelativePath(dir, pPath);
         }
 
         public static bool UnregisterInstance(string pName)

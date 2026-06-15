@@ -139,7 +139,7 @@ public static partial class Manager
 
             if (pCancellationToken.IsCancellationRequested)
             {
-                Manager.Index.RegisterInstance(pName, path, InsideConfig(pName, path));
+                Manager.Index.RegisterInstance(pName, path);
                 return Status.IsCancelled;
             }
 
