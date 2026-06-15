@@ -8,6 +8,7 @@ using TerbinLibrary.Async;
 using TerbinLibrary.Configuration;
 using TerbinLibrary.Data;
 using TerbinLibrary.Data.Instance;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
 
@@ -63,8 +64,7 @@ public static partial class Manager
         [TODO("Cuando permitas crear instancia fuera, recuerda que el path incluya el nombre")]
         public static bool NewInstance(string pName, bool pOverwrite)
         {
-            string dirInstace = Manager.Instances.MakePathFolder(pName)
-                                                    .Replace(':', '_');
+            string dirInstace = Manager.Instances.MakePathFolder(pName.Replace(':', '_'));
 
             if (!pOverwrite && Manager.Instances.ExistInIndex(pName))
                 return false;
