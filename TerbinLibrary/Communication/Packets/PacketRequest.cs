@@ -133,7 +133,7 @@ public struct PacketRequest : IStructSerializable
         int offset = 0;
         Head = pBuffer.Read<Header>(ref offset);
         ActionMethod = pBuffer.ReadStruct<IdArray>(ref offset);
-        Payload = pBuffer.ReadArray<byte>(ref offset);
+        Payload = pBuffer.ReadArray<byte>(ref offset); // TODO: No hacer esto y asignar directamente.
     }
 
     /// <summary>

@@ -34,10 +34,13 @@ public struct ReferenceInstanceDTO : IStructSerializable
 
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
     {
-        int offset = 0;
-        Name = pBuffer.ReadArray<char>(ref offset).CrString();
-        OutSide = pBuffer.Read<sbyte>(ref offset).ToBoolUk();
-        Path = pBuffer.ReadArray<char>(ref offset).CrString();
+        ReadOnlySpan<byte> reader = pBuffer;
+        if (reader.Length >= 2)
+            Name = reader.ReadArray<char>().CrString();
+        if (reader.Length >= 2)
+            OutSide = reader.Read<sbyte>().ToBoolUk();
+        if (reader.Length >= 2)
+            Path = reader.ReadArray<char>().CrString();
     }
 
     public readonly void WriteTo(Span<byte> pBuffer)

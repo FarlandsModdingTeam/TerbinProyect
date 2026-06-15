@@ -158,6 +158,7 @@ public static class BufferReaderExtension
     /// <param name="pStruct">Es: Instancia estructural de referencia y esquema. <br />En: Reference structural instance and schema.</param>
     /// <typeparam name="T">Es: Tipo estructural implementando IStructSerializable. <br />En: Structural type implementing IStructSerializable.</typeparam>
     /// <returns>Es: La nueva instancia serializada extraída del buffer. <br />En: The newly extracted serialized instance from the buffer.</returns>
+    [TODO("Esto que haga un GetSize no tiene sentido")]
     public static T ReadStruct<T>(this ref ReadOnlySpan<byte> pBuffer, T pStruct)
         where T : struct, IStructSerializable
     {
