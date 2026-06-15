@@ -19,6 +19,11 @@ namespace TerbinLibrary;
  */
 
 
+//InstallBepInEx = 12,
+//Plugin_Tests = 20,
+//ReadAllInstances = 30,
+//WIP_NewService = 255,
+
 // methods:
 public enum CodeServices : byte
 {
@@ -28,11 +33,6 @@ public enum CodeServices : byte
     Execute = 12,
     Dowload = 13,
     Install = 14,
-
-    //InstallBepInEx = 12,
-    //Plugin_Tests = 20,
-    //ReadAllInstances = 30,
-    //WIP_NewService = 255,
 
     ReadAll = TerbinCRUD.ReadAll,
     Duplicate = TerbinCRUD.Duplicate,
