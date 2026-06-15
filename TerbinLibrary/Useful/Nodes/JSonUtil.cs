@@ -170,7 +170,11 @@ public class JSonUtil
             string json = JsonConvert.SerializeObject(pContent, Formatting.Indented, _settings);
             if (json == null) return CodeAcessJSonSave.ErrorSerialize;
 
+            FileAttributes? att = getAndRemoveAttributes(routeComplete);
             File.WriteAllText(routeComplete, json);
+            if (att != null)
+                File.SetAttributes(routeComplete, att.Value);
+
             return CodeAcessJSonSave.Succes;
         }
     }
@@ -190,7 +194,11 @@ public class JSonUtil
             string json = JsonConvert.SerializeObject(pContent, Formatting.Indented, _settings);
             if (json == null) return CodeAcessJSonSave.ErrorSerialize;
 
+            FileAttributes? att = getAndRemoveAttributes(routeComplete);
             File.WriteAllText(routeComplete, json);
+            if (att != null)
+                File.SetAttributes(routeComplete, att.Value);
+
             return CodeAcessJSonSave.Succes;
         }
     }
@@ -208,6 +216,21 @@ public class JSonUtil
     {
         return pFile.EndsWith(".json", StringComparison.OrdinalIgnoreCase)
                 ? pFile : pFile + ".json";
+    }
+
+    // TODO: Que coga cualquier atributo.
+    private static FileAttributes? getAndRemoveAttributes(string pRoute)
+    {
+        FileAttributes? att = null;
+        if (OperatingSystem.IsWindows() && File.Exists(pRoute))
+        {
+            att = File.GetAttributes(pRoute);
+            if ((att & FileAttributes.Hidden) == FileAttributes.Hidden)
+            {
+                File.SetAttributes(pRoute, att.Value & ~FileAttributes.Hidden);
+            }
+        }
+        return att;
     }
 
 
