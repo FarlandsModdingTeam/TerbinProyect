@@ -1,15 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
 using TerbinLibrary;
 using TerbinLibrary.Configuration;
+using TerbinLibrary.Data;
 using TerbinLibrary.Data.Store;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.Useful;
 using TerbinLibrary.Useful.Nodes;
-using static TerbinService.Managers.Manager;
 
 namespace TerbinService.Managers;
 /*
@@ -45,7 +46,7 @@ public static partial class Manager
         // TerbinConfiguration
         // TerbinServiceConst.MANIFEST_STORAGE
         private static readonly SemaphoreSlim _semaphoreOperate = new(1, 1);
-        private static readonly SemaphoreSlim _semaphoreManifest = new(1, 1);
+        //private static readonly SemaphoreSlim _semaphoreManifest = new(1, 1);
 
         private static readonly Lock _lockRename = new();
 
@@ -125,7 +126,6 @@ public static partial class Manager
             if (await ExistsByFile(nameFile).ConfigureAwait(false))
             {
                 exist = true;
-                Console.Error($"The plugin {nameFile} already exists");
                 //var r = await GetByFileName(nameFile);
                 //if (r is not null)
                 //    await unregisterPlugin(r);
@@ -145,6 +145,12 @@ public static partial class Manager
         // TODO: Doc.
         private static async ValueTask<bool> save(string pPathPlugin, bool pDuplicate)
         {
+            if (!File.Exists(pPathPlugin))
+            {
+                Console.Error($"The plugin \"{pPathPlugin}\" already exists");
+                return false;
+            }
+
             Console.Log($"Path: {pPathPlugin}");
             if (pDuplicate)
             {
@@ -252,24 +258,7 @@ public static partial class Manager
         /// <returns>Es: Devuelve un estado booleano de éxito según la escritura JSON. <br />En: Returns a boolean success state based on the JSON writing.</returns>
         private static async ValueTask<bool> registerPlugin(ReferencePluginStore pReference)
         {
-            CodeAcessJSonSave r;
-            await _semaphoreManifest.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                string pathStorage = PathStorage;
-
-                r = JSonUtil.UpdateDirect<ManifestIndexStorage>(
-                    pathStorage,
-                    TerbinServiceConst.MANIFEST_STORAGE,
-                    ii => { ii.References?.Add(pReference); }
-                );
-            }
-            finally
-            {
-                _semaphoreManifest.Release();
-            }
-
-            return r == CodeAcessJSonSave.Succes;
+            return await updateIndex(ii => { ii.References?.Add(pReference); });
         }
 
         /// <summary>
@@ -305,30 +294,16 @@ public static partial class Manager
         /// <returns>Es: Si la variable asíncrona fue guardada correctamente. <br />En: If the async variable correctly saved.</returns>
         private static async ValueTask<bool> unregisterPlugin(string pId)
         {
-            CodeAcessJSonSave r;
-            await _semaphoreManifest.WaitAsync().ConfigureAwait(false);
-            try
-            {
-                string pathStorage = PathStorage;
-
-                r = JSonUtil.UpdateDirect<ManifestIndexStorage>(
-                    pathStorage,
-                    TerbinServiceConst.MANIFEST_STORAGE,
-                    ii =>
+            return await updateIndex(
+                (ii) =>
+                {
+                    for (int i = 0; i < ii.References.Count; i++)
                     {
-                        for (int i = 0; i < ii.References.Count; i++)
-                        {
-                            if (ii.References[i].Id == pId)
-                                ii.References.RemoveAt(i);
-                        }
+                        if (ii.References[i].Id == pId)
+                            ii.References.RemoveAt(i);
                     }
-                );
-            }
-            finally
-            {
-                _semaphoreManifest.Release();
-            }
-            return r == CodeAcessJSonSave.Succes;
+                }
+            );
         }
 
         /// <summary>
@@ -410,6 +385,22 @@ public static partial class Manager
             return null;
         }
 
+
+        [TODO("Puede no ser async")]
+        private static async ValueTask<bool> updateIndex(Action<ManifestIndexStorage> updateAction)
+        {
+            CodeAcessJSonSave r;
+            string pathStorage = PathStorage;
+
+            ManifestIndexStorage data = await getIndex();
+
+            updateAction(data);
+
+            r = JSonUtil.SaveDirect(pathStorage, TerbinServiceConst.MANIFEST_STORAGE, data);
+            return r == CodeAcessJSonSave.Succes;
+        }
+
+
         /// <summary>
         /// ___________________( Español )___________________<br />
         /// Retorna el tipo referenciado del plugin según el manifiesto general si se logra relacionar.<br />
@@ -479,6 +470,7 @@ public static partial class Manager
 
             return man;
         }
+
 
         /// <summary>
         /// ___________________( Español )___________________<br />
