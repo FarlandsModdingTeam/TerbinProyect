@@ -55,7 +55,7 @@ public static partial class Manager
         /// <param name="pCancellationToken">Es: Token para detener asíncronamente la tarea. <br />En: Token to cancel the task asynchronously.</param>
         /// <returns>Es: Un indicador enumerable Status delimitando el final de la rutina. <br />En: An enumerable Status indicating the end of the routine.</returns>
         [Obsolete]
-        public static async Task<Status> HandleCloneInInstance
+        public static async Task<InternalErrors> HandleCloneInInstance
             (string pPathDir, string pNameInstance, ushort pIdRequest, bool pOverwrite, CancellationToken pCancellationToken = default)
         {
             var progress = ProgressUtil.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest);
@@ -81,32 +81,32 @@ public static partial class Manager
         /// <param name="pProgrss">Es: Objeto referencial que recibe reportes de progreso Terbin. <br />En: Reference object handling Terbin progress reports.</param>
         /// <param name="pCancellationToken">Es: Token interno para abortar. <br />En: Internal token to safely abort.</param>
         /// <returns>Es: Resultado Status dictaminando el éxito o el código de fallo específico. <br />En: Status result declaring success or specific failure code.</returns>
-        public static async Task<Status> CloneInInstance
+        public static async Task<InternalErrors> CloneInInstance
             (string pPathDir, string pNameInstance, bool pOverwrite, IProgress<TerbinInfoProgrss>? pProgrss = default, CancellationToken pCancellationToken = default)
         {
             string? pathInstace = Manager.Instances.GetPathFolder(pNameInstance);
             if (string.IsNullOrEmpty(pathInstace))
-                return Status.ErrorNotIsInstance;
+                return InternalErrors.InstanceGet;
 
             if (Manager.Instances.ThereGameByPath(pathInstace))
-                return Status.ErrorGameAlreadyExist;
+                return InternalErrors.GameAlredyExist;
 
             // if (!Manager.Instances.IsInstance(pathInstace))
             //     return Status.ErrorNotIsInstance;
 
             if (pCancellationToken.IsCancellationRequested)
-                return Status.IsCancelled;
+                return InternalErrors.IsCancelled;
 
             var (status, json) = await NodeUtil.CloneDirectory(pPathDir, pathInstace, pOverwrite, pProgrss, pCancellationToken);
             if (status != StatusNodeUtil.Succes)
-                return Status.GenericError;
+                return InternalErrors.IsUnknown;
 
             Manager.Manifest.WriteHandwritten(pathInstace, json);
 
             if (pCancellationToken.IsCancellationRequested)
             {
                 await RemoveInInstance(pNameInstance, pCancellationToken: CancellationToken.None);
-                return Status.IsCancelled;
+                return InternalErrors.IsCancelled;
             }
                 
             List<string> exes = NodeUtil.GetAllExeFiles(pathInstace);
@@ -122,17 +122,17 @@ public static partial class Manager
                 if (!update)
                 {
                     // TODO: Desclonar.
-                    return Status.ErrorUpdateInstace;
+                    return InternalErrors.ManifestUpdate;
                 }
             }
 
             if (pCancellationToken.IsCancellationRequested)
             {
                 await RemoveInInstance(pNameInstance, pCancellationToken: CancellationToken.None);
-                return Status.IsCancelled;
+                return InternalErrors.IsCancelled;
             }
 
-            return Status.Succes;
+            return InternalErrors.IsSucces;
         }
 
 
@@ -151,7 +151,7 @@ public static partial class Manager
         /// <param name="pCancellationToken">Es: Control de interrupción de sub-bloque. <br />En: Sub-block interruption control.</param>
         /// <returns>Es: Bandera enum Status indicando si todo fue exitoso. <br />En: Status enum flag of success bounds.</returns>
         [Obsolete]
-        public static async Task<Status> HandleRemoveInInstance
+        public static async Task<InternalErrors> HandleRemoveInInstance
             (string pNameInstance, ushort pIdRequest, CancellationToken pCancellationToken = default)
         {
             var progress = ProgressUtil.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest);
@@ -173,29 +173,29 @@ public static partial class Manager
         /// <param name="pProgress">Es: Contenedor que recibirá los ticks del borrado de cada fichero. <br />En: Container receiving ticks upon each file deletion.</param>
         /// <param name="pCancellationToken">Es: Aborto condicional de lectura de ficheros. <br />En: Conditional file reading boot abortion.</param>
         /// <returns>Es: Código de terminación (Succes = 1). <br />En: Termination code (Succes = 1).</returns>
-        public static async Task<Status> RemoveInInstance
+        public static async Task<InternalErrors> RemoveInInstance
             (string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             string? pathInstace = Instances.GetPathFolder(pNameInstance);
             if (string.IsNullOrEmpty(pathInstace))
-                return Status.ErrorGetInstance;
+                return InternalErrors.InstanceGet;
 
             var handwritten = Manager.Manifest.GetHandwritten(pathInstace);
 
             if (handwritten == null)
-                return Status.ErrorGetHandwritten;
+                return InternalErrors.HandwrittenGet;
 
             if (pCancellationToken.IsCancellationRequested)
-                return Status.IsCancelled;
+                return InternalErrors.IsCancelled;
 
             // Teoricamente DeleteFromHandwritten no puede fallar.
             var r = NodeUtil.DeleteFromHandwritten(pathInstace, handwritten, pProgress);
 
             bool removeHand = Manager.Manifest.RemoveHandwritten(pathInstace);
             if (!removeHand)
-                return Status.ErrorRemoveHandwritten;
+                return InternalErrors.HandwrittenRemove;
 
-            return Status.Succes;
+            return InternalErrors.IsSucces;
         }
 
 
@@ -226,6 +226,7 @@ public static partial class Manager
         /// Notes: Positive/Zero-based codes act as Cancelled (0) and Success (1).<br />
         /// Tips: Negative identifiers and elements above 2 represent purely descriptive runtime faults.<br />
         /// </summary>
+        [Obsolete("Use: InternalErrors", true)]
         public enum Status : sbyte
         {
             GenericException = -1,

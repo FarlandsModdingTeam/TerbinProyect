@@ -102,6 +102,10 @@ public enum InternalErrors : ushort
     TODO_WIP = 12,
     //TODO_SoliciteInfo = 13,
 
+    IsUnknown = 97,
+    IsSucces = 98,
+    IsCancelled = 99,
+
     // Farland = 100,
     GameRuteNotExist = 101,
     GameAlredyExist = 102,
