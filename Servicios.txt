@@ -12,7 +12,7 @@
 
 - Instance
  * Create (v)
- * Deleted
+ * Deleted (v)
  * GetAll (v)
  * GetOne (v)
 
