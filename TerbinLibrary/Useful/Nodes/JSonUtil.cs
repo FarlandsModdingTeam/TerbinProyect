@@ -46,7 +46,6 @@ public class JSonUtil
 {
     private static readonly ConcurrentDictionary<string, string> _places = new();
     private static readonly ConcurrentDictionary<string, Lock> _fileLocks = new(StringComparer.OrdinalIgnoreCase);
-    private static readonly ConcurrentDictionary<string, Lock> _updateLocks = new(StringComparer.OrdinalIgnoreCase);
 
     private static readonly JsonSerializerSettings _settings = new()
     {
@@ -68,16 +67,8 @@ public class JSonUtil
 
     private static Lock getUpdateLock(string pPath, string pFile)
     {
-        string key = pPath + "|" + pFile;
-        lock (_updateLocks)
-        {
-            if (!_fileLocks.TryGetValue(key, out var updateLock))
-            {
-                updateLock = new Lock();
-                _fileLocks[key] = updateLock;
-            }
-            return updateLock;
-        }
+        string key = Path.Combine(pPath, pFile);
+        return getFileLock(key);
     }
 
     public static string? Get(string pKeyDir)
