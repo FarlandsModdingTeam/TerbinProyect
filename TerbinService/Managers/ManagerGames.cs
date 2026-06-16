@@ -207,6 +207,22 @@ public static partial class Manager
         }
 
 
+        public static bool RunOfInstance(string pNameInstance)
+        {
+
+
+
+            return true;
+        }
+
+
+        [TODO("Comprobar si es Linux")]
+        public static bool Run(string pPath)
+        {
+
+            return ManagerFarlands.LaunchGame(pPath);
+        }
+
 
         /// <summary>
         /// ___________________( Español )___________________<br />

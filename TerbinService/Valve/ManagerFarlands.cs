@@ -15,7 +15,7 @@ namespace TerbinLibrary.SteamFarlands;
   empieza: menorculas = privada.
  */
 
-
+[TODO("Convertir en GameUtil y sacar de aqui")]
 public static class ManagerFarlands
 {
     public const int KEY_FARLANDS = 2252680;
@@ -25,7 +25,6 @@ public static class ManagerFarlands
     {
         if (string.IsNullOrEmpty(pPath) || !File.Exists(pPath))
             return false;
-
 
         try
         {
