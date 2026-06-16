@@ -49,7 +49,7 @@ internal class Game : ITests
                     .AddArray<char>(pName.ToCharArray())
                     .AddArray<char>(pPath.ToCharArray());
 
-        r = pCommunicator.Communicate(new(CodeServices.Read, CodeServicesSection.PluginStorage), s.Serialize());
+        r = pCommunicator.Communicate(new(CodeServices.Duplicate, CodeServicesSection.Game), s.Serialize());
         r.ContinueWith(async p =>
         {
             PacketRequest r = await p;
@@ -57,26 +57,43 @@ internal class Game : ITests
             Helper.PrintMethod(r.ActionMethod);
             if (await Helper.IsError(r)) return;
 
-            int offset = 0;
-            try
-            {
-                ReadOnlySpan<byte> reader = r.Payload;
-
-                Console.WriteLine("**( ReferenceInstanceDTO )**");
-                //ReferenceInstanceDTO tmp = new();
-                ReferencePluginStoreDTO tmp = reader.ReadStruct<ReferencePluginStoreDTO>(ref offset);
-                //tmp.ReadFrom(reader);
-
-                tmp.Print();
-            }
-            catch (Exception e)
-            {
-                e.PrintException("getOne");
-            }
+            Console.Succes("Duplicado Correctamente");
 
         });
         return r;
     }
 
+    public static async Task Rm(TerbinCommunicator pCommunicator)
+    {
+        Console.Write($"-------( Game )---------\n" +
+            $"[Client] \"Name Instance\"");
+        string name = Helper.Read("1. Name");
 
+        PacketRequest r;
+        r = await deleted(pCommunicator, name);
+
+        await Helper.Fin();
+    }
+
+
+    private static Task<PacketRequest> deleted(TerbinCommunicator pCommunicator, string pName)
+    {
+        Task<PacketRequest> r;
+        Serialineitor s;
+
+        s = new Serialineitor()
+                    .AddArray<char>(pName.ToCharArray());
+
+        r = pCommunicator.Communicate(new(CodeServices.Deleted, CodeServicesSection.Game), s.Serialize());
+        r.ContinueWith(async p =>
+        {
+            PacketRequest r = await p;
+            Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+            Helper.PrintMethod(r.ActionMethod);
+            if (await Helper.IsError(r)) return;
+
+            Console.Succes("Eliminado Correctamente");
+        });
+        return r;
+    }
 }

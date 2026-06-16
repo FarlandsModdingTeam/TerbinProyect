@@ -195,6 +195,17 @@ public static partial class Manager
             if (!removeHand)
                 return InternalErrors.HandwrittenRemove;
 
+            var update = Manager.Manifest.UpdateInstaceByPath(pathInstace, manifest =>
+            {
+                manifest.Executable = "";
+                manifest.Version = "";
+            });
+            if (!update)
+            {
+                // TODO: Desclonar.
+                return InternalErrors.ManifestUpdate;
+            }
+
             return InternalErrors.IsSucces;
         }
 
