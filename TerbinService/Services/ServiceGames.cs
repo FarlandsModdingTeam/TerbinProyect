@@ -80,7 +80,7 @@ internal static class ServiceGames
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
-    //[TerbinExecutable((byte)CodeServices.Execute, (byte)CodeServicesSection.Game)]
+    [TerbinExecutable((byte)CodeServices.Execute, (byte)CodeServicesSection.Game)]
     public static async Task<InfoResponse?> ExecuteGame(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
@@ -89,7 +89,9 @@ internal static class ServiceGames
         ReadOnlySpan<byte> buffer = pParameters;
         string nameInstance = buffer.ReadArray<char>().CrString();
 
-        // TODO: ejecutar.
+        var result = await Manager.Games.RunInInstance(nameInstance);
+        if (result != InternalErrors.IsSucces)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize<ushort>((ushort)result));
 
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
