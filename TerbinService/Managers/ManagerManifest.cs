@@ -50,7 +50,7 @@ public static partial class Manager
             manifest = new ManifestInstance
             {
                 Name = pName,
-                Version = Games.GetVersion(),
+                Version = "",
                 Plugins = []
             };
             JSonUtil.SaveDirect(pDirInfo, TerbinServiceConst.MANIFEST_INSTANCE, manifest);

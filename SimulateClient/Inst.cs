@@ -145,13 +145,14 @@ internal class Inst : ITests
             Helper.PrintMethod(r.ActionMethod);
             if (await Helper.IsError(r)) return;
 
+            int offset = 0;
             try
             {
                 ReadOnlySpan<byte> reader = r.Payload;
 
                 Console.WriteLine("**( ReferenceInstanceDTO )**");
                 //ReferenceInstanceDTO tmp = new();
-                ReferenceInstanceDTO tmp = reader.ReadStruct<ReferenceInstanceDTO>();
+                ReferenceInstanceDTO tmp = reader.ReadStruct<ReferenceInstanceDTO>(ref offset);
                 //tmp.ReadFrom(reader);
 
                 Console.WriteLine($"""

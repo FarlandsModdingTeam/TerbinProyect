@@ -54,6 +54,7 @@ public static partial class Manager
         /// <param name="pOverwrite">Es: Booleano que indica si se sobrescriben los archivos destino. <br />En: Boolean indicating whether to overwrite destination files.</param>
         /// <param name="pCancellationToken">Es: Token para detener asíncronamente la tarea. <br />En: Token to cancel the task asynchronously.</param>
         /// <returns>Es: Un indicador enumerable Status delimitando el final de la rutina. <br />En: An enumerable Status indicating the end of the routine.</returns>
+        [Obsolete]
         public static async Task<Status> HandleCloneInInstance
             (string pPathDir, string pNameInstance, ushort pIdRequest, bool pOverwrite, CancellationToken pCancellationToken = default)
         {
@@ -109,15 +110,20 @@ public static partial class Manager
             }
                 
             List<string> exes = NodeUtil.GetAllExeFiles(pathInstace);
-            if (exes.Count <= 0)
-                return Status.ErrorGameNotExes;
-
-            var update = Manager.Manifest.UpdateInstaceByPath(pathInstace, manifest =>
+            if (exes.Count > 0)
             {
-                manifest.Executable = exes[0];
-            });
-            if (!update)
-                return Status.ErrorUpdateInstace;
+                //return Status.ErrorGameNotExes;
+
+                var update = Manager.Manifest.UpdateInstaceByPath(pathInstace, manifest =>
+                {
+                    manifest.Executable = exes[0];
+                });
+                if (!update)
+                {
+                    // TODO: Desclonar.
+                    return Status.ErrorUpdateInstace;
+                }
+            }
 
             if (pCancellationToken.IsCancellationRequested)
             {
@@ -143,6 +149,7 @@ public static partial class Manager
         /// <param name="pIdRequest">Es: Número de solicitud activa del pool al cliente. <br />En: Active request number tracked by the client pool.</param>
         /// <param name="pCancellationToken">Es: Control de interrupción de sub-bloque. <br />En: Sub-block interruption control.</param>
         /// <returns>Es: Bandera enum Status indicando si todo fue exitoso. <br />En: Status enum flag of success bounds.</returns>
+        [Obsolete]
         public static async Task<Status> HandleRemoveInInstance
             (string pNameInstance, ushort pIdRequest, CancellationToken pCancellationToken = default)
         {

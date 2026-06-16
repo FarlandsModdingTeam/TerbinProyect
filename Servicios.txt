@@ -1,0 +1,20 @@
+- Plugin
+ * Download (v)
+ * Deleted
+ * Install
+ * Unistall
+ * GetAll
+ * GetOne
+
+- PluginStorage
+ * GetAll
+ * GetOne
+
+- Instance
+ * Create (v)
+ * Deleted
+ * GetAll (v)
+ * GetOne (v)
+
+- Game
+ * Duplicate
