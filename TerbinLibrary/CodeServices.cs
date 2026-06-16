@@ -103,7 +103,9 @@ public enum CodeInternalErrors : ushort
     //TODO_SoliciteInfo = 13,
 
     // Farland = 100,
-    FarlandRuteNotExist = 101,
+    GameRuteNotExist = 101,
+    GameAlredyExist = 102,
+    GameNotContainExes = 103,
 
     // Mods = 200,
     PluginNotConect = 201,
@@ -124,6 +126,7 @@ public enum CodeInternalErrors : ushort
     InstanceRegister = 304,
     InstanceUnregister = 305,
     InstanceCreate = 306,
+    InstanceGet = 307,
 
 
     // FCM = 400,
@@ -138,6 +141,17 @@ public enum CodeInternalErrors : ushort
 
     // Node = 700,
     NodeDinamite = 701,
+
+    // Handwritten = 800,
+    HandwrittenCreate = 801,
+    HandwrittenRemove = 802,
+    HandwrittenGet = 803,
+
+    // Manifest = 900,
+    ManifestCreate = 901,
+    ManifestRemove = 902,
+    ManifestGet = 903,
+    ManifestUpdate = 904,
 
     // Zip = 1000,
     ZipExtractError = 1001,
