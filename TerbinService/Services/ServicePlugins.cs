@@ -167,7 +167,7 @@ internal static class ServicePlugins
         s.Add<ThreeQuartersInt>(manis.Length);
         for (int i = 0; i < manis.Length; i++)
         {
-            ManifestPluginDTO tmp = (ManifestPluginDTO)manis[i];
+            ManifestPluginDTO tmp = (ManifestPluginDTO)(manis[i] ?? new());
             s.AddStruct<ManifestPluginDTO>(tmp);
         }
 

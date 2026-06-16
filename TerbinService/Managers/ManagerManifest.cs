@@ -131,7 +131,7 @@ public static partial class Manager
             if (string.IsNullOrEmpty(information))
                 return (Status.ErrorInstanceNotExist, "");
 
-            string local = $"{Guid.NewGuid:N}";
+            string local = $"{Guid.NewGuid():N}";
             string name = pNamePlugin;
             string file = makeNameFieldPlugin(name, local);
 
@@ -143,7 +143,7 @@ public static partial class Manager
                 Id = pGuid,
                 IdLocal = local,
                 OutSideIntance = pOutSideIntence,
-                HandWritten = pHandwritten,
+                HandWritten = pHandwritten ?? throw new NotImplementedException("TODO: Gestionar Esto"),
             };
             var r = JSonUtil.SaveDirect(information, file, manifest);
 

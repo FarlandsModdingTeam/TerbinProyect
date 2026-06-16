@@ -64,43 +64,43 @@ static class Helper
         lock (LockRead)
         {
             Console.Write($"[Client] {pMSG} -> ( ");
+        }
 
-            int startX = Console.CursorLeft;
-            int startTop = Console.CursorTop;
+        int startX = Console.CursorLeft;
+        int startTop = Console.CursorTop;
 
-            Console.Write(" )");
-            Console.SetCursorPosition(startX, startTop);
+        Console.Write(" )");
+        Console.SetCursorPosition(startX, startTop);
 
-            StringBuilder txt = new();
-            bool flag = true;
+        StringBuilder txt = new();
+        bool flag = true;
 
-            while (flag)
+        while (flag)
+        {
+            ConsoleKeyInfo key = Console.ReadKey(true);
+
+            if (key.Key == ConsoleKey.Enter)
             {
-                ConsoleKeyInfo key = Console.ReadKey(true);
-
-                if (key.Key == ConsoleKey.Enter)
-                {
-                    flag = false;
-                }
-                else if (key.Key == ConsoleKey.Backspace)
-                {
-                    if (txt.Length > 0)
-                        txt.Remove(txt.Length - 1, 1);
-                }
-                else if (!char.IsControl(key.KeyChar))
-                {
-                    txt.Append(key.KeyChar);
-                }
-
-                Console.SetCursorPosition(startX, startTop);
-                Console.Write(txt.ToString() + " ) ");
-                Console.SetCursorPosition(startX + txt.Length, startTop);
-
-                Console.WriteLine();
+                flag = false;
+            }
+            else if (key.Key == ConsoleKey.Backspace)
+            {
+                if (txt.Length > 0)
+                    txt.Remove(txt.Length - 1, 1);
+            }
+            else if (!char.IsControl(key.KeyChar))
+            {
+                txt.Append(key.KeyChar);
             }
 
-            return txt.ToString();
+            Console.SetCursorPosition(startX, startTop);
+            Console.Write(txt.ToString() + " ) ");
+            Console.SetCursorPosition(startX + txt.Length, startTop);
+
+            Console.WriteLine();
         }
+
+        return txt.ToString();
     }
     public static void PrintMethod(params byte[] pData)
     {

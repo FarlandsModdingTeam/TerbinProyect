@@ -88,6 +88,7 @@ public class ZipUtil
     /// <param name="pOverwrite">Es: Permiso para sobrescribir elementos duplicados. <br />En: Permission to overwrite duplicate items.</param>
     /// <param name="pCancellationToken">Es: Token utilizado para cancelar el proceso en ejecución. <br />En: Token used to cancel the running process.</param>
     /// <returns>Es: Un objeto DirectoryHandwritten con el registro. <br />En: A DirectoryHandwritten object containing the record.</returns>
+    [TODO("Controlar que tengas permisos")]
     public static async Task<DirectoryHandwritten> ExtractWithProgress(
                                     string pSourceZipPath,
                                     string pDestinationDirectory,
