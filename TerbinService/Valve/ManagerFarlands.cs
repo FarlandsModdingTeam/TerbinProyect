@@ -93,7 +93,7 @@ public static class ManagerFarlands
         return File.Exists(pFilePath);
     }
 
-
+    [TODO("Solucionar que da la version de Unity en vez del juego XD")]
     public static string GetVersion()
     {
         var ruteFarlands = GetRuteSteamFarlands();

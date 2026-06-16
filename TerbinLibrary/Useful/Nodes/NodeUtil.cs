@@ -414,6 +414,6 @@ public static class NodeUtil
     public static ulong CountContent(string pPath)
     {
         var (files, direc) = GetSizeDir(pPath);
-        return (ulong)((files ?? 0) + (direc ?? 0));
+        return (ulong)(files ?? 0) + (ulong)(direc ?? 0);
     }
 }
