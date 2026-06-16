@@ -33,7 +33,7 @@ internal class Inst : ITests
 
     public static async Task Create(TerbinCommunicator pCommunicator)
     {
-        Console.Write($"-------( Create-Instance )---------\n" +
+        Console.Write($"-------( Instance )---------\n" +
             $"[Client] \"Nombre de la Instancia\" \n");
         string name = Helper.Read("name");
 
@@ -100,6 +100,7 @@ internal class Inst : ITests
                     //tmp.ReadFrom(reader);
 
                     tmp.Print();
+                    Console.WriteLine("----------");
                 }
             }
             catch (Exception e)
@@ -113,7 +114,7 @@ internal class Inst : ITests
 
     public static async Task GetOne(TerbinCommunicator pCommunicator)
     {
-        Console.Write($"-------( Create-Instance )---------\n" +
+        Console.Write($"-------( Instance )---------\n" +
             $"[Client] \"Nombre de la Instancia\" \n");
         string name = Helper.Read("name");
 
@@ -165,7 +166,7 @@ internal class Inst : ITests
 
     public static async Task Del(TerbinCommunicator pCommunicator)
     {
-        Console.Write($"-------( Create-Instance )---------\n" +
+        Console.Write($"-------( Instance )---------\n" +
             $"[Client] \"Nombre de la Instancia\" \n");
         string name = Helper.Read("name");
 

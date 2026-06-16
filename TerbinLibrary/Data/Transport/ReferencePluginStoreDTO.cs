@@ -20,7 +20,7 @@ namespace TerbinLibrary.Data.Transport;
  */
 
 
-public struct ReferencePluginStoreDTO : IStructSerializable
+public struct ReferencePluginStoreDTO : IStructSerializable, IPrintable
 {
     public string? Name { get; set; }
     public string? Id { get; set; } // Guid
@@ -35,6 +35,7 @@ public struct ReferencePluginStoreDTO : IStructSerializable
         ((FileName?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY +
         ((UrlWeb?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY +
         ((Version?.Length ?? 0) * 2) + TerbinProtocol.LENGTH_ARRAY;
+
 
     public void ReadFrom(ReadOnlySpan<byte> pBuffer)
     {
@@ -54,6 +55,16 @@ public struct ReferencePluginStoreDTO : IStructSerializable
         pBuffer.WriteArray<char>(ref offset, FileName?.ToCharArray() ?? "".ToCharArray());
         pBuffer.WriteArray<char>(ref offset, UrlWeb?.ToCharArray() ?? "".ToCharArray());
         pBuffer.WriteArray<char>(ref offset, Version?.ToCharArray() ?? "".ToCharArray());
+    }
+    public void Print()
+    {
+        Console.WriteLine($"""
+            Name: {Name ?? "N/A"};
+            Id: {Id ?? "N/A"};
+            FileName: {FileName ?? "N/A"};
+            UrlWeb: {UrlWeb ?? "N/A"};
+            Version: {Version ?? "N/A"};
+            """);
     }
 
     public static explicit operator ReferencePluginStoreDTO(ReferencePluginStore pData)

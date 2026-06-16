@@ -56,10 +56,11 @@ internal class Store : ITests
                 for (int i = 0; i < length; i++)
                 {
                     //ReferenceInstanceDTO tmp = new();
-                    ReferenceInstanceDTO tmp = reader.ReadStruct<ReferenceInstanceDTO>(ref offset);
+                    ReferencePluginStoreDTO tmp = reader.ReadStruct<ReferencePluginStoreDTO>(ref offset);
                     //tmp.ReadFrom(reader);
 
                     tmp.Print();
+                    Console.WriteLine("----------");
                 }
             }
             catch (Exception e)
@@ -73,26 +74,26 @@ internal class Store : ITests
 
     public static async Task GetOne(TerbinCommunicator pCommunicator)
     {
-        Console.Write($"-------( Create-Instance )---------\n" +
-            $"[Client] \"Nombre de la Instancia\" \n");
-        string name = Helper.Read("name");
+        Console.Write($"-------( Store )---------\n" +
+            $"[Client] \"GUID del plugin\" \n");
+        string pId = Helper.Read("ID");
 
 
         PacketRequest r;
-        r = await getOne(pCommunicator, name);
+        r = await getOne(pCommunicator, pId);
 
 
         await Helper.Fin();
     }
 
 
-    private static Task<PacketRequest> getOne(TerbinCommunicator pCommunicator, string pName)
+    private static Task<PacketRequest> getOne(TerbinCommunicator pCommunicator, string pId)
     {
         Task<PacketRequest> r;
         Serialineitor s;
 
         s = new Serialineitor()
-                    .AddArray<char>(pName.ToCharArray());
+                    .AddArray<char>(pId.ToCharArray());
 
         r = pCommunicator.Communicate(new(CodeServices.Read, CodeServicesSection.PluginStorage), s.Serialize());
         r.ContinueWith(async p =>
@@ -109,7 +110,7 @@ internal class Store : ITests
 
                 Console.WriteLine("**( ReferenceInstanceDTO )**");
                 //ReferenceInstanceDTO tmp = new();
-                ManifestInstanceDTO tmp = reader.ReadStruct<ManifestInstanceDTO>(ref offset);
+                ReferencePluginStoreDTO tmp = reader.ReadStruct<ReferencePluginStoreDTO>(ref offset);
                 //tmp.ReadFrom(reader);
 
                 tmp.Print();

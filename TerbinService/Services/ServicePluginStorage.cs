@@ -37,7 +37,6 @@ internal class ServicePluginStorage
         return InfoResponse.CreateSucces(pHead.IdRequest, s.Serialize());
     }
 
-
     // ReferencePluginStoreDTO
     [TerbinExecutable((byte)CodeServices.Read, (byte)CodeServicesSection.PluginStorage)]
     public static async Task<InfoResponse?> GetAll(Header pHead, byte[] pParameters, CancellationToken pToken)
@@ -56,5 +55,4 @@ internal class ServicePluginStorage
 
         return InfoResponse.CreateSucces(pHead.IdRequest, plugin.ToSerilizeDTO());
     }
-
 }

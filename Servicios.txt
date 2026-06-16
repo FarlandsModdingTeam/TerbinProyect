@@ -7,8 +7,8 @@
  * GetOne
 
 - PluginStorage
- * GetAll
- * GetOne
+ * GetAll (v)
+ * GetOne (v)
 
 - Instance
  * Create (v)
