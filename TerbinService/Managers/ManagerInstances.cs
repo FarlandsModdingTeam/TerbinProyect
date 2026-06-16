@@ -486,7 +486,7 @@ public static partial class Manager
 
             path = Path.Combine(path, pTarjetPath);
 
-            return await InstallPlugin(pPathPlugin, pTarjetPath, pOverwrite, pProgress, pCancellationToken).ConfigureAwait(false);
+            return await InstallPlugin(pPathPlugin, path, pOverwrite, pProgress, pCancellationToken).ConfigureAwait(false);
         }
         public static async Task<DirectoryHandwritten?> InstallPlugin
             (string pPathPlugin, string pTarjetPath, bool pOverwrite, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
