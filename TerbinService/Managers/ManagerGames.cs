@@ -116,7 +116,7 @@ public static partial class Manager
 
                 var update = Manager.Manifest.UpdateInstaceByPath(pathInstace, manifest =>
                 {
-                    manifest.Executable = exes[0];
+                    manifest.Executable = Path.GetRelativePath(pathInstace, exes[0]);
                     manifest.Version = Games.GetVersion();
                 });
                 if (!update)
@@ -201,10 +201,7 @@ public static partial class Manager
                 manifest.Version = "";
             });
             if (!update)
-            {
-                // TODO: Desclonar.
                 return InternalErrors.ManifestUpdate;
-            }
 
             return InternalErrors.IsSucces;
         }
@@ -225,36 +222,6 @@ public static partial class Manager
         public static string GetVersion()
         {
             return ManagerFarlands.GetVersion();
-        }
-
-        /// <summary>
-        /// ___________________( Español )___________________<br />
-        /// Enumerador de respuestas codificadas para el manejador de operaciones sobre juegos.<br />
-        /// Notas: Las respuestas positivas o en base 0 determinan cancelado (0) y Éxito (1).<br />
-        /// Tips: Los códigos negativos y sobre 2 se dedican íntegramente a fallos descriptivos.<br />
-        /// ___________________( English )___________________<br />
-        /// Coded response enumerator covering operations on the game manager scope.<br />
-        /// Notes: Positive/Zero-based codes act as Cancelled (0) and Success (1).<br />
-        /// Tips: Negative identifiers and elements above 2 represent purely descriptive runtime faults.<br />
-        /// </summary>
-        [Obsolete("Use: InternalErrors", true)]
-        public enum Status : sbyte
-        {
-            GenericException = -1,
-
-            IsCancelled = 0,
-            Succes = 1,
-
-            GenericError = 2,
-            ErrorHandwritten = 3,
-            ErrorGetInstance = 4,
-            ErrorNotIsInstance = 5,
-            ErrorGameNotExes = 6,
-            ErrorUpdateInstace = 7,
-
-            ErrorGetHandwritten = 8,
-            ErrorRemoveHandwritten = 9,
-            ErrorGameAlreadyExist = 10,
         }
     }
 }
