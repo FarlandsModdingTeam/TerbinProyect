@@ -25,6 +25,61 @@ internal class Plug : ITests
     }
 
 
+    public static async Task Add(TerbinCommunicator pCommunicator)
+    {
+        Console.Write($"-------( Plugin )---------\n" +
+            $"[Client] \"1. Nombre de la Instancia | 2. GUID del plugin\"\n");
+        string name = Helper.Read("1. name");
+        string id = Helper.Read("2. GUID");
+
+        PacketRequest r;
+        r = await install(pCommunicator, name, id);
+
+
+        await Helper.Fin();
+    }
+    private static Task<PacketRequest> install(TerbinCommunicator pCommunicator, string pName, string pId)
+    {
+        Task<PacketRequest> r;
+        Serialineitor s;
+
+        s = new Serialineitor()
+                    .AddArray<char>(pName.ToCharArray())
+                    .AddArray<char>(pId.ToCharArray());
+
+        r = pCommunicator.Communicate(new(CodeServices.Install, CodeServicesSection.Plugin), s.Serialize());
+        r.ContinueWith(async p =>
+        {
+            PacketRequest r = await p;
+            Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+            Helper.PrintMethod(r.ActionMethod);
+            if (await Helper.IsError(r)) return;
+
+            int offset = 0;
+            try
+            {
+                ReadOnlySpan<byte> reader = r.Payload;
+                if (reader.IsEmpty)
+                    Console.Warn("[Client] reader.IsEmpty");
+
+                Console.WriteLine("**( ManifestPluginDTO )**");
+                //ReferenceInstanceDTO tmp = new();
+                ManifestPluginDTO tmp = reader.ReadStruct<ManifestPluginDTO>(ref offset);
+                //tmp.ReadFrom(reader);
+
+                tmp.Print();
+            }
+            catch (Exception e)
+            {
+                e.PrintException("getOne");
+            }
+
+        });
+        return r;
+    }
+
+
+
 
     public static async Task GetAll(TerbinCommunicator pCommunicator)
     {

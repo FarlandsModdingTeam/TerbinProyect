@@ -34,22 +34,6 @@ public static partial class Manager
 {
     public static class Plugin
     {
-        // todo esto hay que sacarlo fuera.
-        public const string ROOT = /*Game*/"/";
-        public static readonly string BEPINEX_PLUGINS = Path.Combine(ROOT, "BepInEx/plugins");
-        public static readonly string MELONLOADER_MODS = Path.Combine(ROOT, "Mods");
-
-        public static string Root
-        {
-            get => ROOT;
-        }
-        public static string BepInExPlugin
-        {
-            get => Path.Combine(ROOT);
-        }
-
-
-
         private static readonly SemaphoreByKey<string> _locks = new(StringComparer.OrdinalIgnoreCase);
 
 
