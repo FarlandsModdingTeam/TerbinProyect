@@ -110,6 +110,7 @@ public enum InternalErrors : ushort
     GameRuteNotExist = 101,
     GameAlredyExist = 102,
     GameNotContainExes = 103,
+    GameNotLaunch = 104,
 
     // Mods = 200,
     PluginNotConect = 201,

@@ -4,6 +4,7 @@ using System.Text;
 using System.Xml.Linq;
 using TerbinLibrary;
 using TerbinLibrary.Data;
+using TerbinLibrary.Data.Instance;
 using TerbinLibrary.SteamFarlands;
 using TerbinLibrary.TerbinServiceHelper.Exceptions;
 using TerbinLibrary.Useful;
@@ -207,12 +208,21 @@ public static partial class Manager
         }
 
 
-        public static bool RunOfInstance(string pNameInstance)
+        public static async Task<InternalErrors> RunInInstance(string pNameInstance)
         {
+            string? dir = Manager.Instances.GetPathFolder(pNameInstance);
+            if (string.IsNullOrEmpty(dir))
+                return InternalErrors.InstanceNotExist;
 
+            ManifestInstance? inst = await Manager.Instances.GetManifestByPath(dir);
+            if (inst is null)
+                return InternalErrors.ManifestGet;
 
+            if (inst.Executable is null)
+                return InternalErrors.GameNotContainExes;
 
-            return true;
+            string path = Path.Combine(dir, inst.Executable);
+            return Games.Run(path) ? InternalErrors.IsSucces : InternalErrors.GameNotLaunch;
         }
 
 

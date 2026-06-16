@@ -258,7 +258,7 @@ public static partial class Manager
             if (string.IsNullOrEmpty(dir))
                 return null;
 
-            ManifestInstance? inst = await GetManifestByPath(dir);
+            ManifestInstance? inst = await Manager.Instances.GetManifestByPath(dir);
             return inst;
         }
 
