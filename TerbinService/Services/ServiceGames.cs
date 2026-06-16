@@ -1,17 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection.PortableExecutable;
 using System.Text;
+using System.Xml.Linq;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
+using TerbinLibrary.Data.Transport;
 using TerbinLibrary.Execution;
-using TerbinLibrary.Serialize;
 using TerbinLibrary.Extension;
-using TerbinService.Managers;
-using TerbinLibrary.TerbinServiceHelper;
-using TerbinLibrary.TerbinServiceHelper.Exceptions;
-using TerbinLibrary.TerbinServiceHelper.Consoles;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.Serialize;
+using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
+using TerbinLibrary.TerbinServiceHelper.Exceptions;
+using TerbinLibrary.Useful;
+using TerbinLibrary.Useful.Nodes;
+using TerbinService.Managers;
 
 namespace TerbinService.Services;
 
@@ -23,31 +29,29 @@ internal static class ServiceGames
         if (pParameters.Length <= 0)
             return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
 
-        ReadOnlySpan<byte> buffer = pParameters;
-        string nameInstance = buffer.ReadArray<char>().CrString();
-        string dirGame = buffer.ReadArray<char>().CrString();
+        ReadOnlySpan<byte> reader = pParameters;
+        string nameInstance = reader.ReadArray<char>().CrString();
+        string dirGame = reader.ReadArray<char>().CrString();
+        bool useProgress = (reader.Length >= 1) && reader.Read<bool>();
 
-        var sizes = Manager.Node.GetSizeDir(dirGame);
-        if (sizes.maxFiles == null || sizes.maxDir == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceGetSizeError));
 
-        var rId = await Worker.CurrentContext.Value.Communicator.SoliciteRequestMemory();
-        if (rId.Head.Status != CodeStatus.Succes)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
-        byte id = rId.Payload[0];
+        pathInstance = Manager.Instances.GetPathFolder(nameInstance);
+        if (string.IsNullOrEmpty(pathInstance))
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
 
-        //_ = Manager.Games.HandleCloneInInstanceWithProgress(nameInstance, id, dirGame);
 
-        return new InfoResponse
+        IProgress<TerbinInfoProgrss>? progress = null;
+        if (useProgress)
         {
-            IdRequest = pHead.IdRequest,
-            Status = CodeStatus.Succes,
-            Payload = new Serialineitor()
-                        .Add(id)
-                        .Add(sizes.maxFiles.Value)
-                        .Add(sizes.maxDir.Value)
-                        .Serialize(),
-        };
+            long maxSize = (long)NodeUtil.CountContent(dirGame);
+            MaxProgressDTO max = new(maxSize);
+            progress = ProgressUtil.CreateProgressAndSetMax
+                (Worker.CurrentContext.Value.Communicator, max, pHead.IdRequest, (byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin);
+        }
+
+        var result = Manager.Games.CloneInInstance();
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
 
