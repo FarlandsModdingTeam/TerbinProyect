@@ -117,6 +117,7 @@ public static partial class Manager
                 var update = Manager.Manifest.UpdateInstaceByPath(pathInstace, manifest =>
                 {
                     manifest.Executable = exes[0];
+                    manifest.Version = Games.GetVersion();
                 });
                 if (!update)
                 {
