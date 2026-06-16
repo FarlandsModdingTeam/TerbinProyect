@@ -67,7 +67,7 @@ internal class Game : ITests
     {
         Console.Write($"-------( Game )---------\n" +
             $"[Client] \"Name Instance\"");
-        string name = Helper.Read("1. Name");
+        string name = Helper.Read("Name");
 
         PacketRequest r;
         r = await deleted(pCommunicator, name);
@@ -93,6 +93,41 @@ internal class Game : ITests
             if (await Helper.IsError(r)) return;
 
             Console.Succes("Eliminado Correctamente");
+        });
+        return r;
+    }
+
+
+    public static async Task Exe(TerbinCommunicator pCommunicator)
+    {
+        Console.Write($"-------( Game )---------\n" +
+            $"[Client] \"Name Instance\"");
+        string name = Helper.Read("Name");
+
+        PacketRequest r;
+        r = await run(pCommunicator, name);
+
+        await Helper.Fin();
+    }
+
+
+    private static Task<PacketRequest> run(TerbinCommunicator pCommunicator, string pName)
+    {
+        Task<PacketRequest> r;
+        Serialineitor s;
+
+        s = new Serialineitor()
+                    .AddArray<char>(pName.ToCharArray());
+
+        r = pCommunicator.Communicate(new(CodeServices.Execute, CodeServicesSection.Game), s.Serialize());
+        r.ContinueWith(async p =>
+        {
+            PacketRequest r = await p;
+            Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+            Helper.PrintMethod(r.ActionMethod);
+            if (await Helper.IsError(r)) return;
+
+            Console.Succes("Corriendo Correctamente");
         });
         return r;
     }

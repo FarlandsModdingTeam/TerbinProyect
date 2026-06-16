@@ -17,5 +17,7 @@
  * GetOne (v)
 
 - Game
- * Duplicate
- * Remove
+ * Duplicate (v)
+ * Remove (v)
+ * Execute (v)
+ 
