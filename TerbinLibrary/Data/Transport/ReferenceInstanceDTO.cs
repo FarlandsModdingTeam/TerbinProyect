@@ -20,7 +20,7 @@ namespace TerbinLibrary.Data.Transport;
 
 
 
-public struct ReferenceInstanceDTO : IStructSerializable
+public struct ReferenceInstanceDTO : IStructSerializable, IPrintable
 {
     public string? Name;
     public bool? OutSide;
@@ -51,6 +51,14 @@ public struct ReferenceInstanceDTO : IStructSerializable
         pBuffer.WriteArray<char>(ref offset, Path?.ToCharArray() ?? "".ToCharArray());
     }
 
+    public void Print()
+    {
+        Console.WriteLine($"""
+                    Name: {Name};
+                    OutSide: {OutSide};
+                    Path: {Path};
+                """);
+    }
 
     public static explicit operator ReferenceInstanceDTO(ReferenceInstance pData)
     {

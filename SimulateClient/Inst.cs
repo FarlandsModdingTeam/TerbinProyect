@@ -86,7 +86,7 @@ internal class Inst : ITests
 
             try
             {
-                List<ReferenceInstanceDTO> dto = new();
+                //List<ReferenceInstanceDTO> dto = new();
                 ReadOnlySpan<byte> reader = r.Payload;
 
                 ThreeQuartersInt length = reader.Read<ThreeQuartersInt>();
@@ -99,10 +99,7 @@ internal class Inst : ITests
                     ReferenceInstanceDTO tmp = reader.ReadStruct<ReferenceInstanceDTO>(ref offset);
                     //tmp.ReadFrom(reader);
 
-                    Console.WriteLine($"""
-                    Name: {tmp.Name};
-                    OutSide: {tmp.OutSide};
-                    """);
+                    tmp.Print();
                 }
             }
             catch (Exception e)
@@ -152,13 +149,10 @@ internal class Inst : ITests
 
                 Console.WriteLine("**( ReferenceInstanceDTO )**");
                 //ReferenceInstanceDTO tmp = new();
-                ReferenceInstanceDTO tmp = reader.ReadStruct<ReferenceInstanceDTO>(ref offset);
+                ManifestInstanceDTO tmp = reader.ReadStruct<ManifestInstanceDTO>(ref offset);
                 //tmp.ReadFrom(reader);
 
-                Console.WriteLine($"""
-                    Name: {tmp.Name};
-                    OutSide: {tmp.OutSide};
-                """);
+                tmp.Print();
             }
             catch (Exception e)
             {

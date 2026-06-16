@@ -9,7 +9,7 @@ using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Data.Transport;
 
-public struct ManifestInstanceDTO : IStructSerializable
+public struct ManifestInstanceDTO : IStructSerializable, IPrintable
 {
     public string? Name { get; set; }
     public string? Version { get; set; }
@@ -59,6 +59,14 @@ public struct ManifestInstanceDTO : IStructSerializable
         pBuffer.Write<ThreeQuartersInt>(ref offset, PluginCount);
     }
 
+    public void Print()
+    {
+        Console.WriteLine($"""
+                    Name: {Name};
+                    Version: {Version};
+                    PluginCount: {PluginCount};
+                    """);
+    }
 
     public static explicit operator ManifestInstanceDTO(ManifestInstance pData)
     {
