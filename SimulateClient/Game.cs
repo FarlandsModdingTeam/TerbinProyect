@@ -28,7 +28,7 @@ internal class Game : ITests
     public static async Task Dup(TerbinCommunicator pCommunicator)
     {
         Console.Write($"-------( Game )---------\n" +
-            $"[Client] \"1. Name Instance | 2. Path Game\"");
+            $"[Client] \"1. Name Instance | 2. Path Game\"\n");
         string name = Helper.Read("1. Name");
         string path = "C:\\Program Files (x86)\\Steam\\steamapps\\common\\Farlands";
 
@@ -66,7 +66,7 @@ internal class Game : ITests
     public static async Task Rm(TerbinCommunicator pCommunicator)
     {
         Console.Write($"-------( Game )---------\n" +
-            $"[Client] \"Name Instance\"");
+            $"[Client] \"Name Instance\"\n");
         string name = Helper.Read("Name");
 
         PacketRequest r;

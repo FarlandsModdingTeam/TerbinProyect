@@ -34,7 +34,7 @@ internal class Inst : ITests
     public static async Task Create(TerbinCommunicator pCommunicator)
     {
         Console.Write($"-------( Instance )---------\n" +
-            $"[Client] \"Nombre de la Instancia\" \n");
+            $"[Client] \"Nombre de la Instancia\"\n");
         string name = Helper.Read("name");
 
 
@@ -90,6 +90,7 @@ internal class Inst : ITests
                 ReadOnlySpan<byte> reader = r.Payload;
 
                 ThreeQuartersInt length = reader.Read<ThreeQuartersInt>();
+                Console.Warn($"Lenght: {length}");
 
                 int offset = 0;
                 Console.WriteLine("**( ReferenceInstanceDTO )**");
@@ -115,7 +116,7 @@ internal class Inst : ITests
     public static async Task GetOne(TerbinCommunicator pCommunicator)
     {
         Console.Write($"-------( Instance )---------\n" +
-            $"[Client] \"Nombre de la Instancia\" \n");
+            $"[Client] \"Nombre de la Instancia\"\n");
         string name = Helper.Read("name");
 
 

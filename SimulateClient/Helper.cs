@@ -10,6 +10,8 @@ namespace SimulateClient;
 
 static class Helper
 {
+    public static Lock LockRead = new();
+
     public static async Task<bool> IsError(CodeStatus pStatus)
     {
         if (pStatus != CodeStatus.Succes)
@@ -48,51 +50,57 @@ static class Helper
     }
     public static async Task PressAnyKeyToContinue()
     {
-        Console.WriteLine($"[Client] Pulse cualquier tecla para continuar ...");
-        _ = Console.ReadLine();
-        await Task.Delay(500);
+        lock (LockRead)
+        {
+            Console.WriteLine($"[Client] Pulse cualquier tecla para continuar ...");
+            _ = Console.ReadLine();
+        }
+        //await Task.Delay(500);
     }
 
     // TODO: Un start y un end.
     public static string Read(string pMSG) // string pStart, string pEnd
     {
-        Console.Write($"[Client] {pMSG} -> ( ");
-
-        int startX = Console.CursorLeft;
-        int startTop = Console.CursorTop;
-
-        Console.Write(" )");
-        Console.SetCursorPosition(startX, startTop);
-
-        StringBuilder txt = new();
-        bool flag = true;
-
-        while (flag)
+        lock (LockRead)
         {
-            ConsoleKeyInfo key = Console.ReadKey(true);
+            Console.Write($"[Client] {pMSG} -> ( ");
 
-            if (key.Key == ConsoleKey.Enter)
-            {
-                flag = false;
-            }
-            else if (key.Key == ConsoleKey.Backspace)
-            {
-                if (txt.Length > 0)
-                    txt.Remove(txt.Length - 1, 1);
-            }
-            else if (!char.IsControl(key.KeyChar))
-            {
-                txt.Append(key.KeyChar);
-            }
+            int startX = Console.CursorLeft;
+            int startTop = Console.CursorTop;
 
+            Console.Write(" )");
             Console.SetCursorPosition(startX, startTop);
-            Console.Write(txt.ToString() + " ) ");
-            Console.SetCursorPosition(startX + txt.Length, startTop);
+
+            StringBuilder txt = new();
+            bool flag = true;
+
+            while (flag)
+            {
+                ConsoleKeyInfo key = Console.ReadKey(true);
+
+                if (key.Key == ConsoleKey.Enter)
+                {
+                    flag = false;
+                }
+                else if (key.Key == ConsoleKey.Backspace)
+                {
+                    if (txt.Length > 0)
+                        txt.Remove(txt.Length - 1, 1);
+                }
+                else if (!char.IsControl(key.KeyChar))
+                {
+                    txt.Append(key.KeyChar);
+                }
+
+                Console.SetCursorPosition(startX, startTop);
+                Console.Write(txt.ToString() + " ) ");
+                Console.SetCursorPosition(startX + txt.Length, startTop);
+
+                Console.WriteLine();
+            }
+
+            return txt.ToString();
         }
-
-        Console.WriteLine();
-
-        return txt.ToString();
     }
     public static void PrintMethod(params byte[] pData)
     {

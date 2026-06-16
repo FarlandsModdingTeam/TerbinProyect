@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
@@ -11,7 +12,7 @@ using TerbinLibrary.TerbinServiceHelper.Exceptions;
 
 namespace SimulateClient;
 
-internal class Store : ITests
+internal class Plug : ITests
 {
     public static Task LittleByLittle(TerbinCommunicator pCommunicator)
     {
@@ -24,19 +25,27 @@ internal class Store : ITests
     }
 
 
+
     public static async Task GetAll(TerbinCommunicator pCommunicator)
     {
+        Console.Write($"-------( Plugin )---------\n" +
+            $"[Client] \"Nombre de la Instancia\"\n");
+        string name = Helper.Read("Name");
+
         PacketRequest r;
-        r = await getAll(pCommunicator);
+        r = await getAll(pCommunicator, name);
 
         await Helper.Fin();
     }
 
-    private static Task<PacketRequest> getAll(TerbinCommunicator pCommunicator)
+    private static Task<PacketRequest> getAll(TerbinCommunicator pCommunicator, string pName)
     {
         Task<PacketRequest> r;
+        Serialineitor s;
 
-        r = pCommunicator.Communicate(new(CodeServices.ReadAll, CodeServicesSection.PluginStorage), []);
+        s = new Serialineitor()
+                    .AddArray<char>(pName.ToCharArray());
+        r = pCommunicator.Communicate(new(CodeServices.ReadAll, CodeServicesSection.Plugin), s.Serialize());
         r.ContinueWith(async p =>
         {
             PacketRequest r = await p;
@@ -48,6 +57,7 @@ internal class Store : ITests
             {
                 //List<ReferenceInstanceDTO> dto = new();
                 ReadOnlySpan<byte> reader = r.Payload;
+
                 if (reader.IsEmpty)
                     Console.Warn("[Client] reader.IsEmpty");
 
@@ -55,11 +65,11 @@ internal class Store : ITests
                 Console.Warn($"Lenght: {length}");
 
                 int offset = 0;
-                Console.WriteLine("**( ReferencePluginStoreDTO )**");
+                Console.WriteLine("**( ManifestPluginDTO )**");
                 for (int i = 0; i < length; i++)
                 {
                     //ReferenceInstanceDTO tmp = new();
-                    ReferencePluginStoreDTO tmp = reader.ReadStruct<ReferencePluginStoreDTO>(ref offset);
+                    ManifestPluginDTO tmp = reader.ReadStruct<ManifestPluginDTO>(ref offset);
                     //tmp.ReadFrom(reader);
 
                     tmp.Print();
@@ -77,28 +87,29 @@ internal class Store : ITests
 
     public static async Task GetOne(TerbinCommunicator pCommunicator)
     {
-        Console.Write($"-------( Store )---------\n" +
-            $"[Client] \"GUID del plugin\"\n");
-        string pId = Helper.Read("ID");
-
+        Console.Write($"-------( Plugin )---------\n" +
+            $"[Client] \"1. Nombre de la Instancia | 2. GUID del plugin\"\n");
+        string name = Helper.Read("1. name");
+        string id = Helper.Read("2. GUID");
 
         PacketRequest r;
-        r = await getOne(pCommunicator, pId);
+        r = await getOne(pCommunicator, name, id);
 
 
         await Helper.Fin();
     }
 
 
-    private static Task<PacketRequest> getOne(TerbinCommunicator pCommunicator, string pId)
+    private static Task<PacketRequest> getOne(TerbinCommunicator pCommunicator, string pName, string pId)
     {
         Task<PacketRequest> r;
         Serialineitor s;
 
         s = new Serialineitor()
+                    .AddArray<char>(pName.ToCharArray())
                     .AddArray<char>(pId.ToCharArray());
 
-        r = pCommunicator.Communicate(new(CodeServices.Read, CodeServicesSection.PluginStorage), s.Serialize());
+        r = pCommunicator.Communicate(new(CodeServices.Read, CodeServicesSection.Plugin), s.Serialize());
         r.ContinueWith(async p =>
         {
             PacketRequest r = await p;
@@ -113,9 +124,9 @@ internal class Store : ITests
                 if (reader.IsEmpty)
                     Console.Warn("[Client] reader.IsEmpty");
 
-                Console.WriteLine("**( ReferencePluginStoreDTO )**");
+                Console.WriteLine("**( ManifestPluginDTO )**");
                 //ReferenceInstanceDTO tmp = new();
-                ReferencePluginStoreDTO tmp = reader.ReadStruct<ReferencePluginStoreDTO>(ref offset);
+                ManifestPluginDTO tmp = reader.ReadStruct<ManifestPluginDTO>(ref offset);
                 //tmp.ReadFrom(reader);
 
                 tmp.Print();

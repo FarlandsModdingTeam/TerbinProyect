@@ -8,7 +8,7 @@ using TerbinLibrary.Serialize;
 
 namespace TerbinLibrary.Data.Transport;
 
-public struct ManifestPluginDTO : IStructSerializable
+public struct ManifestPluginDTO : IStructSerializable, IPrintable
 {
     // Nombre del mod
     public string? Name { get; set; }
@@ -42,6 +42,16 @@ public struct ManifestPluginDTO : IStructSerializable
         pBuffer.WriteArray<char>(ref offset, Id?.ToCharArray() ?? "".ToCharArray());
         pBuffer.WriteArray<char>(ref offset, IdLocal?.ToCharArray() ?? "".ToCharArray());
         pBuffer.Write<sbyte>(ref offset, OutSideIntance.ToSByte());
+    }
+
+    public void Print()
+    {
+        Console.WriteLine($"""
+            Name: {Name};
+            Id: {Id};
+            IdLocal: {IdLocal};
+            OutSideIntance: {OutSideIntance};
+            """);
     }
 
     public static explicit operator ManifestPluginDTO(ManifestPlugin pData)
