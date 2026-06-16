@@ -51,7 +51,7 @@ internal static class ServicePlugins
 
         long? sizePlugin = await NetUtil.GetContentLength(urlPlugin, pCancellationToken: CancellationToken.None);
         if (sizePlugin is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.PluginNotConect));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.PluginNotConect));
 
         if (useProgress)
         {
@@ -69,9 +69,9 @@ internal static class ServicePlugins
         {
             var error = TSHelper.GetError(r switch
             {
-                Manager.Plugin.Status.NotSuchSpace => CodeInternalErrors.PluginNotSuchSpace,
-                Manager.Plugin.Status.InvalidURL => CodeInternalErrors.PluginInvalidURL,
-                _ => CodeInternalErrors.PluginOnDowload,
+                Manager.Plugin.Status.NotSuchSpace => InternalErrors.PluginNotSuchSpace,
+                Manager.Plugin.Status.InvalidURL => InternalErrors.PluginInvalidURL,
+                _ => InternalErrors.PluginOnDowload,
             });
             return InfoResponse.CreateInteralError(pHead.IdRequest, error);
         }
@@ -98,7 +98,7 @@ internal static class ServicePlugins
 
         pathInstance = Manager.Instances.GetPathFolder(name);
         if (string.IsNullOrEmpty(pathInstance))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         pathPlugin = Path.Combine(pathInstance, relativePath);
 
@@ -119,10 +119,10 @@ internal static class ServicePlugins
             // ErrorGetPlugin, ErrorGetPathPlugin, ErrorGetManifest, ErrorOnSaveManifest, GenericError
             var error = TSHelper.GetError(r switch
             {
-                Manager.Plugin.Status.ErrorGetPathPlugin => CodeInternalErrors.PluginGetPath,
-                Manager.Plugin.Status.ErrorGetManifest => CodeInternalErrors.PluginGetManifest,
-                Manager.Plugin.Status.ErrorOnSaveManifest => CodeInternalErrors.PluginOnSave,
-                _ => CodeInternalErrors.PluginNotExist,
+                Manager.Plugin.Status.ErrorGetPathPlugin => InternalErrors.PluginGetPath,
+                Manager.Plugin.Status.ErrorGetManifest => InternalErrors.PluginGetManifest,
+                Manager.Plugin.Status.ErrorOnSaveManifest => InternalErrors.PluginOnSave,
+                _ => InternalErrors.PluginNotExist,
             });
             return InfoResponse.CreateInteralError(pHead.IdRequest, error);
         }
@@ -148,11 +148,11 @@ internal static class ServicePlugins
 
         path = Manager.Instances.GetPathFolder(nameInstance);
         if (string.IsNullOrEmpty(path))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         manifest = await Manager.Instances.GetManifestByPath(path);
         if (manifest == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         manis = await Manager.Plugin.GetAll(path, manifest, pToken);
 
@@ -193,15 +193,15 @@ internal static class ServicePlugins
 
         path = Manager.Instances.GetPathFolder(name);
         if (string.IsNullOrEmpty(path))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         manifest = await Manager.Instances.GetManifestByPath(path);
         if (manifest == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         mani = await Manager.Plugin.GetOne(id, name, manifest, pToken);
         if (mani is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         byte[] dto = ((ManifestPluginDTO)mani).Serialize();
 
@@ -231,15 +231,15 @@ internal static class ServicePlugins
 
         path = Manager.Instances.GetPathFolder(name);
         if (string.IsNullOrEmpty(path))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         manifest = await Manager.Instances.GetManifestByPath(path);
         if (manifest == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         mani = await Manager.Plugin.GetOne(id, name, manifest, pToken);
         if (mani is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         if (useProgress)
         {

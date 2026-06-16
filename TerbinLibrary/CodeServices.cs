@@ -96,7 +96,7 @@ public enum TypeService : byte
 }
 
 
-public enum CodeInternalErrors : ushort
+public enum InternalErrors : ushort
 {
     IdSoliciteError = 11,
     TODO_WIP = 12,

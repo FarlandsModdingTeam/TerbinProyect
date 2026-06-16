@@ -116,7 +116,7 @@ static class Old
                 }
                 else if (r.Payload.Length > 0 && r.Head.Status == CodeStatus.InternalWorkerError)
                 {
-                    Console.WriteLine($"[Client] R (error: {(CodeInternalErrors)Serialineitor.Deserialize<ushort>(r.Payload)})");
+                    Console.WriteLine($"[Client] R (error: {(InternalErrors)Serialineitor.Deserialize<ushort>(r.Payload)})");
                 }
                 else
                 {

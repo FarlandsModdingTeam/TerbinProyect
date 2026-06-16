@@ -36,7 +36,7 @@ public class TSHelper
     /// </summary>
     /// <param name="pError">Es: Código de error a evaluar. <br />En: Internal error code to evaluate.</param>
     /// <returns>Es: Arreglo de bytes serializado. <br />En: Serialized byte array.</returns>
-    public static byte[] GetError(CodeInternalErrors pError)
+    public static byte[] GetError(InternalErrors pError)
     {
         return Serialineitor.Serialize((ushort)pError);
     }

@@ -44,7 +44,7 @@ internal partial class Template
         // Solicitar id memoria.
         var rIdB = await info.Communicator.SoliciteRequestMemory();
         if (rIdB.Head.Status != CodeStatus.Succes)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.IdSoliciteError));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.IdSoliciteError));
         byte id = rIdB.Payload[0];
 
         // Responder.

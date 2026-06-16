@@ -74,11 +74,11 @@ public partial class Manager
                 if (r is null) throw new Exception("TODO: informar de que BepInEx ya esta instalado");
                 if (r != StatusNetUtil.Succes)
                 {
-                    CodeInternalErrors error = r switch
+                    InternalErrors error = r switch
                     {
-                        StatusNetUtil.ExceptionOnExtractZip => CodeInternalErrors.ZipExtractException,
-                        StatusNetUtil.ExceptionDeleteTemporalFile => CodeInternalErrors.ZipDeletedTempException,
-                        _ => CodeInternalErrors.ZipExtractError
+                        StatusNetUtil.ExceptionOnExtractZip => InternalErrors.ZipExtractException,
+                        StatusNetUtil.ExceptionDeleteTemporalFile => InternalErrors.ZipDeletedTempException,
+                        _ => InternalErrors.ZipExtractError
                     };
                     throw new Exception($"TODO: informar de {error}");
 

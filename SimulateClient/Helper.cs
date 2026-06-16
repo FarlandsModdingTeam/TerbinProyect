@@ -30,7 +30,7 @@ static class Helper
             if (st == CodeStatus.InternalWorkerError)
             {
                 ushort value = BitConverter.ToUInt16(pCapsule.Payload[0..2]);
-                Console.WriteLine($"ErrorInternal: {(CodeInternalErrors)value}");
+                Console.WriteLine($"ErrorInternal: {(InternalErrors)value}");
             }
             else
                 Console.WriteLine($"Error: {st}");

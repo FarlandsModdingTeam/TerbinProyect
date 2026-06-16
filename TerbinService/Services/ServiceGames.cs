@@ -37,7 +37,7 @@ internal static class ServiceGames
 
         pathInstance = Manager.Instances.GetPathFolder(nameInstance);
         if (string.IsNullOrEmpty(pathInstance))
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
 
         IProgress<TerbinInfoProgrss>? progress = null;

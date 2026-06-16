@@ -51,7 +51,7 @@ internal class ServicePluginStorage
 
         plugin = await Manager.StoragePlugin.Get(id);
         if (plugin is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.PluginNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.PluginNotExist));
 
         return InfoResponse.CreateSucces(pHead.IdRequest, plugin.ToSerilizeDTO());
     }

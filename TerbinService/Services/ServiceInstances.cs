@@ -50,7 +50,7 @@ internal static class ServiceInstances
         // TODO: Si hay path crearlo ahí.
         bool succes = Manager.Instances.NewInstance(name, false);
         if (!succes)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceCreate));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceCreate));
 
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
@@ -73,10 +73,10 @@ internal static class ServiceInstances
         {
             var error = TSHelper.GetError(r switch
             {
-                Manager.Instances.Status.ErrorNotExist => CodeInternalErrors.InstanceNotExist,
-                Manager.Instances.Status.ErrorIsNotInstance => CodeInternalErrors.InstanceIsNotInstance,
-                Manager.Instances.Status.ErrorUnregistInstance => CodeInternalErrors.InstanceUnregister,
-                _ => CodeInternalErrors.NodeDinamite,
+                Manager.Instances.Status.ErrorNotExist => InternalErrors.InstanceNotExist,
+                Manager.Instances.Status.ErrorIsNotInstance => InternalErrors.InstanceIsNotInstance,
+                Manager.Instances.Status.ErrorUnregistInstance => InternalErrors.InstanceUnregister,
+                _ => InternalErrors.NodeDinamite,
             });
             return InfoResponse.CreateInteralError(pHead.IdRequest, error);
         }
@@ -116,7 +116,7 @@ internal static class ServiceInstances
 
         manifest = await Manager.Instances.GetManifestByName(name);
         if (manifest is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(CodeInternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
 
         byte[] dto = ((ManifestInstanceDTO)manifest).Serialize();
 
