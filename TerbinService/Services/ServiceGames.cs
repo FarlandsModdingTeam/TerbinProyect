@@ -34,11 +34,35 @@ internal static class ServiceGames
         string dirGame = reader.ReadArray<char>().CrString();
         bool useProgress = (reader.Length >= 1) && reader.Read<bool>();
 
+        IProgress<TerbinInfoProgrss>? progress = null;
+        if (useProgress)
+        {
+            long maxSize = (long)NodeUtil.CountContent(dirGame);
+            MaxProgressDTO max = new(maxSize);
+            progress = ProgressUtil.CreateProgressAndSetMax
+                (Worker.CurrentContext.Value.Communicator, max, pHead.IdRequest, (byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin);
+        }
 
-        pathInstance = Manager.Instances.GetPathFolder(nameInstance);
-        if (string.IsNullOrEmpty(pathInstance))
+        var result = await Manager.Games.CloneInInstance(dirGame, nameInstance, true, progress, pToken);
+        if (result != InternalErrors.IsSucces)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize<ushort>((ushort)result));
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
+    }
+
+    [TerbinExecutable((byte)TerbinCRUD.Deleted, (byte)CodeServicesSection.Game)]
+    public static async Task<InfoResponse?> DeletedGame(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        ReadOnlySpan<byte> reader = pParameters;
+        string nameInstance = reader.ReadArray<char>().CrString();
+        bool useProgress = (reader.Length >= 1) && reader.Read<bool>();
+
+        string? dirGame = Manager.Instances.GetPathFolder(nameInstance);
+        if (string.IsNullOrEmpty(dirGame))
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
-
 
         IProgress<TerbinInfoProgrss>? progress = null;
         if (useProgress)
@@ -49,13 +73,14 @@ internal static class ServiceGames
                 (Worker.CurrentContext.Value.Communicator, max, pHead.IdRequest, (byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin);
         }
 
-        var result = Manager.Games.CloneInInstance();
+        var result = await Manager.Games.RemoveInInstance(nameInstance, progress, pToken);
+        if (result != InternalErrors.IsSucces)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize<ushort>((ushort)result));
 
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
-
-    [TerbinExecutable((byte)CodeServices.Execute, (byte)CodeServicesSection.Game)]
+    //[TerbinExecutable((byte)CodeServices.Execute, (byte)CodeServicesSection.Game)]
     public static async Task<InfoResponse?> ExecuteGame(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
