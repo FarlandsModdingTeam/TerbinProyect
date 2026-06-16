@@ -34,9 +34,6 @@ internal class Plug : ITests
 
         PacketRequest r;
         r = await install(pCommunicator, name, id);
-
-
-        await Helper.Fin();
     }
     private static Task<PacketRequest> install(TerbinCommunicator pCommunicator, string pName, string pId)
     {
@@ -61,20 +58,17 @@ internal class Plug : ITests
         return r;
     }
 
-    public static async Task Rm(TerbinCommunicator pCommunicator)
+    public static async Task Del(TerbinCommunicator pCommunicator)
     {
         Console.Write($"-------( Plugin )---------\n" +
-            $"[Client] \"1. Nombre de la Instancia | 2. GUID del plugin\"\n");
+            $"[Client] \"1. Nombre de la Instancia | 2. GUID (Local) del plugin\"\n");
         string name = Helper.Read("1. name");
         string id = Helper.Read("2. GUID");
 
         PacketRequest r;
-        r = await remove(pCommunicator, name, id);
-
-
-        await Helper.Fin();
+        r = await deleted(pCommunicator, name, id);
     }
-    private static Task<PacketRequest> remove(TerbinCommunicator pCommunicator, string pName, string pId)
+    private static Task<PacketRequest> deleted(TerbinCommunicator pCommunicator, string pName, string pId)
     {
         Task<PacketRequest> r;
         Serialineitor s;
@@ -96,6 +90,35 @@ internal class Plug : ITests
         return r;
     }
 
+    public static async Task Rm(TerbinCommunicator pCommunicator)
+    {
+        Console.Write($"-------( Plugin )---------\n" +
+            $"[Client] \"GUID del plugin\"\n");
+        string id = Helper.Read("2. GUID");
+
+        PacketRequest r;
+        r = await remove(pCommunicator, id);
+    }
+    private static Task<PacketRequest> remove(TerbinCommunicator pCommunicator, string pId)
+    {
+        Task<PacketRequest> r;
+        Serialineitor s;
+
+        s = new Serialineitor()
+                    .AddArray<char>(pId.ToCharArray());
+
+        r = pCommunicator.Communicate(new(CodeServices.Deleted, CodeServicesSection.PluginStorage), s.Serialize());
+        r.ContinueWith(async p =>
+        {
+            PacketRequest r = await p;
+            Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+            Helper.PrintMethod(r.ActionMethod);
+            if (await Helper.IsError(r)) return;
+
+            Console.Succes("Removido Correctamente");
+        });
+        return r;
+    }
 
 
     public static async Task GetAll(TerbinCommunicator pCommunicator)
@@ -106,8 +129,6 @@ internal class Plug : ITests
 
         PacketRequest r;
         r = await getAll(pCommunicator, name);
-
-        await Helper.Fin();
     }
 
     private static Task<PacketRequest> getAll(TerbinCommunicator pCommunicator, string pName)
@@ -169,9 +190,6 @@ internal class Plug : ITests
 
         PacketRequest r;
         r = await getOne(pCommunicator, name, id);
-
-
-        await Helper.Fin();
     }
 
 

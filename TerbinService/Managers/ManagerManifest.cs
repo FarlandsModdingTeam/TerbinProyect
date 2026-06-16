@@ -212,6 +212,9 @@ public static partial class Manager
                 guid = pGUID ?? $"{DateAndTime.Now}";
             pName ??= $"E:{CodeManifestError.NotAccesName}::{guid}";
             pGUID ??= $"E:{CodeManifestError.NotAccesIdLocal}::{guid}";
+
+            pName = pName.Replace(" ", "_").Replace(":", "_");
+
             return $"{pName}_{pGUID}.json";
         }
 

@@ -5,12 +5,13 @@ using System.Text;
 using TerbinLibrary;
 using TerbinLibrary.Communication.Packets;
 using TerbinLibrary.Protocol;
+using TerbinLibrary.TerbinServiceHelper.Consoles;
 
 namespace SimulateClient;
 
 static class Helper
 {
-    public static Lock LockRead = new();
+    //public static Lock LockRead = new();
 
     public static async Task<bool> IsError(CodeStatus pStatus)
     {
@@ -32,10 +33,10 @@ static class Helper
             if (st == CodeStatus.InternalWorkerError)
             {
                 ushort value = BitConverter.ToUInt16(pCapsule.Payload[0..2]);
-                Console.WriteLine($"ErrorInternal: {(InternalErrors)value}");
+                Console.Error($"ErrorInternal: {(InternalErrors)value}");
             }
             else
-                Console.WriteLine($"Error: {st}");
+                Console.Error($"Error: {st}");
 
             await PressAnyKeyToContinue();
         }
@@ -50,21 +51,15 @@ static class Helper
     }
     public static async Task PressAnyKeyToContinue()
     {
-        lock (LockRead)
-        {
-            Console.WriteLine($"[Client] Pulse cualquier tecla para continuar ...");
-            _ = Console.ReadLine();
-        }
-        //await Task.Delay(500);
+        Console.WriteLine($"[Client] Pulse cualquier tecla para continuar ...");
+        _ = Console.ReadLine();
+        await Task.Delay(500);
     }
 
     // TODO: Un start y un end.
     public static string Read(string pMSG) // string pStart, string pEnd
     {
-        lock (LockRead)
-        {
-            Console.Write($"[Client] {pMSG} -> ( ");
-        }
+        Console.Write($"[Client] {pMSG} -> ( ");
 
         int startX = Console.CursorLeft;
         int startTop = Console.CursorTop;

@@ -129,17 +129,16 @@ public static partial class Manager
         /// <param name="pId">Es: Identificador único del plugin a eliminar.<br />En: Unique identifier of the plugin to delete.</param>
         /// <param name="pCancellationToken">Es: Token para monitorear las solicitudes de cancelación.<br />En: Token to monitor for cancellation requests.</param>
         /// <returns>Es: El resultado de la operación de borrado.<br />En: The result of the deletion operation.</returns>
-        public static async Task<Status> DeletedOne
+        public static async Task<InternalErrors> DeletedOne
             (string pId, CancellationToken pCancellationToken = default)
         {
-            bool? r = await Manager.StoragePlugin.Eliminate(pId);
-            Status result = r switch
+            bool? r = await Manager.StoragePlugin.Eliminate(pId, pCancellationToken);
+            return r switch
             {
-                null => Status.NotFound,
-                true => Status.Succes,
-                false => Status.GenericError
+                null => InternalErrors.PluginNotExist,
+                true => InternalErrors.IsSucces,
+                false => InternalErrors.PluginOnRemove
             };
-            return result;
         }
 
 
@@ -254,13 +253,13 @@ public static partial class Manager
         /// <param name="pCancellationToken">Es: Token de cancelación.<br />En: Cancellation token.</param>
         /// <param name="pMethod">Es: Métodos para la creación del progreso en array binario.<br />En: Methods for progress creation in binary array.</param>
         /// <returns>Es: El estado de la desinstalación.<br />En: The status of the uninstallation.</returns>
-        public static async Task<Status> HandleUnistallOne
-            (string pPlugin, string pNameInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
-        {
-            var progress = ProgressUtil.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest, pMethod: pMethod);
+        //public static async Task<Status> HandleUnistallOne
+        //    (string pPlugin, string pNameInstance, ushort pIdRequest, CancellationToken pCancellationToken = default, params byte[] pMethod)
+        //{
+        //    var progress = ProgressUtil.CreateProgessBarr(Worker.CurrentContext.Value.Communicator, pIdRequest, pMethod: pMethod);
 
-            return await UnistallOne(pPlugin, pNameInstance, progress, pCancellationToken);
-        }
+        //    return await UnistallOne(pPlugin, pNameInstance, progress, pCancellationToken);
+        //}
 
         /// <summary>
         /// ___________________( Español )___________________<br />
@@ -280,20 +279,12 @@ public static partial class Manager
         /// <param name="pCancellationToken">Es: Token para monitorear las solicitudes de cancelación.<br />En: Token to monitor for cancellation requests.</param>
         /// <returns>Es: El estado final de la operación de desinstalación.<br />En: The final status of the uninstallation operation.</returns>
         public static async Task<Status> UnistallOne
-            (string pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+            (ManifestPlugin pPlugin, string pPath, string pName, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
-            var (status, manifest) = await GetOne(pPlugin, pNameInstance, pCancellationToken);
-
-            if (status != Status.Succes)
-                return status;
-
-            if (manifest?.HandWritten == null)
-                return Status.ManifestNotExit;
-
             if (pCancellationToken.IsCancellationRequested)
                 return Status.IsCancelled;
 
-            StatusNodeUtil r = await Manager.Instances.UnistallPlugin(manifest.HandWritten, pNameInstance, pProgress, pCancellationToken);
+            StatusNodeUtil r = await Manager.Instances.UnistallPlugin(pPlugin.HandWritten, pPath, pProgress, pCancellationToken);
             Status result = r switch
             {
                 StatusNodeUtil.Succes => Status.Succes,
@@ -302,6 +293,12 @@ public static partial class Manager
 
                 _ => Status.GenericError,
             };
+
+            // TODO: Pasar a InternalError.
+            var rr = Manager.Manifest.HandleRemovePlugin(pPlugin.IdLocal ?? "-1", pName);
+            if (rr != Manifest.Status.Succes)
+                throw new NotImplementedException($"TODO: Controlar HandleRemovePlugin unsando InternalError {rr}");
+
             return result;
         }
 
@@ -366,9 +363,9 @@ public static partial class Manager
         }
 
         public static async Task<ManifestPlugin?>
-            GetOne(string pPlugin, string pPath, ManifestInstance pManifestInstance, CancellationToken pCancellationToken = default)
+            GetOne(string pIdPlugin, string pPath, ManifestInstance pManifestInstance, CancellationToken pCancellationToken = default)
         {
-            string information = Manager.Instances.MakePathFolderInformationByPath(pPath);
+            //string information = Manager.Instances.MakePathFolderInformationByPath(pPath);
 
             for (int i = 0; i < pManifestInstance.Plugins.Count; i++)
             {
@@ -376,13 +373,13 @@ public static partial class Manager
                     return null;
 
                 var refe = pManifestInstance.Plugins[i];
-                if (refe.IdLocal == pPlugin)
+                if (refe.IdLocal == pIdPlugin)
                 {
                     if (refe.Path == null) continue;
 
                     string pathJson = Path.IsPathFullyQualified(refe.Path)
                         ? refe.Path
-                        : Path.Combine(information, refe.Path);
+                        : Path.Combine(pPath, refe.Path);
 
                     ManifestPlugin? man = JSonUtil.AcessDirect<ManifestPlugin>(pathJson);
                     if (man == null)
@@ -436,13 +433,10 @@ public static partial class Manager
         public static async Task<ManifestPlugin[]>
             GetAll(string pPath, ManifestInstance pManifest, CancellationToken pCancellationToken = default)
         {
-            string information;
             ManifestPlugin[] manis;
 
             if (pCancellationToken.IsCancellationRequested)
                 return Array.Empty<ManifestPlugin>();
-
-            information = Manager.Instances.MakePathFolderInformationByPath(pPath);
 
             manis = new ManifestPlugin[pManifest.Plugins.Count];
             for (int i = 0; i < pManifest.Plugins.Count; i++)
@@ -455,7 +449,7 @@ public static partial class Manager
 
                 string pathJson = Path.IsPathFullyQualified(refe.Path)
                     ? refe.Path
-                    : Path.Combine(information, refe.Path);
+                    : Path.Combine(pPath, refe.Path);
 
                 ManifestPlugin? man = JSonUtil.AcessDirect<ManifestPlugin>(pathJson);
 

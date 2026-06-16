@@ -521,28 +521,18 @@ public static partial class Manager
         /// <param name="pCancellationToken">Es: Token cancelatorio. <br />En: Cancellation token.</param>
         /// <returns>Es: Un enum indicando el estado final de la limpieza. <br />En: An enum noting the cleanup ending status.</returns>
         public static async Task<StatusNodeUtil> UnistallPlugin
-            (DirectoryHandwritten pPlugin, string pNameInstance, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
+            (DirectoryHandwritten pPlugin, string pPath, IProgress<TerbinInfoProgrss>? pProgress = default, CancellationToken pCancellationToken = default)
         {
             //ArgumentNullException.ThrowIfNull(pPlugin.Root, "Root is not asing, need root in DirectoryHandwritten");
 
-            string pathInstance = Manager.Instances.MakePathFolder(pNameInstance);
-
-            using (await _instanceLocks.LockAsync(pNameInstance))
+            using (await _instanceLocks.LockAsync(pPath))
             {
                 if (pCancellationToken.IsCancellationRequested)
                     return StatusNodeUtil.IsCancelled;
-                var result = NodeUtil.DeleteFromHandwritten(pathInstance, pPlugin, pProgress);
+                var result = NodeUtil.DeleteFromHandwritten(pPath, pPlugin, pProgress);
                 return result;
             }
         }
-
-
-
-        public static async Task RunGame(string pNameInstance, CancellationToken pCancellationToken = default)
-        {
-
-        }
-
 
         public enum Status : sbyte
         {

@@ -123,6 +123,7 @@ public enum InternalErrors : ushort
     PluginOnSave = 208,
     PluginGetManifest = 209,
     PluginOnUnistall = 210,
+    PluginOnRemove = 211,
 
     // Instances = 300,
     InstanceGetSizeError = 301,

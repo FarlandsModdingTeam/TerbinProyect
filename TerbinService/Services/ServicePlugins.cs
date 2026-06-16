@@ -152,7 +152,7 @@ internal static class ServicePlugins
 
         manifest = await Manager.Instances.GetManifestByPath(path);
         if (manifest == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.ManifestGet));
 
         manis = await Manager.Plugin.GetAll(path, manifest, pToken);
 
@@ -197,11 +197,11 @@ internal static class ServicePlugins
 
         manifest = await Manager.Instances.GetManifestByPath(path);
         if (manifest == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.ManifestGet));
 
-        mani = await Manager.Plugin.GetOne(id, name, manifest, pToken);
+        mani = await Manager.Plugin.GetOne(id, path, manifest, pToken);
         if (mani is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.PluginGet));
 
         byte[] dto = ((ManifestPluginDTO)mani).Serialize();
 
@@ -235,11 +235,11 @@ internal static class ServicePlugins
 
         manifest = await Manager.Instances.GetManifestByPath(path);
         if (manifest == null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.ManifestGet));
 
-        mani = await Manager.Plugin.GetOne(id, name, manifest, pToken);
+        mani = await Manager.Plugin.GetOne(id, path, manifest, pToken);
         if (mani is null)
-            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.InstanceNotExist));
+            return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.PluginGet));
 
         if (useProgress)
         {
@@ -251,8 +251,7 @@ internal static class ServicePlugins
         if (pToken.IsCancellationRequested)
             return InfoResponse.CreateCancelled(pHead.IdRequest);
 
-        // Eh mirado y se supone que no puede fallar, raro.
-        StatusNodeUtil r = await Manager.Instances.UnistallPlugin(mani.HandWritten, name, progress, pToken);
+        var r = await Manager.Plugin.UnistallOne(mani, path, name, progress, pToken);
 
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }

@@ -188,7 +188,7 @@ public static partial class Manager
             if (pCancellationToken.IsCancellationRequested)
                 return null;
 
-            if (!await operatePlugin(plugin.Name, (p, d) => { File.Delete(d); }).ConfigureAwait(false))
+            if (!await operatePlugin(plugin.FileName, (p, d) => { File.Delete(d); }).ConfigureAwait(false))
                 return false;
 
             if (!await unregisterPlugin(plugin.Id).ConfigureAwait(false))

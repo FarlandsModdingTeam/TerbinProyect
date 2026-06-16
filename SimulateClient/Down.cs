@@ -121,6 +121,18 @@ internal class Down : ITests
     }
 
 
+    public static async Task D(TerbinCommunicator pCommunicator)
+    {
+        Console.Write($"-------( Plugin )---------\n" +
+            $"[Client] \"URL del Plugin\"\n");
+        string url = Helper.Read("URL: ");
+
+        var s = new Serialineitor().AddArray<char>(url.ToCharArray());
+
+        PacketRequest r;
+        r = await download(pCommunicator, s);
+    }
+
     private static Task<PacketRequest> download(TerbinCommunicator pCommunicator, Serialineitor s)
     {
         var r = pCommunicator.Communicate(new(CodeServices.Dowload, CodeServicesSection.Plugin), s.Serialize());
@@ -130,6 +142,9 @@ internal class Down : ITests
             Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
             if (await Helper.IsError(r.Head.Status)) return;
+
+
+            Console.Succes("Descargado Correctamente");
         });
         return r;
     }

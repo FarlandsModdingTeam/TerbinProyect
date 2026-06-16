@@ -1,10 +1,10 @@
 - Plugin
  * Download (v)
  * Deleted
- * Install
- * Unistall
- * GetAll
- * GetOne
+ * Install (v)
+ * Unistall (v)
+ * GetAll (v)
+ * GetOne (v)
 
 - PluginStorage
  * GetAll (v)
@@ -20,4 +20,3 @@
  * Duplicate (v)
  * Remove (v)
  * Execute (v)
- 

@@ -12,7 +12,9 @@ using TerbinLibrary.Extension;
 using TerbinLibrary.Protocol;
 using TerbinLibrary.Serialize;
 using TerbinLibrary.TerbinServiceHelper;
+using TerbinLibrary.Useful;
 using TerbinService.Managers;
+using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
 
 namespace TerbinService.Services;
 
@@ -54,5 +56,25 @@ internal class ServicePluginStorage
             return InfoResponse.CreateInteralError(pHead.IdRequest, TSHelper.GetError(InternalErrors.PluginNotExist));
 
         return InfoResponse.CreateSucces(pHead.IdRequest, plugin.ToSerilizeDTO());
+    }
+
+
+    [TerbinExecutable((byte)CodeServices.Deleted, (byte)CodeServicesSection.PluginStorage)]
+    public static async Task<InfoResponse?> Delete(Header pHead, byte[] pParameters, CancellationToken pToken)
+    {
+        if (pParameters.Length <= 0)
+            return InfoResponse.Create(pHead.IdRequest, CodeStatus.ErrorNotPayload);
+
+        ReadOnlySpan<byte> reader = pParameters;
+        string id = reader.ReadArray<char>().CrString();
+
+        if (pToken.IsCancellationRequested)
+            return InfoResponse.CreateCancelled(pHead.IdRequest);
+
+        var result = await Manager.Plugin.DeletedOne(id, pToken);
+        if (result != InternalErrors.IsSucces)
+            return InfoResponse.CreateInteralError(pHead.IdRequest, Serialineitor.Serialize<ushort>((ushort)result));
+
+        return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 }
