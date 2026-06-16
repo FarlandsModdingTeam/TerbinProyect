@@ -163,5 +163,40 @@ internal class Inst : ITests
         return r;
     }
 
+    public static async Task Del(TerbinCommunicator pCommunicator)
+    {
+        Console.Write($"-------( Create-Instance )---------\n" +
+            $"[Client] \"Nombre de la Instancia\" \n");
+        string name = Helper.Read("name");
+
+
+        PacketRequest r;
+        r = await deleted(pCommunicator, name);
+
+
+        await Helper.Fin();
+    }
+
+    private static Task<PacketRequest> deleted(TerbinCommunicator pCommunicator, string pName)
+    {
+        Task<PacketRequest> r;
+        Serialineitor s;
+
+        s = new Serialineitor()
+                    .AddArray<char>(pName.ToCharArray());
+
+        r = pCommunicator.Communicate(new(CodeServices.Deleted, CodeServicesSection.Instances), s.Serialize());
+        r.ContinueWith(async p =>
+        {
+            PacketRequest r = await p;
+            Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
+            Helper.PrintMethod(r.ActionMethod);
+            if (await Helper.IsError(r)) return;
+
+            Console.Succes("Eliminado Correctamente");
+
+        });
+        return r;
+    }
 
 }
