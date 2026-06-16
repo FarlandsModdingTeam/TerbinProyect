@@ -3,6 +3,7 @@ using SimulateClient;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using TerbinLibrary;
 using TerbinLibrary.Communication;
 using TerbinLibrary.Communication.Packets;
@@ -23,6 +24,8 @@ using TerbinLibrary.TerbinServiceHelper.Exceptions;
 // TODO: InstallByInstace y InstallByPath
 
 // Console.Write($"\Trabajando... {Math.Round((float)p.Percentage, 2)}% completado | Total:X/{p.Current}:Actual | Finalizado: {p.Finish}");
+
+//select = Helper.Read("2. tipe"); //(int.Parse(Helper.Read("2. tipe")) == 1) ? "Yolo" : "LittleByLittle";
 
 #if false
 
@@ -56,50 +59,60 @@ else
 
 while (true)
 {
+    string tmp;
     string @class;
-    string select;
+    string method;
+    Type? classType;
+    MethodInfo? methodType;
+    MatchCollection c;
 
     Console.Write($"-------( Start )---------\n" +
-        $"[Client] \"1. Nombre-Clase | 2. Yolo(1) o Poco-A-Poco(2)\" \n");
+        $"[Client] \"Clase -Accion\" \n");
 
-    @class = Helper.Read("1. name");
+    tmp = Helper.Read("Command");
+
+    @class = Commands.GetClass().Match(tmp).Value;
+    c = Commands.GetMethod().Matches(tmp);
+
     if (@class is "exit" or "ex" or "sa" or "salir")
         break;
 
-    select = Helper.Read("2. tipe"); //(int.Parse(Helper.Read("2. tipe")) == 1) ? "Yolo" : "LittleByLittle";
-
-
-    string? meth = select switch
-    {
-        "1" => "Yolo",
-        "2" => "LittleByLittle",
-
-        "n" => null,
-        "null" => null,
-        string msg when string.IsNullOrEmpty(msg) => null,
-
-        _ => select,
-    };
-
-
-    Type? classType;
-    MethodInfo? method;
     classType = Type.GetType($"SimulateClient.{@class}");
-    method = (string.IsNullOrEmpty(meth)) ? null : classType?.GetMethod(meth, BindingFlags.Static | BindingFlags.Public);
 
-
-    if (method != null)
+    if (c.Count == 0)
+        continue;
+    for (int i = 0; i < c.Count; i++)
     {
-        var result = method.Invoke(null, new object[] { communicator });
+        method = c[i].Value.Replace("-", "");
 
-        if (result is Task task)
+        string? meth = method switch
         {
-            await task;
+            "1" => "Yolo",
+            "2" => "LittleByLittle",
+
+            "n" => null,
+            "null" => null,
+            string msg when string.IsNullOrEmpty(msg) => null,
+
+            _ => method,
+        };
+        methodType = (string.IsNullOrEmpty(meth)) ? null : classType?.GetMethod(meth, BindingFlags.Static | BindingFlags.Public);
+
+
+        if (methodType != null)
+        {
+            var result = methodType.Invoke(null, new object[] { communicator });
+
+            if (result is Task task)
+            {
+                await task;
+            }
         }
-    }
-    else
-    {
-        Console.WriteLine($"[Client] El method es null");
+        else
+        {
+            Console.WriteLine($"[Client] El method es null");
+        }
+
     }
 }
 
