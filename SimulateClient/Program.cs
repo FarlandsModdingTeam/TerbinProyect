@@ -74,7 +74,7 @@ while (true)
     @class = Commands.GetClass().Match(tmp).Value;
     c = Commands.GetMethod().Matches(tmp);
 
-    if (@class is "exit" or "ex" or "sa" or "salir")
+    if (@class is "exit" or "ex" or "sa" or "salir" or "q")
         break;
 
     classType = Type.GetType($"SimulateClient.{@class}");
