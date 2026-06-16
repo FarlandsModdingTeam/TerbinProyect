@@ -38,7 +38,7 @@ static class Helper
             await PressAnyKeyToContinue();
         }
 
-        return pCapsule.IsSucces;
+        return !pCapsule.IsSucces;
     }
 
     public static async Task Fin()

@@ -82,8 +82,7 @@ internal class Inst : ITests
             PacketRequest r = await p;
             Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            //if (await Helper.IsError(r)) return;
-            await Helper.IsError(r);
+            if (await Helper.IsError(r)) return;
 
             try
             {
@@ -144,8 +143,7 @@ internal class Inst : ITests
             PacketRequest r = await p;
             Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            //if (await Helper.IsError(r)) return;
-            await Helper.IsError(r);
+            if (await Helper.IsError(r)) return;
 
             try
             {

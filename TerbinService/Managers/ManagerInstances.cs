@@ -258,15 +258,17 @@ public static partial class Manager
             if (string.IsNullOrEmpty(dir))
                 return null;
 
-            return await GetManifestByPath(dir);
+            ManifestInstance? inst = await GetManifestByPath(dir);
+            return inst;
         }
 
         // TODO: Doc.
         public static async Task<ManifestInstance?> GetManifestByPath(string pPath)
         {
+            pPath = MakePathFolderInformationByPath(pPath);
             using (await _instanceLocks.LockAsync(pPath))
             {
-                // El JSonUtil Ya esta protegido, Pero por lock, no se hay alguna diferencia interna.
+                // El JSonUtil Ya esta protegido, Pero por lock, no se si hay alguna diferencia interna.
                 return JSonUtil.AcessDirect<ManifestInstance>(pPath, TerbinServiceConst.MANIFEST_INSTANCE);
             }
         }
@@ -343,13 +345,14 @@ public static partial class Manager
             if (ins is null)
                 return null;
 
-            if (!string.IsNullOrEmpty(ins.Path))
-                return ins.Path;
 
             if (ins.OutSide ?? false)
-                return null;
-            else
-                return Manager.Instances.MakePathFolderFromConfig(pName);
+            {
+                if (!string.IsNullOrEmpty(ins.Path))
+                    return ins.Path;
+            }
+
+            return Manager.Instances.MakePathFolderFromConfig(pName);
         }
 
         // TODO: Doc Actualizar.
