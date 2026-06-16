@@ -1,6 +1,6 @@
 - Plugin
  * Download (v)
- * Deleted
+ * Deleted (v)
  * Install (v)
  * Unistall (v)
  * GetAll (v)
