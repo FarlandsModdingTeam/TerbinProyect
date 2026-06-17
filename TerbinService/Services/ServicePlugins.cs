@@ -36,6 +36,7 @@ namespace TerbinService.Services;
 
 internal static class ServicePlugins
 {
+    [TODO("Mover a ServicePluginStorage")]
     [TODO("Comprobar que el plugin no exista")]
     [TerbinExecutable((byte)CodeServices.Dowload, (byte)CodeServicesSection.Plugin)]
     public static async Task<InfoResponse?> DowloadPlugin(Header pHead, byte[] pParameters, CancellationToken pToken)
@@ -79,7 +80,7 @@ internal static class ServicePlugins
         return InfoResponse.CreateSucces(pHead.IdRequest);
     }
 
-
+    [TODO("Crear Enum (Flag) que permita algo de configuracion como extrar en una carpeta con el nombre del mod")]
     [TerbinExecutable((byte)CodeServices.Install, (byte)CodeServicesSection.Plugin)]
     public static async Task<InfoResponse?> InstallPlugin(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
