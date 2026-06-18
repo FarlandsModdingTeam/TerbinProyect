@@ -1,0 +1,465 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Terbin Services API",
+    "description": "Especificación OpenAPI generada a partir de los servicios de ejecución binaria de Terbin (ServiceConfiguration, ServiceGames, ServiceInstances, ServicePlugins, ServicePluginStorage).",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/configuration/rute": {
+      "put": {
+        "summary": "Actualiza la configuración de una ruta (UpdateRute)",
+        "operationId": "updateRute",
+        "tags": ["Configuration"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "keyRute": { "type": "string" },
+                  "newRute": { "type": "string" }
+                },
+                "required": ["keyRute", "newRute"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "400": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      },
+      "get": {
+        "summary": "Lee la ruta configurada (ReadRute)",
+        "operationId": "readRute",
+        "tags": ["Configuration"],
+        "parameters": [
+          {
+            "name": "keyRute",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "404": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    },
+    "/games/clone": {
+      "post": {
+        "summary": "Clona o copia un juego en una instancia (CloneGame)",
+        "operationId": "cloneGame",
+        "tags": ["Games"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nameInstance": { "type": "string", "description": "Nombre de la instancia destino" },
+                  "dirGame": { "type": "string", "description": "Ruta de origen del juego" },
+                  "useProgress": { "type": "boolean", "default": false }
+                },
+                "required": ["nameInstance", "dirGame"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "500": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    },
+    "/games/{nameInstance}": {
+      "delete": {
+        "summary": "Elimina los archivos de un juego vinculado a una instancia (DeletedGame)",
+        "operationId": "deletedGame",
+        "tags": ["Games"],
+        "parameters": [
+          {
+            "name": "nameInstance",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "useProgress",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean", "default": false }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "404": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    },
+    "/games/{nameInstance}/execute": {
+      "post": {
+        "summary": "Ejecuta o arranca un juego configurado en una instancia (ExecuteGame)",
+        "operationId": "executeGame",
+        "tags": ["Games"],
+        "parameters": [
+          {
+            "name": "nameInstance",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "500": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    },
+    "/instances": {
+      "post": {
+        "summary": "Crea una nueva instancia en el sistema (CreateInstance)",
+        "operationId": "createInstance",
+        "tags": ["Instances"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "description": "Nombre de la instancia" },
+                  "path": { "type": "string", "description": "Ruta física opcional" }
+                },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "500": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      },
+      "get": {
+        "summary": "Recupera la lista completa de instancias (GetAllInstances)",
+        "operationId": "getAllInstances",
+        "tags": ["Instances"],
+        "responses": {
+          "200": {
+            "description": "Lista de ReferenceInstanceDTO",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ReferenceInstanceDTO" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/instances/{name}": {
+      "get": {
+        "summary": "Lee información detallada de una instancia (GetOne)",
+        "operationId": "getInstance",
+        "tags": ["Instances"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ManifestInstanceDTO recuperado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ManifestInstanceDTO" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      },
+      "delete": {
+        "summary": "Elimina completamente una instancia existente (DeleteInstances)",
+        "operationId": "deleteInstance",
+        "tags": ["Instances"],
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "404": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    },
+    "/plugins/download": {
+      "post": {
+        "summary": "Descarga un plugin desde la red (DowloadPlugin)",
+        "operationId": "downloadPlugin",
+        "tags": ["Plugins"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "urlPlugin": { "type": "string" },
+                  "useProgress": { "type": "boolean", "default": false }
+                },
+                "required": ["urlPlugin"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "500": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    },
+    "/plugins/install": {
+      "post": {
+        "summary": "Instala un plugin en una instancia destino (InstallPlugin)",
+        "operationId": "installPlugin",
+        "tags": ["Plugins"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": { "type": "string", "description": "Nombre de la instancia" },
+                  "idPlugin": { "type": "string", "description": "Id en el Storage" },
+                  "relativePath": { "type": "string", "description": "Ruta de descompresión" },
+                  "useProgress": { "type": "boolean", "default": false }
+                },
+                "required": ["name", "idPlugin", "relativePath"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "500": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    },
+    "/plugins/instances/{nameInstance}": {
+      "get": {
+        "summary": "Recupera todos los plugins instalados en una instancia (GetAll)",
+        "operationId": "getAllPluginsInInstance",
+        "tags": ["Plugins"],
+        "parameters": [
+          {
+            "name": "nameInstance",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array de ManifestPluginDTO",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ManifestPluginDTO" }
+                }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    },
+    "/plugins/instances/{nameInstance}/{id}": {
+      "get": {
+        "summary": "Obtiene la información de un plugin particular en una instancia (GetOne)",
+        "operationId": "getOnePluginInInstance",
+        "tags": ["Plugins"],
+        "parameters": [
+          {
+            "name": "nameInstance",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "description": "Id local" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ManifestPluginDTO retornado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ManifestPluginDTO" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      },
+      "delete": {
+        "summary": "Desinstala un plugin asociado a una instancia (Delete)",
+        "operationId": "deletePluginFromInstance",
+        "tags": ["Plugins"],
+        "parameters": [
+          {
+            "name": "nameInstance",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "useProgress",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean", "default": false }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "500": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    },
+    "/plugin-storage": {
+      "get": {
+        "summary": "Devuelve la lista completa de todos los plugins en almacenamiento (ServicePluginStorage.GetOne)",
+        "operationId": "getPluginStorageAll",
+        "tags": ["PluginStorage"],
+        "responses": {
+          "200": {
+            "description": "Array de ReferencePluginStoreDTO",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ReferencePluginStoreDTO" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/plugin-storage/{id}": {
+      "get": {
+        "summary": "Recupera la información de un único plugin almacenado (ServicePluginStorage.GetAll)",
+        "operationId": "getPluginStorageOne",
+        "tags": ["PluginStorage"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "description": "Guid identificador" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "ReferencePluginStoreDTO retornado",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ReferencePluginStoreDTO" }
+              }
+            }
+          },
+          "404": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      },
+      "delete": {
+        "summary": "Elimina física y lógicamente un plugin del almacenamiento (ServicePluginStorage.Delete)",
+        "operationId": "deletePluginStorage",
+        "tags": ["PluginStorage"],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string", "description": "Guid identificador" }
+          }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "500": { "$ref": "#/components/responses/InfoResponseError" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "InfoResponse": {
+        "type": "object",
+        "description": "Representación genérica del paquete InfoResponse devuelto por el protocolo Terbin",
+        "properties": {
+          "IdRequest": { "type": "integer" },
+          "Status": { "type": "integer" },
+          "Payload": { "type": "string", "format": "byte" }
+        }
+      },
+      "ReferenceInstanceDTO": {
+        "type": "object",
+        "description": "Estructura serializada de ReferenceInstance"
+      },
+      "ManifestInstanceDTO": {
+        "type": "object",
+        "description": "Manifiesto de datos de una Instancia (ManifestInstance)"
+      },
+      "ManifestPluginDTO": {
+        "type": "object",
+        "description": "Manifiesto de datos de un Plugin (ManifestPlugin)"
+      },
+      "ReferencePluginStoreDTO": {
+        "type": "object",
+        "description": "Estructura DTO de ReferencePluginStore"
+      }
+    },
+    "responses": {
+      "InfoResponseSuccess": {
+        "description": "Operación exitosa (CodeStatus.Success)",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/InfoResponse" }
+          }
+        }
+      },
+      "InfoResponseError": {
+        "description": "Error interno o de validación",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/InfoResponse" }
+          }
+        }
+      }
+    }
+  }
+}
