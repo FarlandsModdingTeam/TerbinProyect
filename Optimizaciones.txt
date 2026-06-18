@@ -23,3 +23,21 @@ Para parametros y parecidos hazlo en formato:
 Es: Bla bla bla <br />Es: Bla bla bla.
 Haz la documentacion lo mas completa posible
 Y Ignora lo que este marcado como obsoleto.
+
+
+
+Haz la Documentacion Lo mas completa tieneindo en cuenta que la quiero es Castellano e Ingles con un formato parecido a:
+/// ___________________( Español )___________________<br />
+/// Bla bla bla.<br />
+/// Bla2 bla2 bla2.<br />
+/// Notas: Bla bla bla.<br />
+/// Tips: Bla bla bla.<br />
+/// ___________________( English )___________________<br />
+/// Bla bla bla.<br />
+/// Bla2 bla2 bla2.<br />
+/// Notes: Bla bla bla.<br />
+/// Tips: Bla bla bla.<br />
+Para parametros y parecidos hazlo en formato:
+Es: Bla bla bla <br />Es: Bla bla bla.
+Las etiquetas params no pongas los datos (pHead, pParameters, pToken) de la funcion sino los que deserializa posteriormente con el "ReadOnlySpan<byte> reader" y especificando si son obligatorios o no si esque deserializa
+La documentacion solo de los Servicios que son los que tienen el atributo TerbinExecutable.

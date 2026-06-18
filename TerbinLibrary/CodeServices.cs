@@ -95,7 +95,7 @@ public enum TypeService : byte
     SubService = 2,
 }
 
-
+[TODO("Pasar todos los managers a InternalErrors")]
 public enum InternalErrors : ushort
 {
     IdSoliciteError = 11,
