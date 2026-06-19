@@ -100,7 +100,7 @@
           "service": "CodeServices.Deleted",
           "section": "CodeServicesSection.Game"
         },
-        "description": "Elimina de forma lógica o física los archivos de un juego vinculado a una instancia específica.",
+        "description": "___________________( Español )___________________\n\nServicio que elimina los archivos de un juego vinculado a una instancia existente.\n\nDeserializa secuencialmente de los parámetros: el nombre de la instancia y, opcionalmente, si se requiere llevar un registro del progreso del borrado.\n\nNotas: Validará primeramente si la carpeta de la instancia realmente existe en el sistema antes de iniciar el borrado.\n\nTips: Asegúrate de detener la instancia antes de invocar este servicio para evitar conflictos de archivos bloqueados.\n\n___________________( English )___________________\n\nService that deletes the game files linked to an existing instance.\n\nSequentially deserializes from the parameters: the instance name, and optionally, whether to keep a record of the deletion progress.\n\nNotes: It will first validate if the instance folder actually exists on the system before attempting deletion.\n\nTips: Make sure to stop the instance before invoking this service to avoid locked file conflicts.\n\n.",
         "requestBody": {
           "required": true,
           "content": {
@@ -131,7 +131,7 @@
           "service": "CodeServices.Execute",
           "section": "CodeServicesSection.Game"
         },
-        "description": "Servicio encargado de arrancar un juego.\n\nNotas: Se basa en que el gestor de juegos valide internamente la presencia de los binarios.\n\nTips: Gestionar los tiempos de respuesta del cliente en caso de que el juego tarde en reportar su inicio al sistema operativo.",
+        "description": "___________________( Español )___________________\n\nServicio destinado a la ejecución o arranque de un juego configurado en una instancia.\n\nÚnicamente requiere y deserializa el nombre de la instancia desde los parámetros enviados.\n\nNotas: Depende de que el mánager de juegos valide internamente que los binarios estén presentes.\n\nTips: Controla los tiempos de respuesta del cliente en caso de que el juego tarde en reportar su inicio al sistema operativo.\n\n___________________( English )___________________\n\nService intended for the execution or startup of a game configured in an instance.\n\nIt only requires and deserializes the instance name from the sent parameters.\n\nNotes: It relies on the game manager internally validating that the binaries are present.\n\nTips: Manage client response times in case the game takes a while to report its startup to the OS.\n\n",
         "requestBody": {
           "required": true,
           "content": {
