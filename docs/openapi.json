@@ -59,7 +59,7 @@
         }
       }
     },
-    "/games/clone": {
+    "/CodeServices.Duplicate/CodeServicesSection.Game": {
       "post": {
         "summary": "CloneGame",
         "operationId": "cloneGame",
@@ -91,7 +91,7 @@
         }
       }
     },
-    "/games/{nameInstance}": {
+    "/CodeServices.Deleted/CodeServicesSection.Game": {
       "delete": {
         "summary": "DeletedGame",
         "operationId": "deletedGame",
@@ -101,27 +101,28 @@
           "section": "CodeServicesSection.Game"
         },
         "description": "Elimina de forma lógica o física los archivos de un juego vinculado a una instancia específica.",
-        "parameters": [
-          {
-            "name": "nameInstance",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" }
-          },
-          {
-            "name": "useProgress",
-            "in": "query",
-            "required": false,
-            "schema": { "type": "boolean", "default": false }
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nameInstance": { "type": "string", "description": "Nombre de la instancia destino" },
+                  "useProgress": { "type": "boolean", "default": false }
+                },
+                "required": ["nameInstance"]
+              }
+            }
           }
-        ],
+        },
         "responses": {
           "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
           "404": { "$ref": "#/components/responses/InfoResponseError" }
         }
       }
     },
-    "/games/{nameInstance}/execute": {
+    "/CodeServices.Execute/CodeServicesSection.Game": {
       "post": {
         "summary": "ExecuteGame",
         "operationId": "executeGame",
@@ -131,15 +132,20 @@
           "section": "CodeServicesSection.Game"
         },
         "description": "Servicio encargado de arrancar un juego.\n\nNotas: Se basa en que el gestor de juegos valide internamente la presencia de los binarios.\n\nTips: Gestionar los tiempos de respuesta del cliente en caso de que el juego tarde en reportar su inicio al sistema operativo.",
-        "parameters": [
-          {
-            "name": "nameInstance",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "string" },
-            "description": "Nombre de la instancia que contiene el juego a arrancar (Obligatorio)."
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "nameInstance": { "type": "string", "description": "Nombre de la instancia destino" }
+                },
+                "required": ["nameInstance"]
+              }
+            }
           }
-        ],
+        },
         "responses": {
           "200": {
             "description": "Retorna éxito si el proceso arranca, o un código de error si el manejador falla al inicializarlo.",
