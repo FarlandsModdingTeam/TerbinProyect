@@ -42,7 +42,7 @@ internal static class ServiceGames
     /// Es: Un InfoResponse indicando el éxito, o un error si falta el payload o hay fallos internos. <br />
     /// En: An InfoResponse indicating success, or an error if payload is missing or internal failures occur.
     /// </returns>
-    [TerbinExecutable((byte)TerbinCRUD.Duplicate, (byte)CodeServicesSection.Game)]
+    [TerbinExecutable((byte)CodeServices.Duplicate, (byte)CodeServicesSection.Game)]
     public static async Task<InfoResponse?> CloneGame(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
@@ -87,7 +87,7 @@ internal static class ServiceGames
     /// Es: Un InfoResponse exitoso, o código de error interno si la instancia no existe o falla la eliminación. <br />
     /// En: A successful InfoResponse, or an internal error code if the instance does not exist or deletion fails.
     /// </returns>
-    [TerbinExecutable((byte)TerbinCRUD.Deleted, (byte)CodeServicesSection.Game)]
+    [TerbinExecutable((byte)CodeServices.Deleted, (byte)CodeServicesSection.Game)]
     public static async Task<InfoResponse?> DeletedGame(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)

@@ -2,20 +2,15 @@
   "openapi": "3.0.0",
   "info": {
     "title": "Terbin Services API",
-    "description": "Especificación OpenAPI oficial adaptada con las descripciones XML nativas y enlazada con los identificadores de ejecución binaria de Terbin de los atributos TerbinExecutable.",
+    "description": "Especificación OpenAPI generada a partir de los servicios de ejecución binaria de Terbin (ServiceConfiguration, ServiceGames, ServiceInstances, ServicePlugins, ServicePluginStorage).",
     "version": "1.0.0"
   },
   "paths": {
     "/configuration/rute": {
       "put": {
-        "summary": "UpdateRute",
+        "summary": "Actualiza la configuración de una ruta (UpdateRute)",
         "operationId": "updateRute",
         "tags": ["Configuration"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Update",
-          "section": "CodeServicesSection.Rute"
-        },
-        "description": "Actualiza la configuración de una ruta en el sistema utilizando los parámetros proporcionados.",
         "requestBody": {
           "required": true,
           "content": {
@@ -37,14 +32,9 @@
         }
       },
       "get": {
-        "summary": "ReadRute",
+        "summary": "Lee la ruta configurada (ReadRute)",
         "operationId": "readRute",
         "tags": ["Configuration"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Read",
-          "section": "CodeServicesSection.Rute"
-        },
-        "description": "Lee la ruta configurada en el sistema para la clave proporcionada en los parámetros.",
         "parameters": [
           {
             "name": "keyRute",
@@ -61,14 +51,9 @@
     },
     "/games/clone": {
       "post": {
-        "summary": "CloneGame",
+        "summary": "Clona o copia un juego en una instancia (CloneGame)",
         "operationId": "cloneGame",
         "tags": ["Games"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Clone",
-          "section": "CodeServicesSection.Game"
-        },
-        "description": "Servicio encargado de clonar o copiar un juego dentro de una instancia especificada.\n\nDeserializa secuencialmente de los parámetros: el nombre de la instancia, el directorio del juego y, opcionalmente, una bandera para usar reporte de progreso.\n\nNotas: Si se activa el progreso, se calculará el tamaño total del contenido del directorio antes de comenzar.\n\nTips: Es recomendable usar el progreso para juegos o archivos grandes y así evitar timeouts innecesarios en el cliente.",
         "requestBody": {
           "required": true,
           "content": {
@@ -93,14 +78,9 @@
     },
     "/games/{nameInstance}": {
       "delete": {
-        "summary": "DeletedGame",
+        "summary": "Elimina los archivos de un juego vinculado a una instancia (DeletedGame)",
         "operationId": "deletedGame",
         "tags": ["Games"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Deleted",
-          "section": "CodeServicesSection.Game"
-        },
-        "description": "Elimina de forma lógica o física los archivos de un juego vinculado a una instancia específica.",
         "parameters": [
           {
             "name": "nameInstance",
@@ -123,45 +103,28 @@
     },
     "/games/{nameInstance}/execute": {
       "post": {
-        "summary": "ExecuteGame",
+        "summary": "Ejecuta o arranca un juego configurado en una instancia (ExecuteGame)",
         "operationId": "executeGame",
         "tags": ["Games"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Execute",
-          "section": "CodeServicesSection.Game"
-        },
-        "description": "Servicio encargado de arrancar un juego.\n\nNotas: Se basa en que el gestor de juegos valide internamente la presencia de los binarios.\n\nTips: Gestionar los tiempos de respuesta del cliente en caso de que el juego tarde en reportar su inicio al sistema operativo.",
         "parameters": [
           {
             "name": "nameInstance",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" },
-            "description": "Nombre de la instancia que contiene el juego a arrancar (Obligatorio)."
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
-          "200": {
-            "description": "Retorna éxito si el proceso arranca, o un código de error si el manejador falla al inicializarlo.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/InfoResponse" }
-              }
-            }
-          }
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "500": { "$ref": "#/components/responses/InfoResponseError" }
         }
       }
     },
     "/instances": {
       "post": {
-        "summary": "CreateInstance",
+        "summary": "Crea una nueva instancia en el sistema (CreateInstance)",
         "operationId": "createInstance",
         "tags": ["Instances"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Create",
-          "section": "CodeServicesSection.Instances"
-        },
-        "description": "Servicio encargado de crear una nueva instancia en el sistema.\n\nLee el nombre de la instancia desde el payload y, opcionalmente, la ruta de instalación.\n\nNotas: Cancela la operación si el token lo solicita antes de invocar al gestor de almacenamiento.",
         "requestBody": {
           "required": true,
           "content": {
@@ -183,14 +146,9 @@
         }
       },
       "get": {
-        "summary": "GetAllInstances",
+        "summary": "Recupera la lista completa de instancias (GetAllInstances)",
         "operationId": "getAllInstances",
         "tags": ["Instances"],
-        "x-terbin-executable": {
-          "service": "CodeServices.ReadAll",
-          "section": "CodeServicesSection.Instances"
-        },
-        "description": "Recupera la lista completa de todas las instancias disponibles en el entorno de ejecución de Terbin.",
         "responses": {
           "200": {
             "description": "Lista de ReferenceInstanceDTO",
@@ -208,26 +166,20 @@
     },
     "/instances/{name}": {
       "get": {
-        "summary": "GetOne Instance",
+        "summary": "Lee información detallada de una instancia (GetOne)",
         "operationId": "getInstance",
         "tags": ["Instances"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Read",
-          "section": "CodeServicesSection.Instances"
-        },
-        "description": "Servicio encargado de leer información detallada de una instancia y devuelve su manifiesto (ManifestInstance).\n\nNotas: Retorna un error interno tipificado si la instancia de destino no existe en el disco o falla su lectura.\n\nTips: Utilizarlo para cargar propiedades detalladas (como el conteo de plugins) antes de interactuar con la instancia.",
         "parameters": [
           {
             "name": "name",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" },
-            "description": "Nombre de la instancia a consultar (Obligatorio)."
+            "schema": { "type": "string" }
           }
         ],
         "responses": {
           "200": {
-            "description": "Un InfoResponse de éxito con el ManifestInstanceDTO serializado o un error interno.",
+            "description": "ManifestInstanceDTO recuperado",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/ManifestInstanceDTO" }
@@ -238,14 +190,9 @@
         }
       },
       "delete": {
-        "summary": "DeleteInstances",
+        "summary": "Elimina completamente una instancia existente (DeleteInstances)",
         "operationId": "deleteInstance",
         "tags": ["Instances"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Deleted",
-          "section": "CodeServicesSection.Instances"
-        },
-        "description": "Elimina por completo del sistema la instancia indicada.",
         "parameters": [
           {
             "name": "name",
@@ -262,14 +209,9 @@
     },
     "/plugins/download": {
       "post": {
-        "summary": "DownloadPlugin",
+        "summary": "Descarga un plugin desde la red (DowloadPlugin)",
         "operationId": "downloadPlugin",
         "tags": ["Plugins"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Download",
-          "section": "CodeServicesSection.Plugin"
-        },
-        "description": "Servicio encargado de exponer las operaciones de gestión y despliegue de plugins de forma ejecutable. Inicia la descarga de un recurso remoto.",
         "requestBody": {
           "required": true,
           "content": {
@@ -293,14 +235,9 @@
     },
     "/plugins/install": {
       "post": {
-        "summary": "InstallPlugin",
+        "summary": "Instala un plugin en una instancia destino (InstallPlugin)",
         "operationId": "installPlugin",
         "tags": ["Plugins"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Install",
-          "section": "CodeServicesSection.Plugin"
-        },
-        "description": "Despliega e instala un plugin previamente descargado dentro de la estructura de directorios de la instancia objetivo.",
         "requestBody": {
           "required": true,
           "content": {
@@ -308,9 +245,9 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string" },
-                  "idPlugin": { "type": "string" },
-                  "relativePath": { "type": "string" },
+                  "name": { "type": "string", "description": "Nombre de la instancia" },
+                  "idPlugin": { "type": "string", "description": "Id en el Storage" },
+                  "relativePath": { "type": "string", "description": "Ruta de descompresión" },
                   "useProgress": { "type": "boolean", "default": false }
                 },
                 "required": ["name", "idPlugin", "relativePath"]
@@ -326,14 +263,9 @@
     },
     "/plugins/instances/{nameInstance}": {
       "get": {
-        "summary": "GetAll Plugins",
+        "summary": "Recupera todos los plugins instalados en una instancia (GetAll)",
         "operationId": "getAllPluginsInInstance",
         "tags": ["Plugins"],
-        "x-terbin-executable": {
-          "service": "CodeServices.ReadAll",
-          "section": "CodeServicesSection.Plugin"
-        },
-        "description": "Obtiene la relación completa de todos los manifiestos de plugins vinculados a una instancia activa.",
         "parameters": [
           {
             "name": "nameInstance",
@@ -353,20 +285,16 @@
                 }
               }
             }
-          }
+          },
+          "404": { "$ref": "#/components/responses/InfoResponseError" }
         }
       }
     },
     "/plugins/instances/{nameInstance}/{id}": {
       "get": {
-        "summary": "GetOne Plugin",
+        "summary": "Obtiene la información de un plugin particular en una instancia (GetOne)",
         "operationId": "getOnePluginInInstance",
         "tags": ["Plugins"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Read",
-          "section": "CodeServicesSection.Plugin"
-        },
-        "description": "Localiza y lee las propiedades específicas de un plugin instalado haciendo uso de su identificador único dentro del entorno de la instancia.",
         "parameters": [
           {
             "name": "nameInstance",
@@ -378,11 +306,12 @@
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string", "description": "Id local" }
           }
         ],
         "responses": {
           "200": {
+            "description": "ManifestPluginDTO retornado",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/ManifestPluginDTO" }
@@ -393,14 +322,9 @@
         }
       },
       "delete": {
-        "summary": "Delete Plugin",
+        "summary": "Desinstala un plugin asociado a una instancia (Delete)",
         "operationId": "deletePluginFromInstance",
         "tags": ["Plugins"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Deleted",
-          "section": "CodeServicesSection.Plugin"
-        },
-        "description": "Desinstala de forma segura el plugin asignado a la instancia. Si 'useProgress' es verdadero, calcula dinámicamente el progreso sobre el tamaño físico ocupado por el plugin.",
         "parameters": [
           {
             "name": "nameInstance",
@@ -429,14 +353,9 @@
     },
     "/plugin-storage": {
       "get": {
-        "summary": "ServicePluginStorage.GetAll",
+        "summary": "Devuelve la lista completa de todos los plugins en almacenamiento (ServicePluginStorage.GetOne)",
         "operationId": "getPluginStorageAll",
         "tags": ["PluginStorage"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Read",
-          "section": "CodeServicesSection.PluginStorage"
-        },
-        "description": "Servicio encargado de leer y devolver la lista completa de todos los plugins guardados en el almacenamiento del sistema.\n\nConstruye una respuesta empaquetando un conteo inicial seguido de la estructura serializada de cada plugin.\n\nNotas: A pesar de llamarse \"GetOne\" internamente en el código C#, la lógica interna y su código de servicio real corresponden conceptualmente a un \"ReadAll\". Retorna un byte [0] si el almacén está vacío.\n\nTips: Ideal para actualizar el inventario o la interfaz gráfica del cliente con los plugins disponibles localmente.",
         "responses": {
           "200": {
             "description": "Array de ReferencePluginStoreDTO",
@@ -454,25 +373,20 @@
     },
     "/plugin-storage/{id}": {
       "get": {
-        "summary": "ServicePluginStorage.GetOne",
+        "summary": "Recupera la información de un único plugin almacenado (ServicePluginStorage.GetAll)",
         "operationId": "getPluginStorageOne",
         "tags": ["PluginStorage"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Read",
-          "section": "CodeServicesSection.PluginStorage"
-        },
-        "description": "Recupera los datos de un único plugin persistido en el inventario global de almacenamiento por medio de su Guid identificador.",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" },
-            "description": "Guid identificador del plugin en almacenamiento."
+            "schema": { "type": "string", "description": "Guid identificador" }
           }
         ],
         "responses": {
           "200": {
+            "description": "ReferencePluginStoreDTO retornado",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/ReferencePluginStoreDTO" }
@@ -483,32 +397,20 @@
         }
       },
       "delete": {
-        "summary": "ServicePluginStorage.Delete",
+        "summary": "Elimina física y lógicamente un plugin del almacenamiento (ServicePluginStorage.Delete)",
         "operationId": "deletePluginStorage",
         "tags": ["PluginStorage"],
-        "x-terbin-executable": {
-          "service": "CodeServices.Deleted",
-          "section": "CodeServicesSection.PluginStorage"
-        },
-        "description": "Elimina física y lógicamente un plugin del almacenamiento.\n\nInterrumpe el flujo de ejecución si se solicita la cancelación de la tarea mediante el token.\n\nTips: Maneja internamente las respuestas con códigos de error específicos en caso de que la eliminación falle (por ejemplo, si el recurso está actualmente en uso o no es encontrado).",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" },
-            "description": "(Obligatorio) Cadena de texto (String) con el Guid identificador del plugin a borrar."
+            "schema": { "type": "string", "description": "Guid identificador" }
           }
         ],
         "responses": {
-          "200": {
-            "description": "Un InfoResponse de éxito si el archivo se purga correctamente, o un error interno de fallo.",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/InfoResponse" }
-              }
-            }
-          }
+          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
+          "500": { "$ref": "#/components/responses/InfoResponseError" }
         }
       }
     }
@@ -526,24 +428,24 @@
       },
       "ReferenceInstanceDTO": {
         "type": "object",
-        "description": "Estructura de datos serializada representativa de ReferenceInstance"
+        "description": "Estructura serializada de ReferenceInstance"
       },
       "ManifestInstanceDTO": {
         "type": "object",
-        "description": "Manifiesto completo de datos vinculados a una instancia (ManifestInstance)"
+        "description": "Manifiesto de datos de una Instancia (ManifestInstance)"
       },
       "ManifestPluginDTO": {
         "type": "object",
-        "description": "Manifiesto específico de datos e información correspondiente a un Plugin"
+        "description": "Manifiesto de datos de un Plugin (ManifestPlugin)"
       },
       "ReferencePluginStoreDTO": {
         "type": "object",
-        "description": "Estructura DTO de transferencia de datos para ReferencePluginStore"
+        "description": "Estructura DTO de ReferencePluginStore"
       }
     },
     "responses": {
       "InfoResponseSuccess": {
-        "description": "Operación completada con éxito (CodeStatus.Success)",
+        "description": "Operación exitosa (CodeStatus.Success)",
         "content": {
           "application/json": {
             "schema": { "$ref": "#/components/schemas/InfoResponse" }
@@ -551,7 +453,7 @@
         }
       },
       "InfoResponseError": {
-        "description": "Se ha producido un error interno, de serialización o de validación de payload",
+        "description": "Error interno o de validación",
         "content": {
           "application/json": {
             "schema": { "$ref": "#/components/schemas/InfoResponse" }
