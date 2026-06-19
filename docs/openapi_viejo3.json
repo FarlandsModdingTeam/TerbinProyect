@@ -44,21 +44,15 @@
           "service": "CodeServices.Read",
           "section": "CodeServicesSection.Rute"
         },
-        "description": "Lee la ruta configurada en el sistema para la clave proporcionada en el payload.",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "keyRute": { "type": "string" }
-                },
-                "required": ["keyRute"]
-              }
-            }
+        "description": "Lee la ruta configurada en el sistema para la clave proporcionada en los parámetros.",
+        "parameters": [
+          {
+            "name": "keyRute",
+            "in": "query",
+            "required": true,
+            "schema": { "type": "string" }
           }
-        },
+        ],
         "responses": {
           "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
           "404": { "$ref": "#/components/responses/InfoResponseError" }
@@ -228,20 +222,15 @@
           "section": "CodeServicesSection.Instances"
         },
         "description": "___________________( Español )___________________\n\nServicio utilizado para leer la información detallada de una única instancia.\n\nLee el nombre de la instancia solicitada desde el payload y recupera su manifiesto (ManifestInstance).\n\nNotas: Retorna un error interno tipificado si la instancia buscada no existe en disco o falla su lectura.\n\nTips: Utilízalo para cargar propiedades detalladas (como la cantidad de plugins) antes de interactuar con la instancia.\n\n___________________( English )___________________\n\nService used to read detailed information of a single instance.\n\nReads the requested instance name from the payload and retrieves its manifest (ManifestInstance).\n\nNotes: Returns a typed internal error if the targeted instance does not exist on disk or fails to be read.\n\nTips: Use it to load detailed properties (like plugin count) before interacting with the instance.\n\n",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": { "type": "string", "description": "Es: Nombre de la instancia a consultar (Obligatorio). \nEn: Name of the instance to query (Mandatory)." }
-                },
-                "required": ["name"]
-              }
-            }
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Es: Nombre de la instancia a consultar (Obligatorio). \nEn: Name of the instance to query (Mandatory)."
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "Un InfoResponse de éxito con el ManifestInstanceDTO serializado o un error interno.",
@@ -263,20 +252,15 @@
           "section": "CodeServicesSection.Instances"
         },
         "description": "___________________( Español )___________________\n\nServicio destinado a eliminar completamente una instancia existente y sus archivos.\n\nLee el nombre de la instancia a borrar directamente del payload recibido.\n\nNotas: Verifica errores detallados devueltos por el gestor para identificar si la ruta no existe, no era una instancia válida o si el borrado falló.\n\nTips: Esta acción es destructiva; asegúrate de pedir confirmación del usuario antes de enviar este comando.\n\n___________________( English )___________________\n\nService designed to completely delete an existing instance and its files.\n\nReads the name of the instance to be deleted directly from the received payload.\n\nNotes: Checks detailed errors returned by the manager to identify if the path does not exist, was not a valid instance, or if deletion failed.\n\nTips: This action is destructive; make sure to ask for user confirmation before sending this command.\n\n",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "name": { "type": "string", "description": "Es: Nombre de la instancia a eliminar (Obligatorio). \nEn: Name of the instance to delete (Mandatory)." }
-                },
-                "required": ["name"]
-              }
-            }
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Es: Nombre de la instancia a eliminar (Obligatorio). \nEn: Name of the instance to delete (Mandatory)."
           }
-        },
+        ],
         "responses": {
           "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
           "404": { "$ref": "#/components/responses/InfoResponseError" }
@@ -357,20 +341,15 @@
           "section": "CodeServicesSection.Plugin"
         },
         "description": "___________________( Español )___________________\n\nServicio que recupera la lista completa de todos los plugins registrados e instalados en una instancia.\n\nLee el manifiesto de la instancia solicitada, procesa los manifiestos individuales y los empaca en una estructura serializada.\n\nNotas: Si la instancia no contiene plugins, devolverá una respuesta exitosa con una carga útil equivalente a un array vacío.\n\nTips: Utiliza este servicio para renderizar interfaces de inventario o catálogos de mods de los usuarios.\n\n___________________( English )___________________\n\nService that retrieves the complete list of all registered and installed plugins in an instance.\n\nReads the requested instance's manifest, processes the individual manifests, and packs them into a serialized structure.\n\nNotes: If the instance contains no plugins, it will return a successful response with a payload equivalent to an empty array.\n\nTips: Use this service to render inventory interfaces or user mod catalogs.\n\n",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nameInstance": { "type": "string", "description": "Es: (Obligatorio) Cadena de caracteres que define el nombre de la instancia a escanear. \nEn: (Mandatory) Character string defining the name of the instance to scan." }
-                },
-                "required": ["nameInstance"]
-              }
-            }
+        "parameters": [
+          {
+            "name": "nameInstance",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena de caracteres que define el nombre de la instancia a escanear. \nEn: (Mandatory) Character string defining the name of the instance to scan."
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "Array de ManifestPluginDTO",
@@ -396,21 +375,22 @@
           "section": "CodeServicesSection.Plugin"
         },
         "description": "___________________( Español )___________________\n\nServicio enfocado en obtener la información detallada (manifiesto local) de un plugin en particular dentro de una instancia.\n\nValida las rutas de configuración de la instancia y localiza el archivo JSON asociado al identificador proporcionado.\n\nNotas: Es una operación de lectura pasiva; no altera el estado de la instancia ni de los archivos en disco.\n\nTips: Ideal para verificar el estado, versión o metadatos de un mod antes de actualizarlo o modificarlo.\n\n___________________( English )___________________\n\nService focused on obtaining the detailed information (local manifest) of a particular plugin within an instance.\n\nValidates the instance configuration paths and locates the JSON file associated with the provided identifier.\n\nNotes: This is a passive read operation; it does not alter the state of the instance or disk files.\n\nTips: Ideal for verifying the state, version, or metadata of a mod before updating or modifying it.\n\n",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nameInstance": { "type": "string", "description": "Es: (Obligatorio) Cadena de caracteres correspondiente al nombre de la instancia objetivo. \nEn: (Mandatory) Character string corresponding to the target instance name." },
-                  "id": { "type": "string", "description": "Es: (Obligatorio) Identificador local (IdLocal) que señala unívocamente al plugin que se desea leer. \nEn: (Mandatory) Local identifier (IdLocal) that uniquely points to the plugin to be read." }
-                },
-                "required": ["nameInstance", "id"]
-              }
-            }
+        "parameters": [
+          {
+            "name": "nameInstance",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena de caracteres correspondiente al nombre de la instancia objetivo. \nEn: (Mandatory) Character string corresponding to the target instance name."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Identificador local (IdLocal) que señala unívocamente al plugin que se desea leer. \nEn: (Mandatory) Local identifier (IdLocal) that uniquely points to the plugin to be read."
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -431,22 +411,29 @@
           "section": "CodeServicesSection.Plugin"
         },
         "description": "___________________( Español )___________________\n\nServicio destinado a desinstalar y purgar de manera física o lógica un plugin asociado a una instancia de ejecución específica.\n\nResuelve la ruta raíz de la instancia, valida el manifiesto de la misma y remueve los archivos del plugin, permitiendo opcionalmente reportar el progreso del borrado.\n\nNotas: Evalúa activamente el estado del token de cancelación en puntos críticos del flujo para evitar corrupciones de datos en disco.\n\nTips: Activar el indicador de progreso generará llamadas en tiempo real al backend de comunicación para actualizar la interfaz del cliente.\n\n___________________( English )___________________\n\nService intended to physically or logically uninstall and purge a plugin associated with a specific execution instance.\n\nResolves the root folder path of the instance, validates its manifest, and removes the plugin files, optionally allowing progress reporting.\n\nNotes: Actively evaluates the status of the cancellation token at critical flow checkpoints to avoid disk data corruption.\n\nTips: Enabling the progress flag will trigger real-time updates through the communication backend to refresh the client interface.\n\n",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "nameInstance": { "type": "string", "description": "Es: (Obligatorio) Cadena de caracteres que indica el nombre de la instancia de la cual se va a desinstalar el recurso. \nEn: (Mandatory) Character string indicating the name of the instance from which the resource will be uninstalled." },
-                  "id": { "type": "string", "description": "Es: (Obligatorio) Cadena identificadora que localiza unívocamente el plugin específico dentro del manifiesto de la instancia. \nEn: (Mandatory) Identifier string that uniquely locates the specific plugin inside the instance's manifest." },
-                  "useProgress": { "type": "boolean", "default": false, "description": "Es: (Opcional) Valor booleano que define si se inicializará un canal de reporte visual del progreso de eliminación. \nEn: (Optional) Boolean value defining whether a visual progress reporting channel will be initialized for the deletion." }
-                },
-                "required": ["nameInstance", "id"]
-              }
-            }
+        "parameters": [
+          {
+            "name": "nameInstance",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena de caracteres que indica el nombre de la instancia de la cual se va a desinstalar el recurso. \nEn: (Mandatory) Character string indicating the name of the instance from which the resource will be uninstalled."
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena identificadora que localiza unívocamente el plugin específico dentro del manifiesto de la instancia. \nEn: (Mandatory) Identifier string that uniquely locates the specific plugin inside the instance's manifest."
+          },
+          {
+            "name": "useProgress",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "boolean", "default": false },
+            "description": "Es: (Opcional) Valor booleano que define si se inicializará un canal de reporte visual del progreso de eliminación. \nEn: (Optional) Boolean value defining whether a visual progress reporting channel will be initialized for the deletion."
           }
-        },
+        ],
         "responses": {
           "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
           "500": { "$ref": "#/components/responses/InfoResponseError" }
@@ -488,20 +475,15 @@
           "section": "CodeServicesSection.PluginStorage"
         },
         "description": "___________________( Español )___________________\n\nServicio destinado a recuperar la información individual de un único plugin almacenado.\n\nExtrae el identificador del payload y busca la referencia exacta en los registros de almacenamiento de plugins.\n\nNotas: Aunque el método se llame \"GetAll\", actúa como un lector específico (Read) evaluando un único ID.\n\nTips: Controla internamente si el plugin no existe devolviendo un error de tipo PluginNotExist.\n\n___________________( English )___________________\n\nService intended to retrieve the individual information of a single stored plugin.\n\nExtracts the identifier from the payload and searches for the exact reference in the plugin storage records.\n\nNotes: Even though the method is named \"GetAll\", it acts as a specific reader (Read) evaluating a single ID.\n\nTips: Internally handles if the plugin does not exist by returning a PluginNotExist error type.\n\n",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "id": { "type": "string", "description": "Es: (Obligatorio) Cadena de texto (String) con el Guid identificador del plugin.\nEn: (Mandatory) Text string containing the plugin's identifying Guid." }
-                },
-                "required": ["id"]
-              }
-            }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena de texto (String) con el Guid identificador del plugin.\nEn: (Mandatory) Text string containing the plugin's identifying Guid."
           }
-        },
+        ],
         "responses": {
           "200": {
             "content": {
@@ -522,20 +504,15 @@
           "section": "CodeServicesSection.PluginStorage"
         },
         "description": "___________________( Español )___________________\n\nServicio utilizado para eliminar física y lógicamente un plugin del sistema base.\n\nParsea el identificador del payload y procede a solicitar la eliminación irreversible del registro en el manifiesto y su respectivo archivo en disco.\n\nNotas: Considera la cancelación asíncrona mediante Token antes de llamar al Manager, interrumpiendo el flujo si se pide cancelar.\n\nTips: Maneja las respuestas con códigos de error en caso de que la eliminación falle (ej. si está en uso o no se encuentra).\n\n___________________( English )___________________\n\nService used to physically and logically delete a plugin from the base system.\n\nParses the identifier from the payload and proceeds to request the irreversible deletion of the registry in the manifest and its respective file on disk.\n\nNotes: Considers asynchronous cancellation via Token before calling the Manager, interrupting the flow if cancellation is requested.\n\nTips: Handles responses with error codes in case the deletion fails (e.g., if it is in use or not found).\n\n",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "id": { "type": "string", "description": "Es: (Obligatorio) Cadena de texto (String) con el Guid identificador del plugin a borrar.\nEn: (Mandatory) Text string containing the Guid identifier of the plugin to delete." }
-                },
-                "required": ["id"]
-              }
-            }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena de texto (String) con el Guid identificador del plugin a borrar.\nEn: (Mandatory) Text string containing the Guid identifier of the plugin to delete."
           }
-        },
+        ],
         "responses": {
           "200": {
             "description": "Un InfoResponse de éxito si el archivo se purga correctamente, o un error interno de fallo.",
