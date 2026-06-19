@@ -41,6 +41,10 @@ public class TerbinProtocolResource
      */
 }
 
+// TODO: Invertarme mi propito tipos de petición.
+// https://developer.mozilla.org/es/docs/Web/HTTP/Reference/Methods
+
+
 public enum TerbinCRUD : byte
 {
     ReadAll = 250,

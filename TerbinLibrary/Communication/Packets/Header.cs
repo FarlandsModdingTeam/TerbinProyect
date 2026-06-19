@@ -28,6 +28,7 @@ namespace TerbinLibrary.Communication.Packets;
 /// Notes: This is an unmanaged memory structure layout built with Pack = 1.<br />
 /// Tips: Use it to define and parse basic routing information when transmitting data.<br />
 /// </summary>
+[TODO("Que el CodeStatus sea un byte en vez de un ushort")]
 [StructLayout(LayoutKind.Sequential, Pack = 1)]
 public struct Header // la memoria es constante es unmanaged.
 {
