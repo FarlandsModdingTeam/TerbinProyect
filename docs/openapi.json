@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Terbin Services API",
+    "title": "Terbin Services",
     "description": "Especificación OpenAPI oficial adaptada con las descripciones XML nativas y enlazada con los identificadores de ejecución binaria de Terbin de los atributos TerbinExecutable.",
-    "version": "1.0.0"
+    "version": "0.1.0"
   },
   "paths": {
     "/configuration/rute": {
@@ -76,9 +76,9 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "nameInstance": { "type": "string", "description": "Nombre de la instancia destino" },
-                  "dirGame": { "type": "string", "description": "Ruta de origen del juego" },
-                  "useProgress": { "type": "boolean", "default": false }
+                  "nameInstance": { "type": "string", "description": "Es: Nombre de la instancia destino (Obligatorio). \nEn: Name of the destination instance (Mandatory)." },
+                  "dirGame": { "type": "string", "description": "Es: Ruta o directorio de origen del juego a clonar (Obligatorio). \nEn: Source path or directory of the game to be cloned (Mandatory)." },
+                  "useProgress": { "type": "boolean", "default": false, "description": "Es: Bandera booleana para habilitar el progreso por paquetes (Opcional, si hay datos restantes). \nEn: Boolean flag to enable packet-based progress (Optional, if remaining data exists)." }
                 },
                 "required": ["nameInstance", "dirGame"]
               }
@@ -100,7 +100,7 @@
           "service": "CodeServices.Deleted",
           "section": "CodeServicesSection.Game"
         },
-        "description": "___________________( Español )___________________\n\nServicio que elimina los archivos de un juego vinculado a una instancia existente.\n\nDeserializa secuencialmente de los parámetros: el nombre de la instancia y, opcionalmente, si se requiere llevar un registro del progreso del borrado.\n\nNotas: Validará primeramente si la carpeta de la instancia realmente existe en el sistema antes de iniciar el borrado.\n\nTips: Asegúrate de detener la instancia antes de invocar este servicio para evitar conflictos de archivos bloqueados.\n\n___________________( English )___________________\n\nService that deletes the game files linked to an existing instance.\n\nSequentially deserializes from the parameters: the instance name, and optionally, whether to keep a record of the deletion progress.\n\nNotes: It will first validate if the instance folder actually exists on the system before attempting deletion.\n\nTips: Make sure to stop the instance before invoking this service to avoid locked file conflicts.\n\n.",
+        "description": "___________________( Español )___________________\n\nServicio que elimina los archivos de un juego vinculado a una instancia existente.\n\nDeserializa secuencialmente de los parámetros: el nombre de la instancia y, opcionalmente, si se requiere llevar un registro del progreso del borrado.\n\nNotas: Validará primeramente si la carpeta de la instancia realmente existe en el sistema antes de iniciar el borrado.\n\nTips: Asegúrate de detener la instancia antes de invocar este servicio para evitar conflictos de archivos bloqueados.\n\n___________________( English )___________________\n\nService that deletes the game files linked to an existing instance.\n\nSequentially deserializes from the parameters: the instance name, and optionally, whether to keep a record of the deletion progress.\n\nNotes: It will first validate if the instance folder actually exists on the system before attempting deletion.\n\nTips: Make sure to stop the instance before invoking this service to avoid locked file conflicts.\n\n",
         "requestBody": {
           "required": true,
           "content": {
@@ -108,8 +108,8 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "nameInstance": { "type": "string", "description": "Nombre de la instancia destino" },
-                  "useProgress": { "type": "boolean", "default": false }
+                  "nameInstance": { "type": "string", "description": "Es: Nombre de la instancia de la cual se eliminará el juego (Obligatorio). \nEn: Name of the instance from which the game will be deleted (Mandatory)." },
+                  "useProgress": { "type": "boolean", "default": false, "description": "Es: Bandera booleana para notificar el progreso de eliminación de archivos (Opcional, si hay datos restantes). \nEn: Boolean flag to notify file deletion progress (Optional, if remaining data exists)." }
                 },
                 "required": ["nameInstance"]
               }
@@ -139,7 +139,7 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "nameInstance": { "type": "string", "description": "Nombre de la instancia destino" }
+                  "nameInstance": { "type": "string", "description": "Es: Nombre de la instancia que contiene el juego a arrancar (Obligatorio). \nEn: Name of the instance containing the game to start (Mandatory)." }
                 },
                 "required": ["nameInstance"]
               }
@@ -158,7 +158,7 @@
         }
       }
     },
-    "/instances": {
+    "/CodeServices.Create/CodeServicesSection.Instances": {
       "post": {
         "summary": "CreateInstance",
         "operationId": "createInstance",
@@ -167,7 +167,7 @@
           "service": "CodeServices.Create",
           "section": "CodeServicesSection.Instances"
         },
-        "description": "Servicio encargado de crear una nueva instancia en el sistema.\n\nLee el nombre de la instancia desde el payload y, opcionalmente, la ruta de instalación.\n\nNotas: Cancela la operación si el token lo solicita antes de invocar al gestor de almacenamiento.",
+        "description": "___________________( Español )___________________\n\nServicio encargado de crear una nueva instancia en el sistema.\n\nLee el nombre de la instancia desde el payload y, opcionalmente, la ruta de instalación.\n\nNotas: Cancela la operación si el token lo solicita antes de invocar al gestor de almacenamiento.\n\nTips: Envía la ruta si deseas ubicar la instancia de forma absoluta fuera del directorio por defecto.\n\n___________________( English )___________________\n\nService responsible for creating a new instance in the system.\n\nReads the instance name from the payload and, optionally, the installation path.\n\nNotes: Cancels the operation if the token requests it before invoking the storage manager.\n\nTips: Send the path if you wish to locate the instance absolutely outside the default directory.\n\n",
         "requestBody": {
           "required": true,
           "content": {
@@ -175,20 +175,20 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string", "description": "Nombre de la instancia" },
-                  "path": { "type": "string", "description": "Ruta física opcional" }
+                  "name": { "type": "string", "description": "Es: Nombre de la nueva instancia (Obligatorio). \nEn: Name of the new instance (Mandatory)." },
+                  "path": { "type": "string", "description": "Es: Ruta física específica para crear la instancia (Opcional). \nEn: Specific physical path to create the instance (Optional)." }
                 },
                 "required": ["name"]
               }
             }
           }
         },
-        "responses": {
+        "responses/CodeServicesSection.Instances": {
           "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
           "500": { "$ref": "#/components/responses/InfoResponseError" }
         }
       },
-      "get": {
+      "/CodeServices.ReadAll/": {
         "summary": "GetAllInstances",
         "operationId": "getAllInstances",
         "tags": ["Instances"],
@@ -196,7 +196,7 @@
           "service": "CodeServices.ReadAll",
           "section": "CodeServicesSection.Instances"
         },
-        "description": "Recupera la lista completa de todas las instancias disponibles en el entorno de ejecución de Terbin.",
+        "description": "___________________( Español )___________________\n\nServicio que recupera la lista completa de instancias registradas en el índice del sistema.\n\nSerializa y devuelve un array compuesto por el conteo total seguido de objetos ReferenceInstanceDTO.\n\nNotas: Si no hay instancias registradas en el índice, devuelve un payload con un único byte nulo o de valor 0.\n\nTips: Ideal para inicializar la vista principal del cliente o refrescar el catálogo de juegos.\n\n___________________( English )___________________\n\nService that retrieves the complete list of instances registered in the system's index.\n\nSerializes and returns an array composed of the total count followed by ReferenceInstanceDTO objects.\n\nNotes: If there are no instances registered in the index, it returns a payload with a single null byte or 0 value.\n\nTips: Ideal for initializing the client's main view or refreshing the game catalog.\n\n",
         "responses": {
           "200": {
             "description": "Lista de ReferenceInstanceDTO",
@@ -212,7 +212,7 @@
         }
       }
     },
-    "/instances/{name}": {
+    "/CodeServices.Read/CodeServicesSection.Instances": {
       "get": {
         "summary": "GetOne Instance",
         "operationId": "getInstance",
@@ -221,14 +221,14 @@
           "service": "CodeServices.Read",
           "section": "CodeServicesSection.Instances"
         },
-        "description": "Servicio encargado de leer información detallada de una instancia y devuelve su manifiesto (ManifestInstance).\n\nNotas: Retorna un error interno tipificado si la instancia de destino no existe en el disco o falla su lectura.\n\nTips: Utilizarlo para cargar propiedades detalladas (como el conteo de plugins) antes de interactuar con la instancia.",
+        "description": "___________________( Español )___________________\n\nServicio utilizado para leer la información detallada de una única instancia.\n\nLee el nombre de la instancia solicitada desde el payload y recupera su manifiesto (ManifestInstance).\n\nNotas: Retorna un error interno tipificado si la instancia buscada no existe en disco o falla su lectura.\n\nTips: Utilízalo para cargar propiedades detalladas (como la cantidad de plugins) antes de interactuar con la instancia.\n\n___________________( English )___________________\n\nService used to read detailed information of a single instance.\n\nReads the requested instance name from the payload and retrieves its manifest (ManifestInstance).\n\nNotes: Returns a typed internal error if the targeted instance does not exist on disk or fails to be read.\n\nTips: Use it to load detailed properties (like plugin count) before interacting with the instance.\n\n",
         "parameters": [
           {
             "name": "name",
             "in": "path",
             "required": true,
             "schema": { "type": "string" },
-            "description": "Nombre de la instancia a consultar (Obligatorio)."
+            "description": "Es: Nombre de la instancia a consultar (Obligatorio). \nEn: Name of the instance to query (Mandatory)."
           }
         ],
         "responses": {
@@ -243,7 +243,7 @@
           "404": { "$ref": "#/components/responses/InfoResponseError" }
         }
       },
-      "delete": {
+      "/CodeServices.Deleted/CodeServicesSection.Instances": {
         "summary": "DeleteInstances",
         "operationId": "deleteInstance",
         "tags": ["Instances"],
@@ -251,13 +251,14 @@
           "service": "CodeServices.Deleted",
           "section": "CodeServicesSection.Instances"
         },
-        "description": "Elimina por completo del sistema la instancia indicada.",
+        "description": "___________________( Español )___________________\n\nServicio destinado a eliminar completamente una instancia existente y sus archivos.\n\nLee el nombre de la instancia a borrar directamente del payload recibido.\n\nNotas: Verifica errores detallados devueltos por el gestor para identificar si la ruta no existe, no era una instancia válida o si el borrado falló.\n\nTips: Esta acción es destructiva; asegúrate de pedir confirmación del usuario antes de enviar este comando.\n\n___________________( English )___________________\n\nService designed to completely delete an existing instance and its files.\n\nReads the name of the instance to be deleted directly from the received payload.\n\nNotes: Checks detailed errors returned by the manager to identify if the path does not exist, was not a valid instance, or if deletion failed.\n\nTips: This action is destructive; make sure to ask for user confirmation before sending this command.\n\n",
         "parameters": [
           {
             "name": "name",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string" },
+            "description": "Es: Nombre de la instancia a eliminar (Obligatorio). \nEn: Name of the instance to delete (Mandatory)."
           }
         ],
         "responses": {
@@ -266,7 +267,7 @@
         }
       }
     },
-    "/plugins/download": {
+    "/CodeServices.Dowload/CodeServicesSection.Plugin": {
       "post": {
         "summary": "DownloadPlugin",
         "operationId": "downloadPlugin",
@@ -275,7 +276,7 @@
           "service": "CodeServices.Download",
           "section": "CodeServicesSection.Plugin"
         },
-        "description": "Servicio encargado de exponer las operaciones de gestión y despliegue de plugins de forma ejecutable. Inicia la descarga de un recurso remoto.",
+        "description": "___________________( Español )___________________\n\nServicio encargado de procesar la solicitud de descarga de un plugin desde la red.\n\nValida el tamaño del recurso remoto y delega la tarea de descarga al gestor de plugins (Manager.Plugin).\n\nNotas: Si la descarga falla por falta de espacio o URL inválida, se devuelve un error interno categorizado.\n\nTips: Asegúrese de tener conexión a la red o permisos en el firewall antes de invocar este comando.\n\n___________________( English )___________________\n\nService in charge of processing the plugin download request from the network.\n\nValidates the remote resource size and delegates the download task to the plugin manager (Manager.Plugin).\n\nNotes: If the download fails due to lack of space or an invalid URL, a categorized internal error is returned.\n\nTips: Ensure you have network connectivity or firewall permissions before invoking this command.\n\n",
         "requestBody": {
           "required": true,
           "content": {
@@ -283,8 +284,8 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "urlPlugin": { "type": "string" },
-                  "useProgress": { "type": "boolean", "default": false }
+                  "urlPlugin": { "type": "string", "description": "Es: (Obligatorio) Cadena de caracteres que contiene la URL directa desde donde se descargará el plugin. \nEn: (Mandatory) Character string containing the direct URL from where the plugin will be downloaded." },
+                  "useProgress": { "type": "boolean", "default": false, "description": "Es: (Opcional) Valor booleano que indica si se debe inicializar un canal para reportar visualmente el progreso de la descarga. \nEn: (Optional) Boolean value indicating whether to initialize a channel to visually report the download progress." }
                 },
                 "required": ["urlPlugin"]
               }
@@ -297,7 +298,7 @@
         }
       }
     },
-    "/plugins/install": {
+    "/CodeServices.Install/CodeServicesSection.Plugin": {
       "post": {
         "summary": "InstallPlugin",
         "operationId": "installPlugin",
@@ -306,7 +307,7 @@
           "service": "CodeServices.Install",
           "section": "CodeServicesSection.Plugin"
         },
-        "description": "Despliega e instala un plugin previamente descargado dentro de la estructura de directorios de la instancia objetivo.",
+        "description": "___________________( Español )___________________\n\nServicio responsable de instalar un plugin previamente almacenado en una instancia de destino.\n\nDescomprime y ubica los archivos en la ruta relativa proporcionada dentro del directorio de la instancia.\n\nNotas: Valida la existencia de la instancia y genera una entrada en el manifiesto al finalizar con éxito.\n\nTips: La ruta relativa puede ser útil para organizar mods o plugins en diferentes subcarpetas soportadas por BePinEx u otros loaders.\n\n___________________( English )___________________\n\nService responsible for installing a previously stored plugin into a target instance.\n\nExtracts and places the files in the provided relative path within the instance's directory.\n\nNotes: Validates the existence of the instance and generates a manifest entry upon successful completion.\n\nTips: The relative path can be useful for organizing mods or plugins in different subfolders supported by BePinEx or other loaders.\n\n",
         "requestBody": {
           "required": true,
           "content": {
@@ -314,10 +315,10 @@
               "schema": {
                 "type": "object",
                 "properties": {
-                  "name": { "type": "string" },
-                  "idPlugin": { "type": "string" },
-                  "relativePath": { "type": "string" },
-                  "useProgress": { "type": "boolean", "default": false }
+                  "name": { "type": "string", "description": "Es: (Obligatorio) Cadena de caracteres con el nombre de la instancia donde se realizará la instalación. \nEn: (Mandatory) Character string with the name of the instance where the installation will take place." },
+                  "idPlugin": { "type": "string", "description": "Es: (Obligatorio) Identificador único en el almacenamiento (Storage) que hace referencia al plugin descargado. \nEn: (Mandatory) Unique identifier in the Storage referencing the downloaded plugin." },
+                  "relativePath": { "type": "string", "description": "Es: (Obligatorio) Ruta relativa dentro de la instancia donde se desempaquetarán los archivos. \nEn: (Mandatory) Relative path within the instance where the files will be unpacked." },
+                  "useProgress": { "type": "boolean", "default": false, "description": "Es: (Opcional) Valor booleano que habilita la emisión de paquetes de progreso durante la extracción del plugin. \nEn: (Optional) Boolean value that enables the emission of progress packets during the plugin extraction." }
                 },
                 "required": ["name", "idPlugin", "relativePath"]
               }
@@ -330,7 +331,7 @@
         }
       }
     },
-    "/plugins/instances/{nameInstance}": {
+    "/CodeServices.ReadAll/CodeServicesSection.Plugin": {
       "get": {
         "summary": "GetAll Plugins",
         "operationId": "getAllPluginsInInstance",
@@ -339,13 +340,14 @@
           "service": "CodeServices.ReadAll",
           "section": "CodeServicesSection.Plugin"
         },
-        "description": "Obtiene la relación completa de todos los manifiestos de plugins vinculados a una instancia activa.",
+        "description": "___________________( Español )___________________\n\nServicio que recupera la lista completa de todos los plugins registrados e instalados en una instancia.\n\nLee el manifiesto de la instancia solicitada, procesa los manifiestos individuales y los empaca en una estructura serializada.\n\nNotas: Si la instancia no contiene plugins, devolverá una respuesta exitosa con una carga útil equivalente a un array vacío.\n\nTips: Utiliza este servicio para renderizar interfaces de inventario o catálogos de mods de los usuarios.\n\n___________________( English )___________________\n\nService that retrieves the complete list of all registered and installed plugins in an instance.\n\nReads the requested instance's manifest, processes the individual manifests, and packs them into a serialized structure.\n\nNotes: If the instance contains no plugins, it will return a successful response with a payload equivalent to an empty array.\n\nTips: Use this service to render inventory interfaces or user mod catalogs.\n\n",
         "parameters": [
           {
             "name": "nameInstance",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena de caracteres que define el nombre de la instancia a escanear. \nEn: (Mandatory) Character string defining the name of the instance to scan."
           }
         ],
         "responses": {
@@ -363,7 +365,7 @@
         }
       }
     },
-    "/plugins/instances/{nameInstance}/{id}": {
+    "/CodeServices.Read/CodeServicesSection.Plugin": {
       "get": {
         "summary": "GetOne Plugin",
         "operationId": "getOnePluginInInstance",
@@ -372,19 +374,21 @@
           "service": "CodeServices.Read",
           "section": "CodeServicesSection.Plugin"
         },
-        "description": "Localiza y lee las propiedades específicas de un plugin instalado haciendo uso de su identificador único dentro del entorno de la instancia.",
+        "description": "___________________( Español )___________________\n\nServicio enfocado en obtener la información detallada (manifiesto local) de un plugin en particular dentro de una instancia.\n\nValida las rutas de configuración de la instancia y localiza el archivo JSON asociado al identificador proporcionado.\n\nNotas: Es una operación de lectura pasiva; no altera el estado de la instancia ni de los archivos en disco.\n\nTips: Ideal para verificar el estado, versión o metadatos de un mod antes de actualizarlo o modificarlo.\n\n___________________( English )___________________\n\nService focused on obtaining the detailed information (local manifest) of a particular plugin within an instance.\n\nValidates the instance configuration paths and locates the JSON file associated with the provided identifier.\n\nNotes: This is a passive read operation; it does not alter the state of the instance or disk files.\n\nTips: Ideal for verifying the state, version, or metadata of a mod before updating or modifying it.\n\n",
         "parameters": [
           {
             "name": "nameInstance",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena de caracteres correspondiente al nombre de la instancia objetivo. \nEn: (Mandatory) Character string corresponding to the target instance name."
           },
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Identificador local (IdLocal) que señala unívocamente al plugin que se desea leer. \nEn: (Mandatory) Local identifier (IdLocal) that uniquely points to the plugin to be read."
           }
         ],
         "responses": {
@@ -398,7 +402,7 @@
           "404": { "$ref": "#/components/responses/InfoResponseError" }
         }
       },
-      "delete": {
+      "/CodeServices.Deleted/CodeServicesSection.Plugin": {
         "summary": "Delete Plugin",
         "operationId": "deletePluginFromInstance",
         "tags": ["Plugins"],
@@ -406,25 +410,28 @@
           "service": "CodeServices.Deleted",
           "section": "CodeServicesSection.Plugin"
         },
-        "description": "Desinstala de forma segura el plugin asignado a la instancia. Si 'useProgress' es verdadero, calcula dinámicamente el progreso sobre el tamaño físico ocupado por el plugin.",
+        "description": "___________________( Español )___________________\n\nServicio destinado a desinstalar y purgar de manera física o lógica un plugin asociado a una instancia de ejecución específica.\n\nResuelve la ruta raíz de la instancia, valida el manifiesto de la misma y remueve los archivos del plugin, permitiendo opcionalmente reportar el progreso del borrado.\n\nNotas: Evalúa activamente el estado del token de cancelación en puntos críticos del flujo para evitar corrupciones de datos en disco.\n\nTips: Activar el indicador de progreso generará llamadas en tiempo real al backend de comunicación para actualizar la interfaz del cliente.\n\n___________________( English )___________________\n\nService intended to physically or logically uninstall and purge a plugin associated with a specific execution instance.\n\nResolves the root folder path of the instance, validates its manifest, and removes the plugin files, optionally allowing progress reporting.\n\nNotes: Actively evaluates the status of the cancellation token at critical flow checkpoints to avoid disk data corruption.\n\nTips: Enabling the progress flag will trigger real-time updates through the communication backend to refresh the client interface.\n\n",
         "parameters": [
           {
             "name": "nameInstance",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena de caracteres que indica el nombre de la instancia de la cual se va a desinstalar el recurso. \nEn: (Mandatory) Character string indicating the name of the instance from which the resource will be uninstalled."
           },
           {
             "name": "id",
             "in": "path",
             "required": true,
-            "schema": { "type": "string" }
+            "schema": { "type": "string" },
+            "description": "Es: (Obligatorio) Cadena identificadora que localiza unívocamente el plugin específico dentro del manifiesto de la instancia. \nEn: (Mandatory) Identifier string that uniquely locates the specific plugin inside the instance's manifest."
           },
           {
             "name": "useProgress",
             "in": "query",
             "required": false,
-            "schema": { "type": "boolean", "default": false }
+            "schema": { "type": "boolean", "default": false },
+            "description": "Es: (Opcional) Valor booleano que define si se inicializará un canal de reporte visual del progreso de eliminación. \nEn: (Optional) Boolean value defining whether a visual progress reporting channel will be initialized for the deletion."
           }
         ],
         "responses": {
@@ -433,16 +440,16 @@
         }
       }
     },
-    "/plugin-storage": {
+    "/CodeServices.ReadAll/CodeServicesSection.PluginStorage": {
       "get": {
-        "summary": "ServicePluginStorage.GetAll",
+        "summary": "ServicePluginStorage.GetAll (ReadAll)",
         "operationId": "getPluginStorageAll",
         "tags": ["PluginStorage"],
         "x-terbin-executable": {
-          "service": "CodeServices.Read",
+          "service": "CodeServices.ReadAll",
           "section": "CodeServicesSection.PluginStorage"
         },
-        "description": "Servicio encargado de leer y devolver la lista completa de todos los plugins guardados en el almacenamiento del sistema.\n\nConstruye una respuesta empaquetando un conteo inicial seguido de la estructura serializada de cada plugin.\n\nNotas: A pesar de llamarse \"GetOne\" internamente en el código C#, la lógica interna y su código de servicio real corresponden conceptualmente a un \"ReadAll\". Retorna un byte [0] si el almacén está vacío.\n\nTips: Ideal para actualizar el inventario o la interfaz gráfica del cliente con los plugins disponibles localmente.",
+        "description": "___________________( Español )___________________\n\nServicio encargado de leer y devolver la lista completa de todos los plugins guardados en el almacenamiento del sistema.\n\nConstruye una respuesta empaquetando un conteo inicial seguido de la estructura serializada de cada plugin.\n\nNotas: A pesar de llamarse \"GetOne\", la lógica interna y su código de servicio corresponden a \"ReadAll\". Retorna un byte [0] si el almacén está vacío.\n\nTips: Ideal para actualizar el inventario o la interfaz gráfica del cliente con los plugins disponibles localmente.\n\n___________________( English )___________________\n\nService in charge of reading and returning the complete list of all plugins saved in the system's storage.\n\nBuilds a response packing an initial count followed by the serialized structure of each plugin.\n\nNotes: Despite being named \"GetOne\", the internal logic and its service code correspond to \"ReadAll\". Returns a [0] byte if the storage is empty.\n\nTips: Ideal for updating the inventory or the client's graphical interface with locally available plugins.\n\n",
         "responses": {
           "200": {
             "description": "Array de ReferencePluginStoreDTO",
@@ -458,23 +465,23 @@
         }
       }
     },
-    "/plugin-storage/{id}": {
+    "/CodeServices.Read/CodeServicesSection.PluginStorage": {
       "get": {
-        "summary": "ServicePluginStorage.GetOne",
+        "summary": "ServicePluginStorage.GetOne (Read One)",
         "operationId": "getPluginStorageOne",
         "tags": ["PluginStorage"],
         "x-terbin-executable": {
           "service": "CodeServices.Read",
           "section": "CodeServicesSection.PluginStorage"
         },
-        "description": "Recupera los datos de un único plugin persistido en el inventario global de almacenamiento por medio de su Guid identificador.",
+        "description": "___________________( Español )___________________\n\nServicio destinado a recuperar la información individual de un único plugin almacenado.\n\nExtrae el identificador del payload y busca la referencia exacta en los registros de almacenamiento de plugins.\n\nNotas: Aunque el método se llame \"GetAll\", actúa como un lector específico (Read) evaluando un único ID.\n\nTips: Controla internamente si el plugin no existe devolviendo un error de tipo PluginNotExist.\n\n___________________( English )___________________\n\nService intended to retrieve the individual information of a single stored plugin.\n\nExtracts the identifier from the payload and searches for the exact reference in the plugin storage records.\n\nNotes: Even though the method is named \"GetAll\", it acts as a specific reader (Read) evaluating a single ID.\n\nTips: Internally handles if the plugin does not exist by returning a PluginNotExist error type.\n\n",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": { "type": "string" },
-            "description": "Guid identificador del plugin en almacenamiento."
+            "description": "Es: (Obligatorio) Cadena de texto (String) con el Guid identificador del plugin.\nEn: (Mandatory) Text string containing the plugin's identifying Guid."
           }
         ],
         "responses": {
@@ -488,7 +495,7 @@
           "404": { "$ref": "#/components/responses/InfoResponseError" }
         }
       },
-      "delete": {
+      "/CodeServices.Deleted/CodeServicesSection.PluginStorage": {
         "summary": "ServicePluginStorage.Delete",
         "operationId": "deletePluginStorage",
         "tags": ["PluginStorage"],
@@ -496,14 +503,14 @@
           "service": "CodeServices.Deleted",
           "section": "CodeServicesSection.PluginStorage"
         },
-        "description": "Elimina física y lógicamente un plugin del almacenamiento.\n\nInterrumpe el flujo de ejecución si se solicita la cancelación de la tarea mediante el token.\n\nTips: Maneja internamente las respuestas con códigos de error específicos en caso de que la eliminación falle (por ejemplo, si el recurso está actualmente en uso o no es encontrado).",
+        "description": "___________________( Español )___________________\n\nServicio utilizado para eliminar física y lógicamente un plugin del sistema base.\n\nParsea el identificador del payload y procede a solicitar la eliminación irreversible del registro en el manifiesto y su respectivo archivo en disco.\n\nNotas: Considera la cancelación asíncrona mediante Token antes de llamar al Manager, interrumpiendo el flujo si se pide cancelar.\n\nTips: Maneja las respuestas con códigos de error en caso de que la eliminación falle (ej. si está en uso o no se encuentra).\n\n___________________( English )___________________\n\nService used to physically and logically delete a plugin from the base system.\n\nParses the identifier from the payload and proceeds to request the irreversible deletion of the registry in the manifest and its respective file on disk.\n\nNotes: Considers asynchronous cancellation via Token before calling the Manager, interrupting the flow if cancellation is requested.\n\nTips: Handles responses with error codes in case the deletion fails (e.g., if it is in use or not found).\n\n",
         "parameters": [
           {
             "name": "id",
             "in": "path",
             "required": true,
             "schema": { "type": "string" },
-            "description": "(Obligatorio) Cadena de texto (String) con el Guid identificador del plugin a borrar."
+            "description": "Es: (Obligatorio) Cadena de texto (String) con el Guid identificador del plugin a borrar.\nEn: (Mandatory) Text string containing the Guid identifier of the plugin to delete."
           }
         ],
         "responses": {

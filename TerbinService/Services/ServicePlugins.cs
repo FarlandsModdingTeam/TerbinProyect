@@ -297,6 +297,7 @@ internal static class ServicePlugins
     /// <param name="id">Es: (Obligatorio) Cadena identificadora que localiza unívocamente el plugin específico dentro del manifiesto de la instancia. <br />En: (Mandatory) Identifier string that uniquely locates the specific plugin inside the instance's manifest.</param>
     /// <param name="useProgress">Es: (Opcional) Valor booleano que define si se inicializará un canal de reporte visual del progreso de eliminación. <br />En: (Optional) Boolean value defining whether a visual progress reporting channel will be initialized for the deletion.</param>
     /// <returns>Es: Un InfoResponse de éxito si el proceso concluye correctamente, o errores internos correspondientes a InstanceNotExist, ManifestGet o PluginGet. <br />En: A success InfoResponse if the process concludes cleanly, or internal errors relating to InstanceNotExist, ManifestGet, or PluginGet.</returns>[TerbinExecutable((byte)CodeServices.Deleted, (byte)CodeServicesSection.Plugin)]
+    [TerbinExecutable((byte)CodeServices.Deleted, (byte)CodeServicesSection.Plugin)]
     public static async Task<InfoResponse?> Delete(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)

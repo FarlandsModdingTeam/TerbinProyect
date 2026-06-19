@@ -98,6 +98,7 @@ internal class ServicePluginStorage
     /// </summary>
     /// <param name="id">Es: (Obligatorio) Cadena de texto (String) con el Guid identificador del plugin a borrar.<br />En: (Mandatory) Text string containing the Guid identifier of the plugin to delete.</param>
     /// <returns>Es: Un InfoResponse de éxito si el archivo se purga correctamente, o un error interno de fallo.<br />En: A success InfoResponse if the file is correctly purged, or an internal error upon failure.</returns>[TerbinExecutable((byte)CodeServices.Deleted, (byte)CodeServicesSection.PluginStorage)]
+    [TerbinExecutable((byte)CodeServices.Deleted, (byte)CodeServicesSection.PluginStorage)]
     public static async Task<InfoResponse?> Delete(Header pHead, byte[] pParameters, CancellationToken pToken)
     {
         if (pParameters.Length <= 0)
