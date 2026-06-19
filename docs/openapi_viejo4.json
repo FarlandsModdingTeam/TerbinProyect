@@ -65,7 +65,7 @@
         }
       }
     },
-    "/CodeServices.Clone/CodeServicesSection.Game": {
+    "/CodeServices.Duplicate/CodeServicesSection.Game": {
       "post": {
         "summary": "CloneGame",
         "operationId": "cloneGame",
@@ -106,7 +106,7 @@
           "service": "CodeServices.Deleted",
           "section": "CodeServicesSection.Game"
         },
-        "description": "___________________( Español )___________________\n\nServicio que elimina los archivos de un juego vinculado a una instancia existente.\n\nDeserializa secuencialmente de los parámetros: el nombre de la instancia y, opcionalmente, si se requiere llevar un registro del progreso del borrado.\n\nNotas: Validará primeramente si la carpeta de la instancia realmente existe del sistema antes de iniciar el borrado.\n\nTips: Asegúrate de detener la instancia antes de invocar este servicio para evitar conflictos de archivos bloqueados.\n\n___________________( English )___________________\n\nService that deletes the game files linked to an existing instance.\n\nSequentially deserializes from the parameters: the instance name, and optionally, whether to keep a record of the deletion progress.\n\nNotes: It will first validate if the instance folder actually exists on the system before attempting deletion.\n\nTips: Make sure to stop the instance before invoking this service to avoid locked file conflicts.\n\n",
+        "description": "___________________( Español )___________________\n\nServicio que elimina los archivos de un juego vinculado a una instancia existente.\n\nDeserializa secuencialmente de los parámetros: el nombre de la instancia y, opcionalmente, si se requiere llevar un registro del progreso del borrado.\n\nNotas: Validará primeramente si la carpeta de la instancia realmente existe en el sistema antes de iniciar el borrado.\n\nTips: Asegúrate de detener la instancia antes de invocar este servicio para evitar conflictos de archivos bloqueados.\n\n___________________( English )___________________\n\nService that deletes the game files linked to an existing instance.\n\nSequentially deserializes from the parameters: the instance name, and optionally, whether to keep a record of the deletion progress.\n\nNotes: It will first validate if the instance folder actually exists on the system before attempting deletion.\n\nTips: Make sure to stop the instance before invoking this service to avoid locked file conflicts.\n\n",
         "requestBody": {
           "required": true,
           "content": {
@@ -153,8 +153,14 @@
           }
         },
         "responses": {
-          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
-          "500": { "$ref": "#/components/responses/InfoResponseError" }
+          "200": {
+            "description": "Retorna éxito si el proceso arranca, o un código de error si el manejador falla al inicializarlo.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InfoResponse" }
+              }
+            }
+          }
         }
       }
     },
@@ -183,14 +189,12 @@
             }
           }
         },
-        "responses": {
+        "responses/CodeServicesSection.Instances": {
           "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
           "500": { "$ref": "#/components/responses/InfoResponseError" }
         }
-      }
-    },
-    "/CodeServices.ReadAll/CodeServicesSection.Instances": {
-      "get": {
+      },
+      "/CodeServices.ReadAll/": {
         "summary": "GetAllInstances",
         "operationId": "getAllInstances",
         "tags": ["Instances"],
@@ -240,7 +244,7 @@
         },
         "responses": {
           "200": {
-            "description": "Un InfoResponse de éxito con el ManifestInstanceDTO serializado.",
+            "description": "Un InfoResponse de éxito con el ManifestInstanceDTO serializado o un error interno.",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/ManifestInstanceDTO" }
@@ -249,11 +253,9 @@
           },
           "404": { "$ref": "#/components/responses/InfoResponseError" }
         }
-      }
-    },
-    "/CodeServices.Deleted/CodeServicesSection.Instances": {
-      "delete": {
-        "summary": "DeleteInstance",
+      },
+      "/CodeServices.Deleted/CodeServicesSection.Instances": {
+        "summary": "DeleteInstances",
         "operationId": "deleteInstance",
         "tags": ["Instances"],
         "x-terbin-executable": {
@@ -281,7 +283,7 @@
         }
       }
     },
-    "/CodeServices.Download/CodeServicesSection.Plugin": {
+    "/CodeServices.Dowload/CodeServicesSection.Plugin": {
       "post": {
         "summary": "DownloadPlugin",
         "operationId": "downloadPlugin",
@@ -419,10 +421,8 @@
           },
           "404": { "$ref": "#/components/responses/InfoResponseError" }
         }
-      }
-    },
-    "/CodeServices.Deleted/CodeServicesSection.Plugin": {
-      "delete": {
+      },
+      "/CodeServices.Deleted/CodeServicesSection.Plugin": {
         "summary": "Delete Plugin",
         "operationId": "deletePluginFromInstance",
         "tags": ["Plugins"],
@@ -455,7 +455,7 @@
     },
     "/CodeServices.ReadAll/CodeServicesSection.PluginStorage": {
       "get": {
-        "summary": "ServicePluginStorage.GetAll",
+        "summary": "ServicePluginStorage.GetAll (ReadAll)",
         "operationId": "getPluginStorageAll",
         "tags": ["PluginStorage"],
         "x-terbin-executable": {
@@ -480,7 +480,7 @@
     },
     "/CodeServices.Read/CodeServicesSection.PluginStorage": {
       "get": {
-        "summary": "ServicePluginStorage.GetOne",
+        "summary": "ServicePluginStorage.GetOne (Read One)",
         "operationId": "getPluginStorageOne",
         "tags": ["PluginStorage"],
         "x-terbin-executable": {
@@ -512,10 +512,8 @@
           },
           "404": { "$ref": "#/components/responses/InfoResponseError" }
         }
-      }
-    },
-    "/CodeServices.Deleted/CodeServicesSection.PluginStorage": {
-      "delete": {
+      },
+      "/CodeServices.Deleted/CodeServicesSection.PluginStorage": {
         "summary": "ServicePluginStorage.Delete",
         "operationId": "deletePluginStorage",
         "tags": ["PluginStorage"],
@@ -539,8 +537,14 @@
           }
         },
         "responses": {
-          "200": { "$ref": "#/components/responses/InfoResponseSuccess" },
-          "500": { "$ref": "#/components/responses/InfoResponseError" }
+          "200": {
+            "description": "Un InfoResponse de éxito si el archivo se purga correctamente, o un error interno de fallo.",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/InfoResponse" }
+              }
+            }
+          }
         }
       }
     }
