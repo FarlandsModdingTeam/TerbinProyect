@@ -40,7 +40,7 @@ public static class TerbinExecutableHelper
         );
     }
 
-
+    [TODO("Por alguna razon registra metódos que no tiene atributo")]
     public static void RegisterFromAssembly<T, E>(Assembly pAssembly, E pExecutor)
         where T : Attribute, IExecutableAttribute
         where E : IExecutableDispatcher 
