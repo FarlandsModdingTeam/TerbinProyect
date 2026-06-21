@@ -36,14 +36,11 @@ Console.WriteLine($"Ponga en false el if para activarlo.");
 await pressAnyKeyToContinue();
 
 #else
+
 var communicator = new TerbinCommunicator(false);
 TerbinExecutor.Register(Assembly.GetExecutingAssembly());
 communicator.OnRecive += async p =>
 {
-    //CurrentConst.Value = new AmongInfoThreads
-    //{
-    //    Communicator = communicator,
-    //};
     return await TerbinExecutableManager.DispatchAsync(p.Head, p.Payload, p.ActionMethod);
 };
 
