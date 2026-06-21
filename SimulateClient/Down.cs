@@ -30,7 +30,7 @@ internal class Down : ITests
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            await Helper.IsError(r.Head.Status);
+            await Helper.IsError(r);
         }
 
 
@@ -44,7 +44,7 @@ internal class Down : ITests
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            await Helper.IsError(r.Head.Status);
+            await Helper.IsError(r);
         }
 
 
@@ -58,7 +58,7 @@ internal class Down : ITests
 
             Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            await Helper.IsError(r.Head.Status);
+            await Helper.IsError(r);
         }
 
 
@@ -82,7 +82,7 @@ internal class Down : ITests
                 PacketRequest r = await p;
                 Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
                 Helper.PrintMethod(r.ActionMethod);
-                await Helper.IsError(r.Head.Status);
+                await Helper.IsError(r);
             });
 
         }
@@ -98,7 +98,7 @@ internal class Down : ITests
                 PacketRequest r = await p;
                 Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
                 Helper.PrintMethod(r.ActionMethod);
-                await Helper.IsError(r.Head.Status);
+                await Helper.IsError(r);
             });
         }
 
@@ -112,7 +112,7 @@ internal class Down : ITests
             {
                 PacketRequest r = await p;
                 Console.Log($"[Client] {c++} R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-                if (await Helper.IsError(r.Head.Status)) return;
+                if (await Helper.IsError(r)) return;
             });
         }
 
@@ -141,7 +141,7 @@ internal class Down : ITests
             PacketRequest r = await p;
             Console.Log($"[Client] Result (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
             Helper.PrintMethod(r.ActionMethod);
-            if (await Helper.IsError(r.Head.Status)) return;
+            if (await Helper.IsError(r)) return;
 
 
             Console.Succes("Descargado Correctamente");

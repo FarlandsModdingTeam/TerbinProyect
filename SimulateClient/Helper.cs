@@ -13,6 +13,7 @@ static class Helper
 {
     //public static Lock LockRead = new();
 
+    [Obsolete("Pase el PacketRequest", true)]
     public static async Task<bool> IsError(CodeStatus pStatus)
     {
         if (pStatus != CodeStatus.Succes)

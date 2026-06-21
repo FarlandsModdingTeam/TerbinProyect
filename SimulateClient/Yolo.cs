@@ -39,7 +39,7 @@ static class Yolo
                     .AddArray(TerbinConfiguration.RUTE_INSTANCES.ToCharArray());
         r = await pCommunicator.Communicate(new IdArray(TerbinCRUD.Read, CodeSubServices.Rute), s.Serialize());
         Console.WriteLine($"[Client] 1 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (await Helper.IsError(r.Head.Status)) return;
+        if (await Helper.IsError(r)) return;
 
         ReadOnlySpan<byte> reader = r.Payload;
         pathInstaces = reader.ReadArray<char>().CrString();
@@ -51,7 +51,7 @@ static class Yolo
                     .AddArray(TerbinConfiguration.RUTE_FARLANDS.ToCharArray());
         r = await pCommunicator.Communicate(new(TerbinCRUD.Read, CodeSubServices.Rute), s.Serialize());
         Console.WriteLine($"[Client] 2 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (await Helper.IsError(r.Head.Status)) return;
+        if (await Helper.IsError(r)) return;
 
         ReadOnlySpan<byte> reader1 = r.Payload;
         pathFarlands = reader1.ReadArray<char>().CrString();
@@ -63,7 +63,7 @@ static class Yolo
                     .AddArray(nameInstace.ToCharArray());
         r = await pCommunicator.Communicate(new(TerbinCRUD.Create, CodeSubServices.Instances), s.Serialize());
         Console.WriteLine($"[Client] 3 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (await Helper.IsError(r.Head.Status)) return;
+        if (await Helper.IsError(r)) return;
 
 
         await Helper.PressAnyKeyToContinue();
@@ -73,7 +73,7 @@ static class Yolo
                     .AddArray(pathFarlands.ToCharArray());
         r = await pCommunicator.Communicate(new(TerbinCRUD.Duplicate, CodeSubServices.Game), s.Serialize());
         Console.WriteLine($"[Client] 4 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (await Helper.IsError(r.Head.Status)) return;
+        if (await Helper.IsError(r)) return;
 
 
         await Helper.PressAnyKeyToContinue();
@@ -84,7 +84,7 @@ static class Yolo
                     .Add(false);
         r = await pCommunicator.Communicate(new(CodeServices.Install, CodeSubServices.Plugin), s.Serialize());
         Console.WriteLine($"[Client] 5 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (await Helper.IsError(r.Head.Status)) return;
+        if (await Helper.IsError(r)) return;
 
 
         await Helper.PressAnyKeyToContinue();
@@ -95,7 +95,7 @@ static class Yolo
                     .Add(true);
         r = await pCommunicator.Communicate(new(CodeServices.Install, CodeSubServices.Plugin), s.Serialize());
         Console.WriteLine($"[Client] 6 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (await Helper.IsError(r.Head.Status)) return;
+        if (await Helper.IsError(r)) return;
 
 
         await Helper.PressAnyKeyToContinue();
@@ -106,7 +106,7 @@ static class Yolo
                     .Add(true);
         r = await pCommunicator.Communicate(new(CodeServices.Install, CodeSubServices.Plugin), s.Serialize());
         Console.WriteLine($"[Client] 7 R (Action: {r.ActionMethod} | Status: {r.Head.Status} | Memory: {r.Head.IdMemory})");
-        if (await Helper.IsError(r.Head.Status)) return;
+        if (await Helper.IsError(r)) return;
 
 
         Console.WriteLine($"[Client] 8 Final -----------------------------------------------------------");
