@@ -24,7 +24,7 @@ internal class Plug : ITests
         throw new NotImplementedException();
     }
 
-
+    [TODO("Si lo añades sin juego se instala en la raiz de la instancia")]
     public static async Task Add(TerbinCommunicator pCommunicator)
     {
         Console.Write($"-------( Plugin )---------\n" +
