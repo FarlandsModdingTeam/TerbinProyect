@@ -329,7 +329,7 @@ public static class NodeUtil
     public static List<string> GetAllDirectories(string pDir)
     {
         if (!Directory.Exists(pDir))
-            throw new Exception("Not Exist Directory");
+            return new List<string>();
         return Directory.EnumerateDirectories(pDir, "*", SearchOption.AllDirectories).ToList();
     }
 
@@ -344,7 +344,7 @@ public static class NodeUtil
     public static List<string> GetAllExeFiles(string pDir)
     {
         if (!Directory.Exists(pDir))
-            throw new Exception("Not Exist Directory");
+            return new List<string>();
 
         return Directory.EnumerateFiles(pDir, "*", SearchOption.AllDirectories)
             .Where(file => file.EndsWith(".exe", StringComparison.OrdinalIgnoreCase))
