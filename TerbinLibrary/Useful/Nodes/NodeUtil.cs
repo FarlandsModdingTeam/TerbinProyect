@@ -314,7 +314,7 @@ public static class NodeUtil
     public static List<string> GetAllFiles(string pDir)
     {
         if (!Directory.Exists(pDir))
-            throw new Exception("Not Exist Directory");
+            return new List<string>();
         return Directory.EnumerateFiles(pDir, "*", SearchOption.AllDirectories).ToList();
     }
 
